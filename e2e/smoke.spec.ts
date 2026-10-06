@@ -32,6 +32,21 @@ test("sealing casts the Patri with the golden numbers", async ({ page }) => {
   await expect(page.getByText(/Based on classical Jyotisha/)).toBeVisible();
 });
 
+test("brass drums are spinbuttons and refuse 31 February", async ({ page }) => {
+  await page.goto("#/leaf/new");
+  await page.getByRole("button", { name: /house example/i }).click();
+  const month = page.getByRole("spinbutton", { name: "Month" });
+  const day = page.getByRole("spinbutton", { name: "Day" });
+  await month.focus();
+  await page.keyboard.press("ArrowDown"); // March → February
+  await expect(month).toHaveAttribute("aria-valuenow", "2");
+  await day.focus();
+  await page.keyboard.press("End"); // ask for the 31st
+  await expect(day).toHaveAttribute("aria-valuenow", "14"); // refused, not clamped to 28
+  await page.keyboard.press("PageUp"); // 14 → 24 is a real date
+  await expect(day).toHaveAttribute("aria-valuenow", "24");
+});
+
 test("a short press on the seal saves nothing", async ({ page }) => {
   await page.goto("#/leaf/new");
   await page.getByRole("button", { name: /house example/i }).click();

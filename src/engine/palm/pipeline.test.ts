@@ -110,9 +110,9 @@ describe("line extraction on synthetic palms (§10.5)", () => {
 // ─── the OpenCV path (the worker's), in Node ─────────────────────────────────
 // Boxed: the emscripten Module is a thenable, so resolving a promise WITH it recurses forever.
 let cvPromise: Promise<{ cv: CvLike | null }> | null = null;
-async function loadCv(): Promise<CvLike | null> {
+function loadCv(): Promise<{ cv: CvLike | null }> {
   cvPromise ??= loadCvOnce();
-  return (await cvPromise).cv;
+  return cvPromise;
 }
 async function loadCvOnce(): Promise<{ cv: CvLike | null }> {
   try {
@@ -131,7 +131,7 @@ async function loadCvOnce(): Promise<{ cv: CvLike | null }> {
 
 describe("OpenCV ops (worker path)", () => {
   it("every cv.Mat constructed is deleted (delta 0), and the cv path is as honest", async (ctx) => {
-    const cv = await loadCv();
+    const { cv } = await loadCv();
     if (!cv) return ctx.skip();
     for (const name of ["synthetic-clean", "synthetic-blur"] as const) {
       const ops = makeCvOps(cv);
@@ -148,7 +148,7 @@ describe("OpenCV ops (worker path)", () => {
   });
 
   it("the delta stays 0 when a step throws mid-way", async (ctx) => {
-    const cv = await loadCv();
+    const { cv } = await loadCv();
     if (!cv) return ctx.skip();
     const ops = makeCvOps(cv);
     // more data than the Mat holds: Mat.data.set() throws after the Mat was constructed
