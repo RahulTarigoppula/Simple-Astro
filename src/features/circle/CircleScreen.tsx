@@ -22,7 +22,7 @@ import { ThreadKnot } from "./ThreadKnot";
 import "./circle.css";
 
 const STEP = LEAF_H + 12;
-const TIED_STEP = 18;
+const TIED_STEP = 38; // a covered leaf still shows its name and nakṣatra line
 const FAN_DEG = 12;
 const FAN_X = 18;
 const HOLE_X = 22;
@@ -160,7 +160,7 @@ export default function CircleScreen() {
   if (n === 0) {
     return (
       <Screen className="circle circle--empty" label="The leaf bundle — empty">
-        <div className="circle__col">
+        <div className="paper paper--cut sheet-col circle__col">
           <h1 className="circle__empty-h display">Write your first leaf</h1>
           <p className="circle__empty-p">
             The bundle is empty. A leaf holds one person's birth — date, time, place — and everything here is cast from it, on this device.
@@ -173,8 +173,8 @@ export default function CircleScreen() {
 
   return (
     <Screen className="circle" label="The leaf bundle">
-      <div className="circle__col">
-        <header className="paper circle__head">
+      <div className="paper paper--cut sheet-col circle__col">
+        <header className="circle__head">
           <TurmericBand
             level={1}
             dev="पोथी"
@@ -185,14 +185,17 @@ export default function CircleScreen() {
               </>
             }
           />
-          <p className="circle__hint">
-            {tied ? "Pull the thread's end to untie the bundle." : "Tap a leaf to open its patri · swipe left or ⋯ for more."}{" "}
-            <button type="button" className="linkish" onClick={toggle} aria-pressed={!tied}>
+          <div className="circle__hintrow">
+            <p className="circle__hint">
+              {tied ? "Pull the thread's end — or press Untie — to fan the leaves." : "Tap a leaf to open its patri · swipe left or ⋯ for more."}
+            </p>
+            <button type="button" className="circle__toggle" onClick={toggle} aria-pressed={!tied}>
               {tied ? "Untie" : "Tie it up"}
             </button>
-          </p>
+          </div>
         </header>
 
+        <div className="circle__desk">
         <section className={`bundle${tied ? " is-tied" : " is-untied"}`} aria-label={`Bundle of ${n} ${n === 1 ? "leaf" : "leaves"}`}>
           <div className="board board--top" aria-hidden="true" data-decorative="true">
             <span className="board__wrap" style={{ opacity: tied ? 1 : 0 }} />
@@ -206,7 +209,7 @@ export default function CircleScreen() {
                     profile={p}
                     moon={leafMoon(p, settings.preset.ayanamsa)}
                     pose={layout.poses[i] ?? { x: 0, y: 0, rotate: 0, delay: 0 }}
-                    z={n - i}
+                    z={i + 1}
                     tied={tied}
                     active={active?.id === p.id}
                     tone={(i % 2) as 0 | 1}
@@ -241,6 +244,7 @@ export default function CircleScreen() {
         </section>
 
         <BlankLeaf first={false} />
+        </div>
       </div>
 
       <Sheet open={sheet !== null && sheetProfile !== undefined} onClose={() => setSheet(null)} label={sheetProfile ? `Leaf — ${sheetProfile.name}` : "Leaf"}>

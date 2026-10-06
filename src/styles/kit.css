@@ -1958,3 +1958,26 @@ button.cite:hover {
 .radio-row .seg {
   flex: 0 1 auto;
 }
+
+/* Native <dialog> sheets rise from the bottom edge; the desk behind dims with ink at 25 %. */
+dialog.sheet-dialog {
+  inset: auto 0 0 0;
+  top: auto;
+  margin: 0 auto;
+  border: 0;
+  color: var(--ink);
+  animation: sheet-rise var(--dur-slow) var(--ease-spring) both;
+}
+dialog.sheet-dialog::backdrop {
+  background: color-mix(in oklch, var(--ink), transparent 75%);
+}
+@keyframes sheet-rise {
+  from {
+    transform: translateY(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  dialog.sheet-dialog {
+    animation: object-open-calm 160ms linear both;
+  }
+}

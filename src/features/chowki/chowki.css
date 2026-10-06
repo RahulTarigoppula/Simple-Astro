@@ -67,3 +67,18 @@
 :root[data-theme="day"] .cloth .deskobj .tip {
   color: var(--surface);
 }
+@media (min-width: 900px) {
+  .chowki .deskobj svg {
+    width: 150px;
+    height: auto;
+  }
+  .chowki .deskobj--patri svg {
+    width: min(420px, 100%);
+  }
+  .chowki .chowki__drawer svg {
+    width: 170px;
+  }
+  .chowki .deskobj .lbl {
+    font-size: 11px;
+  }
+}

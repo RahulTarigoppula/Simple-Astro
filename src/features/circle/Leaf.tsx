@@ -140,21 +140,24 @@ export function Leaf(props: LeafProps) {
         >
           <span className="leaf__hole" aria-hidden="true" />
           <span className="leaf__text">
-            <span className="leaf__name">
-              {name}
+            <span className="leaf__line1">
+              <span className="leaf__name">{name}</span>
               {active ? <span className="leaf__tilak" aria-hidden="true" /> : null}
+              {moon ? (
+                <span className="leaf__nak">
+                  <span lang="hi" className="dev">
+                    {moon.nakDev}
+                  </span>{" "}
+                  · {moon.nakName}
+                </span>
+              ) : (
+                <span className="leaf__nak leaf__muted">Moon not cast</span>
+              )}
             </span>
-            {moon ? (
-              <span className="leaf__nak">
-                <span lang="hi" className="dev">
-                  {moon.nakDev}
-                </span>{" "}
-                · {moon.nakName} <span className="leaf__muted">· Moon in {moon.signName}</span>
-              </span>
-            ) : (
-              <span className="leaf__nak leaf__muted">Moon not cast</span>
-            )}
-            <span className="leaf__birth">{birthLine(profile)}</span>
+            <span className="leaf__birth">
+              {birthLine(profile)}
+              {moon ? <> · Moon in {moon.signName}</> : null}
+            </span>
           </span>
         </button>
         <button type="button" className="leaf__more" aria-label={`Actions for ${name}'s leaf`} aria-haspopup="dialog" onClick={props.onMenu}>

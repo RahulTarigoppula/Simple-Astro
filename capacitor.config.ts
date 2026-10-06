@@ -5,7 +5,6 @@ const config: CapacitorConfig = {
   appName: "Chowki",
   webDir: "dist",
   android: {
-    adjustMarginsForEdgeToEdge: "auto",
     webContentsDebuggingEnabled: false,
   },
   plugins: {

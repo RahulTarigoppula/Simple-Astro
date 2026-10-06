@@ -3,7 +3,7 @@
 *Your Janam Patri, written in ink under one lamp.*
 
 **Codename:** Jyoti (project 02 of 8) · **Repo:** `jyoti` · **App / brand:** Chowki (चौकी)
-**Status: Planned — not started.** GOAL, RESEARCH, DESIGN, ARCHITECTURE, PLAN, TESTING, DEPLOYMENT and IMPLEMENTATION-PROMPT are all complete (2026-09-08), and `design/preview.html` is committed as the visual baseline; **no application code yet**.
+**Status: v0.1.0 built (2026-10-06)** — the MVP plus most of v1 is implemented and tested locally; deployment needs the owner's GitHub account and keystore (see [docs/HANDOFF.md](docs/HANDOFF.md)). What changed versus the plan, and why, is in [CHANGELOG.md](CHANGELOG.md) and [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
 
 ## Summary
 
@@ -28,100 +28,35 @@
 | [design/preview.html](design/preview.html) | The visual contract — five screens with a live embedded ephemeris; if the app looks worse than this, it is not done |
 | [../\_shared/DECISIONS.md](../_shared/DECISIONS.md) | Cross-project binding decisions (this project is row 02 of §D8) |
 
-## Quickstart (from zero, Windows 11, Node 22, Git Bash)
-
-The project folder itself becomes the repo, so `docs/` and `design/` stay with the code (`_shared/DECISIONS.md` §D6).
+## Run it
 
 ```bash
-cd /c/Work/Personal_Projects/02-jyoti-astrology-palmistry
-
-# 1. Scaffold (choose "Ignore files and continue" when Vite notices docs/ already exists)
-npm create vite@latest . -- --template react-ts
-npm install
-
-# 2. Runtime dependencies — app shell, storage, motion.
-#    Every version is pinned to IMPLEMENTATION-PROMPT §2.1; an unpinned tree is not the spec.
-npm i vite@8.2.2 react@19.2.8 react-dom@19.2.8
-npm i tailwindcss@4.3.3 @tailwindcss/vite@4.3.3 motion@13.2.0 zustand@5.0.15 react-router@7 \
-      dexie@4.4.5 dexie-react-hooks@4.4.0 dexie-export-import@4.4.0 lucide-react@1.41.0
-
-# 3. The engine's dependencies (MIT lane — no Swiss Ephemeris, no AGPL)
-npm i astronomy-engine@2.1.19 luxon@3.7.2 @photostructure/tz-lookup@11.6.1 minisearch@7.2.0
-npm i -D @types/luxon
-npm i -D @ishubhamx/panchangam-js@3.0.0   # devDependency ONLY — Node-side oracle for tests.
-#   It is CJS and `require`s fs; check-bundle.mjs (TESTING §2.3) FAILS the build if it reaches dist/.
-#   Import it only from src/engine/__oracle__/ under Vitest's node environment.
-
-# 4. Palm + sky (all lazy-loaded chunks, never in the initial bundle)
-npm i @mediapipe/tasks-vision@1.0.1 @techstark/opencv-js@4.12.0-release.1
-npm i three@0.185.1 @react-three/fiber@9.7.0 @react-three/drei@10.7.8 d3-geo@3
-npm i -D @types/three @types/d3-geo
-
-# 5. Sound + fonts (self-hosted, OFL, subset in Phase 3)
-npm i howler@2.2 @fontsource/yatra-one@5.3 @fontsource/tiro-devanagari-hindi@5.3 @fontsource-variable/martian-mono@5.3
-npm i -D @types/howler
-
-# 6. Capacitor 8 core + the plugins Chowki uses (all MIT)
-npm i @capacitor/core@8.5.1 @capacitor/android@8.5.1 @capacitor/app@8.1.1 @capacitor/camera@8.2.4 \
-      @capacitor/filesystem@8.1.3 @capacitor/haptics@8.0.2 @capacitor/preferences@8.0.1 \
-      @capacitor/share@8.0.1 @capacitor/status-bar@8.0.3 @capacitor/splash-screen@8.0.2
-npm i -D @capacitor/cli@8.5.1
-
-# 7. Tooling
-npm i -D vite-plugin-pwa@1.3.0 @vite-pwa/assets-generator@1.0.2 vitest@3 @testing-library/react \
-         @testing-library/jest-dom jsdom fake-indexeddb @playwright/test @axe-core/playwright @biomejs/biome
-npx biome init
-npx playwright install chromium
-npm ls --depth=0        # sanity: the installed tree must match IMPLEMENTATION-PROMPT §2.1
-
-# 8. Accessible primitives (shadcn/ui on Base UI, MIT) — restyled through tokens, never forked
-npx shadcn@latest init
-npx shadcn@latest add dialog radio-group switch tabs
-
-# 9. Self-host the offline models and MediaPipe wasm (no CDN at runtime)
-mkdir -p public/models public/mediapipe
-cp node_modules/@mediapipe/tasks-vision/wasm/* public/mediapipe/
-# Pin the immutable version, NOT the "latest" alias — the alias moves and would silently
-# break both the byte assertion below and the offline precache budget (DEPLOYMENT §2.2).
-curl -L -o public/models/hand_landmarker.task \
-  https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
-stat -c%s public/models/hand_landmarker.task    # must print 7819105
-sha256sum public/models/hand_landmarker.task    # record the digest in src/data/attribution.json
-# 7,819,105 bytes, Apache-2.0 (model card). Committed once; never fetched at runtime.
-
-# 10. Android shell (writes files only; no Java needed locally). appId must never change after first install.
-npx cap init Chowki com.rahul.jyoti --web-dir dist
-npx cap add android
-printf 'android/gradlew text eol=lf\n*.sh text eol=lf\n' >> .gitattributes
-
-# 11. Shared CI templates and the signing block
-mkdir -p .github/workflows
-cp ../_shared/templates/pages.yml            .github/workflows/pages.yml
-cp ../_shared/templates/android-release.yml  .github/workflows/android-release.yml
-# Merge ../_shared/templates/app-build.gradle.snippet into android/app/build.gradle
-# (namespace + applicationId = com.rahul.jyoti).
-
-# 12. Signing key (run OUTSIDE the repo; back up the .p12 + passphrase)
-(cd /c/Work && bash /c/Work/Personal_Projects/_shared/scripts/make-keystore.sh jyoti)
-
-# 13. Repo, secrets, Pages
-git init -b main && git add -A && git commit -m "Scaffold Chowki"
-gh repo create jyoti --public --source=. --push
-gh secret set ANDROID_KEYSTORE_BASE64  < /c/Work/jyoti-release.p12.b64
-gh secret set ANDROID_KEYSTORE_PASSWORD   # paste passphrase
-gh secret set ANDROID_KEY_ALIAS  --body release
-gh secret set ANDROID_KEY_PASSWORD        # same passphrase (PKCS12)
-# GitHub -> repo Settings -> Pages -> Source: "GitHub Actions". Push to main = live site.
-# git tag v0.1.0 && git push origin v0.1.0  = signed APK on the Releases page.
+npm ci
+npm run dev            # http://localhost:5173 — the desk, fully offline after first load
+npm run test:unit      # engine (golden charts, oracle, time zones), data layer, palm, screens
+npm run build          # tsc + vite build into dist/ (add VITE_BASE_PATH=/jyoti/ for Pages)
+npx playwright test    # smoke, zero-leakage privacy, axe, offline — against `vite preview --base /jyoti/`
 ```
 
-Three things `vite.config.ts` must do (details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) §7–§8):
+On Windows Git Bash, prefix commands that pass `/jyoti/` with `MSYS_NO_PATHCONV=1` (Git Bash rewrites
+leading-slash arguments into `C:/Program Files/Git/...`). PowerShell and CI are unaffected.
 
-1. `base: process.env.VITE_BASE_PATH ?? "/"` — Pages builds with `/jyoti/`, the APK with `/`.
-2. Stub Node built-ins for `@techstark/opencv-js`: `resolve.alias` maps `fs`, `path` and `crypto` to an empty shim so the OpenCV glue bundles cleanly (RESEARCH §4, verification item 7). **`@ishubhamx/panchangam-js` is deliberately not covered by that shim** — it is a devDependency, imported only from `src/engine/__oracle__/` under Vitest's node environment, and `scripts/check-bundle.mjs` (TESTING §2.3) fails the build if it ever appears in `dist/`.
-3. `VitePWA({ registerType: "prompt" })` with the shell, fonts, grain, sounds and gazetteer precached and the models/OpenCV/sky chunks on a runtime `CacheFirst` route; register the service worker only when `!Capacitor.isNativePlatform()`.
+Useful one-off scripts (all outside-the-repo downloads are cached in `%TEMP%`):
 
-Routing is `createHashRouter` (D1) so `https://<owner>.github.io/jyoti/#/patri/<id>` deep-links without a server rewrite.
+| Script | What it does |
+|---|---|
+| `scripts/build-gazetteer.mjs` | GeoNames dumps → `src/data/geonames-in.json.gz` (≤ 1.8 MB gz, asserts its own size and must-resolve names) |
+| `scripts/build-stars.mjs` | Yale BSC5 → `src/data/bsc5.bin` (9 096 stars, 45 kB) |
+| `scripts/import-oracle.mjs` | PyJHora's 11 664-pair Ashtakoota CSV → `src/engine/__fixtures__/ashtakoota-oracle.bin` (numbers only) |
+| `scripts/make-palm-fixtures.mjs` | synthetic palm PNGs for the CV tests (no real hands, ever) |
+| `scripts/copy-mediapipe.mjs` | runs as `prebuild`: copies the MediaPipe wasm into `public/mediapipe/` |
+| `scripts/check-licences.mjs` · `check-bundle.mjs` · `check-no-biometrics.mjs` | the three blocking gates CI runs |
+
+## Ship it (owner steps — see [docs/HANDOFF.md](docs/HANDOFF.md))
+
+The repository, workflows and Android shell are ready; what remains needs your accounts and keys:
+create the public GitHub repo `jyoti`, push `main`, set Pages → Source "GitHub Actions", generate the
+release keystore outside the repo and set the four `ANDROID_*` secrets, then `git tag v0.1.0 && git push --tags`.
 
 ## Attribution
 
@@ -133,8 +68,7 @@ Chowki's own code is MIT. The classical tables (nakshatra lords, yoni animals, g
 | `@ishubhamx/panchangam-js` | MIT | Node-side panchang/dasha cross-check oracle — **devDependency only**, never in the browser bundle |
 | `luxon` | MIT | Zoned birth times; historical offsets come from the browser's IANA tzdb |
 | `@photostructure/tz-lookup` (Matt McEachen) | CC0-1.0 | lat/lon → IANA zone, 88 kB, bundled |
-| `minisearch` | MIT | Fuzzy search over the bundled gazetteer |
-| GeoNames `cities500` subset (India + neighbours full, world ≥ 15k) | CC BY 4.0 | Offline birthplace search — credited in the Colophon and in `src/data/attribution.json` |
+| GeoNames subset: `cities15000` (world) + full IN/NP/LK/PK/BD dumps + historical alternate names (IN/NP/LK/PK/BD/MM) | CC BY 4.0 | Offline birthplace search — credited in the Colophon and in `src/data/attribution.json` |
 | Yale Bright Star Catalog (BSC5), NASA/HEASARC | Public domain (US Government) | ~9,100 stars for the Rooftop dome; HYG (CC BY-SA) deliberately avoided |
 | MediaPipe `hand_landmarker.task` (Google) | Apache-2.0 (model card, Oct 2021) | 21 hand landmarks, self-hosted in `public/models` |
 | `@mediapipe/tasks-vision` + its `wasm/` folder | Apache-2.0 | Self-hosted for offline use |
@@ -143,13 +77,11 @@ Chowki's own code is MIT. The classical tables (nakshatra lords, yoni animals, g
 | Tiro Devanagari Hindi (Tiro Typeworks) via `@fontsource/tiro-devanagari-hindi` | SIL OFL 1.1 | Body: readings, ledger, leaf lines |
 | Martian Mono (Evil Martians) via `@fontsource-variable/martian-mono` | SIL OFL 1.1 | Engraved brass labels, degrees, end-times |
 | `dexie`, `dexie-react-hooks`, `dexie-export-import` | Apache-2.0 | IndexedDB profiles, palm Blobs, backup envelope |
-| `three`, `@react-three/fiber`, `@react-three/drei`, `d3-geo` | MIT | Rooftop dome, parapet sky strip, painted-sky fallback |
+| `three`, `@react-three/fiber`, `d3-geo` | MIT | Rooftop dome (lazy chunk), painted-sky fallback |
 | `motion` | MIT | Ink draw (`pathLength`), springs, drag; **GSAP is not used** (non-OSI, and Motion covers the draw) |
-| `howler` + CC0 sound sprite (freesound.org CC0 filter, Kenney.nl) | MIT + CC0-1.0 | Per-file credits in `public/sounds/ATTRIBUTION.md` |
-| `lucide-react` | ISC | 16 px icons inside paper content only (DESIGN §11) |
-| React 19, Vite 8, React Router 7, Zustand, Tailwind CSS v4, vite-plugin-pwa (Workbox), Biome, Vitest, Playwright | MIT | Framework, build, tooling |
+| Desk sounds | CC0-1.0 (original) | Synthesised on the device with Web Audio — no samples, no Howler |
+| React 19, Vite 8, React Router 7, Zustand, Tailwind CSS v4, vite-plugin-pwa (Workbox), Biome, Vitest 5, Playwright | MIT | Framework, build, tooling |
 | Capacitor 8 and `@capacitor/*` plugins | MIT | Android shell, camera, haptics, filesystem, share, status bar, splash |
-| shadcn/ui components on Base UI | MIT | Dialog → Drawer/FootnoteSheet, RadioGroup, Switch, Tabs — restyled with tokens |
 | Planet/nakshatra marks, desk objects, grain, seal edges, adaptive icon, poster template | Original artwork (CC0 within this repo) | Drawn on a 24-unit grid; no commercial glyph fonts |
 | Swiss Ephemeris WASM (`@kuntay/swisseph`) | AGPL-3.0 | **Not a dependency.** Optional "precision mode" lane only; enabling it requires relicensing the repo (DECISIONS §D5.1) |
 
@@ -161,3 +93,7 @@ Runtime services (optional, user-initiated, no key, no account):
 | Nominatim (OpenStreetMap) | ODbL data; ≤ 1 req/s, identifying User-Agent/Referer, **no autocomplete**, attribution required | Second fallback, on submit only, never per keystroke |
 
 No other network request exists. No analytics, no telemetry, no accounts, no crash reporting.
+
+## Disclaimer
+
+Based on classical Jyotisha / Samudrika Shastra texts. For reflection and fun — not medical, legal or financial advice. Chowki makes no predictions about health, death, fertility, wealth or legal outcomes, and sells nothing.

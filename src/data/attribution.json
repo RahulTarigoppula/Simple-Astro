@@ -113,7 +113,7 @@
     },
     {
       "id": "three",
-      "name": "three, @react-three/fiber, @react-three/drei, d3-geo",
+      "name": "three, @react-three/fiber, d3-geo",
       "licence": "MIT",
       "url": "https://threejs.org/",
       "use": "Rooftop dome, parapet sky strip, painted-sky fallback"
