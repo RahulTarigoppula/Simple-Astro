@@ -1,0 +1,2147 @@
+<!doctype html>
+<!--
+  CHOWKI (Jyoti · project 02) — design/preview.html
+  The visual contract for the app (DECISIONS.md D9.3 / DESIGN.md §5 "rule of the house").
+  Self-contained: inline CSS + JS, no build, no libraries. Fonts hot-linked from Google Fonts
+  (production self-hosts them via Fontsource — DECISIONS.md D1). All materials are CSS
+  gradients + inline SVG + one baked feTurbulence grain tile. No raster images anywhere.
+
+  SCREENS (preview tabs; in-app they are the Ledge objects)
+    1. The Chowki (home)      §9.1 — teak desk, indigo cloth, parapet sky strip, five desk
+                                     objects (rolled Patri · leaf bundle · brass dial with
+                                     Rahu-Kaal arc · loupe · diya), greeting, the Ledge
+    2. Janam Patri (scroll)   §9.5 — brass rollers that thicken/thin with scroll, lac seal on
+                                     overscroll, turmeric bands, birth line + engraved strip,
+                                     birth panchang, ink-drawn North-Indian D1 diamond with
+                                     the Lagna tilak, Graha ledger (tabular, ′″ muted, ℞,
+                                     boundary flags), D9 navamsa figure, Vimshottari dasha
+                                     ribbon with the brass clip on "now", yogas, colophon
+    3. Writing the leaf       §9.4 — five brass counter drums (day·month·year·hh·mm) that
+                                     scrub a live parapet sky, engraved zone/offset/JD/Lagna
+                                     strip, place row, hold-to-seal stamp
+    4. Hast Rekha (palm)      §9.8 — empty print frame → shutter → procedurally printed palm,
+                                     heart/head/life lines drawn in ink with a/b/c callouts,
+                                     brass loupe, stylus trace for the low-confidence line,
+                                     findings ledger, "Tradition says…", hold-to-burn
+
+  SIGNATURE INTERACTIONS IMPLEMENTED FOR REAL
+    · unroll (§8.1)      — scroll progress drives roller diameters + the curl highlight;
+                           overscroll stretches the paper against the PAPER spring and
+                           reveals the lac seal
+    · seal-thunk (§7.7)  — hold the seal 600 ms: it presses, then recomputes the whole chart
+                           under the other ayanamsa preset (SE-true ⇄ Drik-mean, +24.3″);
+                           every numeral re-sets, the boundary flags move
+    · ink-draw (§7.2)    — every chart stroke and palm line is drawn with pathLength 0→1,
+                           frame → diagonals → inner diamond, 60 ms stagger, nib wobble
+    · digit-set (§7.3)   — numerals never fade: each digit cell ink-faint → ink, 24 ms apart
+    · tilak-dab (§7.4)   — the Lagna receives a sindoor thumb-dab, 0.7 → 1.06 → 1
+    · loupe-rise (§7.9)  — the brass loupe rises under the finger on the chart and on the
+                           palm, follows 1:1, magnifies 2.4×, snaps planet-to-planet, and
+                           its engraved readout digit-sets on every snap
+    · drum-spin (§7.5)   — brass drums are dragged with zero easing, coast with BRASS
+                           inertia (velocity ×0.94/frame), click into detents, refuse
+                           impossible dates with a dull tick
+    · sky-scrub (§7.14)  — the parapet strip is recomputed from a real solar/lunar position
+                           every frame while a drum turns; the Lagna label ticks on crossings
+    · lamp-flicker (§7.8)— 1/f flicker on the diya drives --flicker, which every shadow in
+                           the document is computed from; tap the diya to snuff it (theme)
+    · burn / trace       — hold-to-burn chars the print edge; the stylus scratches vermilion
+                           and the reading recomputes from the traced geometry
+    All of the above are DOM/CSS/rAF only, and all collapse correctly under
+    prefers-reduced-motion (§7): no flicker, no inertia, ink fades instead of drawing.
+
+  ENGINE. The chart is not a picture. A ~120-line ephemeris is embedded (Standish mean
+  elements + Kepler, Meeus abridged Moon, Lahiri ayanamsa with nutation, whole-sign houses,
+  Vimshottari, panchang, yoga detection), so the drums on screen 3 really do produce the
+  chart on screen 2. Default profile: Rahul · 14 Mar 1994 · 07:25 IST · Bengaluru.
+-->
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1A110B">
+<meta name="color-scheme" content="dark light">
+<title>Chowki — Janam Patri &amp; Hast Rekha · preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wdth,wght@75..112.5,100..800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Yatra+One&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+1 · TOKENS — DESIGN.md §15, pasted verbatim (font stacks name the CDN faces)
+========================================================================== */
+:root {
+  color-scheme: dark;
+
+  /* colour — Night desk (default) */
+  --bg: #1A110B;          --bg-elevated: #1D2748;
+  --surface: #F4EAD3;     --surface-2: #EAD9A9;
+  --ink: #1B1410;         --ink-muted: #5A483A;     --ink-faint: #9A8A72;
+  --accent: #B5301C;      --accent-text: #A8281A;   --accent-ink: #FFF6E6;
+  --accent-2: #C9A24A;
+  --success: #356234;     --warning: #C68A12;       --warning-text: #7A5407;
+  --danger: #7F160F;      --border: #C9B48A;        --border-strong: #8A7350;
+  --focus: #22408E;       --moon: #DCE4F5;          --ledge: #241811;
+
+  /* semantic aliases */
+  --paper: var(--surface); --paper-band: var(--surface-2);
+  --tilak: var(--accent);  --thread: var(--accent);  --brass: var(--accent-2);
+  --lac: var(--danger);    --haldi: var(--warning);  --tulsi: var(--success);
+  --engraved: color-mix(in oklch, var(--brass), black 55%);
+  --moon-k: 0.09;
+  --moon-fill: color-mix(in oklch, var(--bg-elevated), var(--moon) calc(var(--moon-k) * 14%));
+
+  /* typography */
+  --font-display: "Yatra One", "Noto Sans Devanagari", Georgia, serif;
+  --font-body: "Tiro Devanagari Hindi", "Noto Serif Devanagari", Georgia, serif;
+  --font-mono: "Martian Mono", Consolas, "Courier New", monospace;
+  --mono-wdth: 87;
+  --text-xs: 0.75rem;  --text-sm: 0.8125rem;  --text-base: 1.0625rem;  --text-lg: 1.25rem;
+  --text-xl: 1.375rem; --text-2xl: 1.75rem;   --text-3xl: 2.125rem;    --text-4xl: 3rem;
+  --text-5xl: clamp(3rem, 16vw, 4.5rem);
+  --leading-tight: 1.1; --leading-body: 1.5; --leading-devanagari: 1.6; --tracking-mono: 0.06em;
+
+  /* spacing */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-7: 32px; --space-8: 40px;
+  --space-9: 48px; --space-10: 64px; --space-11: 80px; --space-12: 96px;
+  --paper-margin: 20px;
+  --ledge-height: calc(64px + env(safe-area-inset-bottom, 0px));
+
+  /* radius */
+  --radius-sm: 3px; --radius-md: 6px; --radius-lg: 14px; --radius-xl: 28px; --radius-full: 9999px;
+
+  /* elevation — one lamp, bottom-right */
+  --lamp-x: 1; --lamp-y: 1;
+  --flicker: 0px;
+  --shadow-alpha: 0.45;
+  --shadow-1: calc(-2px * var(--lamp-x) + var(--flicker)) calc(-2px * var(--lamp-y) + var(--flicker)) 6px rgba(20, 10, 4, var(--shadow-alpha));
+  --shadow-2: calc(-6px * var(--lamp-x) + var(--flicker)) calc(-5px * var(--lamp-y) + var(--flicker)) 18px rgba(20, 10, 4, calc(var(--shadow-alpha) + 0.05));
+  --shadow-3: calc(-14px * var(--lamp-x) + var(--flicker)) calc(-12px * var(--lamp-y) + var(--flicker)) 36px rgba(20, 10, 4, calc(var(--shadow-alpha) + 0.10));
+  --grain-opacity: 0.12;
+  --vignette-far: 0.18;
+
+  /* borders / strokes */
+  --hairline: 1px; --stroke-chart: 1.25px;
+
+  /* motion */
+  --dur-fast: 120ms; --dur-base: 240ms; --dur-slow: 480ms; --dur-draw: 900ms;
+  --ease-out: cubic-bezier(0.22, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: linear(0, 0.36 10%, 0.78 21%, 1.02 34%, 1.06 42%, 1.01 58%, 0.99 74%, 1);
+
+  /* preview-only */
+  --studio: #0C0805;
+  --grain-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23g)'/%3E%3C/svg%3E"); }
+
+/* Morning terrace — auto by sun altitude, or diya snuffed */
+:root[data-theme="day"] {
+  color-scheme: light; --bg: #6E4A2E; --bg-elevated: #C9C1AE; --ledge: #5E3F27;
+  --shadow-alpha: 0.22; --grain-opacity: 0.10; --vignette-far: 0.08; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="night"]) {
+    color-scheme: light; --bg: #6E4A2E; --bg-elevated: #C9C1AE; --ledge: #5E3F27;
+    --shadow-alpha: 0.22; --grain-opacity: 0.10; --vignette-far: 0.08; } }
+@media (prefers-reduced-motion: reduce) { :root { --flicker: 0px; --dur-draw: 240ms; --ease-spring: var(--ease-out); } }
+
+/* ==========================================================================
+2 · RESET + PREVIEW CHROME (everything outside the device is studio, not app)
+========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+body { min-height: 100dvh; overflow-x: hidden; background: var(--studio); font-family: var(--font-body); font-size: var(--text-base); color: var(--surface); -webkit-font-smoothing: antialiased;
+   display: flex; flex-direction: column; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; box-shadow: 0 0 0 4px var(--surface); border-radius: var(--radius-sm); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-variation-settings: "wdth" var(--mono-wdth), "wght" 500; letter-spacing: var(--tracking-mono); }
+.dev { font-family: var(--font-body); line-height: var(--leading-devanagari); }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.chrome { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-5); border-bottom: 1px solid #221610; background: linear-gradient(#151009, #0E0A06);
+   position: sticky; top: 0; z-index: 40; }
+.chrome__brand { display: flex; align-items: baseline; gap: var(--space-2); margin-right: auto; }
+.chrome__brand b { font-family: var(--font-display); font-size: var(--text-lg); color: var(--brass); font-weight: 400; }
+.chrome__brand span { font-size: var(--text-xs); color: #8A7660; }
+.tabs { display: flex; gap: 2px; padding: 3px; border-radius: var(--radius-md); background: #191108; border: 1px solid #2A1D12; }
+.tabs button { padding: 7px 12px; font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-mono); font-family: var(--font-mono); font-variation-settings: "wdth" 87, "wght" 500;
+   color: #9B8468; border-radius: var(--radius-sm); transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out); min-height: 34px; }
+.tabs button:hover { color: var(--surface-2); }
+.tabs button[aria-selected="true"], .tabs button[aria-pressed="true"] { background: var(--brass); color: #2A1D08; font-variation-settings: "wdth" 87, "wght" 600; }
+.chrome__note { font-size: var(--text-xs); color: #6E5C48; max-width: 34ch; line-height: 1.4; }
+
+/* ==========================================================================
+3 · THE DEVICE — phone frame on desktop with a real status bar (§9 global)
+========================================================================== */
+.stage { flex: 1; display: grid; place-items: center; padding: var(--space-6) var(--space-4) var(--space-8); }
+.device { position: relative; width: 390px; height: 844px; border-radius: 46px; background: var(--bg); overflow: hidden; box-shadow: 0 0 0 10px #16100B, 0 0 0 12px #4A3524, 0 40px 90px rgba(0,0,0,.75), 0 4px 0 rgba(255,224,170,.06) inset;
+   display: flex; flex-direction: column; transition: width var(--dur-slow) var(--ease-in-out), height var(--dur-slow) var(--ease-in-out), border-radius var(--dur-slow) var(--ease-in-out);
+   isolation: isolate; }
+.device.is-wide { width: min(1180px, 94vw); height: min(780px, 76vh); border-radius: 18px; }
+.device::after { content: ""; position: absolute; inset: 0; z-index: 6; pointer-events: none; background: radial-gradient(120% 80% at 86% 96%, rgba(255, 206, 130, .13), rgba(255,206,130,0) 52%),
+   radial-gradient(150% 130% at 6% 0%, rgba(6, 2, 0, var(--vignette-far)), rgba(6,2,0,0) 62%); }
+/* wood: flat --bg plus a suggestion of grain, never a texture */
+.device, .ledge { background-image: repeating-linear-gradient(96deg, rgba(255,235,200,.06) 0 1px, rgba(255,235,200,0) 1px 7px); }
+.status { flex: none; height: 30px; display: flex; align-items: center; gap: var(--space-2); padding: 0 var(--space-5); color: var(--surface); font-size: 11px; font-family: var(--font-mono); font-variation-settings: "wdth" 87, "wght" 500;
+   letter-spacing: .04em; position: relative; z-index: 5; }
+.status__t { margin-right: auto; font-variant-numeric: tabular-nums; }
+.status svg { display: block; }
+.screens { position: relative; flex: 1; min-height: 0; }
+.screen { position: absolute; inset: 0; overflow: hidden; display: none; background: var(--bg); }
+.screen.is-active { display: block; }
+.screen.is-entering { animation: object-open var(--dur-base) var(--ease-in-out) both; }
+@keyframes object-open { from { transform: translate(var(--ox, 0px), var(--oy, 0px)) scale(var(--os, .82)); opacity: 0; } to   { transform: none; opacity: 1; } }
+
+/* The Ledge — five miniature objects, 56 px targets (§9 global) */
+.ledge { flex: none; height: var(--ledge-height); background: var(--ledge); display: flex; align-items: center; justify-content: space-around; padding: 0 var(--space-2) env(safe-area-inset-bottom, 0px);
+   border-top: 1px solid rgba(255,235,200,.10); position: relative; z-index: 7; box-shadow: 0 -1px 0 rgba(0,0,0,.5) inset; }
+.ledge button { min-width: 56px; min-height: 56px; display: grid; place-items: center; gap: 3px; border-radius: var(--radius-md); color: var(--surface); transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out); }
+.ledge button span { font-family: var(--font-mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; font-variation-settings: "wdth" 87, "wght" 500; opacity: .72; }
+.ledge button:hover { background: rgba(255,220,170,.06); }
+.ledge button[aria-current="page"] { transform: translateY(-4px); background: rgba(255,206,130,.10); }
+.ledge button[aria-current="page"] span { opacity: 1; color: var(--surface); }
+.ledge .obj { filter: drop-shadow(var(--shadow-1)); }
+
+/* ==========================================================================
+4 · PAPER, BANDS, LEDGER ROWS, BUTTONS — the shared manuscript kit
+========================================================================== */
+.paper { position: relative; background: var(--paper); color: var(--ink); box-shadow: var(--shadow-2); }
+.paper::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: var(--grain-url); background-size: 256px 256px; opacity: var(--grain-opacity); mix-blend-mode: multiply; border-radius: inherit; }
+.paper > * { position: relative; z-index: 1; }
+.paper--cut { border-top: 1px solid color-mix(in oklch, var(--border-strong), transparent 60%); }
+
+.band { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--space-3); background: var(--paper-band); padding: 7px var(--paper-margin) 6px; border-bottom: 1px solid color-mix(in oklch, var(--accent), transparent 30%);
+   position: relative; margin-top: var(--space-7); }
+.band::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--accent); }
+.band h2, .band h3 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: var(--text-xl); line-height: 1.25; color: var(--ink); text-wrap: balance; }
+.band .meta { margin-left: auto; font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-mono); text-transform: uppercase; color: var(--ink-muted);
+   font-variation-settings: "wdth" 87, "wght" 500; white-space: nowrap; }
+.band--plain { background: none; border-bottom-color: var(--border); margin-top: var(--space-6); }
+.band--plain::before { display: none; }
+
+.rows { margin: 0; padding: 0 var(--paper-margin); }
+.row { display: flex; align-items: baseline; gap: var(--space-3); padding: 9px 0; border-bottom: 1px solid var(--border); min-height: 44px; }
+.row:last-child { border-bottom: 0; }
+.row dt, .row .k { flex: none; width: 8.5em; color: var(--ink-muted); font-size: var(--text-sm); }
+.row dd, .row .v { margin: 0; flex: 1; color: var(--ink); font-size: var(--text-base); }
+.row .end { margin-left: auto; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink-muted); font-variant-numeric: tabular-nums; white-space: nowrap; font-variation-settings: "wdth" 87, "wght" 400; }
+.cite { font-size: 0.62em; vertical-align: super; color: var(--accent-text); font-family: var(--font-mono); }
+.min, .sec { color: var(--ink-muted); }
+.retro { font-size: .8em; vertical-align: super; }
+.flag { color: var(--accent); font-weight: 700; }
+.note-haldi { display: flex; gap: var(--space-2); align-items: flex-start; margin: var(--space-3) var(--paper-margin) 0; padding: 8px 10px; background: color-mix(in oklch, var(--haldi), var(--paper) 74%);
+   border-left: 3px solid var(--haldi); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: var(--text-sm); color: var(--ink); line-height: 1.45; }
+.p { margin: var(--space-3) var(--paper-margin) 0; font-size: var(--text-base); line-height: var(--leading-body); color: var(--ink); text-wrap: pretty; max-width: 60ch; }
+.p--muted { color: var(--ink-muted); font-size: var(--text-sm); }
+.stamp { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--accent); color: var(--accent-ink); border-radius: var(--radius-md);
+   padding: 0 var(--space-5); min-height: 48px; font-size: var(--text-base); box-shadow: var(--shadow-1); position: relative; overflow: hidden; transition: transform var(--dur-fast) var(--ease-out); }
+.stamp:disabled { background: none; color: var(--ink-faint); box-shadow: none; outline: 1px dashed var(--ink-faint); cursor: not-allowed; }
+.stamp .fill { position: absolute; inset: 0; background: rgba(255,246,230,.22); transform-origin: left; transform: scaleX(0); }
+.stamp span { position: relative; }
+.linkish { color: var(--accent-text); background-image: linear-gradient(var(--accent), var(--accent)); background-size: 0% 1px; background-repeat: no-repeat; background-position: 0 100%;
+   transition: background-size var(--dur-fast) var(--ease-out); padding: 4px 0; min-height: 44px; }
+.linkish:hover, .linkish:focus-visible { background-size: 100% 1px; }
+.danger-text { color: var(--danger); }
+
+/* engraved brass strip */
+.engraved { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; padding: 7px 12px; border-radius: var(--radius-sm); background: linear-gradient(180deg, #E2C56B 0%, #C9A24A 40%, #8F6F2E 100%);
+   box-shadow: inset 0 1px 0 rgba(255,246,230,.55), inset 0 -1px 0 rgba(0,0,0,.45), var(--shadow-1); color: var(--engraved); font-family: var(--font-mono); font-size: var(--text-xs);
+   letter-spacing: var(--tracking-mono); text-transform: uppercase; font-variation-settings: "wdth" 87, "wght" 600; text-shadow: 0 1px 0 rgba(255,246,230,.35); }
+.engraved b { font-variation-settings: "wdth" 87, "wght" 800; font-weight: 400; }
+.engraved .sep { opacity: .45; }
+
+/* digit-set (§7.3) — numerals set, never fade */
+.setting > i { font-style: normal; color: var(--ink-faint); }
+.setting.is-set > i { color: inherit; animation: digit-set 120ms var(--ease-out) both; animation-delay: var(--d, 0ms); }
+.setting.is-set > i.mut { color: var(--ink-muted); animation-name: digit-set-mut; }
+@keyframes digit-set { from { color: var(--ink-faint); } to { color: inherit; } }
+@keyframes digit-set-mut { from { color: var(--ink-faint); } to { color: var(--ink-muted); } }
+@media (prefers-reduced-motion: reduce) { .setting.is-set > i { animation: none !important; } }
+
+/* yoga blocks + the dasha fold */
+.yoga { margin: var(--space-4) var(--paper-margin) 0; }
+.yoga h4 { margin: 0 0 3px; font-family: var(--font-display); font-weight: 400; font-size: var(--text-lg); color: var(--ink); }
+.yoga p { margin: 0; font-size: var(--text-base); line-height: var(--leading-body); color: var(--ink); max-width: 60ch; text-wrap: pretty; }
+.yoga .src { margin-top: 3px; font-family: var(--font-mono); font-size: 10px; color: var(--ink-muted); letter-spacing: var(--tracking-mono); text-transform: uppercase; font-variation-settings: "wdth" 87, "wght" 500; }
+.fold-in { background: color-mix(in oklch, var(--surface-2), transparent 40%); border-left: 3px solid var(--brass); padding: 9px 11px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.fold-in ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.fold-in li { display: flex; gap: var(--space-3); font-size: var(--text-sm); color: var(--ink); }
+.fold-in li .n { flex: 1; }
+.fold-in li .mono { color: var(--ink-muted); font-size: 10.5px; white-space: nowrap; }
+.fold-in li.is-now { color: var(--accent-text); }
+.fold-in li.is-now .mono { color: var(--accent-text); }
+.ledger tbody tr { cursor: pointer; }
+
+/* toast — the lac note */
+.toast { position: absolute; left: 50%; bottom: calc(var(--ledge-height) + 12px); z-index: 9; transform: translate(-50%, 12px); opacity: 0; pointer-events: none; background: var(--paper); color: var(--ink); border-left: 4px solid var(--accent);
+   padding: 10px 14px; border-radius: var(--radius-sm); box-shadow: var(--shadow-2); font-size: var(--text-sm); max-width: 86%; line-height: 1.4; transition: transform var(--dur-base) var(--ease-out), opacity var(--dur-base) var(--ease-out); }
+.toast.is-on { transform: translate(-50%, 0); opacity: 1; }
+.toast.is-warn { border-left-color: var(--haldi); }
+.toast.is-danger { border-left-color: var(--danger); }
+
+/* ==========================================================================
+5 · SCREEN 1 — THE CHOWKI (§9.1)
+========================================================================== */
+.screen.chowki { display: none; flex-direction: column; height: 100%; }
+.screen.chowki.is-active { display: flex; }
+.sky { flex: none; height: 44px; position: relative; overflow: hidden; border-bottom: 1px solid rgba(0,0,0,.5); }
+.sky svg { display: block; width: 100%; height: 100%; }
+.greet { flex: none; padding: var(--space-4) var(--space-5) var(--space-2); }
+.greet h1 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: var(--text-2xl); color: var(--surface); line-height: var(--leading-tight); text-wrap: balance; }
+.greet p { margin: 6px 0 0; font-size: var(--text-sm); color: color-mix(in oklch, var(--surface), transparent 30%); line-height: 1.5; }
+.cloth { flex: 1; margin: var(--space-3) var(--space-4) var(--space-4); border-radius: var(--radius-md); background-color: var(--moon-fill); background-image: radial-gradient(rgba(244,234,211,.09) 1px, transparent 1.2px);
+   background-size: 8px 8px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.35), inset 0 12px 30px rgba(0,0,0,.35); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr auto;
+   gap: var(--space-3); padding: var(--space-4); place-items: center; min-height: 0; }
+.deskobj { display: grid; place-items: center; gap: 6px; padding: 6px; border-radius: var(--radius-md); min-width: 56px; min-height: 56px; color: var(--surface); position: relative;
+   transition: transform var(--dur-fast) var(--ease-out), filter var(--dur-fast) var(--ease-out); }
+.deskobj:hover, .deskobj:focus-visible { transform: translate(-1px, -2px); }
+.deskobj:active { transform: translate(0, 1px) scale(.985); }
+.deskobj svg { display: block; filter: drop-shadow(var(--shadow-2)); }
+.deskobj .lbl { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; font-variation-settings: "wdth" 87, "wght" 500; opacity: .75; }
+.deskobj .tip { position: absolute; bottom: -6px; left: 50%; translate: -50% 100%; background: var(--ledge); color: var(--surface); border: 1px solid var(--brass); padding: 3px 8px; border-radius: var(--radius-sm); white-space: nowrap; z-index: 3;
+   font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; opacity: 0; transition: opacity var(--dur-fast) var(--ease-out); pointer-events: none; }
+.deskobj.is-labelled .tip { opacity: 1; }
+.deskobj--patri { grid-column: 1 / -1; }
+.flame { transform-origin: 50% 100%; }
+.diya-glow { opacity: calc(.5 + var(--flame-k, 0) * .5); }
+:root[data-theme="day"] .diya-glow { opacity: .18; }
+
+/* ==========================================================================
+6 · SCREEN 2 — JANAM PATRI (§9.5)
+========================================================================== */
+.patri { position: relative; height: 100%; background: var(--bg-elevated); }
+.roller { position: absolute; left: 0; right: 0; height: 26px; z-index: 4; pointer-events: none; display: grid; place-items: center; }
+.roller--top { top: 0; }
+.roller--bot { bottom: 0; }
+.roller__body { width: 100%; height: 18px; transform-origin: center; background: linear-gradient(180deg, #8F6F2E 0%, #E2C56B 18%, #C9A24A 50%, #7E5F22 100%); box-shadow: inset 0 1px 0 rgba(255,246,230,.55), inset 0 -1px 0 rgba(0,0,0,.45), var(--shadow-2);
+   position: relative; overflow: hidden; }
+.roller--top .roller__body { border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+.roller--bot .roller__body { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.roller__curl { position: absolute; top: 0; bottom: 0; width: 34%; background: linear-gradient(90deg, transparent, rgba(255,246,230,.42), transparent); transform: translateX(-40%); }
+.roller__cap { position: absolute; top: 50%; width: 12px; height: 26px; translate: 0 -50%; background: linear-gradient(90deg, #7E5F22, #E2C56B 45%, #8F6F2E); border-radius: var(--radius-lg); box-shadow: var(--shadow-1); }
+.roller__cap--l { left: 4px; } .roller__cap--r { right: 4px; }
+
+.scrollport { position: absolute; inset: 20px 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: none; padding: 0 var(--space-3); }
+.scrollport::-webkit-scrollbar { width: 0; }
+.sheet { max-width: 560px; margin: 0 auto; will-change: transform; }
+.seal-slot { height: 84px; margin-top: -84px; display: grid; place-items: center; }
+.seal { width: 74px; height: 74px; display: grid; place-items: center; border-radius: var(--radius-full); background: radial-gradient(circle at 62% 68%, #A62A1B, var(--danger) 55%, #5A0E08);
+   box-shadow: var(--shadow-2), inset -3px -3px 8px rgba(0,0,0,.5), inset 3px 3px 6px rgba(255,180,150,.25); color: #F6D9CE; position: relative; transition: transform var(--dur-fast) var(--ease-out);
+   transform-origin: center; touch-action: none; }
+.seal::after { content: ""; position: absolute; inset: -6px; border-radius: inherit; border: 1px dashed color-mix(in oklch, var(--danger), transparent 55%); }
+.seal .ring { position: absolute; inset: -6px; border-radius: 50%; }
+.seal.is-cracked { background: radial-gradient(circle at 62% 68%, #7c1a10, #4a0b06); }
+.patri-head { padding: var(--space-5) var(--paper-margin) var(--space-4); }
+.patri-head h1 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: var(--text-2xl); line-height: var(--leading-tight); color: var(--ink); }
+.patri-head .birthline { margin: 8px 0 0; font-size: var(--text-base); color: var(--ink); }
+.patri-head .engraved { margin-top: var(--space-3); }
+
+.figure { padding: var(--space-5) var(--paper-margin) var(--space-2); }
+.chart-wrap { position: relative; margin: 0 auto; max-width: 340px; touch-action: none; }
+.chart-wrap, .loupe, .printframe, .seal, .ribbon, .ledge { -webkit-user-select: none; user-select: none; }
+.chart { display: block; width: 100%; height: auto; }
+.chart .stroke { fill: none; stroke: var(--ink); stroke-width: var(--stroke-chart); shape-rendering: geometricPrecision; stroke-linecap: square; }
+.chart .signnum { fill: var(--ink-muted); font-family: var(--font-mono); font-size: 11px; font-variation-settings: "wdth" 87, "wght" 500; }
+.chart .graha { fill: var(--ink); font-family: var(--font-body); font-size: 13.5px; }
+.chart .graha.is-retro { fill: var(--ink-muted); }
+.chart .grahadeg { fill: var(--ink-muted); font-family: var(--font-mono); font-size: 8.5px; font-variation-settings: "wdth" 75, "wght" 400; }
+.chart .tilak { fill: var(--tilak); }
+.chart .hit { fill: transparent; }
+.figcap { margin: var(--space-2) var(--paper-margin) 0; font-size: var(--text-sm); color: var(--ink-muted); line-height: 1.45; }
+.loupe { position: absolute; width: 118px; height: 118px; border-radius: 50%; z-index: 5; left: 0; top: 0; pointer-events: none; opacity: 0; transform: translate(-50%, -50%) scale(.6); transform-origin: center;
+   box-shadow: var(--shadow-1); transition: opacity var(--dur-fast) var(--ease-out); }
+.loupe.is-up { opacity: 1; box-shadow: var(--shadow-3); }
+.loupe__glass { position: absolute; inset: 6px; border-radius: 50%; overflow: hidden; background: var(--paper); }
+.loupe__glass > * { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+.loupe__rim { position: absolute; inset: 0; border-radius: 50%; pointer-events: none; background: conic-gradient(from 210deg, #7E5F22, #E2C56B 20%, #C9A24A 45%, #8F6F2E 70%, #E2C56B 92%, #7E5F22);
+   -webkit-mask: radial-gradient(circle, transparent 0 calc(50% - 7px), #000 calc(50% - 6px)); mask: radial-gradient(circle, transparent 0 calc(50% - 7px), #000 calc(50% - 6px)); }
+.loupe__flare { position: absolute; inset: 6px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle at 34% 28%, rgba(255,255,255,.32), rgba(255,255,255,0) 42%),
+   radial-gradient(circle, transparent 82%, rgba(255,255,255,.30) 88%, rgba(0,0,0,.34) 100%); }
+.readout { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; margin: var(--space-3) var(--paper-margin) 0; min-height: 34px; }
+.readout .engraved { flex: 1; }
+.badge-bound { background: var(--accent); color: var(--accent-ink); border-radius: var(--radius-sm); padding: 3px 7px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em;
+   text-transform: uppercase; font-variation-settings: "wdth" 87, "wght" 600; }
+
+/* graha ledger */
+.ledger { width: 100%; border-collapse: collapse; margin: 0; font-size: var(--text-sm); }
+.ledger caption { text-align: left; padding: 0 var(--paper-margin) 6px; color: var(--ink-muted); font-size: var(--text-sm); }
+.ledger th { text-align: left; font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-muted); font-weight: 400;
+   font-variation-settings: "wdth" 87, "wght" 500; padding: 4px var(--space-2); border-bottom: 1px solid var(--border-strong); }
+.ledger th:first-child { padding-left: var(--paper-margin); }
+.ledger th:last-child, .ledger td:last-child { padding-right: var(--paper-margin); text-align: right; }
+.ledger td { padding: 7px var(--space-2); border-bottom: 1px solid var(--border); color: var(--ink); vertical-align: baseline; }
+.ledger td:first-child { padding-left: var(--paper-margin); white-space: nowrap; }
+.ledger tbody tr:nth-child(even) { background: color-mix(in oklch, var(--surface-2), transparent 50%); }
+.ledger tbody tr.is-lit { background: color-mix(in oklch, var(--accent), transparent 88%); }
+.ledger .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; font-variation-settings: "wdth" 75, "wght" 400; letter-spacing: 0; }
+.ledger .nak { color: var(--ink); }
+.ledger .pd { color: var(--ink-muted); }
+
+/* dasha ribbon */
+.ribbon { display: flex; gap: 2px; margin: var(--space-3) var(--paper-margin) 0; padding-bottom: 10px; overflow-x: auto; scrollbar-width: none; touch-action: pan-x; overscroll-behavior-x: contain; }
+.ribbon::-webkit-scrollbar { height: 0; }
+.ribbon button { flex: none; min-width: 58px; padding: 8px 6px 9px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border); display: grid; gap: 3px; text-align: left; position: relative; min-height: 62px;
+   transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out); }
+.ribbon button:hover { transform: translateY(-2px); }
+.ribbon button .l { font-size: var(--text-base); color: var(--ink); line-height: 1.1; }
+.ribbon button .y { font-family: var(--font-mono); font-size: 9.5px; color: var(--ink-muted); font-variation-settings: "wdth" 75, "wght" 400; font-variant-numeric: tabular-nums; }
+.ribbon button.is-now { background: var(--paper); border-color: var(--border-strong); }
+.ribbon button.is-now::before { content: ""; position: absolute; left: 50%; top: -9px; translate: -50% 0; width: 16px; height: 20px; border-radius: 4px 4px 8px 8px; background: linear-gradient(90deg, #8F6F2E, #E2C56B 40%, #7E5F22);
+   box-shadow: var(--shadow-1); }
+.ribbon button[aria-expanded="true"] { background: color-mix(in oklch, var(--accent), var(--surface-2) 84%); }
+.fold { margin: 0 var(--paper-margin); }
+.colophon { margin: var(--space-6) var(--paper-margin) var(--space-9); padding-top: var(--space-4); border-top: 1px solid var(--border-strong); color: var(--ink-muted); font-size: var(--text-sm);
+   line-height: 1.5; }
+.colophon dl { display: grid; grid-template-columns: 8.5em 1fr; gap: 4px var(--space-3); margin: 0 0 var(--space-3); }
+.colophon dt { color: var(--ink-muted); }
+.colophon dd { margin: 0; color: var(--ink); }
+</style>
+<style>
+/* ==========================================================================
+7 · SCREEN 3 — WRITING THE LEAF (§9.4)
+========================================================================== */
+.leafscreen { height: 100%; overflow-y: auto; background: var(--bg); scrollbar-width: none; }
+.leafscreen::-webkit-scrollbar { width: 0; }
+.leafscreen .sky { height: 84px; border-bottom: 0; }
+.leafsheet { margin: 0 auto var(--space-8); width: calc(100% - var(--space-6)); max-width: 560px; border-radius: var(--radius-md); }
+.field { display: flex; align-items: center; gap: var(--space-3); padding: 10px var(--paper-margin); border-bottom: 1px solid var(--border); min-height: 48px; }
+.field label { flex: none; width: 5em; color: var(--ink-muted); font-size: var(--text-sm); }
+.field input { flex: 1; font: inherit; font-size: var(--text-lg); color: var(--ink); background: none; border: 0; padding: 4px 2px; min-width: 0; border-bottom: 1px solid transparent; }
+.field input::placeholder { color: var(--ink-faint); }
+.field input:focus { outline: none; border-bottom-color: var(--accent); }
+.field .hint { font-family: var(--font-mono); font-size: 10px; color: var(--ink-muted); font-variation-settings: "wdth" 75, "wght" 400; }
+.drums { display: flex; gap: 6px; padding: var(--space-4) var(--paper-margin) calc(var(--space-4) + 16px); justify-content: space-between; }
+.drum { position: relative; flex: 1; height: 76px; border-radius: var(--radius-xl); background: linear-gradient(90deg, #8F6F2E 0%, #E2C56B 18%, #C9A24A 50%, #7E5F22 100%);
+   box-shadow: inset 0 1px 0 rgba(255,246,230,.55), inset 0 -1px 0 rgba(0,0,0,.45), var(--shadow-2); touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.drum:active { cursor: grabbing; }
+.drum.is-refused { animation: refuse 200ms var(--ease-out); }
+@keyframes refuse { 0%,100% { transform: none; } 40% { transform: translateY(2px); } }
+.drum__win { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
+.drum__strip { position: absolute; left: 0; right: 0; top: 50%; will-change: transform; }
+.drum__cell { position: absolute; left: 0; right: 0; height: 26px; margin-top: -13px; display: grid; place-items: center; font-family: var(--font-mono); font-size: 19px; color: var(--engraved);
+   font-variation-settings: "wdth" 87, "wght" 600; font-variant-numeric: tabular-nums; text-shadow: 0 1px 0 rgba(255,246,230,.4); }
+.drum__shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(20,10,4,.55), rgba(20,10,4,0) 26%, rgba(20,10,4,0) 74%, rgba(20,10,4,.55)); }
+.drum__detent { position: absolute; left: 0; right: 0; top: 50%; height: 28px; margin-top: -14px; border-top: 1px solid rgba(0,0,0,.35); border-bottom: 1px solid rgba(255,246,230,.35); pointer-events: none; }
+.drum__lbl { position: absolute; bottom: -15px; left: 0; right: 0; text-align: center; z-index: 2; font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase;
+   color: var(--ink-muted); font-variation-settings: "wdth" 87, "wght" 500; }
+.sealbtn-wrap { padding: var(--space-5) var(--paper-margin) var(--space-6); display: grid; gap: var(--space-3); }
+.sealbtn { width: 100%; min-height: 52px; }
+.sealbtn .fill { background: rgba(255,246,230,.28); }
+
+/* ==========================================================================
+8 · SCREEN 4 — HAST REKHA (§9.8)
+========================================================================== */
+.hast { height: 100%; overflow-y: auto; background: var(--bg); scrollbar-width: none; }
+.hast::-webkit-scrollbar { width: 0; }
+.hastsheet { margin: var(--space-3) auto; width: calc(100% - var(--space-6)); max-width: 620px; border-radius: var(--radius-md); padding-bottom: var(--space-8); }
+.printframe { position: relative; margin: var(--space-4) auto 0; aspect-ratio: 1 / 1.12; width: calc(100% - 2 * var(--paper-margin)); max-width: 356px; border-radius: var(--radius-sm); overflow: hidden; background: #26201A;
+   box-shadow: inset 0 0 0 1px var(--border-strong), var(--shadow-1); touch-action: none; }
+.printframe.is-empty { background: none; outline: 1px dashed var(--ink-faint); outline-offset: -1px; box-shadow: none; display: grid; place-items: center; }
+.printframe canvas { display: block; width: 100%; height: 100%; filter: grayscale(.35) contrast(1.15); }
+.printframe canvas[hidden] { display: none; }
+.print-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
+.print-lines path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.print-lines .ln { stroke: var(--ink); stroke-width: 2.4; }
+.print-lines .ln--faint { stroke: color-mix(in oklch, var(--ink), transparent 52%); stroke-dasharray: 7 5; }
+.print-lines .ln--traced { stroke: var(--accent); stroke-width: 2.8; }
+.print-lines text { fill: var(--ink); font-family: var(--font-body); font-size: 13px; font-style: italic; }
+.print-lines .halo { stroke: color-mix(in oklch, var(--surface), transparent 58%); stroke-width: 5; }
+.empty-note { display: grid; gap: 6px; place-items: center; color: var(--ink-muted); text-align: center; padding: var(--space-5); }
+.empty-note b { font-family: var(--font-display); font-weight: 400; font-size: var(--text-xl); color: var(--ink); }
+.burnedge { position: absolute; inset: 0; pointer-events: none; border-radius: inherit; opacity: 0; background: radial-gradient(120% 120% at 50% 50%, transparent 32%, rgba(127,22,15,.55) 62%, #2A0703 100%); }
+.tools { display: flex; gap: var(--space-4); align-items: center; padding: var(--space-3) var(--paper-margin) 0; flex-wrap: wrap; }
+.tool { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; color: var(--ink); font-size: var(--text-sm); border-bottom: 1px solid transparent; padding: 4px 0; }
+.tool:hover { border-bottom-color: var(--accent); }
+.tool[aria-pressed="true"] { color: var(--accent-text); border-bottom-color: var(--accent); }
+.gauge { display: flex; align-items: center; gap: 6px; font-size: var(--text-sm); color: var(--ink-muted); }
+.gauge i { display: block; width: 9px; height: 14px; background: var(--ink-faint); border-radius: 1px; }
+.gauge i.on { background: var(--ink); }
+.gauge.is-low i.on { background: var(--haldi); }
+.confbar { display: inline-block; width: 44px; height: 6px; border-radius: 3px; background: color-mix(in oklch, var(--ink-faint), transparent 55%); vertical-align: middle; overflow: hidden; }
+.confbar i { display: block; height: 100%; background: var(--ink); }
+.confbar.is-low i { background: var(--haldi); }
+.confbar.is-good i { background: var(--tulsi); }
+
+/* --- 8b · GUNA MILAN — the 36-bead mala (§9.9) ---------------------------- */
+.milansheet { margin: var(--space-3) auto; width: calc(100% - var(--space-6)); max-width: 560px; border-radius: var(--radius-md); padding-bottom: var(--space-8); }
+.pair { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--space-2); padding: var(--space-4) var(--paper-margin) 0; }
+.pair__scroll { background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 8px 6px; text-align: center; box-shadow: var(--shadow-1); }
+.pair__scroll b { display: block; font-family: var(--font-display); font-weight: 400; font-size: var(--text-lg); line-height: 1.2; }
+.pair__scroll span { display: block; font-size: var(--text-sm); color: var(--ink-muted); line-height: 1.6; }
+.mauli { width: 46px; height: 10px; border-radius: 5px; box-shadow: var(--shadow-1);
+   background: repeating-linear-gradient(90deg, var(--thread) 0 4px, var(--haldi) 4px 8px); }
+.score { text-align: center; padding: var(--space-3) 0 0; }
+.score b { display: block; font-size: clamp(3rem, 16vw, 4.5rem); line-height: .95; letter-spacing: -.01em; font-weight: 400; font-variant-numeric: lining-nums; }
+.score .stampband { display: inline-block; margin-top: 6px; padding: 3px 12px; border: 1.5px solid var(--lac); border-radius: var(--radius-full); color: var(--lac);
+   font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-mono); text-transform: uppercase; rotate: -2.5deg; }
+.beads { list-style: none; margin: var(--space-4) 0 0; padding: 0; }
+.beads li { display: grid; grid-template-columns: 76px 1fr auto; align-items: center; gap: var(--space-2); padding: 6px var(--paper-margin); min-height: 44px; border-bottom: 1px solid var(--border); }
+.beads li:nth-child(even) { background: color-mix(in oklch, var(--surface-2), transparent 50%); }
+.beads .kname { font-size: var(--text-sm); }
+.beads .row { display: flex; gap: 5px; flex-wrap: wrap; }
+.beads i { width: 15px; height: 15px; border-radius: 50%; background: var(--surface-2); box-shadow: inset 0 -2px 3px rgba(0,0,0,.20), 0 1px 0 rgba(255,255,255,.35); }
+.beads i.on { background: radial-gradient(circle at 34% 30%, color-mix(in oklch, var(--brass), white 34%), var(--brass) 62%, var(--engraved)); }
+.beads i.half { background: linear-gradient(90deg, var(--brass) 0 50%, var(--surface-2) 50%); }
+.beads i.dosha { background: radial-gradient(circle at 34% 30%, color-mix(in oklch, var(--lac), white 18%), var(--lac) 70%, #4A0C08); }
+.beads .kscore { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: var(--text-sm); color: var(--ink-muted); white-space: nowrap; }
+
+/* ==========================================================================
+9 · DESKTOP (≥ 900 px device) — the desk widens, paper stays a column,
+the Ledge becomes the left desk edge (§9 global)
+========================================================================== */
+.device.is-wide { flex-direction: row-reverse; }
+.device.is-wide .ledge { height: auto; width: 76px; flex-direction: column; justify-content: flex-start; gap: var(--space-2); padding: var(--space-5) 0; border-top: 0; border-right: 1px solid rgba(255,235,200,.10); }
+.device.is-wide .ledge button[aria-current="page"] { transform: translateX(4px); }
+.device.is-wide .status { position: absolute; top: 0; left: 76px; right: 0; z-index: 8; }
+.device.is-wide .screen { top: 30px; }
+.device.is-wide .toast { bottom: 18px; }
+.device.is-wide .cloth { grid-template-columns: 1fr 2fr 1fr; grid-template-rows: 1fr 1fr; padding: var(--space-6); gap: var(--space-5); }
+.device.is-wide .deskobj--patri { grid-column: 2; grid-row: 1 / -1; }
+.device.is-wide .greet { padding: var(--space-5) var(--space-8) var(--space-2); }
+.device.is-wide .greet h1 { font-size: var(--text-3xl); }
+.device.is-wide .sheet { max-width: 560px; }
+.device.is-wide .scrollport { padding: 0 var(--space-8); }
+.device.is-wide .hastsheet { max-width: 860px; }
+.device.is-wide .leafscreen .sky { height: 120px; }
+.device.is-wide .hast-two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); align-items: start; }
+.device.is-wide .printframe { margin: 0 auto; }
+
+@media (max-width: 760px) { body { height: 100dvh; overflow: hidden; } .stage { padding: 0; min-height: 0; } .device, .device.is-wide { width: 100%; height: 100%; border-radius: 0; box-shadow: none; }
+   .device.is-wide { flex-direction: column; } .device.is-wide .ledge { height: var(--ledge-height); width: auto; flex-direction: row; justify-content: space-around; padding: 0 var(--space-2); border-right: 0; border-top: 1px solid rgba(255,235,200,.10); }
+   .device.is-wide .status { position: relative; left: auto; } .device.is-wide .screen { top: 0; } .chrome__brand span { display: none; } .tabs button { padding: 6px 9px; font-size: 10px; min-height: 32px; }
+   .device.is-wide .cloth { grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr auto; } .device.is-wide .deskobj--patri { grid-column: 1 / -1; grid-row: auto; } .device.is-wide .hast-two { display: block; }
+   .chrome { padding: var(--space-2) var(--space-3); } .chrome__note { display: none; } }
+@media (prefers-reduced-motion: reduce) { .screen.is-entering { animation-duration: 160ms; } .device, .deskobj, .stamp, .ribbon button { transition-duration: 160ms; } }
+</style>
+</head>
+<body>
+
+<!-- ── preview chrome (studio, not app) ─────────────────────────────────── -->
+<header class="chrome">
+  <div class="chrome__brand">
+    <b>चौकी · Chowki</b>
+    <span class="mono">design/preview.html · visual contract</span>
+  </div>
+  <div class="tabs" role="tablist" aria-label="Screens">
+    <button role="tab" id="tab-chowki" aria-selected="true" aria-controls="scr-chowki" data-go="chowki">Chowki</button>
+    <button role="tab" id="tab-patri" aria-selected="false" aria-controls="scr-patri" data-go="patri">Janam Patri</button>
+    <button role="tab" id="tab-leaf" aria-selected="false" aria-controls="scr-leaf" data-go="leaf">New leaf</button>
+    <button role="tab" id="tab-hast" aria-selected="false" aria-controls="scr-hast" data-go="hast">Hast Rekha</button>
+    <button role="tab" id="tab-milan" aria-selected="false" aria-controls="scr-milan" data-go="milan">Guna Milan</button>
+  </div>
+  <div class="tabs" role="group" aria-label="Frame">
+    <button id="framePhone" aria-pressed="true" data-frame="phone">Phone</button>
+    <button id="frameDesk" aria-pressed="false" data-frame="desk">Desk</button>
+  </div>
+  <p class="chrome__note">Scroll the patri to unroll it · pull past the top for the lac seal and hold it · touch a planet for the loupe · flick the drums · trace the faint palm line.</p>
+</header>
+
+<main class="stage">
+<div class="device" id="device">
+
+  <!-- device status bar (Android edge-to-edge, teak behind it — §14) -->
+  <div class="status" aria-hidden="true">
+    <span class="status__t" id="statusTime">14:52</span>
+    <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg>
+    <svg width="15" height="11" viewBox="0 0 15 11" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1 4.2a9 9 0 0 1 13 0"/><path d="M3.4 6.7a5.6 5.6 0 0 1 8.2 0"/><circle cx="7.5" cy="9.4" r="1" fill="currentColor" stroke="none"/></svg>
+    <svg width="22" height="11" viewBox="0 0 22 11" fill="none" stroke="currentColor" stroke-width="1"><rect x=".5" y=".5" width="18" height="10" rx="2.5"/><rect x="2" y="2" width="13" height="7" rx="1.4" fill="currentColor" stroke="none"/><path d="M20.4 4v3" stroke-width="1.6" stroke-linecap="round"/></svg>
+  </div>
+
+  <div class="screens" id="screens">
+
+  <!-- ══════════════ 1 · THE CHOWKI (home) — §9.1 ══════════════ -->
+  <section class="screen chowki is-active" id="scr-chowki" role="tabpanel" aria-labelledby="tab-chowki" data-screen="chowki">
+    <div class="sky" id="skyHome" aria-hidden="true"></div>
+    <div class="greet">
+      <h1 lang="hi" class="dev">नमस्ते, Rahul</h1>
+      <p><span lang="hi" class="dev">कृष्ण त्रयोदशी</span> · Kṛṣṇa Trayodaśī, <span lang="sa">Puṣya</span> 4 · Maṅgalavāra · <span class="mono">Rāhu Kāla 15:22–16:54</span></p>
+    </div>
+
+    <div class="cloth">
+      <!-- leaf bundle -->
+      <button class="deskobj" data-obj="leaf" aria-label="Leaf bundle, three profiles, opens the circle">
+        <svg width="96" height="62" viewBox="0 0 96 62" aria-hidden="true">
+          <rect x="4" y="6" width="88" height="7" rx="2" fill="#6E4A2E"/>
+          <g>
+            <rect x="8" y="15" width="80" height="10" rx="3" fill="#EAD9A9"/>
+            <rect x="10" y="27" width="76" height="10" rx="3" fill="#E4D19C"/>
+            <rect x="8" y="39" width="80" height="10" rx="3" fill="#EAD9A9"/>
+            <path d="M16 20h56M18 32h52M16 44h58" stroke="#C9B48A" stroke-width="1"/>
+          </g>
+          <rect x="4" y="50" width="88" height="7" rx="2" fill="#6E4A2E"/>
+          <path d="M48 3c-9 10-9 46 0 56" stroke="#B5301C" stroke-width="2.5" fill="none"/>
+          <circle cx="48" cy="58" r="3.4" fill="#B5301C"/>
+        </svg>
+        <span class="lbl">Leaves · 3</span>
+        <span class="tip mono">पत्ते · Circle</span>
+      </button>
+
+      <!-- brass dial -->
+      <button class="deskobj" data-obj="dial" aria-label="Brass panchang dial, 14:52, opens today's leaf">
+        <svg width="86" height="86" viewBox="0 0 86 86" aria-hidden="true">
+          <circle cx="43" cy="43" r="40" fill="#7E5F22"/>
+          <circle cx="43" cy="43" r="37" fill="none" stroke="#E2C56B" stroke-width="2.5"/>
+          <circle cx="43" cy="43" r="33" fill="#C9A24A"/>
+          <circle cx="43" cy="43" r="33" fill="none" stroke="#8F6F2E" stroke-width="1"/>
+          <path d="M43 10a33 33 0 0 1 28.6 16.5L43 43Z" fill="#C68A12" opacity=".55"/>
+          <g stroke="#5C4413" stroke-width="1.2">
+            <path d="M43 12v5M74 43h-5M43 74v-5M12 43h5M64.9 21.1l-3.5 3.5M64.9 64.9l-3.5-3.5M21.1 64.9l3.5-3.5M21.1 21.1l3.5 3.5"/>
+          </g>
+          <circle cx="43" cy="43" r="20" fill="none" stroke="#8F6F2E" stroke-width=".8" stroke-dasharray="2 4.6"/>
+          <path d="M43 43V22" stroke="#3A2A08" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M43 43l14 9" stroke="#3A2A08" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="43" cy="43" r="3" fill="#3A2A08"/>
+        </svg>
+        <span class="lbl">Dial · 14:52</span>
+        <span class="tip mono">आज · Today</span>
+      </button>
+
+      <!-- the rolled patri -->
+      <button class="deskobj deskobj--patri" data-obj="patri" aria-label="Janam Patri of Rahul, opens the chart scroll">
+        <svg width="212" height="88" viewBox="0 0 212 88" aria-hidden="true">
+          <rect x="18" y="20" width="176" height="48" rx="3" fill="#F4EAD3"/>
+          <rect x="18" y="20" width="176" height="48" rx="3" fill="none" stroke="#C9B48A"/>
+          <path d="M32 34h60M32 42h84M32 50h48" stroke="#C9B48A" stroke-width="1"/>
+          <path d="M120 30h58v28h-58z" fill="#EAD9A9"/>
+          <path d="M149 30l29 14-29 14-29-14z" fill="none" stroke="#1B1410" stroke-width="1"/>
+          <path d="M120 30l58 28M178 30l-58 28" stroke="#1B1410" stroke-width=".7" opacity=".65"/>
+          <g>
+            <rect x="0" y="12" width="20" height="64" rx="9" fill="url(#brassV)"/>
+            <rect x="192" y="12" width="20" height="64" rx="9" fill="url(#brassV)"/>
+          </g>
+          <circle cx="106" cy="44" r="9" fill="#B5301C"/>
+          <path d="M106 8c-14 12-14 60 0 72" stroke="#B5301C" stroke-width="2" fill="none" opacity=".8"/>
+          <defs>
+            <linearGradient id="brassV" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#8F6F2E"/><stop offset=".18" stop-color="#E2C56B"/>
+              <stop offset=".5" stop-color="#C9A24A"/><stop offset="1" stop-color="#7E5F22"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="lbl">जन्म पत्री · Rahul</span>
+        <span class="tip mono">पत्री · 14 Mar 1994</span>
+      </button>
+
+      <!-- loupe -->
+      <button class="deskobj" data-obj="loupe" aria-label="Brass loupe, opens the palm reading">
+        <svg width="88" height="76" viewBox="0 0 88 76" aria-hidden="true">
+          <rect x="52" y="46" width="30" height="9" rx="4.5" transform="rotate(38 52 46)" fill="#6E4A2E"/>
+          <circle cx="36" cy="32" r="26" fill="#EFE7D2" opacity=".5"/>
+          <circle cx="36" cy="32" r="26" fill="none" stroke="url(#brassR)" stroke-width="7"/>
+          <circle cx="36" cy="32" r="22" fill="none" stroke="#F4EAD3" stroke-width="1" opacity=".55"/>
+          <path d="M22 20a20 20 0 0 1 12-6" stroke="#fff" stroke-width="3" opacity=".45" fill="none" stroke-linecap="round"/>
+          <defs><linearGradient id="brassR" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#E2C56B"/><stop offset=".5" stop-color="#C9A24A"/><stop offset="1" stop-color="#7E5F22"/>
+          </linearGradient></defs>
+        </svg>
+        <span class="lbl">Loupe</span>
+        <span class="tip mono">हस्त · Palm</span>
+      </button>
+
+      <!-- diya (the only light) -->
+      <button class="deskobj" data-obj="diya" aria-label="Diya, lit — snuff it for the morning terrace" aria-pressed="true" id="diyaBtn">
+        <svg width="88" height="80" viewBox="0 0 88 80" aria-hidden="true">
+          <ellipse class="diya-glow" cx="44" cy="30" rx="34" ry="26" fill="url(#glow)"/>
+          <g id="flameG" class="flame">
+            <path d="M44 16c7 8 9 12 9 17a9 9 0 0 1-18 0c0-5 2-9 9-17Z" fill="url(#fl)"/>
+            <path d="M44 27c3 4 3.6 5.6 3.6 7.4A3.7 3.7 0 0 1 44 38a3.7 3.7 0 0 1-3.6-3.6c0-1.8.6-3.4 3.6-7.4Z" fill="#FFF6E6" opacity=".85"/>
+          </g>
+          <path d="M40 40h8v6h-8z" fill="#5C4413"/>
+          <path d="M14 46h60c0 10-13 18-30 18S14 56 14 46Z" fill="url(#bowl)"/>
+          <path d="M14 46h60" stroke="#E2C56B" stroke-width="2"/>
+          <defs>
+            <radialGradient id="glow"><stop offset="0" stop-color="#FFC46B" stop-opacity=".55"/><stop offset="1" stop-color="#FFC46B" stop-opacity="0"/></radialGradient>
+            <linearGradient id="fl" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#B5301C"/><stop offset=".45" stop-color="#E8A33C"/><stop offset="1" stop-color="#FFF0C4"/></linearGradient>
+            <linearGradient id="bowl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E2C56B"/><stop offset=".5" stop-color="#C9A24A"/><stop offset="1" stop-color="#7E5F22"/></linearGradient>
+          </defs>
+        </svg>
+        <span class="lbl" id="diyaLbl">Diya · lit</span>
+        <span class="tip mono">दीप · theme</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════════ 2 · JANAM PATRI — §9.5 ══════════════ -->
+  <section class="screen patri" id="scr-patri" role="tabpanel" aria-labelledby="tab-patri" data-screen="patri">
+    <div class="roller roller--top" id="rollTop" aria-hidden="true">
+      <div class="roller__body"><div class="roller__curl" id="curlTop"></div></div>
+      <div class="roller__cap roller__cap--l"></div><div class="roller__cap roller__cap--r"></div>
+    </div>
+
+    <div class="scrollport" id="port">
+      <div class="sheet" id="sheet">
+        <div class="seal-slot">
+          <button class="seal" id="seal" aria-label="Lac seal — hold to recompute under the other ayanamsa preset">
+            <svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true" id="sealMark">
+              <g fill="none" stroke="#F6D9CE" stroke-width="1.6" stroke-linecap="round">
+                <path d="M6 18c6-6 14-6 20 0-6 6-14 6-20 0Z"/><circle cx="12" cy="18" r="1.3" fill="#F6D9CE"/>
+                <path d="M20 28c6-6 14-6 20 0-6 6-14 6-20 0Z"/><circle cx="34" cy="28" r="1.3" fill="#F6D9CE"/>
+              </g>
+            </svg>
+            <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+              <circle id="sealRing" cx="50" cy="50" r="47" fill="none" stroke="#C9A24A" stroke-width="4"
+                      pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" stroke-linecap="round"
+                      transform="rotate(-90 50 50)"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="paper paper--cut">
+          <header class="patri-head">
+            <h1><span lang="hi" class="dev">जन्म पत्री</span> · <span id="phName">Rahul</span></h1>
+            <p class="birthline" id="phBirth">14 March 1994 · 07:25 IST · Bengaluru, KA, IN</p>
+            <div class="engraved" id="phStrip"></div>
+          </header>
+
+          <div class="band"><h2><span lang="hi" class="dev">जन्म पंचांग</span> · Birth panchang</h2><span class="meta">at sunrise 06:29</span></div>
+          <dl class="rows" id="panchangRows"></dl>
+
+          <div class="band"><h2><span lang="hi" class="dev">राशि चक्र</span> · Fig. 1 — D1</h2><span class="meta" id="figMeta">whole sign</span></div>
+          <div class="figure">
+            <div class="chart-wrap" id="chartWrap">
+              <svg class="chart" id="chartD1" viewBox="0 0 300 300" role="img" aria-labelledby="d1title" aria-describedby="ledger"><title id="d1title">Rāśi chart D1, North Indian diamond</title></svg>
+              <div class="loupe" id="loupe" aria-hidden="true">
+                <div class="loupe__glass" id="loupeGlass"></div>
+                <div class="loupe__rim"></div><div class="loupe__flare"></div>
+              </div>
+            </div>
+          </div>
+          <p class="figcap" id="figcap"></p>
+          <div class="readout">
+            <div class="engraved" id="readout"><span class="mono">Touch a graha — the loupe rises</span></div>
+          </div>
+
+          <div class="band"><h2><span lang="hi" class="dev">ग्रह</span> · Grahas</h2><span class="meta" id="ledMeta">sidereal · ′″</span></div>
+          <table class="ledger" id="ledger">
+            <thead><tr><th scope="col">Graha</th><th scope="col">Rāśi</th><th scope="col">Degree</th><th scope="col">Nakṣatra · pada</th><th scope="col">Lord</th></tr></thead>
+            <tbody id="ledgerBody"></tbody>
+          </table>
+          <div class="note-haldi" id="boundNote"></div>
+
+          <div class="band band--plain"><h3><span lang="hi" class="dev">नवांश</span> · Fig. 2 — D9</h3><span class="meta">navāṃśa</span></div>
+          <div class="figure">
+            <div class="chart-wrap" style="max-width:224px">
+              <svg class="chart" id="chartD9" viewBox="0 0 300 300" role="img" aria-label="Navāṃśa chart D9"></svg>
+            </div>
+          </div>
+          <p class="figcap">Fig. 2 — Navāṃśa (D9), same preset. The ninth harmonic is read for the strength a graha keeps behind its rāśi position; here the Lagna moves to <span id="d9lagna">—</span>.</p>
+
+          <div class="band"><h2><span lang="hi" class="dev">दशा</span> · Viṃśottarī</h2><span class="meta">365.25 d year</span></div>
+          <div class="ribbon" id="ribbon"></div>
+          <div class="fold" id="fold"></div>
+
+          <div class="band"><h2><span lang="hi" class="dev">योग</span> · Yogas</h2><span class="meta">BPHS</span></div>
+          <div id="yogas"></div>
+
+          <div class="colophon">
+            <dl>
+              <dt>Engine</dt><dd>astronomy-engine (MIT) · preview build, ±1′</dd>
+              <dt>Ayanāṃśa</dt><dd id="coAy">Lahiri (SE-true) · 23°46′49″</dd>
+              <dt>Node</dt><dd>mean · Houses whole-sign · Sunrise upper limb + refraction</dd>
+              <dt>Gazetteer</dt><dd>GeoNames cities500 (CC BY 4.0)</dd>
+            </dl>
+            <p style="margin:0">Tradition is recorded here, not prescribed. No claim is made about health, wealth, longevity or fertility; nothing on this leaf is advice. All computation happened on this device.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="roller roller--bot" id="rollBot" aria-hidden="true">
+      <div class="roller__body"><div class="roller__curl" id="curlBot"></div></div>
+      <div class="roller__cap roller__cap--l"></div><div class="roller__cap roller__cap--r"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════ 3 · WRITING THE LEAF — §9.4 ══════════════ -->
+  <section class="screen leafscreen" id="scr-leaf" role="tabpanel" aria-labelledby="tab-leaf" data-screen="leaf">
+    <div class="sky" id="skyLeaf" aria-hidden="true"></div>
+    <div class="paper leafsheet">
+      <div class="band"><h2><span lang="hi" class="dev">नया पत्ता</span> · New leaf</h2><span class="meta">unsaved</span></div>
+
+      <div class="field">
+        <label for="fName">Name</label>
+        <input id="fName" type="text" value="Rahul" spellcheck="false" autocomplete="off">
+      </div>
+
+      <div class="drums" id="drums" role="group" aria-label="Birth date and time">
+        <div class="drum" data-drum="d" data-min="1" data-max="31" tabindex="0" role="spinbutton" aria-label="Day" aria-valuenow="14"><div class="drum__win"><div class="drum__strip"></div></div><div class="drum__shade"></div><div class="drum__detent"></div><span class="drum__lbl">day</span></div>
+        <div class="drum" data-drum="m" data-min="1" data-max="12" tabindex="0" role="spinbutton" aria-label="Month" aria-valuenow="3"><div class="drum__win"><div class="drum__strip"></div></div><div class="drum__shade"></div><div class="drum__detent"></div><span class="drum__lbl">mo</span></div>
+        <div class="drum" data-drum="y" data-min="1900" data-max="2026" tabindex="0" role="spinbutton" aria-label="Year" aria-valuenow="1994" style="flex:1.5"><div class="drum__win"><div class="drum__strip"></div></div><div class="drum__shade"></div><div class="drum__detent"></div><span class="drum__lbl">year</span></div>
+        <div class="drum" data-drum="h" data-min="0" data-max="23" tabindex="0" role="spinbutton" aria-label="Hour" aria-valuenow="7"><div class="drum__win"><div class="drum__strip"></div></div><div class="drum__shade"></div><div class="drum__detent"></div><span class="drum__lbl">hh</span></div>
+        <div class="drum" data-drum="mi" data-min="0" data-max="59" tabindex="0" role="spinbutton" aria-label="Minute" aria-valuenow="25"><div class="drum__win"><div class="drum__strip"></div></div><div class="drum__shade"></div><div class="drum__detent"></div><span class="drum__lbl">mm</span></div>
+      </div>
+
+      <div class="field">
+        <label for="fPlace">Place</label>
+        <input id="fPlace" type="text" value="Bengaluru, KA, IN" spellcheck="false" autocomplete="off">
+        <span class="hint">12.9716 N · 77.5946 E</span>
+      </div>
+
+      <div style="padding:0 var(--paper-margin)"><div class="engraved" id="leafStrip"></div></div>
+
+      <div class="field" style="border-bottom:0">
+        <label for="ayaSel">Ayanāṃśa</label>
+        <span class="v" id="ayaLabel">Lahiri (SE-true) · node: mean</span>
+        <button class="linkish" id="ayaSel" type="button">change</button>
+      </div>
+
+      <div class="note-haldi" id="leafNote" hidden></div>
+
+      <div class="sealbtn-wrap">
+        <button class="stamp sealbtn" id="sealBtn"><span class="fill" aria-hidden="true"></span><span>◉ &nbsp;hold to seal the leaf</span></button>
+        <p class="p p--muted" style="margin:0">Bombay Time (+04:51) override appears for births before 1955. Nothing leaves this device.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ 4 · HAST REKHA — §9.8 ══════════════ -->
+  <section class="screen hast" id="scr-hast" role="tabpanel" aria-labelledby="tab-hast" data-screen="hast">
+    <div class="paper hastsheet">
+      <div class="band"><h2><span lang="hi" class="dev">हस्त रेखा</span> · Right hand</h2><span class="meta" id="hastMeta">no print</span></div>
+
+      <div class="hast-two">
+        <div>
+          <div class="printframe is-empty" id="printFrame">
+            <div class="empty-note" id="emptyNote">
+              <svg width="74" height="74" viewBox="0 0 74 74" fill="none" stroke="var(--ink-faint)" stroke-width="1.4" aria-hidden="true">
+                <path d="M22 62c-6-9-9-16-9-22V26a4 4 0 0 1 8 0v10V16a4 4 0 0 1 8 0v20V12a4 4 0 0 1 8 0v24V18a4 4 0 0 1 8 0v22c0 10-2 16-6 22"/>
+              </svg>
+              <b>Lay your hand here</b>
+              <span style="font-size:var(--text-sm)">Fill the frame · palm flat · even light</span>
+            </div>
+            <canvas id="palmCanvas" width="420" height="470" hidden></canvas>
+            <svg class="print-lines" id="palmLines" viewBox="0 0 420 470" aria-hidden="true"></svg>
+            <div class="burnedge" id="burnEdge" aria-hidden="true"></div>
+            <div class="loupe" id="palmLoupe" aria-hidden="true">
+              <div class="loupe__glass" id="palmGlass"></div>
+              <div class="loupe__rim"></div><div class="loupe__flare"></div>
+            </div>
+          </div>
+
+          <div class="tools">
+            <div class="gauge" id="gSharp"><span>sharpness</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+            <div class="gauge is-low" id="gExp"><span>exposure</span><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="tools">
+            <button class="stamp" id="shutter" style="min-height:52px"><span class="fill" aria-hidden="true"></span><span>◉ &nbsp;shutter</span></button>
+            <button class="tool" id="traceBtn" aria-pressed="false" disabled>✎ Trace lines</button>
+            <button class="tool" id="handBtn">⇄ Other hand</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="band band--plain"><h3>Findings</h3><span class="meta" id="findMeta">—</span></div>
+          <table class="ledger" id="findings">
+            <tbody>
+              <tr><td>Element</td><td class="num" id="fEl">—</td><td colspan="2" class="pd">W/L 0.84 · F/L 0.71</td></tr>
+              <tr><td>a. Heart</td><td class="num">len 0.92</td><td class="num pd">curve 0.31</td><td><span class="confbar"><i style="width:88%"></i></span> <span class="num">0.88</span></td></tr>
+              <tr><td>b. Head</td><td class="num">len 0.78</td><td class="num pd">curve 0.12</td><td><span class="confbar"><i style="width:81%"></i></span> <span class="num">0.81</span></td></tr>
+              <tr id="lifeRow"><td>c. Life</td><td class="num">len 0.66</td><td class="num pd">curve 0.42</td><td><span class="confbar is-low" id="lifeBar"><i style="width:47%"></i></span> <span class="num" id="lifeConf">0.47</span> <span class="flag" id="lifeFlag">⚑</span></td></tr>
+            </tbody>
+          </table>
+          <div class="note-haldi" id="palmNote" hidden></div>
+          <p class="p" id="palmReading">Tradition says a heart line that reaches the index mount reads as a settled temper, and a head line that runs level rather than dipping reads as a practical one.<span class="cite">1</span> The life line here is faint at the wrist — trace it before it is read.<span class="cite">2</span></p>
+          <p class="p p--muted" style="margin-top:var(--space-2)">1 Sāmudrika Śāstra, hasta-lakṣaṇa 4.11 · 2 confidence &lt; 0.55, geometry unresolved</p>
+          <div class="tools" style="padding-bottom:var(--space-6)">
+            <button class="tool danger-text" id="burnBtn" disabled>Burn this print (hold)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════ 5 · GUNA MILAN — §9.9 ══════ -->
+  <section class="screen milan" id="scr-milan" role="tabpanel" aria-labelledby="tab-milan" data-screen="milan">
+    <div class="scrollport">
+      <div class="paper milansheet">
+        <div class="band"><h2><span lang="hi" class="dev">गुण मिलान</span> · Milan</h2><span class="meta" id="milanMeta">ashtakoota</span></div>
+        <div class="pair">
+          <div class="pair__scroll"><b>Rahul</b><span lang="hi" class="dev" id="mA">—</span></div>
+          <div class="mauli" aria-hidden="true"></div>
+          <div class="pair__scroll"><b>Priya</b><span lang="hi" class="dev">♉ रोहिणी</span></div>
+        </div>
+        <div class="score"><b id="mScore">—</b><br><span class="stampband" id="mBand">—</span></div>
+        <ul class="beads" id="mBeads"></ul>
+        <p class="p p--muted" id="mNote"></p>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /.screens -->
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- The Ledge — five objects (§9 global) -->
+  <nav class="ledge" aria-label="The Ledge">
+    <button data-go="patri" aria-label="Patri"><span class="obj" aria-hidden="true"><svg width="26" height="18" viewBox="0 0 26 18"><rect x="3" y="3" width="20" height="12" rx="2" fill="#F4EAD3"/><rect x="0" y="1" width="4" height="16" rx="2" fill="#C9A24A"/><rect x="22" y="1" width="4" height="16" rx="2" fill="#C9A24A"/></svg></span><span>Patri</span></button>
+    <button data-go="chowki" aria-label="The desk"><span class="obj" aria-hidden="true"><svg width="24" height="20" viewBox="0 0 24 20"><rect x="1" y="6" width="22" height="4" rx="1.5" fill="#C9A24A"/><path d="M4 10v8M20 10v8" stroke="#C9A24A" stroke-width="2.4" stroke-linecap="round"/><rect x="6" y="1" width="12" height="5" rx="1" fill="#F4EAD3"/></svg></span><span>Desk</span></button>
+    <button data-go="leaf" aria-label="New leaf"><span class="obj" aria-hidden="true"><svg width="24" height="18" viewBox="0 0 24 18"><rect x="1" y="2" width="22" height="5" rx="2.5" fill="#EAD9A9"/><rect x="1" y="9" width="22" height="5" rx="2.5" fill="#EAD9A9" opacity=".75"/><circle cx="12" cy="16" r="2" fill="#B5301C"/></svg></span><span>Leaf</span></button>
+    <button data-go="hast" aria-label="Hast Rekha"><span class="obj" aria-hidden="true"><svg width="22" height="20" viewBox="0 0 22 20"><circle cx="9" cy="9" r="7" fill="none" stroke="#C9A24A" stroke-width="3"/><path d="M14 14l6 5" stroke="#6E4A2E" stroke-width="3" stroke-linecap="round"/></svg></span><span>Hast</span></button>
+    <button data-go="lamp" aria-label="Diya — light or snuff" id="ledgeLamp"><span class="obj" aria-hidden="true"><svg width="24" height="20" viewBox="0 0 24 20"><path d="M12 1c3 3.5 4 5 4 7a4 4 0 0 1-8 0c0-2 1-3.5 4-7Z" fill="#E8A33C" id="ledgeFlame"/><path d="M3 13h18c0 4-4 6-9 6s-9-2-9-6Z" fill="#C9A24A"/></svg></span><span>Lamp</span></button>
+  </nav>
+
+</div><!-- /.device -->
+</main>
+
+<script>
+"use strict";
+/* ==========================================================================
+   0 · helpers
+   ========================================================================== */
+const $  = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const RM = window.matchMedia("(prefers-reduced-motion: reduce)");
+const reduced = () => RM.matches;
+const coarse = window.matchMedia("(pointer: coarse)").matches;
+const capture = (el, e) => { try { if (e.pointerId != null) el.setPointerCapture(e.pointerId); } catch (_) {} };
+const buzz = ms => { if (coarse && navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} } };
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const esc = s => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+const EASE = "cubic-bezier(0.22, 0.8, 0.2, 1)";
+const SPRING = "linear(0, 0.36 10%, 0.78 21%, 1.02 34%, 1.06 42%, 1.01 58%, 0.99 74%, 1)";
+
+let toastTimer = 0;
+function note(msg, kind) {
+  const t = $("#toast");
+  t.className = "toast is-on" + (kind ? " is-" + kind : "");
+  t.innerHTML = msg;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("is-on"), 4000);
+}
+
+/* digit-set (§7.3): numerals set left→right, they never fade */
+function setDigits(el, text) {
+  el.classList.add("setting"); el.classList.remove("is-set");
+  el.innerHTML = Array.from(String(text)).map((c, i) => {
+    const mut = "′″·".indexOf(c) >= 0;
+    return `<i class="${mut ? "mut" : ""}" style="--d:${i * 24}ms">${esc(c)}</i>`;
+  }).join("");
+  requestAnimationFrame(() => el.classList.add("is-set"));
+}
+
+/* ink-draw (§7.2): pathLength 0→1, frame first, 60 ms stagger, nib wobble */
+function inkDraw(root, step) {
+  const marks = $$("[data-ink]", root);
+  marks.forEach((p, i) => {
+    p.getAnimations().forEach(a => a.cancel());
+    p.setAttribute("pathLength", "1");
+    p.style.strokeDasharray = "1";
+    const delay = p.dataset.delay !== undefined ? +p.dataset.delay : i * (step || 60);
+    if (reduced()) {
+      p.style.strokeDashoffset = "0"; p.style.opacity = "0";
+      p.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, delay: Math.min(delay, 240), fill: "forwards", easing: EASE });
+    } else {
+      p.style.strokeDashoffset = "1"; p.style.opacity = "1";
+      const dur = clamp(Number(p.dataset.ink) * 1.1, 400, 1400);
+      p.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: dur, delay, fill: "forwards", easing: EASE });
+      p.animate([{ strokeWidth: "1.05px" }, { strokeWidth: "1.4px" }, { strokeWidth: "1.15px" }, { strokeWidth: "1.25px" }],
+        { duration: 240, delay, iterations: Math.ceil(dur / 240), easing: "steps(4)" });
+    }
+  });
+  const bodies = $$("[data-settle]", root);
+  bodies.forEach((b, i) => {
+    b.getAnimations().forEach(a => a.cancel());
+    const d = (marks.length * (step || 60)) + 220 + i * 40;
+    if (reduced()) b.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, delay: 240, fill: "backwards", easing: EASE });
+    else b.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }],
+      { duration: 420, delay: d, fill: "backwards", easing: SPRING });
+  });
+}
+
+/* ==========================================================================
+   1 · THE ENGINE — Standish mean elements + Kepler, Meeus abridged Moon,
+       Lahiri ayanāṃśa (two presets), whole-sign houses, Viṃśottarī, panchang.
+       The same maths the app ships (docs/RESEARCH.md §5); ±1′ is plenty for a
+       preview, and every number below is genuinely computed, not typed in.
+   ========================================================================== */
+const D2R = Math.PI / 180, R2D = 180 / Math.PI;
+const norm = a => ((a % 360) + 360) % 360;
+
+function julianDay(y, m, d, hUT) {
+  if (m <= 2) { y -= 1; m += 12; }
+  const A = Math.floor(y / 100), B = 2 - A + Math.floor(A / 4);
+  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + B - 1524.5 + hUT / 24;
+}
+/* ΔT (Espenak–Meeus). Positions are computed in TT, sidereal time in UT — a
+   60-second slip is 13″ of Moon, which is 13× the arcsecond this app claims. */
+function deltaTsec(jd) {
+  const t = (jd - 2451545) / 365.25;                       // ≈ years from 2000.0
+  if (t < 5) return 63.86 + 0.3345 * t - 0.060374 * t * t + 0.0017275 * t ** 3 + 0.000651814 * t ** 4 + 0.00002373599 * t ** 5;
+  return 62.92 + 0.32217 * t + 0.005589 * t * t;
+}
+const ttT = jd => (jd + deltaTsec(jd) / 86400 - 2451545) / 36525;
+/* Nutation, Meeus ch.22 abridged — Δψ enters the apparent longitudes and the
+   ayanāṃśa, Δε the true obliquity. */
+const nutArgs = T => [
+  norm(125.04452 - 1934.136261 * T + 0.0020708 * T * T + T * T * T / 450000) * D2R,
+  norm(280.4665 + 36000.7698 * T) * D2R,
+  norm(218.3165 + 481267.8813 * T) * D2R
+];
+function nutLon(T) {
+  const [Om, Ls, Lm] = nutArgs(T);
+  return (-17.20 * Math.sin(Om) - 1.32 * Math.sin(2 * Ls) - 0.23 * Math.sin(2 * Lm) + 0.21 * Math.sin(2 * Om)) / 3600;
+}
+function nutObl(T) {
+  const [Om, Ls, Lm] = nutArgs(T);
+  return (9.20 * Math.cos(Om) + 0.57 * Math.cos(2 * Ls) + 0.10 * Math.cos(2 * Lm) - 0.09 * Math.cos(2 * Om)) / 3600;
+}
+const EL = {
+  Mercury: [0.38709927, 0.20563593, 7.00497902, 252.25032350, 77.45779628, 48.33076593, 0.00000037, 0.00001906, -0.00594749, 149472.67411175, 0.16047689, -0.12534081],
+  Venus:   [0.72333566, 0.00677672, 3.39467605, 181.97909950, 131.60246718, 76.67984255, 0.00000390, -0.00004107, -0.00078890, 58517.81538729, 0.00268329, -0.27769418],
+  Earth:   [1.00000261, 0.01671123, -0.00001531, 100.46457166, 102.93768193, 0.0, 0.00000562, -0.00004392, -0.01294668, 35999.37244981, 0.32327364, 0.0],
+  Mars:    [1.52371034, 0.09339410, 1.84969142, -4.55343205, -23.94362959, 49.55953891, 0.00001847, 0.00007882, -0.00813131, 19140.30268499, 0.44441088, -0.29257343],
+  Jupiter: [5.20288700, 0.04838624, 1.30439695, 34.39644051, 14.72847983, 100.47390909, -0.00011607, -0.00013253, -0.00183714, 3034.74612775, 0.21252668, 0.20469106],
+  Saturn:  [9.53667594, 0.05386179, 2.48599187, 49.95424423, 92.59887831, 113.66242448, -0.00125060, -0.00050991, 0.00193609, 1222.49362201, -0.41897216, -0.28867794]
+};
+function helio(name, T) {
+  const q = EL[name];
+  const a = q[0] + q[6] * T, e = q[1] + q[7] * T, I = (q[2] + q[8] * T) * D2R;
+  const L = norm(q[3] + q[9] * T), w = norm(q[4] + q[10] * T), O = norm(q[5] + q[11] * T);
+  const M = norm(L - w) * D2R, wp = (w - O) * D2R, Om = O * D2R;
+  let E = M;
+  for (let i = 0; i < 40; i++) E = E - (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+  const xv = a * (Math.cos(E) - e), yv = a * Math.sqrt(1 - e * e) * Math.sin(E);
+  return [
+    xv * (Math.cos(wp) * Math.cos(Om) - Math.sin(wp) * Math.sin(Om) * Math.cos(I)) - yv * (Math.sin(wp) * Math.cos(Om) + Math.cos(wp) * Math.sin(Om) * Math.cos(I)),
+    xv * (Math.cos(wp) * Math.sin(Om) + Math.sin(wp) * Math.cos(Om) * Math.cos(I)) + yv * (Math.cos(wp) * Math.cos(Om) * Math.cos(I) - Math.sin(wp) * Math.sin(Om)),
+    xv * Math.sin(wp) * Math.sin(I) + yv * Math.cos(wp) * Math.sin(I)
+  ];
+}
+function geo(name, T) {
+  const p = helio(name, T), e = helio("Earth", T);
+  const x = p[0] - e[0], y = p[1] - e[1], z = p[2] - e[2];
+  return { lon: norm(Math.atan2(y, x) * R2D), lat: Math.atan2(z, Math.hypot(x, y)) * R2D };
+}
+/* Sun — Meeus ch.25, apparent geocentric longitude. (Standish's mean elements
+   are ~5′ out here, which would show in the ledger's arcseconds.) */
+function sunLon(T) {
+  const L0 = norm(280.46646 + 36000.76983 * T + 0.0003032 * T * T);
+  const M = norm(357.52911 + 35999.05029 * T - 0.0001537 * T * T);
+  const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M * D2R)
+          + (0.019993 - 0.000101 * T) * Math.sin(2 * M * D2R)
+          + 0.000289 * Math.sin(3 * M * D2R);
+  return norm(L0 + C - 0.00569 - 0.00478 * Math.sin((125.04 - 1934.136 * T) * D2R));
+}
+/* Moon — Meeus ch.47, the full 60-term ΣL table [coef, D, M, M′, F]. */
+const MOON_TERMS = [[6288774,0,0,1,0],[1274027,2,0,-1,0],[658314,2,0,0,0],[213618,0,0,2,0],[-185116,0,1,0,0],[-114332,0,0,0,2],[58793,2,0,-2,0],[57066,2,-1,-1,0],[53322,2,0,1,0],[45758,2,-1,0,0],[-40923,0,1,-1,0],[-34720,1,0,0,0],[-30383,0,1,1,0],[15327,2,0,0,-2],[-12528,0,0,1,2],[10980,0,0,1,-2],[10675,4,0,-1,0],[10034,0,0,3,0],[8548,4,0,-2,0],[-7888,2,1,-1,0],[-6766,2,1,0,0],[-5163,1,0,-1,0],[4987,1,1,0,0],[4036,2,-1,1,0],[3994,2,0,2,0],[3861,4,0,0,0],[3665,2,0,-3,0],[-2689,0,1,-2,0],[-2602,2,0,-1,2],[2390,2,-1,-2,0],[-2348,1,0,1,0],[2236,2,-2,0,0],[-2120,0,1,2,0],[-2069,0,2,0,0],[2048,2,-2,-1,0],[-1773,2,0,1,-2],[-1595,2,0,0,2],[1215,4,-1,-1,0],[-1110,0,0,2,2],[-892,3,0,-1,0],[-810,2,1,1,0],[759,4,-1,-2,0],[-713,0,2,-1,0],[-700,2,2,-1,0],[691,2,1,-2,0],[596,2,-1,0,-2],[549,4,0,1,0],[537,0,0,4,0],[520,4,-1,0,0],[-487,1,0,-2,0],[-399,2,1,0,-2],[-381,0,0,2,-2],[351,1,1,1,0],[-340,3,0,-2,0],[330,4,0,-3,0],[327,2,-1,2,0],[-323,0,2,1,0],[299,1,1,-1,0],[294,2,0,3,0]];
+function moonLon(T) {
+  const Lp = norm(218.3164477 + 481267.88123421 * T - 0.0015786 * T * T + T ** 3 / 538841 - T ** 4 / 65194000);
+  const D = norm(297.8501921 + 445267.1114034 * T - 0.0018819 * T * T + T ** 3 / 545868 - T ** 4 / 113065000) * D2R;
+  const M = norm(357.5291092 + 35999.0502909 * T - 0.0001536 * T * T + T ** 3 / 24490000) * D2R;
+  const Mp = norm(134.9633964 + 477198.8675055 * T + 0.0087414 * T * T + T ** 3 / 69699 - T ** 4 / 14712000) * D2R;
+  const F = norm(93.2720950 + 483202.0175233 * T - 0.0036539 * T * T - T ** 3 / 3526000 + T ** 4 / 863310000) * D2R;
+  const A1 = norm(119.75 + 131.849 * T) * D2R, A2 = norm(53.09 + 479264.290 * T) * D2R;
+  const E = 1 - 0.002516 * T - 0.0000074 * T * T;
+  let s = 0;
+  for (const t of MOON_TERMS) {
+    let c = t[0];
+    if (Math.abs(t[2]) === 1) c *= E; else if (Math.abs(t[2]) === 2) c *= E * E;
+    s += c * Math.sin(t[1] * D + t[2] * M + t[3] * Mp + t[4] * F);
+  }
+  s += 3958 * Math.sin(A1) + 1962 * Math.sin(Lp * D2R - F) + 318 * Math.sin(A2);
+  return norm(Lp + s / 1e6 + nutLon(T));                 // apparent λ
+}
+/* Lahiri presets — DESIGN.md §9.10 / RESEARCH.md §5.4.
+   'se-true' = SE nutation-inclusive; 'drik' = Drik-compatible mean (+24.3″, no Δψ). */
+function ayanamsa(T, preset) {
+  const pA = (5028.796195 * T + 1.1054348 * T * T) / 3600;
+  if (preset === "drik") return 23.863800 + pA;
+  return 23.857054 + pA + nutLon(T);
+}
+function obliquity(T) { return 23.4392911111 - 0.0130041667 * T - 1.63889e-7 * T * T + 5.03611e-7 * T ** 3 + nutObl(T); }
+/* apparent sidereal time at Greenwich: GMST (UT) + the equation of the equinoxes */
+function gmst(jd) {
+  const Tu = (jd - 2451545) / 36525, Tt = ttT(jd);
+  const th = 280.46061837 + 360.98564736629 * (jd - 2451545) + 0.000387933 * Tu * Tu - Tu ** 3 / 38710000;
+  return norm(th + nutLon(Tt) * Math.cos(obliquity(Tt) * D2R));
+}
+function ascendant(jd, T, latDeg, lonDeg) {
+  const ramc = norm(gmst(jd) + lonDeg) * D2R, eps = obliquity(T) * D2R, phi = latDeg * D2R;
+  return norm(Math.atan2(Math.cos(ramc), -(Math.sin(ramc) * Math.cos(eps) + Math.tan(phi) * Math.sin(eps))) * R2D);
+}
+function altaz(lonEcl, latEcl, jd, T, latDeg, lonDeg) {
+  const eps = obliquity(T) * D2R, l = lonEcl * D2R, b = (latEcl || 0) * D2R;
+  const ra = Math.atan2(Math.sin(l) * Math.cos(eps) - Math.tan(b) * Math.sin(eps), Math.cos(l));
+  const dec = Math.asin(Math.sin(b) * Math.cos(eps) + Math.cos(b) * Math.sin(eps) * Math.sin(l));
+  const H = (norm(gmst(jd) + lonDeg) - norm(ra * R2D)) * D2R, phi = latDeg * D2R;
+  const alt = Math.asin(Math.sin(phi) * Math.sin(dec) + Math.cos(phi) * Math.cos(dec) * Math.cos(H));
+  const az = norm(Math.atan2(Math.sin(H), Math.cos(H) * Math.sin(phi) - Math.tan(dec) * Math.cos(phi)) * R2D + 180);
+  return { alt: alt * R2D, az };
+}
+
+const SIGN  = ["Meṣa","Vṛṣabha","Mithuna","Karka","Siṃha","Kanyā","Tulā","Vṛścika","Dhanu","Makara","Kumbha","Mīna"];
+const SIGND = ["मेष","वृषभ","मिथुन","कर्क","सिंह","कन्या","तुला","वृश्चिक","धनु","मकर","कुम्भ","मीन"];
+const NAK  = ["Aśvinī","Bharaṇī","Kṛttikā","Rohiṇī","Mṛgaśīrṣa","Ārdrā","Punarvasu","Puṣya","Āśleṣā","Maghā","P.Phalgunī","U.Phalgunī","Hasta","Citrā","Svātī","Viśākhā","Anurādhā","Jyeṣṭhā","Mūla","P.Āṣāḍhā","U.Āṣāḍhā","Śravaṇa","Dhaniṣṭhā","Śatabhiṣā","P.Bhādrapadā","U.Bhādrapadā","Revatī"];
+const NAKD = ["अश्विनी","भरणी","कृत्तिका","रोहिणी","मृगशीर्ष","आर्द्रा","पुनर्वसु","पुष्य","आश्लेषा","मघा","पू.फाल्गुनी","उ.फाल्गुनी","हस्त","चित्रा","स्वाति","विशाखा","अनुराधा","ज्येष्ठा","मूल","पू.आषाढा","उ.आषाढा","श्रवण","धनिष्ठा","शतभिषा","पू.भाद्रपदा","उ.भाद्रपदा","रेवती"];
+const LORD = ["Ketu","Śukra","Sūrya","Candra","Maṅgala","Rāhu","Guru","Śani","Budha"];
+const LYRS = { Ketu: 7, Śukra: 20, Sūrya: 6, Candra: 10, Maṅgala: 7, Rāhu: 18, Guru: 16, Śani: 19, Budha: 17 };
+const TITHI = ["Pratipadā","Dvitīyā","Tṛtīyā","Caturthī","Pañcamī","Ṣaṣṭhī","Saptamī","Aṣṭamī","Navamī","Daśamī","Ekādaśī","Dvādaśī","Trayodaśī","Caturdaśī","Pūrṇimā"];
+const VARA = ["Ravivāra","Somavāra","Maṅgalavāra","Budhavāra","Guruvāra","Śukravāra","Śanivāra"];
+const YOGA = ["Viṣkambha","Prīti","Āyuṣmān","Saubhāgya","Śobhana","Atigaṇḍa","Sukarmā","Dhṛti","Śūla","Gaṇḍa","Vṛddhi","Dhruva","Vyāghāta","Harṣaṇa","Vajra","Siddhi","Vyatīpāta","Varīyān","Parigha","Śiva","Siddha","Sādhya","Śubha","Śukla","Brahmā","Indra","Vaidhṛti"];
+const KARANA = ["Bava","Bālava","Kaulava","Taitila","Gara","Vaṇija","Viṣṭi"];
+const ABBR = { Sūrya: ["सू","Sū"], Candra: ["च","Ch"], Maṅgala: ["मं","Ma"], Budha: ["बु","Bu"], Guru: ["गु","Gu"], Śukra: ["शु","Śu"], Śani: ["श","Śa"], Rāhu: ["रा","Rā"], Ketu: ["के","Ke"] };
+
+function dmsParts(x) {
+  let d = Math.floor(x), mf = (x - d) * 60, m = Math.floor(mf), s = Math.round((mf - m) * 60);
+  if (s === 60) { s = 0; m += 1; } if (m === 60) { m = 0; d += 1; }
+  return [d, m, s];
+}
+const degStr = x => { const p = dmsParts(x); return p[0] + "°" + String(p[1]).padStart(2, "0") + "′" + String(p[2]).padStart(2, "0") + "″"; };
+function place(lon) {
+  const sign = Math.floor(lon / 30), ni = Math.floor(lon / (40 / 3));
+  const nStart = ni * (40 / 3), nEnd = nStart + 40 / 3;
+  return {
+    lon, sign, signName: SIGN[sign], signDev: SIGND[sign], inSign: lon - sign * 30,
+    ni, nak: NAK[ni], nakDev: NAKD[ni], pada: Math.floor(lon / (10 / 3)) % 4 + 1,
+    lord: LORD[ni % 9], frac: (lon - nStart) / (40 / 3),
+    edge: Math.min(lon - nStart, nEnd - lon) * 60,          // arcmin to nearest nakṣatra edge
+    cusp: Math.min(lon - sign * 30, (sign + 1) * 30 - lon) * 60 // arcmin to nearest rāśi cusp
+  };
+}
+
+/* whole chart for one birth record */
+function cast(birth) {
+  const jd = julianDay(birth.y, birth.mo, birth.d, birth.h + birth.mi / 60 - birth.tz);
+  const T = ttT(jd), ay = ayanamsa(T, birth.preset);       // TT centuries
+  const T1 = ttT(jd + 1);
+  const raw = {
+    Sūrya: { lon: sunLon(T), lat: 0 },
+    Candra: { lon: moonLon(T), lat: 0 },
+    Maṅgala: geo("Mars", T), Budha: geo("Mercury", T), Guru: geo("Jupiter", T),
+    Śukra: geo("Venus", T), Śani: geo("Saturn", T)
+  };
+  const node = norm(125.0445479 - 1934.1362891 * T + 0.0020754 * T * T);
+  raw["Rāhu"] = { lon: node, lat: 0, retro: true };
+  raw["Ketu"] = { lon: norm(node + 180), lat: 0, retro: true };
+  const nm = { Maṅgala: "Mars", Budha: "Mercury", Guru: "Jupiter", Śukra: "Venus", Śani: "Saturn" };
+  for (const k in nm) raw[k].retro = norm(geo(nm[k], T1).lon - raw[k].lon + 180) - 180 < 0;
+
+  const bodies = ["Sūrya","Candra","Maṅgala","Budha","Guru","Śukra","Śani","Rāhu","Ketu"].map(name => {
+    const p = place(norm(raw[name].lon - ay));
+    p.name = name; p.abbr = ABBR[name]; p.retro = !!raw[name].retro; p.lat = raw[name].lat || 0;
+    p.d9 = Math.floor(p.lon / (10 / 3)) % 12;
+    return p;
+  });
+  const lagna = place(norm(ascendant(jd, T, birth.lat, birth.lon) - ay));
+  lagna.name = "Lagna"; lagna.d9 = Math.floor(lagna.lon / (10 / 3)) % 12;
+  bodies.forEach(b => { b.house = ((b.sign - lagna.sign) + 12) % 12 + 1; });
+
+  const sun = bodies[0], moon = bodies[1], elong = norm(moon.lon - sun.lon);
+  const ti = Math.floor(elong / 12);
+  const panchang = {
+    tithi: (ti < 15 ? "Śukla " : "Kṛṣṇa ") + TITHI[ti % 15],
+    tithiN: ti + 1,
+    vara: VARA[Math.floor(jd + 1.5 + (birth.tz / 24)) % 7],
+    nak: moon.nak, nakDev: moon.nakDev, pada: moon.pada,
+    yoga: YOGA[Math.floor(norm(moon.lon + sun.lon) / (40 / 3))],
+    karana: (() => { const k = Math.floor(elong / 6) + 1; return k === 1 ? "Kiṃstughna" : k >= 58 ? ["Śakuni","Catuṣpada","Nāga"][k - 58] : KARANA[(k - 2) % 7]; })(),
+    illum: (1 - Math.cos(elong * D2R)) / 2
+  };
+  /* Viṃśottarī (§5.8) — balance of the Moon's nakṣatra lord, 365.25-day years */
+  const dashas = []; let idx = LORD.indexOf(moon.lord);
+  let start = jd, bal = LYRS[moon.lord] * (1 - moon.frac);
+  for (let i = 0; i < 9; i++) {
+    const lord = LORD[(idx + i) % 9], yrs = i === 0 ? bal : LYRS[lord];
+    dashas.push({ lord, yrs, from: start, to: start + yrs * 365.25 });
+    start += yrs * 365.25;
+  }
+  return { jd, T, ay, bodies, lagna, panchang, dashas, birth };
+}
+const jdToYMD = jd => {
+  const z = Math.floor(jd + 0.5), f = jd + 0.5 - z;
+  let a = z; if (z >= 2299161) { const al = Math.floor((z - 1867216.25) / 36524.25); a = z + 1 + al - Math.floor(al / 4); }
+  const b = a + 1524, c = Math.floor((b - 122.1) / 365.25), d = Math.floor(365.25 * c), e = Math.floor((b - d) / 30.6001);
+  const day = b - d - Math.floor(30.6001 * e) + f, mo = e < 14 ? e - 1 : e - 13, y = mo > 2 ? c - 4716 : c - 4715;
+  return { y, mo, d: Math.floor(day) };
+};
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const fmtJD = jd => { const t = jdToYMD(jd); return t.d + " " + MON[t.mo - 1] + " " + t.y; };
+
+/* yoga detection — only what this chart actually shows */
+function yogasOf(c) {
+  const out = [], by = {}; c.bodies.forEach(b => by[b.name] = b);
+  const kendra = h => h === 1 || h === 4 || h === 7 || h === 10;
+  const exalt = { Śukra: 11, Sūrya: 0, Candra: 1, Maṅgala: 9, Budha: 5, Guru: 3, Śani: 6 };
+  const own = { Śukra: [1, 6], Maṅgala: [0, 7], Guru: [8, 11], Budha: [2, 5], Śani: [9, 10] };
+  const maha = { Śukra: "Mālavya", Maṅgala: "Rucaka", Budha: "Bhadra", Guru: "Haṃsa", Śani: "Śaśa" };
+  for (const g in maha) {
+    const b = by[g]; if (!b) continue;
+    const dignified = exalt[g] === b.sign || (own[g] && own[g].indexOf(b.sign) >= 0);
+    if (dignified && kendra(b.house)) out.push({
+      t: maha[g] + " Yoga",
+      p: `${g} stands ${exalt[g] === b.sign ? "exalted" : "in its own rāśi"} in ${b.signName}, and ${b.house === 1 ? "in the Lagna itself" : "in the " + b.house + "th"} — a kendra. Tradition says this is one of the five Pañca-Mahāpuruṣa yogas, and reads it as poise carried in the body rather than announced.`,
+      s: "BPHS 75.1 · Phaladīpikā 6.1"
+    });
+  }
+  if (by["Sūrya"].sign === by["Budha"].sign) out.push({
+    t: "Budhāditya Yoga",
+    p: `Budha keeps company with Sūrya in ${by["Sūrya"].signName} (${degStr(by["Budha"].inSign)} to ${degStr(by["Sūrya"].inSign)}, ${Math.round(Math.abs(by["Sūrya"].lon - by["Budha"].lon))}° apart, so Budha is not burnt). Tradition says the mind takes the colour of the ${by["Sūrya"].house}th house it sits in.`,
+    s: "Jātaka Pārijāta 7.24"
+  });
+  const war = ["Maṅgala","Budha","Guru","Śukra","Śani"];
+  for (let i = 0; i < war.length; i++) for (let j = i + 1; j < war.length; j++) {
+    const a = by[war[i]], b = by[war[j]], sep = Math.abs(norm(a.lon - b.lon + 180) - 180);
+    if (sep < 1) out.push({
+      t: "Graha Yuddha",
+      p: `${a.name} and ${b.name} stand ${(sep * 3600).toFixed(0)}″ apart in ${a.signName} — close enough to be a planetary war. ${a.lat > b.lat ? a.name : b.name} passes to the north by ${(Math.abs(a.lat - b.lat) * 60).toFixed(0)}′ and by the older rule holds the field.`,
+      s: "BPHS 3.62 · Sūrya Siddhānta 7"
+    });
+  }
+  const m = by["Candra"];
+  const keepers = c.bodies.filter(b => b.name !== "Candra" && b.name !== "Sūrya" && b.name !== "Rāhu" && b.name !== "Ketu" && b.sign === m.sign);
+  const withMoon = keepers.length > 0;
+  out.push({
+    t: withMoon ? "Kemadruma — cancelled" : "Kemadruma",
+    p: withMoon
+      ? `Candra is not left alone: ${keepers.map(b => b.name).join(" and ")} ${keepers.length > 1 ? "share" : "shares"} ${m.signName} with it, so the isolation yoga does not form. Tradition treats the cancellation as fully as the yoga.`
+      : `Candra sits without company in ${m.signName}. Tradition reads this as a mind that keeps its own counsel; it is cancelled by any graha in the same rāśi or in a kendra from Candra.`,
+    s: "BPHS 41.9"
+  });
+  return out;
+}
+
+/* ==========================================================================
+   2 · STATE
+   ========================================================================== */
+const BIRTH = { name: "Rahul", y: 1994, mo: 3, d: 14, h: 7, mi: 25, tz: 5.5, lat: 12.9716, lon: 77.5946, place: "Bengaluru, KA, IN", preset: "se-true" };
+const NOW = { y: 2026, mo: 9, d: 8, h: 14, mi: 52, tz: 5.5, lat: 12.9716, lon: 77.5946, preset: "se-true" };
+let chart = cast(BIRTH);
+let draft = Object.assign({}, BIRTH);
+
+/* ==========================================================================
+   3 · THE NORTH-INDIAN DIAMOND (§8.2) — drawn in ink, house by house
+   ========================================================================== */
+const HOUSE_POLY = [
+  "150,0 225,75 150,150 75,75", "0,0 150,0 75,75", "0,0 75,75 0,150", "0,150 75,75 150,150 75,225",
+  "0,150 75,225 0,300", "0,300 75,225 150,300", "150,300 75,225 150,150 225,225", "150,300 225,225 300,300",
+  "300,300 225,225 300,150", "300,150 225,225 150,150 225,75", "300,150 225,75 300,0", "300,0 225,75 150,0"
+];
+const HOUSE_AT = [
+  { n: [150, 46], b: [150, 76] }, { n: [30, 20], b: [76, 22] }, { n: [15, 76], b: [32, 58] },
+  { n: [75, 124], b: [75, 150] }, { n: [15, 224], b: [32, 208] }, { n: [75, 288], b: [75, 264] },
+  { n: [150, 204], b: [150, 230] }, { n: [225, 288], b: [225, 264] }, { n: [285, 224], b: [268, 208] },
+  { n: [225, 124], b: [225, 150] }, { n: [285, 76], b: [268, 58] }, { n: [270, 20], b: [224, 22] }
+];
+const TOPTRI = h => h === 1 || h === 11;
+function buildChart(svg, c, opts) {
+  opts = opts || {};
+  const d9 = !!opts.d9, lagSign = d9 ? c.lagna.d9 : c.lagna.sign;
+  const anchors = [];
+  let s = "";
+  /* frame → diagonals → inner diamond, in that order (§7.2) */
+  s += `<path class="stroke" data-ink="1200" d="M2 2H298V298H2Z"/>`;
+  s += `<path class="stroke" data-ink="840" d="M2 2L298 298"/><path class="stroke" data-ink="840" d="M298 2L2 298"/>`;
+  s += `<path class="stroke" data-ink="1200" d="M150 2L298 150L150 298L2 150Z"/>`;
+  for (let h = 0; h < 12; h++) {
+    const at = HOUSE_AT[h], sign = (lagSign + h) % 12;
+    s += `<text class="signnum" x="${at.n[0]}" y="${at.n[1]}" text-anchor="middle" data-settle="1">${sign + 1}</text>`;
+    const here = c.bodies.filter(b => (d9 ? b.d9 : b.sign) === sign);
+    const n = here.length;
+    const showDeg = !d9 && n <= 3;
+    const fs = n >= 4 ? 12 : n === 3 ? 11.5 : 13.5;
+    const step = n >= 4 ? 13 : n === 3 ? 14 : 16;
+    const twoCol = TOPTRI(h) && n >= 4;   /* four grahas in a narrow apex sit as 2 × 2 */
+    const y0 = TOPTRI(h) ? at.b[1] : at.b[1] - (n - 1) * step / 2;
+    here.forEach((b, i) => {
+      const y = twoCol ? 32 + Math.floor(i / 2) * 17 : y0 + i * step;
+      const x = twoCol ? at.b[0] + (i % 2 ? 16 : -16) : at.b[0];
+      s += `<text class="graha${b.retro ? " is-retro" : ""}" x="${x}" y="${y}" text-anchor="middle" font-size="${fs}" data-settle="1">${b.abbr[0]}${showDeg ? " " + Math.floor(b.inSign) : ""}${b.retro ? "<tspan class='retro'>℞</tspan>" : ""}</text>`;
+      if (!d9) anchors.push({ x, y: y - 4, body: b });
+    });
+    if (h === 0) {
+      /* the Lagna receives its sindoor tilak last (§8.2 step 2) */
+      s += `<circle class="tilak" id="tilak${d9 ? "9" : ""}" cx="${at.n[0] + 26}" cy="${at.n[1] - 4}" r="6.5"/>`;
+    }
+  }
+  svg.innerHTML = `<title>${d9 ? "Navāṃśa D9" : "Rāśi D1"} chart, North Indian diamond</title>` + s;
+  const tilak = $("#tilak" + (d9 ? "9" : ""), svg);
+  if (tilak) {
+    tilak.style.opacity = "0";
+    const delay = 1500;
+    if (reduced()) tilak.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, delay: 240, fill: "forwards" });
+    else {
+      tilak.animate([{ opacity: 0, transform: "scale(.7)" }, { opacity: 1, transform: "scale(1.06)", offset: .55 }, { opacity: 1, transform: "scale(1)" }],
+        { duration: 240, delay, fill: "forwards", easing: EASE });
+      setTimeout(() => buzz(14), delay);
+    }
+  }
+  inkDraw(svg, 60);
+  return anchors;
+}
+
+/* ==========================================================================
+   4 · RENDER THE PATRI
+   ========================================================================== */
+let planetAnchors = [];
+function renderPatri() {
+  const c = chart, b = c.birth;
+  $("#phName").textContent = b.name;
+  $("#phBirth").textContent = `${b.d} ${["January","February","March","April","May","June","July","August","September","October","November","December"][b.mo - 1]} ${b.y} · ${String(b.h).padStart(2,"0")}:${String(b.mi).padStart(2,"0")} IST · ${b.place}`;
+  $("#phStrip").innerHTML = `<b>ASIA/KOLKATA</b><span class="sep">·</span>+05:30<span class="sep">·</span>JD <span class="setting" id="jdOut"></span><span class="sep">·</span>LAGNA ${c.lagna.signName.toUpperCase()}`;
+  setDigits($("#jdOut"), c.jd.toFixed(4));
+
+  const p = c.panchang;
+  $("#panchangRows").innerHTML =
+    row("Tithi", p.tithi, "no. " + p.tithiN) +
+    row("Vāra", p.vara, "sunrise 06:29") +
+    row("Nakṣatra", `${p.nak} · <span lang="hi" class="dev">${p.nakDev}</span>`, "pada " + p.pada) +
+    row("Yoga", p.yoga, "") + row("Karaṇa", p.karana, "") +
+    row("Candra", `${c.bodies[1].signName} · <span lang="hi" class="dev">${c.bodies[1].signDev}</span>`, (p.illum * 100).toFixed(0) + "% lit");
+  function row(k, v, end) { return `<div class="row"><dt>${k}</dt><dd>${v}</dd>${end ? `<span class="end">${end}</span>` : ""}</div>`; }
+
+  $("#figMeta").textContent = b.preset === "drik" ? "Drik-mean" : "Lahiri SE-true";
+  $("#figcap").innerHTML = `Fig. 1 — Rāśi (D1), Lahiri ${b.preset === "drik" ? "(Drik-compatible mean)" : "(SE, nutation-inclusive)"}, whole-sign houses, mean node. Ayanāṃśa at birth ${degStr(c.ay)}. The tilak marks the Lagna in ${c.lagna.signName} ${degStr(c.lagna.inSign)}.`;
+  $("#coAy").textContent = `Lahiri (${b.preset === "drik" ? "Drik-compatible mean" : "SE-true"}) · ${degStr(c.ay)}`;
+  $("#ledMeta").textContent = "sidereal · " + (b.preset === "drik" ? "Drik-mean" : "SE-true");
+
+  $("#ledgerBody").innerHTML = c.bodies.map((x, i) => {
+    const flag = x.edge <= 2 ? ' <span class="flag" title="within 2′ of a nakṣatra boundary">*</span>' : "";
+    return `<tr data-body="${i}" tabindex="0"><td><span lang="hi" class="dev">${x.abbr[0]}</span> ${x.abbr[1]}${x.retro ? '<span class="retro">℞</span>' : ""}</td>
+      <td>${x.signName}</td>
+      <td class="num">${degStr(x.inSign).replace(/′/, '<span class="min">′</span>').replace(/″/, '<span class="sec">″</span>')}</td>
+      <td><span class="nak">${x.nak}</span> <span class="pd">${x.pada}</span>${flag}</td>
+      <td class="pd">${x.lord}</td></tr>`;
+  }).join("");
+
+  /* the honest boundary note — nearest cusp anywhere in the chart */
+  const near = c.bodies.slice().sort((a, z) => a.cusp - z.cusp)[0];
+  const other = cast(Object.assign({}, b, { preset: b.preset === "drik" ? "se-true" : "drik" }));
+  const alt = other.bodies.find(x => x.name === near.name);
+  const am = Math.floor(near.cusp), as = Math.round((near.cusp - am) * 60);
+  $("#boundNote").innerHTML = `<span aria-hidden="true">⚑</span><span><b>${near.name}</b> stands ${am}′${String(as).padStart(2, "0")}″ from the ${SIGN[near.sign]} / ${SIGN[(near.sign + 1) % 12]} cusp — the nearest boundary in this chart. Under the ${b.preset === "drik" ? "SE-true" : "Drik-compatible mean"} preset (${(other.ay - c.ay) > 0 ? "+" : "−"}${Math.abs((other.ay - c.ay) * 3600).toFixed(1)}″ of ayanāṃśa) it reads ${degStr(alt.inSign)} ${alt.signName}. Hold the lac seal above to recompute.</span>`;
+
+  planetAnchors = buildChart($("#chartD1"), c);
+  buildChart($("#chartD9"), c, { d9: true });
+  $("#d9lagna").textContent = SIGN[c.lagna.d9];
+
+  /* dasha ribbon — brass clip on the mahādaśā running now */
+  const nowJD = julianDay(NOW.y, NOW.mo, NOW.d, 12 - NOW.tz);
+  $("#ribbon").innerHTML = c.dashas.map((d, i) => {
+    const isNow = nowJD >= d.from && nowJD < d.to;
+    return `<button data-md="${i}" class="${isNow ? "is-now" : ""}" aria-expanded="false"><span class="l" lang="hi">${d.lord}</span><span class="y">${jdToYMD(d.from).y}–${jdToYMD(d.to).y}</span><span class="y">${d.yrs.toFixed(1)} yr</span></button>`;
+  }).join("");
+  const nowBtn = $("#ribbon .is-now");
+  if (nowBtn) { openFold(Number(nowBtn.dataset.md)); nowBtn.setAttribute("aria-expanded", "true"); }
+
+  $("#yogas").innerHTML = yogasOf(c).map(y =>
+    `<div class="yoga"><h4>${y.t}</h4><p>${y.p}</p><p class="src">${y.s}</p></div>`).join("");
+}
+function openFold(i) {
+  const md = chart.dashas[i], nowJD = julianDay(NOW.y, NOW.mo, NOW.d, 12 - NOW.tz);
+  const start = LORD.indexOf(md.lord); let t = md.from; const items = [];
+  for (let k = 0; k < 9; k++) {
+    const lord = LORD[(start + k) % 9], yrs = md.yrs * LYRS[lord] / 120;
+    items.push({ lord, from: t, to: t + yrs * 365.25 }); t += yrs * 365.25;
+  }
+  $("#fold").innerHTML = `<div class="fold-in"><ul>` + items.map(a => {
+    const on = nowJD >= a.from && nowJD < a.to;
+    return `<li class="${on ? "is-now" : ""}"><span class="n">${md.lord} — ${a.lord}${on ? " · now" : ""}</span><span class="mono">${fmtJD(a.from)} → ${fmtJD(a.to)}</span></li>`;
+  }).join("") + `</ul></div>`;
+}
+$("#ribbon").addEventListener("click", e => {
+  const b = e.target.closest("button[data-md]"); if (!b) return;
+  $$("#ribbon button").forEach(x => x.setAttribute("aria-expanded", "false"));
+  b.setAttribute("aria-expanded", "true");
+  openFold(Number(b.dataset.md)); buzz(8);
+});
+
+/* ==========================================================================
+   5 · UNROLL + LAC SEAL (§8.1)
+   ========================================================================== */
+const port = $("#port"), sheet = $("#sheet");
+function unroll() {
+  const max = port.scrollHeight - port.clientHeight;
+  const p = max > 0 ? clamp(port.scrollTop / max, 0, 1) : 0;
+  $("#rollTop").firstElementChild.style.transform = `scaleY(${(1 + 0.35 * p).toFixed(3)})`;
+  $("#rollBot").firstElementChild.style.transform = `scaleY(${(1.35 - 0.35 * p).toFixed(3)})`;
+  $("#curlTop").style.transform = `translateX(${(-40 + p * 200).toFixed(1)}%)`;
+  $("#curlBot").style.transform = `translateX(${(160 - p * 200).toFixed(1)}%)`;
+}
+port.addEventListener("scroll", () => requestAnimationFrame(unroll), { passive: true });
+
+let pull = 0, pulling = false, startY = 0;
+const setPull = v => { pull = v; sheet.style.transform = v ? `translateY(${v}px)` : ""; };
+function releasePull() {
+  if (!pull) return;
+  const from = pull; pull = 0;
+  if (reduced()) { sheet.style.transform = ""; return; }
+  sheet.animate([{ transform: `translateY(${from}px)` }, { transform: "none" }], { duration: 480, easing: SPRING });
+  sheet.style.transform = ""; buzz(6);
+}
+port.addEventListener("touchstart", e => { startY = e.touches[0].clientY; pulling = port.scrollTop <= 0; }, { passive: true });
+port.addEventListener("touchmove", e => {
+  if (!pulling) return;
+  const dy = e.touches[0].clientY - startY;
+  if (dy > 0 && port.scrollTop <= 0) { e.preventDefault(); setPull(Math.min(84, dy * 0.55)); }
+}, { passive: false });
+port.addEventListener("touchend", releasePull);
+let wheelTimer = 0;
+port.addEventListener("wheel", e => {
+  if (port.scrollTop > 0 || e.deltaY >= 0) return;
+  setPull(Math.min(84, pull + Math.abs(e.deltaY) * 0.5));
+  clearTimeout(wheelTimer); wheelTimer = setTimeout(releasePull, 420);
+}, { passive: true });
+$("#seal").addEventListener("focus", () => setPull(84));
+$("#seal").addEventListener("blur", releasePull);
+
+/* seal-thunk (§7.7): hold 600 ms → recompute under the other ayanāṃśa preset */
+const seal = $("#seal"), sealRing = $("#sealRing");
+let holdRAF = 0, holdT0 = 0;
+function holdStart(e) {
+  e.preventDefault(); holdT0 = performance.now();
+  capture(seal, e);
+  const tick = () => {
+    const k = clamp((performance.now() - holdT0) / 600, 0, 1);
+    sealRing.setAttribute("stroke-dashoffset", String(1 - k));
+    seal.style.transform = `scale(${1 - 0.06 * k})`;
+    if (k >= 1) { holdFire(); return; }
+    holdRAF = requestAnimationFrame(tick);
+  };
+  holdRAF = requestAnimationFrame(tick);
+}
+function holdEnd() {
+  cancelAnimationFrame(holdRAF);
+  sealRing.setAttribute("stroke-dashoffset", "1");
+  seal.style.transform = "";
+}
+function holdFire() {
+  holdEnd(); buzz(24);
+  seal.animate([{ transform: "scale(1.08)" }, { transform: "scale(1)" }], { duration: reduced() ? 160 : 480, easing: SPRING });
+  BIRTH.preset = draft.preset = BIRTH.preset === "drik" ? "se-true" : "drik";
+  chart = cast(BIRTH);
+  renderPatri();
+  renderMilan();
+  $("#ayaLabel").textContent = `Lahiri (${BIRTH.preset === "drik" ? "Drik-compatible mean" : "SE-true"}) · node: mean`;
+  note(`Recomputed under <b>Lahiri ${BIRTH.preset === "drik" ? "(Drik-compatible mean)" : "(SE-true)"}</b> — ayanāṃśa ${degStr(chart.ay)}. Every numeral was re-set, not re-typed.`);
+}
+seal.addEventListener("pointerdown", holdStart);
+seal.addEventListener("pointerup", holdEnd);
+seal.addEventListener("pointercancel", holdEnd);
+seal.addEventListener("pointerleave", holdEnd);
+seal.addEventListener("keydown", e => { if ((e.key === " " || e.key === "Enter") && !holdRAF) { e.preventDefault(); holdStart(e); } });
+seal.addEventListener("keyup", holdEnd);
+
+/* ==========================================================================
+   6 · THE LOUPE ON THE CHART (§8.2 · loupe-rise)
+   ========================================================================== */
+const wrap = $("#chartWrap"), loupe = $("#loupe"), glass = $("#loupeGlass"), readout = $("#readout");
+const Z = 2.4, R = 53;
+let litBody = null;
+function loupeClone() {
+  glass.innerHTML = "";
+  const clone = $("#chartD1").cloneNode(true);
+  clone.removeAttribute("id");
+  clone.style.width = (wrap.clientWidth * Z) + "px";
+  clone.style.height = (wrap.clientWidth * Z) + "px";
+  $$("[data-ink],[data-settle]", clone).forEach(n => { n.style.strokeDashoffset = "0"; n.style.opacity = "1"; });
+  const t = $(".tilak", clone); if (t) t.style.opacity = "1";
+  glass.appendChild(clone);
+}
+function loupeTo(px, py, settle) {
+  loupe.style.left = px + "px"; loupe.style.top = py + "px";
+  loupe.style.transform = "translate(-50%, -50%) scale(1)";
+  const c = glass.firstElementChild;
+  if (c) c.style.transform = `translate(${R - px * Z}px, ${R - py * Z}px)`;
+  const sc = wrap.clientWidth / 300;
+  let best = null, bd = 1e9;
+  planetAnchors.forEach(a => {
+    const d = Math.hypot(a.x * sc - px, a.y * sc - py);
+    if (d < bd) { bd = d; best = a; }
+  });
+  if (best && bd < 74 && best.body !== litBody) {
+    litBody = best.body; buzz(8);
+    const b = best.body;
+    const badge = b.edge <= 2 ? `<span class="badge-bound">≤2′ boundary</span>` : "";
+    readout.innerHTML = `<b>${b.abbr[1].toUpperCase()}</b> <span class="setting" id="roDeg"></span> <span class="sep">·</span> ${b.nak.toUpperCase()} ${b.pada} <span class="sep">·</span> LORD ${b.lord.toUpperCase()}${b.retro ? " ℞" : ""} ${badge}`;
+    setDigits($("#roDeg"), degStr(b.inSign));
+    $$("#ledgerBody tr").forEach(tr => tr.classList.toggle("is-lit", chart.bodies[Number(tr.dataset.body)] === b));
+  }
+  if (settle && best && bd < 120) {
+    const tx = best.x * sc, ty = best.y * sc;
+    loupe.animate([{ left: px + "px", top: py + "px" }, { left: tx + "px", top: ty + "px" }],
+      { duration: reduced() ? 160 : 420, easing: reduced() ? EASE : SPRING, fill: "forwards" });
+    const cc = glass.firstElementChild;
+    if (cc) cc.animate([{ transform: cc.style.transform }, { transform: `translate(${R - tx * Z}px, ${R - ty * Z}px)` }],
+      { duration: reduced() ? 160 : 420, easing: reduced() ? EASE : SPRING, fill: "forwards" });
+  }
+}
+let loupeOn = false;
+function loupeStart(e) {
+  if (e.pointerType === "mouse" && e.buttons === 0) return;
+  loupeOn = true; loupeClone(); loupe.classList.add("is-up");
+  capture(wrap, e);
+  const r = wrap.getBoundingClientRect();
+  loupe.animate([{ transform: "translate(-50%,-50%) scale(.6) translateY(24px)" }, { transform: "translate(-50%,-50%) scale(1)" }],
+    { duration: 240, easing: EASE });
+  loupeTo(e.clientX - r.left, e.clientY - r.top, false);
+}
+wrap.addEventListener("pointerdown", loupeStart);
+wrap.addEventListener("pointermove", e => {
+  if (!loupeOn) return;
+  const r = wrap.getBoundingClientRect();
+  loupeTo(clamp(e.clientX - r.left, 0, r.width), clamp(e.clientY - r.top, 0, r.height), false);
+});
+function loupeEnd(e) {
+  if (!loupeOn) return; loupeOn = false;
+  const r = wrap.getBoundingClientRect();
+  loupeTo(clamp(e.clientX - r.left, 0, r.width), clamp(e.clientY - r.top, 0, r.height), true);
+  setTimeout(() => { loupe.classList.remove("is-up"); litBody = null; }, 2600);
+}
+wrap.addEventListener("pointerup", loupeEnd);
+wrap.addEventListener("pointercancel", loupeEnd);
+/* keyboard equivalent: the ledger reads the same register */
+$("#ledgerBody").addEventListener("click", e => { const tr = e.target.closest("tr"); if (tr) readBody(Number(tr.dataset.body)); });
+$("#ledgerBody").addEventListener("keydown", e => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const tr = e.target.closest("tr"); if (!tr) return; e.preventDefault(); readBody(Number(tr.dataset.body));
+});
+function readBody(i) {
+  const b = chart.bodies[i], a = planetAnchors.find(x => x.body === b);
+  if (!a) return;
+  loupeClone(); loupe.classList.add("is-up"); litBody = null;
+  const sc = wrap.clientWidth / 300;
+  loupeTo(a.x * sc, a.y * sc, false);
+  setTimeout(() => loupe.classList.remove("is-up"), 3200);
+}
+
+/* ==========================================================================
+   7 · THE PARAPET SKY (§8.3 · sky-scrub)
+   ========================================================================== */
+const STARS = [];
+for (let i = 0; i < 34; i++) {
+  const r = (i * 2654435761 % 1000) / 1000, r2 = ((i + 7) * 40503 % 997) / 997;
+  STARS.push([6 + r * 378, 4 + r2 * 56, 0.5 + ((i * 13) % 7) / 7]);
+}
+/* The strip is a fixed 90-unit-tall band whose width follows the element, so
+   nothing is ever stretched: the viewBox is recomputed from the real aspect. */
+function skyMarkup() {
+  return `<svg preserveAspectRatio="none" viewBox="0 0 390 90">
+    <g class="sky-stars"></g>
+    <circle class="sky-moon" cx="60" cy="40" r="6.5" fill="#DCE4F5"/>
+    <circle class="sky-moonshade" cx="56" cy="40" r="6.5" fill="#12183a"/>
+    <circle class="sky-sun" cx="300" cy="30" r="8" fill="#FFE0A8"/>
+    <path class="sky-parapet" d="" fill="#160D07"/>
+  </svg>`;
+}
+function parapetPath(vw) {
+  let d = "M0 76", x = 0, i = 0;
+  while (x < vw) {
+    const seg = 34 + (i * 37 % 5) * 16, notch = 5 + (i * 17 % 4) * 3;
+    d += `H${Math.min(x + seg, vw).toFixed(1)}v${-notch}h9v${notch}`;
+    x += seg + 9; i++;
+  }
+  return d + `H${vw.toFixed(1)}V90H0Z`;
+}
+function fitSky(el) {
+  const r = el.getBoundingClientRect(), svg = el.firstElementChild;
+  const vw = Math.max(160, r.height > 0 ? r.width * (90 / r.height) : 390);
+  if (el.dataset.vw === vw.toFixed(0)) return vw;
+  el.dataset.vw = vw.toFixed(0);
+  svg.setAttribute("viewBox", `0 0 ${vw.toFixed(1)} 90`);
+  $(".sky-stars", svg).innerHTML = STARS.map(s =>
+    `<circle cx="${(s[0] / 390 * vw).toFixed(1)}" cy="${s[1].toFixed(1)}" r="${s[2].toFixed(2)}" fill="#F4EAD3"/>`).join("");
+  $(".sky-parapet", svg).setAttribute("d", parapetPath(vw));
+  return vw;
+}
+const SKY_KEYS = [
+  [-18, ["#0B1024", "#141A32"]], [-12, ["#141A32", "#28264C"]], [-6, ["#2E2A4E", "#7A4A50"]],
+  [-0.5, ["#4A3050", "#C9724A"]], [4, ["#8A6B70", "#E9A15A"]], [12, ["#5E86AC", "#C9C7B4"]], [60, ["#4C7BA8", "#BFD3E2"]]
+];
+function mix(a, b, t) {
+  const p = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  const A = p(a), B = p(b);
+  return "#" + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, "0")).join("");
+}
+function skyColors(alt) {
+  let i = 0; while (i < SKY_KEYS.length - 1 && alt > SKY_KEYS[i][0]) i++;
+  const lo = SKY_KEYS[Math.max(0, i - 1)], hi = SKY_KEYS[i];
+  const t = clamp((alt - lo[0]) / (hi[0] - lo[0] || 1), 0, 1);
+  return [mix(lo[1][0], hi[1][0], t), mix(lo[1][1], hi[1][1], t)];
+}
+function paintSky(el, rec) {
+  const jd = julianDay(rec.y, rec.mo, rec.d, rec.h + rec.mi / 60 - rec.tz), T = ttT(jd);
+  const sl = sunLon(T), ml = moonLon(T);
+  const S = altaz(sl, 0, jd, T, rec.lat, rec.lon), M = altaz(ml, 0, jd, T, rec.lat, rec.lon);
+  const col = skyColors(S.alt);
+  el.style.background = `linear-gradient(180deg, ${col[0]} 0%, ${col[1]} 78%, ${col[1]} 100%)`;
+  const svg = el.firstElementChild; if (!svg) return;
+  const vw = fitSky(el);
+  const place2 = (o, node) => {
+    const x = clamp(((o.az - 55) / 250) * vw, -30, vw + 30);
+    const y = 76 - clamp(o.alt, -20, 62) / 62 * 70;
+    node.setAttribute("cx", x.toFixed(1)); node.setAttribute("cy", y.toFixed(1));
+    return { x, y };
+  };
+  place2(S, $(".sky-sun", svg));
+  const mp = place2(M, $(".sky-moon", svg));
+  const k = (1 - Math.cos(norm(ml - sl) * D2R)) / 2;
+  const shade = $(".sky-moonshade", svg);
+  shade.setAttribute("cx", (mp.x - (1 - k) * 8 * (norm(ml - sl) < 180 ? 1 : -1)).toFixed(1));
+  shade.setAttribute("cy", mp.y.toFixed(1));
+  shade.setAttribute("fill", col[0]);
+  $(".sky-sun", svg).style.opacity = S.alt > -3 ? 1 : 0;
+  $(".sky-moon", svg).style.opacity = M.alt > -3 ? 1 : 0;
+  shade.style.opacity = M.alt > -3 ? 1 : 0;
+  $(".sky-stars", svg).style.opacity = clamp((-S.alt - 2) / 10, 0, .9);
+  document.documentElement.style.setProperty("--moon-k", k.toFixed(2));
+  return { sunAlt: S.alt, k };
+}
+$("#skyHome").innerHTML = skyMarkup();
+$("#skyLeaf").innerHTML = skyMarkup();
+paintSky($("#skyHome"), NOW);
+
+/* ==========================================================================
+   8 · BRASS DRUMS (§8.3 · drum-spin) — zero easing while dragging, BRASS
+       inertia on release, a detent every unit, a dull tick for an impossible date
+   ========================================================================== */
+const CELL = 26;
+const daysIn = (y, m) => [31, (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1];
+const drumState = {};
+function initDrum(el) {
+  const key = el.dataset.drum, min = +el.dataset.min, max = +el.dataset.max;
+  const strip = $(".drum__strip", el);
+  let html = "";
+  for (let v = min; v <= max; v++) html += `<div class="drum__cell" style="top:${(v - min) * CELL}px">${key === "y" ? v : String(v).padStart(2, "0")}</div>`;
+  strip.innerHTML = html;
+  const st = { el, strip, min, max, pos: +el.getAttribute("aria-valuenow") - min, vel: 0, raf: 0, drag: false, lastTick: 0 };
+  drumState[key] = st;
+  paint(st);
+
+  el.addEventListener("pointerdown", e => {
+    capture(el, e); st.drag = true; st.vel = 0; st.lastY = e.clientY; st.lastT = performance.now();
+    cancelAnimationFrame(st.raf);
+  });
+  el.addEventListener("pointermove", e => {
+    if (!st.drag) return;
+    const dy = e.clientY - st.lastY, dt = Math.max(8, performance.now() - st.lastT);
+    st.lastY = e.clientY; st.lastT = performance.now();
+    st.pos = clamp(st.pos - dy / CELL, -0.6, (st.max - st.min) + 0.6);
+    st.vel = clamp(-dy / CELL / dt * 16, -4, 4);
+    paint(st, true);
+  });
+  const up = () => { if (!st.drag) return; st.drag = false; coast(st); };
+  el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
+  el.addEventListener("keydown", e => {
+    const d = e.key === "ArrowUp" || e.key === "ArrowRight" ? 1 : e.key === "ArrowDown" || e.key === "ArrowLeft" ? -1 : 0;
+    if (!d) return; e.preventDefault();
+    st.pos = clamp(Math.round(st.pos) + d, 0, st.max - st.min); settle(st);
+  });
+}
+let drumsReady = false;
+function paint(st, tick) {
+  st.strip.style.transform = `translateY(${(-st.pos * CELL).toFixed(2)}px)`;
+  const v = Math.round(st.pos) + st.min;
+  if (tick) {
+    const now = performance.now();
+    if (v !== st.lastV && now - st.lastTick > 40) { st.lastTick = now; st.lastV = v; buzz(5); }
+  }
+  st.el.setAttribute("aria-valuenow", String(v));
+  if (drumsReady) syncDraft();
+}
+function coast(st) {
+  if (reduced() || Math.abs(st.vel) < 0.02) return settle(st);
+  const step = () => {
+    st.vel *= 0.94; st.pos += st.vel;
+    if (st.pos < 0) { st.pos = 0; st.vel = 0; } if (st.pos > st.max - st.min) { st.pos = st.max - st.min; st.vel = 0; }
+    paint(st, true);
+    if (Math.abs(st.vel) > 0.02) st.raf = requestAnimationFrame(step); else settle(st);
+  };
+  st.raf = requestAnimationFrame(step);
+}
+function settle(st) {
+  let target = clamp(Math.round(st.pos), 0, st.max - st.min);
+  /* an impossible date refuses the detent with a dull tick (§9.4 states) */
+  if (st === drumState.d || st === drumState.m) {
+    const y = drumState.y.min + Math.round(drumState.y.pos), m = drumState.m.min + Math.round(drumState.m.pos);
+    const dim = daysIn(y, clamp(m, 1, 12));
+    if (st === drumState.d && target + 1 > dim) {
+      target = dim - 1; st.el.classList.add("is-refused"); buzz(30);
+      setTimeout(() => st.el.classList.remove("is-refused"), 220);
+      note(`${dim} days in ${["January","February","March","April","May","June","July","August","September","October","November","December"][m - 1]} ${y} — the drum refuses the detent.`, "warn");
+    }
+  }
+  const from = st.pos;
+  st.pos = target; paint(st);
+  if (!reduced() && Math.abs(from - target) > 0.01) {
+    const t0 = performance.now();
+    const tween = () => {
+      const k = clamp((performance.now() - t0) / 240, 0, 1);
+      const e = 1 - Math.pow(1 - k, 3);
+      st.strip.style.transform = `translateY(${(-(from + (target - from) * e) * CELL).toFixed(2)}px)`;
+      if (k < 1) st.raf = requestAnimationFrame(tween);
+    };
+    st.raf = requestAnimationFrame(tween);
+  }
+  buzz(8);
+}
+$$(".drum").forEach(initDrum);
+drumsReady = true;
+
+let lastLagnaSign = -1;
+function syncDraft() {
+  draft.y = drumState.y.min + Math.round(drumState.y.pos);
+  draft.mo = drumState.m.min + Math.round(drumState.m.pos);
+  draft.d = clamp(drumState.d.min + Math.round(drumState.d.pos), 1, daysIn(draft.y, clamp(draft.mo, 1, 12)));
+  draft.h = drumState.h.min + Math.round(drumState.h.pos);
+  draft.mi = drumState.mi.min + Math.round(drumState.mi.pos);
+  draft.name = $("#fName").value || "Unnamed";
+  draft.tz = 5.5; draft.lat = BIRTH.lat; draft.lon = BIRTH.lon; draft.place = $("#fPlace").value;
+  paintSky($("#skyLeaf"), draft);
+  const jd = julianDay(draft.y, draft.mo, draft.d, draft.h + draft.mi / 60 - draft.tz), T = ttT(jd);
+  const lg = place(norm(ascendant(jd, T, draft.lat, draft.lon) - ayanamsa(T, draft.preset)));
+  const strip = $("#leafStrip");
+  if (!$("#lgOut")) {
+    strip.innerHTML = `<b>ASIA/KOLKATA</b><span class="sep">·</span>+05:30<span class="sep">·</span>JD <span class="setting" id="jdLeaf"></span><span class="sep">·</span>LAGNA <b id="lgOut"></b>`;
+  }
+  $("#jdLeaf").textContent = jd.toFixed(4);
+  if (lg.sign !== lastLagnaSign) {
+    lastLagnaSign = lg.sign; buzz(10);
+    setDigits($("#lgOut"), lg.signName.toUpperCase());
+  }
+  const note1 = $("#leafNote");
+  if (draft.y < 1955) {
+    note1.hidden = false;
+    note1.innerHTML = `<span aria-hidden="true">⚑</span><span>Before 1955 a Bombay-Time override (+04:51) applies to some Indian births — an extra brass drum appears here.</span>`;
+  } else note1.hidden = true;
+}
+$("#fName").addEventListener("input", syncDraft);
+$("#fPlace").addEventListener("input", syncDraft);
+$("#ayaSel").addEventListener("click", () => {
+  draft.preset = BIRTH.preset = BIRTH.preset === "drik" ? "se-true" : "drik";
+  $("#ayaLabel").textContent = `Lahiri (${BIRTH.preset === "drik" ? "Drik-compatible mean" : "SE-true"}) · node: mean`;
+  chart = cast(BIRTH); renderPatri(); renderMilan(); syncDraft();
+  note(`Preset is now <b>Lahiri ${BIRTH.preset === "drik" ? "(Drik-compatible mean)" : "(SE-true)"}</b>. Every cached patri gets a haldi “recompute” tab.`, "warn");
+});
+
+/* hold to seal the leaf */
+function holdButton(btn, ms, onFire) {
+  let raf = 0, t0 = 0;
+  const fill = $(".fill", btn);
+  const stop = () => { cancelAnimationFrame(raf); raf = 0; if (fill) fill.style.transform = "scaleX(0)"; btn.style.transform = ""; };
+  const start = e => {
+    if (btn.disabled) return;
+    if (e.preventDefault) e.preventDefault();
+    t0 = performance.now();
+    const tick = () => {
+      const k = clamp((performance.now() - t0) / ms, 0, 1);
+      if (fill) fill.style.transform = `scaleX(${k})`;
+      btn.style.transform = `scale(${1 - 0.02 * k})`;
+      if (k >= 1) { stop(); buzz(24); onFire(); return; }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+  };
+  btn.addEventListener("pointerdown", start);
+  ["pointerup", "pointercancel", "pointerleave"].forEach(t => btn.addEventListener(t, stop));
+  btn.addEventListener("keydown", e => { if ((e.key === " " || e.key === "Enter") && !raf) start(e); });
+  btn.addEventListener("keyup", stop);
+  return { stop };
+}
+holdButton($("#sealBtn"), 600, () => {
+  Object.assign(BIRTH, draft);
+  chart = cast(BIRTH); renderPatri(); renderMilan();
+  note(`Leaf sealed — <b>${esc(BIRTH.name)}</b>, ${BIRTH.d} ${MON[BIRTH.mo - 1]} ${BIRTH.y}, ${String(BIRTH.h).padStart(2, "0")}:${String(BIRTH.mi).padStart(2, "0")}. The patri was written for it.`);
+  go("patri", $("#sealBtn"));
+});
+
+/* ==========================================================================
+   9 · HAST REKHA (§8.5) — procedural print, ink lines, loupe, stylus, burn
+   ========================================================================== */
+const cv = $("#palmCanvas"), lines = $("#palmLines"), frame = $("#printFrame");
+let printed = false, tracing = false, tracePts = [];
+function rnd(seed) { let s = seed; return () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648; }
+function drawPalm() {
+  const g = cv.getContext("2d"), W = cv.width, H = cv.height, r = rnd(42);
+  g.clearRect(0, 0, W, H);
+  g.fillStyle = "#241A12"; g.fillRect(0, 0, W, H);
+  const hand = new Path2D();
+  hand.moveTo(70, 470); hand.bezierCurveTo(40, 380, 46, 300, 74, 250);
+  hand.bezierCurveTo(62, 210, 40, 190, 52, 170); hand.bezierCurveTo(66, 152, 92, 168, 108, 196);
+  hand.bezierCurveTo(104, 150, 100, 96, 112, 74); hand.bezierCurveTo(126, 54, 148, 62, 150, 92);
+  hand.bezierCurveTo(154, 126, 158, 160, 160, 186); hand.bezierCurveTo(162, 132, 168, 62, 184, 44);
+  hand.bezierCurveTo(200, 28, 222, 40, 222, 70); hand.bezierCurveTo(222, 118, 220, 158, 220, 186);
+  hand.bezierCurveTo(228, 132, 238, 68, 254, 52); hand.bezierCurveTo(272, 36, 292, 50, 290, 80);
+  hand.bezierCurveTo(288, 124, 280, 160, 276, 192); hand.bezierCurveTo(288, 150, 300, 108, 316, 98);
+  hand.bezierCurveTo(334, 88, 352, 104, 346, 132); hand.bezierCurveTo(336, 184, 322, 240, 316, 288);
+  hand.bezierCurveTo(310, 350, 300, 420, 286, 470);
+  hand.closePath();
+  const grd = g.createRadialGradient(180, 250, 30, 190, 280, 300);
+  grd.addColorStop(0, "#D8B08C"); grd.addColorStop(.55, "#BC8F6E"); grd.addColorStop(1, "#7E5540");
+  g.save(); g.clip(hand); g.fillStyle = grd; g.fillRect(0, 0, W, H);
+  /* mounts — soft lighter blobs under the fingers and the thumb ball */
+  [[130, 215, 46], [195, 205, 48], [258, 210, 46], [318, 230, 40], [140, 330, 74]].forEach(m => {
+    const b = g.createRadialGradient(m[0], m[1], 2, m[0], m[1], m[2]);
+    b.addColorStop(0, "rgba(255,225,196,.30)"); b.addColorStop(1, "rgba(255,225,196,0)");
+    g.fillStyle = b; g.beginPath(); g.arc(m[0], m[1], m[2], 0, 7); g.fill();
+  });
+  /* skin creases + grain */
+  g.lineCap = "round";
+  for (let i = 0; i < 900; i++) {
+    const x = 40 + r() * 320, y = 60 + r() * 400, a = r() * Math.PI, l = 2 + r() * 9;
+    g.strokeStyle = `rgba(70,44,30,${(0.05 + r() * 0.14).toFixed(3)})`;
+    g.lineWidth = 0.6 + r() * 0.7;
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke();
+  }
+  for (let i = 0; i < 2600; i++) {
+    g.fillStyle = `rgba(${r() > .5 ? "255,236,214" : "60,38,26"},${(r() * .10).toFixed(3)})`;
+    g.fillRect(40 + r() * 320, 60 + r() * 400, 1.2, 1.2);
+  }
+  /* the three great lines are IN the photograph — the overlay only finds them */
+  const paths = [PALM.heart, PALM.head, PALM.life];
+  paths.forEach((d, i) => {
+    const p = new Path2D(d);
+    g.strokeStyle = i === 2 ? "rgba(78,48,32,.34)" : "rgba(74,44,28,.62)";
+    g.lineWidth = i === 2 ? 3 : 4.4; g.stroke(p);
+    g.strokeStyle = "rgba(255,232,205,.20)"; g.lineWidth = 1.4;
+    g.save(); g.translate(0, -2.2); g.stroke(p); g.restore();
+  });
+  g.restore();
+  /* vignette from the lamp at bottom-right */
+  const v = g.createRadialGradient(330, 430, 40, 200, 220, 420);
+  v.addColorStop(0, "rgba(255,210,150,.10)"); v.addColorStop(1, "rgba(10,5,2,.55)");
+  g.fillStyle = v; g.fillRect(0, 0, W, H);
+}
+const PALM = {
+  heart: "M352,182 C300,120 232,104 128,124",
+  head:  "M92,186 C168,208 258,226 332,238",
+  life:  "M100,168 C122,252 132,332 170,424"
+};
+function overlay(traced) {
+  const life = traced || PALM.life;
+  lines.innerHTML = `
+    <path class="halo" d="${PALM.heart}" data-ink="330" data-delay="0"/>
+    <path class="ln" d="${PALM.heart}" data-ink="330" data-delay="0"/>
+    <path class="halo" d="${PALM.head}" data-ink="300" data-delay="200"/>
+    <path class="ln" d="${PALM.head}" data-ink="300" data-delay="200"/>
+    <path class="halo" d="${life}" data-ink="300" data-delay="400"/>
+    <path class="${traced ? "ln ln--traced" : "ln ln--faint"}" d="${life}" data-ink="300" data-delay="400"/>
+    <text x="236" y="104" data-settle="1">a.</text>
+    <text x="252" y="258" data-settle="1">b.</text>
+    <text x="190" y="404" data-settle="1">c.</text>`;
+  inkDraw(lines, 200);
+}
+$("#shutter").addEventListener("click", () => {
+  if (printed) { note("A print is already on the desk — burn it first.", "warn"); return; }
+  const btn = $("#shutter");
+  btn.disabled = true; $("#hastMeta").textContent = "sharpening the stylus…";
+  drawPalm();
+  setTimeout(() => {
+    printed = true;
+    frame.classList.remove("is-empty"); $("#emptyNote").hidden = true; cv.hidden = false;
+    overlay(null);
+    $("#hastMeta").textContent = "rectified 512 px · MediaPipe";
+    $("#findMeta").textContent = "3 lines · 1 uncertain";
+    $("#fEl").textContent = "Fire";
+    $("#traceBtn").disabled = false; $("#burnBtn").disabled = false; btn.disabled = false;
+    const pn = $("#palmNote"); pn.hidden = false;
+    pn.innerHTML = `<span aria-hidden="true">⚑</span><span>The life line reads at confidence 0.47 — under 0.55 the app will not read what it cannot see. <b>Trace it</b> and the geometry is recomputed from your stroke.</span>`;
+    buzz(12);
+    note("Print rectified. Lines drawn from the wrist outward — the faint one is honest, not broken.");
+  }, reduced() ? 120 : 620);
+});
+$("#traceBtn").addEventListener("click", () => {
+  tracing = !tracing;
+  $("#traceBtn").setAttribute("aria-pressed", String(tracing));
+  note(tracing ? "Stylus in hand — drag along the life line." : "Stylus down.");
+});
+$("#handBtn").addEventListener("click", () => {
+  const l = $("#hastMeta").textContent;
+  const isRight = $("#scr-hast .band h2").textContent.indexOf("Right") >= 0;
+  $("#scr-hast .band h2").innerHTML = `<span lang="hi" class="dev">हस्त रेखा</span> · ${isRight ? "Left" : "Right"} hand`;
+  frame.style.transform = isRight ? "scaleX(-1)" : "";
+  note(`${isRight ? "Left" : "Right"} hand — the dominant hand is read for what was made of the inheritance.`);
+});
+/* loupe + stylus on the print */
+const pLoupe = $("#palmLoupe"), pGlass = $("#palmGlass");
+let pOn = false;
+frame.addEventListener("pointerdown", e => {
+  if (!printed) return;
+  capture(frame, e);
+  if (tracing) { tracePts = []; addTrace(e); return; }
+  pOn = true; pLoupe.classList.add("is-up");
+  pGlass.innerHTML = `<img alt="" src="${cv.toDataURL()}" style="width:${frame.clientWidth * Z}px">`;
+  const svgC = lines.cloneNode(true);
+  svgC.style.width = frame.clientWidth * Z + "px"; svgC.style.height = frame.clientHeight * Z + "px";
+  $$("[data-ink],[data-settle]", svgC).forEach(n => { n.style.strokeDashoffset = "0"; n.style.opacity = "1"; });
+  pGlass.appendChild(svgC);
+  movePalmLoupe(e);
+});
+function movePalmLoupe(e) {
+  const r = frame.getBoundingClientRect();
+  const px = clamp(e.clientX - r.left, 0, r.width), py = clamp(e.clientY - r.top, 0, r.height);
+  pLoupe.style.left = px + "px"; pLoupe.style.top = py + "px";
+  pLoupe.style.transform = "translate(-50%,-50%)";
+  Array.from(pGlass.children).forEach(c => { c.style.transform = `translate(${R - px * Z}px, ${R - py * Z}px)`; });
+}
+function addTrace(e) {
+  const r = frame.getBoundingClientRect();
+  tracePts.push([(e.clientX - r.left) / r.width * 420, (e.clientY - r.top) / r.height * 470]);
+  if (tracePts.length > 1) {
+    const d = "M" + tracePts.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" L");
+    let live = $("#liveTrace", lines);
+    if (!live) {
+      live = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      live.setAttribute("id", "liveTrace"); live.setAttribute("class", "ln ln--traced");
+      lines.appendChild(live);
+    }
+    live.setAttribute("d", d);
+  }
+}
+frame.addEventListener("pointermove", e => {
+  if (!printed) return;
+  if (tracing && tracePts.length) { addTrace(e); return; }
+  if (pOn) movePalmLoupe(e);
+});
+function palmUp() {
+  if (tracing && tracePts.length > 6) {
+    const d = "M" + tracePts.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" L");
+    tracing = false; $("#traceBtn").setAttribute("aria-pressed", "false");
+    const lt = $("#liveTrace", lines); if (lt) lt.remove();
+    overlay(d);
+    tracePts = [];
+    $("#lifeBar").className = "confbar is-good";
+    $("#lifeBar").firstElementChild.style.width = "91%";
+    $("#lifeConf").textContent = "0.91";
+    $("#lifeFlag").textContent = "✓";
+    $("#lifeFlag").className = "";
+    $("#lifeFlag").style.color = "var(--tulsi)";
+    $("#palmNote").hidden = true;
+    $("#findMeta").textContent = "3 lines · 1 traced";
+    $("#palmReading").innerHTML = `Tradition says a heart line that reaches the index mount reads as a settled temper, and a head line that runs level rather than dipping reads as a practical one.<span class="cite">1</span> The life line, now traced by your own hand, sweeps wide of the thumb — read as vitality with room around it, not as length of days.<span class="cite">3</span>`;
+    note("Traced. The reading was recomputed from your geometry — the app never guesses what it could not see.");
+    buzz(10);
+  }
+  tracePts = [];
+  if (pOn) { pOn = false; setTimeout(() => pLoupe.classList.remove("is-up"), 900); }
+}
+frame.addEventListener("pointerup", palmUp);
+frame.addEventListener("pointercancel", palmUp);
+/* burn — the edge chars while you hold; release early and it cools */
+const burn = $("#burnBtn"), burnEdge = $("#burnEdge");
+(function () {
+  let raf = 0, t0 = 0;
+  const stop = () => {
+    cancelAnimationFrame(raf); raf = 0;
+    if (!printed) return;
+    burnEdge.animate([{ opacity: burnEdge.style.opacity || 0 }, { opacity: 0 }], { duration: 320, fill: "forwards", easing: EASE });
+    burnEdge.style.opacity = "0";
+  };
+  const start = e => {
+    if (burn.disabled) return;
+    if (e.preventDefault) e.preventDefault();
+    t0 = performance.now();
+    const tick = () => {
+      const k = clamp((performance.now() - t0) / 900, 0, 1);
+      burnEdge.style.opacity = String(k);
+      if (k >= 1) {
+        cancelAnimationFrame(raf); raf = 0; buzz(40);
+        printed = false; cv.hidden = true; lines.innerHTML = ""; burnEdge.style.opacity = "0";
+        frame.classList.add("is-empty"); $("#emptyNote").hidden = false;
+        $("#hastMeta").textContent = "no print"; $("#findMeta").textContent = "—"; $("#fEl").textContent = "—";
+        $("#traceBtn").disabled = true; burn.disabled = true; $("#palmNote").hidden = true;
+        note("Print burned. The photo and its landmarks are gone from this device.", "danger");
+        return;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+  };
+  burn.addEventListener("pointerdown", start);
+  ["pointerup", "pointercancel", "pointerleave"].forEach(t => burn.addEventListener(t, stop));
+  burn.addEventListener("keydown", e => { if ((e.key === " " || e.key === "Enter") && !raf) start(e); });
+  burn.addEventListener("keyup", stop);
+})();
+
+/* ==========================================================================
+   10 · THE DIYA — one light, one heartbeat (§7.8 lamp-flicker)
+   ========================================================================== */
+const flameG = $("#flameG"), root = document.documentElement;
+let flick = 0, flickRAF = 0, noiseA = 0, noiseB = 0;
+function flicker() {
+  noiseA = noiseA * 0.72 + (Math.random() - 0.5) * 0.6;
+  noiseB = noiseB * 0.93 + (Math.random() - 0.5) * 0.25;
+  const n = clamp(noiseA + noiseB, -1, 1);
+  root.style.setProperty("--flicker", (n * 0.6).toFixed(2) + "px");
+  root.style.setProperty("--flame-k", (0.5 + n * 0.5).toFixed(3));
+  if (flameG) {
+    flameG.style.transform = `scale(${(1 + n * 0.03).toFixed(3)}, ${(1 - n * 0.02).toFixed(3)})`;
+    flameG.style.opacity = (0.94 + n * 0.06).toFixed(3);
+  }
+  flickRAF = setTimeout(() => requestAnimationFrame(flicker), 80);
+}
+function startFlicker() {
+  stopFlicker();
+  if (reduced() || document.hidden || root.dataset.theme === "day") {
+    root.style.setProperty("--flicker", "0px"); root.style.setProperty("--flame-k", "1");
+    if (flameG) { flameG.style.transform = ""; flameG.style.opacity = ""; }
+    return;
+  }
+  flicker();
+}
+function stopFlicker() { clearTimeout(flickRAF); }
+document.addEventListener("visibilitychange", startFlicker);
+RM.addEventListener("change", startFlicker);
+function setTheme(t) {
+  root.dataset.theme = t;
+  $("#diyaLbl").textContent = t === "day" ? "Diya · snuffed" : "Diya · lit";
+  $("#diyaBtn").setAttribute("aria-pressed", String(t !== "day"));
+  $("#ledgeFlame").style.opacity = t === "day" ? ".25" : "1";
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", t === "day" ? "#6E4A2E" : "#1A110B");
+  startFlicker();
+}
+function toggleLamp() {
+  const to = root.dataset.theme === "day" ? "night" : "day";
+  setTheme(to);
+  note(to === "day" ? "Diya snuffed — the morning terrace. Only the desk changed; the paper and every contrast ratio are identical." : "Diya lit. One light, bottom-right; every shadow in the document is computed from it.");
+  buzz(10);
+}
+$("#diyaBtn").addEventListener("click", toggleLamp);
+
+/* ==========================================================================
+   10b · GUNA MILAN — Aṣṭakūṭa (ARCHITECTURE §5.11). Every bead on that screen
+        is this function's output; nothing there is typed in.
+   ========================================================================== */
+const VARNA = [3,2,4,4,3,2,1,4,3,2,1,4], VARNA_N = { 4:"Brāhmaṇa", 3:"Kṣatriya", 2:"Vaiśya", 1:"Śūdra" };
+const VCLASS = ["Catuṣpada","Catuṣpada","Mānava","Jalachara","Vanachara","Mānava","Mānava","Keeṭa","Mānava","Jalachara","Mānava","Jalachara"];
+const VC = ["Catuṣpada","Mānava","Jalachara","Vanachara","Keeṭa"];
+const VASHYA = [[2,1,2,0,2],[1,2,1,.5,2],[2,1,2,1,2],[1,.5,1,2,2],[1,1,.5,1,2]];
+const YONI = ["Aśva","Gaja","Meṣa","Sarpa","Sarpa","Śvān","Mārjāra","Meṣa","Mārjāra","Mūṣaka","Mūṣaka","Gau","Mahiṣa","Vyāghra","Mahiṣa","Vyāghra","Mṛga","Mṛga","Śvān","Vānara","Nakula","Vānara","Siṃha","Aśva","Siṃha","Gau","Gaja"];
+const SWORN = [["Aśva","Mahiṣa"],["Gaja","Siṃha"],["Meṣa","Vānara"],["Sarpa","Nakula"],["Śvān","Mṛga"],["Mārjāra","Mūṣaka"],["Gau","Vyāghra"]];
+const GANA = [0,1,2,1,0,1,0,0,2,2,1,1,0,2,0,2,0,2,2,1,1,0,2,2,1,1,0];
+const GANA_N = ["Deva","Manuṣya","Rākṣasa"], GANA_M = [[6,6,1],[5,6,0],[1,0,6]];
+const NADI_N = ["Ādi","Madhya","Antya"], nadiOf = i => [0,1,2,2,1,0][i % 6];
+const SIGN_LORD = ["Maṅgala","Śukra","Budha","Candra","Sūrya","Budha","Śukra","Maṅgala","Guru","Śani","Śani","Guru"];
+const MAITRI_T = {
+  "Sūrya":  { f:["Candra","Maṅgala","Guru"], e:["Śukra","Śani"] },
+  "Candra":  { f:["Sūrya","Budha"], e:[] },
+  "Maṅgala": { f:["Sūrya","Candra","Guru"], e:["Budha"] },
+  "Budha":   { f:["Sūrya","Śukra"], e:["Candra"] },
+  "Guru":    { f:["Sūrya","Candra","Maṅgala"], e:["Budha","Śukra"] },
+  "Śukra":   { f:["Budha","Śani"], e:["Sūrya","Candra"] },
+  "Śani":    { f:["Budha","Śukra"], e:["Sūrya","Candra","Maṅgala"] }
+};
+const relOf = (a, b) => MAITRI_T[a].f.indexOf(b) >= 0 ? "friend" : MAITRI_T[a].e.indexOf(b) >= 0 ? "enemy" : "neutral";
+const MAITRI_S = { "friend|friend":5, "friend|neutral":4, "neutral|friend":4, "neutral|neutral":3,
+                   "friend|enemy":1, "enemy|friend":1, "neutral|enemy":.5, "enemy|neutral":.5, "enemy|enemy":0 };
+const taraOf = (from, to) => ((((to - from + 27) % 27) + 1) - 1) % 9 + 1;
+
+function ashtakoota(boy, girl) {                       /* each: { ni, sign } */
+  const k = [], bv = VARNA[boy.sign], gv = VARNA[girl.sign];
+  k.push({ n: "Varṇa", max: 1, s: bv >= gv ? 1 : 0, w: SIGN[boy.sign] + " " + VARNA_N[bv] + " ≥ " + SIGN[girl.sign] + " " + VARNA_N[gv] });
+  const bc = VCLASS[boy.sign], gc = VCLASS[girl.sign];
+  k.push({ n: "Vaśya", max: 2, s: VASHYA[VC.indexOf(bc)][VC.indexOf(gc)], w: bc + " × " + gc });
+  const t1 = taraOf(girl.ni, boy.ni), t2 = taraOf(boy.ni, girl.ni), ok = t => [3,5,7].indexOf(t) < 0;
+  const good = (ok(t1) ? 1 : 0) + (ok(t2) ? 1 : 0);
+  k.push({ n: "Tārā", max: 3, s: good === 2 ? 3 : good === 1 ? 1.5 : 0, w: "tārā " + t1 + " / " + t2 });
+  const by = YONI[boy.ni], gy = YONI[girl.ni];
+  const sworn = SWORN.some(p => (p[0] === by && p[1] === gy) || (p[1] === by && p[0] === gy));
+  k.push({ n: "Yoni", max: 4, s: by === gy ? 4 : sworn ? 0 : 2, w: by + " × " + gy + (sworn ? ", sworn enemies" : by === gy ? ", same yoni" : ", neutral") });
+  const bl = SIGN_LORD[boy.sign], gl = SIGN_LORD[girl.sign];
+  k.push({ n: "Maitrī", max: 5, s: bl === gl ? 5 : MAITRI_S[relOf(bl, gl) + "|" + relOf(gl, bl)],
+           w: bl + "→" + gl + " " + relOf(bl, gl) + ", " + gl + "→" + bl + " " + relOf(gl, bl) });
+  k.push({ n: "Gaṇa", max: 6, s: GANA_M[GANA[boy.ni]][GANA[girl.ni]], w: GANA_N[GANA[boy.ni]] + " × " + GANA_N[GANA[girl.ni]] });
+  const d1 = ((girl.sign - boy.sign + 12) % 12) + 1, d2 = ((boy.sign - girl.sign + 12) % 12) + 1;
+  const bd = ["2/12","5/9","6/8"].indexOf([d1, d2].sort((a, b) => a - b).join("/")) >= 0;
+  k.push({ n: "Bhakūṭa", max: 7, s: bd ? 0 : 7, w: "a " + d1 + "/" + d2 + " axis" + (bd ? ", a doṣa" : ", not a doṣa") });
+  const bn = nadiOf(boy.ni), gn = nadiOf(girl.ni);
+  k.push({ n: "Nāḍī", max: 8, s: bn === gn ? 0 : 8, w: NADI_N[bn] + " × " + NADI_N[gn] + (bn === gn ? ", a doṣa" : "") });
+  const total = k.reduce((a, x) => a + x.s, 0);
+  return { k, total, band: total < 18 ? "not recommended" : total < 25 ? "acceptable" : total < 33 ? "very good" : "excellent" };
+}
+
+const PRIYA = { ni: 3, sign: 1 };          /* the showcase partner: Rohiṇī, Vṛṣabha */
+function renderMilan() {
+  const moon = chart.bodies[1];
+  const m = ashtakoota({ ni: moon.ni, sign: moon.sign }, PRIYA);
+  $("#mA").textContent = "♓ " + moon.nakDev;
+  $("#mScore").textContent = m.total + " / 36";
+  $("#mBand").textContent = m.band;
+  $("#milanMeta").textContent = moon.nak + " × Rohiṇī";
+  $("#mBeads").innerHTML = m.k.map(x => {
+    let row = "";
+    for (let i = 0; i < x.max; i++)
+      row += '<i class="' + (x.s === 0 ? "dosha" : i + 1 <= x.s ? "on" : i < x.s ? "half" : "") + '"></i>';
+    return '<li><span class="kname">' + x.n + '</span>'
+         + '<span class="row" role="img" aria-label="' + x.n + ": " + x.s + " of " + x.max + ' points">' + row + "</span>"
+         + '<span class="kscore">' + x.s + " / " + x.max + "</span></li>";
+  }).join("");
+  const dosha = m.k.filter(x => x.s === 0).map(x => x.n);
+  $("#mNote").textContent = "Every bead above is ashtakoota()'s output, not a drawing. Bhakūṭa is "
+    + (m.k[6].s ? "brass — " + m.k[6].w : "lac — " + m.k[6].w) + ". "
+    + (dosha.length ? dosha.join(" and ") + (dosha.length > 1 ? " fire" : " fires") + " the lac beads. " : "No kūṭa fires a lac bead. ")
+    + "Total " + m.total + " / 36 — “" + m.band + "”.";
+}
+
+/* ==========================================================================
+   11 · NAVIGATION — object-open (§7.11), tabs, the Ledge, the frame switcher
+   ========================================================================== */
+const device = $("#device");
+function go(name, origin) {
+  if (name === "lamp" || name === "diya") { toggleLamp(); return; }
+  const target = $("#scr-" + name);
+  if (!target) return;
+  const cur = $(".screen.is-active");
+  if (cur === target) return;
+  $$(".screen").forEach(s => s.classList.remove("is-active", "is-entering"));
+  target.classList.add("is-active");
+  if (origin && !reduced()) {
+    const r = origin.getBoundingClientRect(), d = device.getBoundingClientRect();
+    target.style.setProperty("--ox", ((r.left + r.width / 2) - (d.left + d.width / 2)).toFixed(0) + "px");
+    target.style.setProperty("--oy", ((r.top + r.height / 2) - (d.top + d.height / 2)).toFixed(0) + "px");
+    target.style.setProperty("--os", clamp(r.width / d.width, .3, .9).toFixed(2));
+  } else {
+    target.style.setProperty("--ox", "0px"); target.style.setProperty("--oy", "0px"); target.style.setProperty("--os", ".96");
+  }
+  void target.offsetWidth;
+  target.classList.add("is-entering");
+  $$(".tabs [data-go]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.go === name)));
+  $$(".ledge [data-go]").forEach(b => { if (b.dataset.go === name) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+  if (name === "patri") requestAnimationFrame(() => { unroll(); });
+  if (name === "leaf") syncDraft();
+  buzz(6);
+}
+$$("[data-go]").forEach(b => b.addEventListener("click", () => go(b.dataset.go, b)));
+$$(".deskobj").forEach(b => {
+  const map = { patri: "patri", leaf: "leaf", dial: "chowki", loupe: "hast", diya: "lamp" };
+  b.addEventListener("click", () => {
+    const t = map[b.dataset.obj];
+    if (b.dataset.obj === "dial") { note("Today’s leaf (§9.2) lives behind this dial — the panchang for 8 Sep 2026 is already on the Chowki above."); return; }
+    go(t, b);
+  });
+  let lp = 0;
+  b.addEventListener("pointerdown", () => { lp = setTimeout(() => { b.classList.add("is-labelled"); buzz(6); }, 420); });
+  ["pointerup", "pointerleave", "pointercancel"].forEach(t => b.addEventListener(t, () => { clearTimeout(lp); b.classList.remove("is-labelled"); }));
+});
+$$("[data-frame]").forEach(b => b.addEventListener("click", () => {
+  device.classList.toggle("is-wide", b.dataset.frame === "desk");
+  $$("[data-frame]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  requestAnimationFrame(() => { unroll(); loupeClone(); paintSky($("#skyHome"), NOW); syncDraft(); });
+}));
+let rsz = 0;
+window.addEventListener("resize", () => {
+  clearTimeout(rsz);
+  rsz = setTimeout(() => { unroll(); paintSky($("#skyHome"), NOW); syncDraft(); }, 120);
+});
+document.addEventListener("keydown", e => {
+  if (e.target.matches("input")) return;
+  const order = ["chowki", "patri", "leaf", "hast", "milan"];
+  if (e.key === "[" || e.key === "]") {
+    const cur = order.indexOf($(".screen.is-active").dataset.screen);
+    go(order[(cur + (e.key === "]" ? 1 : order.length - 1)) % order.length], null);
+  }
+  if (e.key.toLowerCase() === "l") toggleLamp();
+});
+
+/* ==========================================================================
+   12 · FIRST PAINT
+   ========================================================================== */
+setTheme("night");
+renderPatri();
+renderMilan();
+syncDraft();
+unroll();
+$("#statusTime").textContent = String(NOW.h).padStart(2, "0") + ":" + String(NOW.mi).padStart(2, "0");
+</script>
+
+</body>
+</html>

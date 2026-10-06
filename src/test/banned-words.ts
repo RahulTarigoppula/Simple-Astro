@@ -1,0 +1,26 @@
+// Content care (IMPLEMENTATION-PROMPT §2.3.6): no health, death, fertility, wealth or legal output.
+// Matched case-insensitively as substrings against every reading template and rendered screen.
+export const BANNED_WORDS = [
+  "health",
+  "disease",
+  "death",
+  "die ",
+  "dies",
+  "dying",
+  "cancer",
+  "pregnan",
+  "fertility",
+  "wealth",
+  "money",
+  "marriage date",
+  "lawsuit",
+  "remedy",
+  "remedies",
+  "gemstone",
+  "pooja",
+  "puja",
+  "cure",
+  "illness",
+  "longevity",
+  "lifespan",
+] as const;

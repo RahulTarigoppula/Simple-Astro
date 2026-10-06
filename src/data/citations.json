@@ -1,0 +1,142 @@
+{
+  "$comment": "Every Citation used by a rule resolves to one entry here (src/engine/citations.test.ts). Chapter numbers follow the common English translations (BPHS: R. Santhanam; Phaladīpikā: V. Subrahmanya Sastri; Sārāvalī: R. Santhanam); a verse is given only where it is well established. 'Later tradition' marks conventions that are widely used but have no verse in the classical texts.",
+  "works": {
+    "BPHS": "Bṛhat Parāśara Horā Śāstra — the foundational Parāśarī text on natal astrology.",
+    "Phaladīpikā": "Phaladīpikā of Mantreśvara (c. 14th century), a compact manual of natal rules and yogas.",
+    "Sārāvalī": "Sārāvalī of Kalyāṇavarmā (c. 9th–10th century), notable for its chapters on planetary combinations.",
+    "Sūrya Siddhānta": "Sūrya Siddhānta, the classical astronomical treatise; its chapter on conjunctions defines planetary contests.",
+    "Muhūrta Cintāmaṇi": "Muhūrta Cintāmaṇi of Rāma Daivajña (1600), the standard muhūrta text; its sixth chapter sets out the Aṣṭakūṭa.",
+    "Later tradition": "A convention found in later manuals and commentaries rather than in a verse of the classical texts.",
+    "Sāmudrika Śāstra": "Sāmudrika Śāstra — the Indian tradition of reading the body's marks; its hasta (hand) section reads the lines and fingers.",
+    "Cheiro, Language of the Hand": "Cheiro (William John Warner), Cheiro's Language of the Hand, 1894 — a public-domain classic of Western palmistry.",
+    "Gettings, The Book of the Hand": "Fred Gettings, The Book of the Hand, 1965 — source of the four-element hand typology (earth, air, fire, water)."
+  },
+  "entries": [
+    {
+      "text": "BPHS",
+      "ref": "ch. 26",
+      "title": "Graha dṛṣṭi",
+      "description": "Planetary aspects: every graha aspects the 7th; Maṅgala also the 4th and 8th, Guru the 5th and 9th, Śani the 3rd and 10th."
+    },
+    {
+      "text": "BPHS",
+      "ref": "ch. 36",
+      "title": "Various yogas",
+      "description": "Includes Gaja-Kesari (Guru in a kendra from Candra) and Amalā (only benefics in the 10th)."
+    },
+    {
+      "text": "BPHS",
+      "ref": "ch. 37",
+      "title": "Candra yogas",
+      "description": "Lunar yogas: Sunaphā, Anaphā, Durudharā, Kemadruma and Adhi, read from the grahas around Candra."
+    },
+    {
+      "text": "BPHS",
+      "ref": "ch. 38",
+      "title": "Sūrya yogas",
+      "description": "Solar yogas: Veśi, Vāśi and Ubhayacarī, read from the grahas on either side of Sūrya."
+    },
+    {
+      "text": "BPHS",
+      "ref": "ch. 39",
+      "title": "Rāja yogas",
+      "description": "Combinations of kendra and trikona lords, including the lords of the 9th and 10th together or in exchange."
+    },
+    {
+      "text": "Phaladīpikā",
+      "ref": "6.1",
+      "title": "Pañca-Mahāpuruṣa",
+      "description": "The five great-person yogas: Maṅgala, Budha, Guru, Śukra or Śani in its own or exaltation sign and in a kendra (Rucaka, Bhadra, Haṃsa, Mālavya, Śaśa)."
+    },
+    {
+      "text": "Phaladīpikā",
+      "ref": "ch. 6",
+      "title": "Yogas",
+      "description": "The yoga chapter: cancellations of Kemadruma, the three kinds of Parivartana (Mahā, Khala, Dainya) and Harṣa, Sarala and Vimala (Viparīta Rāja)."
+    },
+    {
+      "text": "Phaladīpikā",
+      "ref": "ch. 7",
+      "title": "Rāja yogas",
+      "description": "Royal combinations, including Nīca-Bhaṅga: a graha's fall cancelled when its dispositor or exaltation lord holds a kendra."
+    },
+    {
+      "text": "Sārāvalī",
+      "ref": "ch. 15",
+      "title": "Two-graha combinations",
+      "description": "The effects of two grahas in one sign, including Sūrya with Budha (Budha-Āditya) and Candra with Maṅgala."
+    },
+    {
+      "text": "Sūrya Siddhānta",
+      "ref": "ch. 7",
+      "title": "Graha yuti / yuddha",
+      "description": "Planetary conjunctions: two star-planets within a degree are in contest; the one further north is the victor."
+    },
+    {
+      "text": "Later tradition",
+      "ref": "Kāla-Sarpa",
+      "title": "Kāla-Sarpa",
+      "description": "All seven grahas on one side of the Rāhu–Ketu axis. Widely used in modern practice; not described in BPHS or the other classical texts."
+    },
+    {
+      "text": "Later tradition",
+      "ref": "Kuja-doṣa",
+      "title": "Kuja doṣa (Manglik)",
+      "description": "Maṅgala in the 1st, 2nd, 4th, 7th, 8th or 12th from the Lagna, Candra or Śukra, as given in later muhūrta manuals."
+    },
+    {
+      "text": "Later tradition",
+      "ref": "Kuja-doṣa bhaṅga",
+      "title": "Exceptions to Kuja doṣa",
+      "description": "The standard exceptions: Maṅgala in own or exaltation sign; in the 2nd in Mithuna or Kanyā; joined or aspected by Guru; with Śani; both charts Manglik; and past the 28th year (some schools; recorded, never applied)."
+    },
+    {
+      "text": "Muhūrta Cintāmaṇi",
+      "ref": "ch. 6",
+      "title": "Aṣṭakūṭa",
+      "description": "The eight kootas of Guna Milan — Varṇa, Vaśya, Tārā, Yoni, Graha Maitrī, Gaṇa, Bhakūṭa, Nāḍī — worth 1 to 8 points, 36 in all."
+    },
+    {
+      "text": "Later tradition",
+      "ref": "Aṣṭakūṭa parihāra",
+      "title": "Exceptions to Bhakūṭa and Nāḍī doṣa",
+      "description": "Commentarial exceptions: Bhakūṭa eased when the sign lords are the same or mutual friends; Nāḍī eased for the same sign with different nakshatras, the same nakshatra with different padas, or friendly sign lords."
+    },
+    {
+      "text": "Sāmudrika Śāstra",
+      "ref": "Hṛdaya-rekhā",
+      "title": "The heart line",
+      "description": "The line beneath the fingers, read for the temperament of affection: its length, depth and curve."
+    },
+    {
+      "text": "Sāmudrika Śāstra",
+      "ref": "Mastiṣka-rekhā",
+      "title": "The head line",
+      "description": "The line across the middle of the palm, read for the style of thinking: its length and slope."
+    },
+    {
+      "text": "Sāmudrika Śāstra",
+      "ref": "Jīvana-rekhā",
+      "title": "The life line",
+      "description": "The line curving around the mount of the thumb, read for vitality of temperament: the breadth of its arc and its depth."
+    },
+    {
+      "text": "Sāmudrika Śāstra",
+      "ref": "Aṅguli-lakṣaṇa",
+      "title": "The fingers",
+      "description": "The relative lengths of the fingers, notably the index (tarjanī) against the ring finger (anāmikā)."
+    },
+    {
+      "text": "Cheiro, Language of the Hand",
+      "ref": "The Thumb",
+      "title": "The thumb",
+      "description": "The supple-jointed thumb that bends back and the firm-jointed thumb that stands upright, read as adaptability and will."
+    },
+    {
+      "text": "Gettings, The Book of the Hand",
+      "ref": "Hand types",
+      "title": "The four elemental hands",
+      "description": "Earth (square palm, short fingers), air (square palm, long fingers), fire (oblong palm, short fingers), water (oblong palm, long fingers)."
+    }
+  ]
+}

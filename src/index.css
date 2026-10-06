@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@import "./styles/tokens.css";
+@import "./styles/kit.css";
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-paper: var(--surface);
+  --color-band: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-accent: var(--accent);
+  --color-brass: var(--accent-2);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+  --radius-md: var(--radius-md);
+  --ease-out: var(--ease-out);
+}

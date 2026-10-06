@@ -1,0 +1,100 @@
+/* §3.3 design tokens — pasted verbatim from IMPLEMENTATION-PROMPT. Do not edit the first block. */
+:root {
+  color-scheme: dark;
+
+  /* ── colour (Night desk, default) ── */
+  --bg: #1A110B;          --bg-elevated: #1D2748;   /* teak desk (margins only); indigo cloth */
+  --surface: #F4EAD3;     --surface-2: #EAD9A9;     /* handmade paper (dominant); turmeric band */
+  --ink: #1B1410;         --ink-muted: #5A483A;     --ink-faint: #9A8A72;   /* faint = art only */
+  --accent: #B5301C;      --accent-text: #A8281A;   --accent-ink: #FFF6E6;  /* sindoor; on band; on fills */
+  --accent-2: #C9A24A;                              /* brass — never text on paper */
+  --success: #356234;     --warning: #C68A12;       --warning-text: #7A5407; /* tulsi; haldi fills only */
+  --danger: #7F160F;      --border: #C9B48A;        --border-strong: #8A7350; /* lac; turmeric hairlines */
+  --focus: #22408E;       --moon: #DCE4F5;          --ledge: #241811;
+
+  /* semantic aliases */
+  --paper: var(--surface); --paper-band: var(--surface-2);
+  --tilak: var(--accent);  --thread: var(--accent); --brass: var(--accent-2);
+  --lac: var(--danger);    --haldi: var(--warning); --tulsi: var(--success);
+  --engraved: color-mix(in oklch, var(--brass), black 55%);
+  --moon-k: 0;                /* Moon illumination 0–1, set by the engine */
+  --moon-fill: color-mix(in oklch, var(--bg-elevated), var(--moon) calc(var(--moon-k) * 14%));
+
+  /* ── typography ── */
+  --font-display: "Yatra One", "Noto Sans Devanagari", Georgia, serif;
+  --font-body: "Tiro Devanagari Hindi", "Noto Serif Devanagari", Georgia, serif;
+  --font-mono: "Martian Mono Variable", "Martian Mono", Consolas, "Courier New", monospace;
+  --mono-wdth: 87;
+  --text-xs: 0.75rem;  --text-sm: 0.8125rem;  --text-base: 1.0625rem;  --text-lg: 1.25rem;
+  --text-xl: 1.375rem; --text-2xl: 1.75rem;   --text-3xl: 2.125rem;    --text-4xl: 3rem;
+  --text-5xl: clamp(3rem, 16vw, 4.5rem);
+  --leading-tight: 1.1; --leading-body: 1.5; --leading-devanagari: 1.6; --tracking-mono: 0.06em;
+
+  /* ── spacing ── */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-7: 32px; --space-8: 40px;
+  --space-9: 48px; --space-10: 64px; --space-11: 80px; --space-12: 96px;
+  --paper-margin: 20px;
+  --ledge-height: calc(64px + env(safe-area-inset-bottom, 0px));
+
+  /* ── radius ── */
+  --radius-sm: 3px; --radius-md: 6px; --radius-lg: 14px; --radius-xl: 28px; --radius-full: 9999px;
+
+  /* ── elevation (one lamp, bottom-right) ── */
+  --lamp-x: 1; --lamp-y: 1;   /* bottom-right */
+  --flicker: 0px;             /* ±0.6px jitter set by lamp-flicker */
+  --shadow-alpha: 0.45;
+  --shadow-1: calc(-2px * var(--lamp-x) + var(--flicker)) calc(-2px * var(--lamp-y) + var(--flicker)) 6px rgba(20, 10, 4, var(--shadow-alpha));
+  --shadow-2: calc(-6px * var(--lamp-x) + var(--flicker)) calc(-5px * var(--lamp-y) + var(--flicker)) 18px rgba(20, 10, 4, calc(var(--shadow-alpha) + 0.05));
+  --shadow-3: calc(-14px * var(--lamp-x) + var(--flicker)) calc(-12px * var(--lamp-y) + var(--flicker)) 36px rgba(20, 10, 4, calc(var(--shadow-alpha) + 0.10));
+  --grain-opacity: 0.12;
+  --vignette-far: 0.18;       /* darkness at the corner opposite the lamp */
+
+  /* ── borders / strokes ── */
+  --hairline: 1px; --stroke-chart: 1.25px;
+
+  /* ── motion ── */
+  --dur-fast: 120ms; --dur-base: 240ms; --dur-slow: 480ms; --dur-draw: 900ms;
+  --ease-out: cubic-bezier(0.22, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: linear(0, 0.36 10%, 0.78 21%, 1.02 34%, 1.06 42%, 1.01 58%, 0.99 74%, 1);
+}
+
+/* Morning terrace — auto by sun altitude, or diya snuffed */
+:root[data-theme="day"] {
+  color-scheme: light; --bg: #6E4A2E; --bg-elevated: #C9C1AE; --ledge: #5E3F27;
+  --shadow-alpha: 0.22; --grain-opacity: 0.10; --vignette-far: 0.08;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="night"]) {
+    color-scheme: light; --bg: #6E4A2E; --bg-elevated: #C9C1AE; --ledge: #5E3F27;
+    --shadow-alpha: 0.22; --grain-opacity: 0.10; --vignette-far: 0.08;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --flicker: 0px; --dur-draw: 240ms; --ease-spring: var(--ease-out);
+  }
+}
+
+/* ── Material stops (§3.2 "Materials") — every hex the art needs lives here, never in components ── */
+:root {
+  --brass-hi: #E2C56B;  --brass-mid: #C9A24A;  --brass-lo: #8F6F2E;  --brass-dark: #7E5F22;
+  --brass-shadow: #5C4413; --brass-ink: #3A2A08; --brass-label: #2A1D08;
+  --teak-light: #6E4A2E; --leaf-face: #E4D19C;
+  --lac-hi: #A62A1B; --lac-deep: #5A0E08; --lac-dark: #4A0C08; --lac-text: #F6D9CE;
+  --flame-core: #FFF6E6; --flame-mid: #E8A33C; --flame-tip: #FFF0C4; --flame-glow: #FFC46B;
+  --sun-disc: #FFE0A8; --parapet: #160D07; --star: #F4EAD3;
+  --print-ground: #26201A; --palm-ground: #241A12;
+  --sky-night-0: #0B1024; --sky-night-1: #141A32; --sky-astro-1: #28264C;
+  --sky-civil-0: #2E2A4E; --sky-civil-1: #7A4A50; --sky-rise-0: #4A3050; --sky-rise-1: #C9724A;
+  --sky-golden-0: #8A6B70; --sky-golden-1: #E9A15A; --sky-day-0: #5E86AC; --sky-day-1: #C9C7B4;
+  --sky-noon-0: #4C7BA8; --sky-noon-1: #BFD3E2;
+  --brass-cyl: linear-gradient(90deg, var(--brass-lo) 0%, var(--brass-hi) 18%, var(--brass-mid) 50%, var(--brass-dark) 100%);
+  --brass-cyl-v: linear-gradient(180deg, var(--brass-lo) 0%, var(--brass-hi) 18%, var(--brass-mid) 50%, var(--brass-dark) 100%);
+  --brass-plate: linear-gradient(180deg, var(--brass-hi) 0%, var(--brass-mid) 40%, var(--brass-lo) 100%);
+  --brass-edge: inset 0 1px 0 rgba(255, 246, 230, 0.55), inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+  --grain-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23g)'/%3E%3C/svg%3E");
+}

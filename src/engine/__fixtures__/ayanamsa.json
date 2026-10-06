@@ -1,0 +1,10 @@
+{
+  "$comment": "§6.2 reference table (0 h UT). Values in d°m′s″ as printed; tolerance ±0.2″ (the table is rounded to 0.1″). Drik's published value is decimal degrees; drik-mean must agree within 0.5″.",
+  "worked": { "jdTt": 2449425.580556, "T": -0.05802654, "pA": -291.8, "dpsi": 14.951, "se-true": 23.780152, "se-mean": 23.775998, "drik-mean": 23.782744 },
+  "rows": [
+    { "date": "2000-01-01", "jdUt": 2451544.5, "se-true": [23, 51, 11.3], "se-mean": [23, 51, 25.3], "drik-mean": [23, 51, 49.6], "drikPublished": 23.863782 },
+    { "date": "2020-01-01", "jdUt": 2458849.5, "se-true": [24, 7, 54.6], "se-mean": [24, 8, 11.3], "drik-mean": [24, 8, 35.6], "drikPublished": 24.143189 },
+    { "date": "2025-01-01", "jdUt": 2460676.5, "se-true": [24, 12, 23.0], "se-mean": [24, 12, 22.8], "drik-mean": [24, 12, 47.1], "drikPublished": 24.213073 },
+    { "date": "2026-01-01", "jdUt": 2461041.5, "se-true": [24, 13, 18.4], "se-mean": [24, 13, 13.0], "drik-mean": [24, 13, 37.3], "drikPublished": 24.227035 }
+  ]
+}

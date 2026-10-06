@@ -1,0 +1,13 @@
+{
+  "$comment": "§6.7 hand-derived rows. Sign indices 0 = Meṣa. D30 for the Kanyā row: even sign, bands 5/7/8/5/5, d = 26.2° falls in the last (Mars) band → Vṛścika.",
+  "rows": [
+    { "lonSid": 329.4811, "note": "Sun, Kumbha 29°28′52″ (fixed, odd sign number)", "D1": 10, "D2": 3, "D3": 6, "D7": 4, "D9": 2, "D10": 7, "D12": 9, "D30": 6, "D60": 8 },
+    { "lonSid": 176.2, "note": "Kanyā 26.2° (dual, even sign number)", "D1": 5, "D2": 4, "D3": 1, "D7": 5, "D9": 4, "D10": 9, "D12": 3, "D30": 7, "D60": 9 }
+  ],
+  "edges": [
+    { "lonSid": 0, "D9": 0 },
+    { "lonSid": 359.9999, "D9": 11 },
+    { "lonSid": 30, "D1": 1 },
+    { "lonSid": 29.999999, "D1": 0 }
+  ]
+}

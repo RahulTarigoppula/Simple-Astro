@@ -1,0 +1,138 @@
+.drawer-screen {
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in oklch, var(--bg), var(--ink) 25%);
+}
+.drawer-screen__dim {
+  flex: none;
+  min-height: 56px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: var(--space-2);
+}
+.drawer-box {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  margin: 0 auto;
+  width: min(100%, 640px);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  background: var(--teak-light);
+  padding: 10px 10px 0;
+  box-shadow: var(--shadow-3);
+  animation: drawer-slide var(--dur-slow) var(--ease-spring) both;
+}
+.drawer-box::-webkit-scrollbar {
+  width: 0;
+}
+.drawer-box > .paper {
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  min-height: 100%;
+  padding-bottom: var(--space-9);
+}
+.drawer-knob {
+  display: block;
+  margin: 0 auto 8px;
+  width: 64px;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--brass-plate);
+  box-shadow: var(--brass-edge);
+}
+@keyframes drawer-slide {
+  from {
+    transform: translateY(100%);
+  }
+}
+.dial-seg {
+  padding: var(--space-4) var(--paper-margin) var(--space-2);
+}
+.dial-seg svg {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  height: auto;
+}
+.dial-seg .tickbtn {
+  cursor: pointer;
+}
+.dial-seg .tickbtn text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: var(--engraved);
+  font-variation-settings: "wdth" 87, "wght" 600;
+}
+.dial-seg .tickbtn[aria-checked="true"] .needle {
+  stroke: var(--accent);
+}
+.dial-seg .tickbtn:focus-visible {
+  outline: none;
+}
+.dial-seg .tickbtn:focus-visible .focus-ring {
+  stroke: var(--focus);
+  stroke-width: 2;
+}
+.dial-list {
+  display: grid;
+  gap: 4px;
+  padding: var(--space-2) var(--paper-margin) 0;
+}
+.dial-list button {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  color: var(--ink);
+  border: 1px solid transparent;
+}
+.dial-list button[aria-checked="true"] {
+  border-color: var(--accent);
+  background: color-mix(in oklch, var(--accent), var(--paper) 92%);
+}
+.dial-list .delta {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+.drawer-pass {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--paper-margin);
+}
+.drawer-pass input {
+  font: inherit;
+  font-size: var(--text-lg);
+  color: var(--ink);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--border-strong);
+  padding: 6px 2px;
+  min-height: 44px;
+}
+.credits {
+  list-style: none;
+  margin: var(--space-3) var(--paper-margin) 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+.credits li {
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+  line-height: 1.45;
+}
+.credits .lic {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-muted);
+}

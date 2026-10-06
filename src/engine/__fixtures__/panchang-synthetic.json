@@ -1,0 +1,90 @@
+{
+  "$comment": "§6.9 pure-angle fixtures (no ephemeris) and the six seam cases.",
+  "pure": {
+    "moonTrop": 200.0,
+    "sunTrop": 41.5,
+    "ayanamsa": 23.8,
+    "elongation": 158.5,
+    "tithi": {
+      "index": 14,
+      "name": "Śukla Caturdaśī",
+      "paksha": "shukla"
+    },
+    "karana": {
+      "index": 27,
+      "name": "Gara"
+    },
+    "yoga": {
+      "index": 15,
+      "name": "Vajra"
+    },
+    "nakshatra": {
+      "index": 13,
+      "name": "Citrā"
+    }
+  },
+  "seams": [
+    {
+      "case": "just below 360 → Amāvasyā (30), karaṇa 60 Nāga",
+      "elongation": 359.9999,
+      "tithi": 30,
+      "tithiName": "Amāvasyā",
+      "karana": 60,
+      "karanaName": "Nāga"
+    },
+    {
+      "case": "exactly 0 → Śukla Pratipadā (1), never tithi 0; karaṇa 1 Kiṃstughna",
+      "elongation": 0,
+      "tithi": 1,
+      "tithiName": "Śukla Pratipadā",
+      "karana": 1,
+      "karanaName": "Kiṃstughna"
+    },
+    {
+      "case": "just below 180 → Pūrṇimā (15)",
+      "elongation": 179.9999,
+      "tithi": 15,
+      "tithiName": "Pūrṇimā",
+      "karana": 30,
+      "karanaName": "Bava"
+    },
+    {
+      "case": "exactly 180 → Kṛṣṇa Pratipadā (16)",
+      "elongation": 180,
+      "tithi": 16,
+      "tithiName": "Kṛṣṇa Pratipadā",
+      "karana": 31,
+      "karanaName": "Bālava"
+    },
+    {
+      "case": "k = 58 Śakuni",
+      "elongation": 343,
+      "tithi": 29,
+      "tithiName": "Kṛṣṇa Caturdaśī",
+      "karana": 58,
+      "karanaName": "Śakuni"
+    },
+    {
+      "case": "k = 59 Catuṣpāda",
+      "elongation": 349,
+      "tithi": 30,
+      "tithiName": "Amāvasyā",
+      "karana": 59,
+      "karanaName": "Catuṣpāda"
+    }
+  ],
+  "yogaSeams": [
+    {
+      "sunSid": 170,
+      "moonSid": 186.6667,
+      "index": 27,
+      "name": "Vaidhṛti"
+    },
+    {
+      "sunSid": 0,
+      "moonSid": 0,
+      "index": 1,
+      "name": "Viṣkambha"
+    }
+  ]
+}

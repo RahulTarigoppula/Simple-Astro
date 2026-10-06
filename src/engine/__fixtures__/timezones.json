@@ -1,0 +1,20 @@
+{
+  "$comment": "§6.1 historical cases, asserted as UTC instants (never as integer offset minutes). TZ-8 uses the manual override; Bombay Time +04:51 is not in tzdb.",
+  "rows": [
+    { "id": "TZ-1", "local": [1994, 3, 14, 7, 25], "zone": "Asia/Kolkata", "offset": "+05:30", "utc": "1994-03-14T01:55:00Z", "jdUt": 2449425.579861, "why": "the house reference chart" },
+    { "id": "TZ-2", "local": [1943, 6, 1, 6, 0], "zone": "Asia/Kolkata", "offset": "+06:30", "utc": "1943-05-31T23:30:00Z", "why": "war time, second spell (1942-09-01 → 1945-10-15)" },
+    { "id": "TZ-3", "local": [1942, 1, 15, 12, 0], "zone": "Asia/Kolkata", "offset": "+06:30", "utc": "1942-01-15T05:30:00Z", "why": "war time, first spell" },
+    { "id": "TZ-4", "local": [1942, 7, 1, 12, 0], "zone": "Asia/Kolkata", "offset": "+05:30", "utc": "1942-07-01T06:30:00Z", "why": "the gap between the spells" },
+    { "id": "TZ-5", "local": [1941, 9, 30, 23, 0], "zone": "Asia/Kolkata", "offset": "+05:30", "utc": "1941-09-30T17:30:00Z", "why": "one day before spell 1" },
+    { "id": "TZ-6", "local": [1945, 10, 16, 0, 30], "zone": "Asia/Kolkata", "offset": "+05:30", "utc": "1945-10-15T19:00:00Z", "why": "one day after spell 2" },
+    { "id": "TZ-7", "local": [1900, 7, 15, 10, 0], "zone": "Asia/Kolkata", "offset": "+05:21:10", "utc": "1900-07-15T04:38:50Z", "why": "Madras MMT, sub-minute offset, ends 1906-01-01" },
+    { "id": "TZ-8", "local": [1950, 2, 10, 5, 0], "zone": "Asia/Kolkata", "offsetOverrideMin": 291, "offset": "+04:51", "utc": "1950-02-10T00:09:00Z", "why": "Bombay Time is not in tzdb — the override drum is the only route" },
+    { "id": "TZ-9", "local": [1980, 6, 1, 9, 0], "zone": "Asia/Kathmandu", "offset": "+05:30", "utc": "1980-06-01T03:30:00Z", "why": "Nepal before the 1986 change" },
+    { "id": "TZ-10", "local": [1990, 6, 1, 9, 0], "zone": "Asia/Kathmandu", "offset": "+05:45", "utc": "1990-06-01T03:15:00Z", "why": "Nepal after" },
+    { "id": "TZ-11", "local": [1996, 8, 1, 9, 0], "zone": "Asia/Colombo", "offset": "+06:30", "utc": "1996-08-01T02:30:00Z", "why": "Sri Lanka's 1996 double change" },
+    { "id": "TZ-12", "local": [2006, 6, 1, 9, 0], "zone": "Asia/Colombo", "offset": "+05:30", "utc": "2006-06-01T03:30:00Z", "why": "after the 2006-04-15 revert" },
+    { "id": "TZ-13", "local": [1965, 3, 1, 9, 0], "zone": "Asia/Karachi", "offset": "+05:00", "utc": "1965-03-01T04:00:00Z", "why": "pre-1971 Pakistan" },
+    { "id": "TZ-14", "local": [1968, 11, 21, 21, 40], "zone": "America/New_York", "offset": "-05:00", "utc": "1968-11-22T02:40:00Z", "why": "a non-Indian, DST-adjacent chart" },
+    { "id": "TZ-15", "local": [2020, 6, 21, 12, 0], "zone": "Australia/Eucla", "offset": "+08:45", "utc": "2020-06-21T03:15:00Z", "why": "45-minute zone, southern hemisphere" }
+  ]
+}

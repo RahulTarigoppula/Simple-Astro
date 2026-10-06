@@ -1,0 +1,69 @@
+.chowki {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.chowki .cloth {
+  position: relative;
+}
+.chowki__drawer {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+.chowki__rooftop {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--surface);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  opacity: 0.85;
+}
+.chowki__rooftop:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+}
+.flame {
+  transform: scale(calc(0.97 + var(--flame-k, 0.5) * 0.06), calc(1.02 - var(--flame-k, 0.5) * 0.04));
+  opacity: calc(0.9 + var(--flame-k, 0.5) * 0.1);
+}
+.chowki__note {
+  margin: 0 var(--space-5);
+  font-size: var(--text-sm);
+}
+.chowki__note .note-haldi {
+  margin: var(--space-2) 0 0;
+}
+@media (min-width: 900px) {
+  .chowki .cloth {
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-rows: 1fr 1fr auto;
+    padding: var(--space-6);
+    gap: var(--space-5);
+    max-width: 1100px;
+    width: calc(100% - var(--space-8));
+    margin: var(--space-3) auto var(--space-6);
+  }
+  .chowki .deskobj--patri {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+  .chowki .greet {
+    padding: var(--space-6) var(--space-8) var(--space-2);
+  }
+  .chowki .greet h1 {
+    font-size: var(--text-3xl);
+  }
+  .chowki .sky {
+    height: 72px;
+  }
+}
+/* Morning terrace: the cloth turns pale, so the engraved labels lying on it switch to ink. */
+:root[data-theme="day"] .cloth .deskobj {
+  color: var(--ink);
+}
+:root[data-theme="day"] .cloth .deskobj .tip {
+  color: var(--surface);
+}

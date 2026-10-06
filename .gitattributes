@@ -1,0 +1,10 @@
+* text=auto
+android/gradlew text eol=lf
+*.sh text eol=lf
+*.task binary
+*.bin binary
+*.gz binary
+*.woff2 binary
+*.wasm binary
+*.png binary
+e2e/visual/__screenshots__/**/*.png binary

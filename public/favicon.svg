@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bowl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E2C56B"/><stop offset=".5" stop-color="#C9A24A"/><stop offset="1" stop-color="#7E5F22"/></linearGradient>
+    <linearGradient id="fl" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#B5301C"/><stop offset=".45" stop-color="#E8A33C"/><stop offset="1" stop-color="#FFF0C4"/></linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".42" r=".5"><stop offset="0" stop-color="#FFC46B" stop-opacity=".35"/><stop offset="1" stop-color="#FFC46B" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="#1A110B"/>
+  <circle cx="256" cy="210" r="190" fill="url(#glow)"/>
+  <path d="M256 92c42 48 54 72 54 102a54 54 0 0 1-108 0c0-30 12-54 54-102Z" fill="url(#fl)"/>
+  <path d="M256 158c18 24 21.6 33.6 21.6 44.4a21.6 21.6 0 0 1-43.2 0c0-10.8 3.6-20.4 21.6-44.4Z" fill="#FFF6E6" opacity=".85"/>
+  <path d="M232 252h48v34h-48z" fill="#5C4413"/>
+  <path d="M84 286h344c0 62-76 108-172 108S84 348 84 286Z" fill="url(#bowl)"/>
+  <path d="M84 286h344" stroke="#E2C56B" stroke-width="10" stroke-linecap="round"/>
+</svg>

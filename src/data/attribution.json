@@ -1,0 +1,203 @@
+{
+  "v": 1,
+  "own": {
+    "name": "Chowki",
+    "licence": "MIT",
+    "note": "Classical tables (nakshatra lords, yoni animals, gana, nadi, varna, koota matrices, varga rules, yoga definitions) are facts re-typed from Brihat Parashara Hora Shastra and Muhurta Chintamani. PyJHora (AGPL-3.0) and Drik Panchang are validation oracles only, never dependencies."
+  },
+  "bundled": [
+    {
+      "id": "astronomy-engine",
+      "name": "astronomy-engine",
+      "author": "Don Cross",
+      "licence": "MIT",
+      "url": "https://github.com/cosinekitty/astronomy",
+      "use": "Tropical apparent longitudes, sidereal time, rise/set, Moon-phase search — the whole ephemeris lane"
+    },
+    {
+      "id": "luxon",
+      "name": "Luxon",
+      "licence": "MIT",
+      "url": "https://moment.github.io/luxon/",
+      "use": "Zoned birth times; historical offsets come from the browser's IANA tzdb"
+    },
+    {
+      "id": "tz-lookup",
+      "name": "@photostructure/tz-lookup",
+      "author": "Matt McEachen, PhotoStructure, Inc.",
+      "licence": "CC0-1.0",
+      "url": "https://github.com/photostructure/tz-lookup",
+      "use": "Latitude/longitude to IANA time zone, bundled"
+    },
+    {
+      "id": "minisearch",
+      "name": "MiniSearch",
+      "licence": "MIT",
+      "url": "https://github.com/lucaong/minisearch",
+      "use": "Fuzzy search over the bundled gazetteer"
+    },
+    {
+      "id": "geonames",
+      "name": "GeoNames gazetteer subset (India, Nepal, Sri Lanka, Pakistan, Bangladesh populated places; world cities ≥ 15 000; selected alternate names)",
+      "author": "GeoNames",
+      "licence": "CC BY 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "url": "https://www.geonames.org/",
+      "file": "src/data/geonames-in.json.gz",
+      "build": "scripts/build-gazetteer.mjs",
+      "modified": "Filtered (feature class P, population/notability thresholds), coordinates rounded to 4 decimals, alternate names reduced to a few historical/English forms, re-encoded as columnar JSON",
+      "use": "Offline birthplace search",
+      "credit": "Place data © GeoNames (geonames.org), licensed under CC BY 4.0"
+    },
+    {
+      "id": "bsc5",
+      "name": "Yale Bright Star Catalog (BSC5)",
+      "author": "NASA/HEASARC",
+      "licence": "Public domain (US Government)",
+      "url": "https://heasarc.gsfc.nasa.gov/W3Browse/star-catalog/bsc5p.html",
+      "use": "~9,100 stars for the Rooftop dome"
+    },
+    {
+      "id": "hand-landmarker",
+      "name": "MediaPipe hand_landmarker.task",
+      "author": "Google",
+      "licence": "Apache-2.0",
+      "url": "https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker",
+      "use": "21 hand landmarks, self-hosted in public/models"
+    },
+    {
+      "id": "mediapipe-tasks-vision",
+      "name": "@mediapipe/tasks-vision and its wasm folder",
+      "author": "Google",
+      "licence": "Apache-2.0",
+      "url": "https://github.com/google-ai-edge/mediapipe",
+      "use": "Hand landmark runtime, self-hosted for offline use"
+    },
+    {
+      "id": "opencv-js",
+      "name": "@techstark/opencv-js 4.12.0-release.1",
+      "author": "OpenCV team; packaged by TechStark",
+      "licence": "Apache-2.0",
+      "url": "https://github.com/TechStark/opencv-js",
+      "use": "CLAHE, black-hat, Hessian, warpPerspective — lazy-loaded on the Hast screen only"
+    },
+    {
+      "id": "font-yatra-one",
+      "name": "Yatra One",
+      "author": "Catharsis Fonts",
+      "licence": "SIL OFL 1.1",
+      "url": "https://fonts.google.com/specimen/Yatra+One",
+      "use": "Display: screen titles, the name on the seal"
+    },
+    {
+      "id": "font-tiro-devanagari-hindi",
+      "name": "Tiro Devanagari Hindi",
+      "author": "Tiro Typeworks",
+      "licence": "SIL OFL 1.1",
+      "url": "https://fonts.google.com/specimen/Tiro+Devanagari+Hindi",
+      "use": "Body: readings, ledger, leaf lines"
+    },
+    {
+      "id": "font-martian-mono",
+      "name": "Martian Mono",
+      "author": "Evil Martians",
+      "licence": "SIL OFL 1.1",
+      "url": "https://github.com/evilmartians/mono",
+      "use": "Engraved brass labels, degrees, end-times"
+    },
+    {
+      "id": "dexie",
+      "name": "Dexie.js, dexie-react-hooks, dexie-export-import",
+      "licence": "Apache-2.0",
+      "url": "https://dexie.org/",
+      "use": "IndexedDB profiles, palm Blobs, backup envelope"
+    },
+    {
+      "id": "three",
+      "name": "three, @react-three/fiber, @react-three/drei, d3-geo",
+      "licence": "MIT",
+      "url": "https://threejs.org/",
+      "use": "Rooftop dome, parapet sky strip, painted-sky fallback"
+    },
+    {
+      "id": "motion",
+      "name": "Motion",
+      "licence": "MIT",
+      "url": "https://motion.dev/",
+      "use": "Ink draw, springs, drag"
+    },
+    {
+      "id": "sounds",
+      "name": "howler + CC0 sound sprite (freesound.org CC0 filter, Kenney.nl)",
+      "licence": "MIT + CC0-1.0",
+      "url": "https://howlerjs.com/",
+      "use": "Desk sounds; per-file credits in public/sounds/ATTRIBUTION.md"
+    },
+    {
+      "id": "lucide",
+      "name": "lucide-react",
+      "licence": "ISC",
+      "url": "https://lucide.dev/",
+      "use": "16 px icons inside paper content only"
+    },
+    {
+      "id": "framework",
+      "name": "React 19, Vite 8, React Router 7, Zustand, Tailwind CSS v4, vite-plugin-pwa (Workbox), Biome, Vitest, Playwright",
+      "licence": "MIT",
+      "use": "Framework, build, tooling"
+    },
+    {
+      "id": "capacitor",
+      "name": "Capacitor 8 and @capacitor/* plugins",
+      "licence": "MIT",
+      "url": "https://capacitorjs.com/",
+      "use": "Android shell, camera, haptics, filesystem, share, status bar, splash"
+    },
+    {
+      "id": "shadcn",
+      "name": "shadcn/ui components on Base UI",
+      "licence": "MIT",
+      "url": "https://ui.shadcn.com/",
+      "use": "Dialog, RadioGroup, Switch, Tabs — restyled with tokens"
+    },
+    {
+      "id": "artwork",
+      "name": "Planet/nakshatra marks, desk objects, grain, seal edges, adaptive icon, poster template",
+      "licence": "Original artwork (CC0 within this repo)",
+      "use": "Drawn on a 24-unit grid; no commercial glyph fonts"
+    }
+  ],
+  "devOnly": [
+    {
+      "id": "panchangam-js",
+      "name": "@ishubhamx/panchangam-js",
+      "licence": "MIT",
+      "use": "Node-side panchang/dasha cross-check oracle — devDependency only, never in the browser bundle"
+    }
+  ],
+  "services": [
+    {
+      "id": "open-meteo",
+      "name": "Open-Meteo Geocoding API",
+      "licence": "Data CC BY 4.0; free tier non-commercial",
+      "url": "https://open-meteo.com/en/docs/geocoding-api",
+      "use": "Only when the owner taps \"search online\" for a place missing from the bundle",
+      "credit": "Geocoding by Open-Meteo.com (data CC BY 4.0)"
+    },
+    {
+      "id": "nominatim",
+      "name": "Nominatim (OpenStreetMap)",
+      "licence": "ODbL 1.0",
+      "url": "https://nominatim.openstreetmap.org/",
+      "use": "Second fallback, on submit only, never per keystroke; ≤ 1 request per second",
+      "credit": "Data © OpenStreetMap contributors, ODbL"
+    }
+  ],
+  "notDependencies": [
+    {
+      "name": "Swiss Ephemeris WASM (@kuntay/swisseph)",
+      "licence": "AGPL-3.0",
+      "note": "Not a dependency. Optional precision-mode lane only; enabling it requires relicensing the repo."
+    }
+  ]
+}

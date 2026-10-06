@@ -1,0 +1,125 @@
+.chart[data-tilak-anim="on"] .tilak {
+  animation: tilak-dab 240ms var(--ease-out) var(--tilak-delay, 1500ms) both;
+}
+.chart .tilak {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes tilak-dab {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  33% {
+    opacity: 1;
+  }
+  55% {
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chart[data-tilak-anim="on"] .tilak {
+    animation: tilak-fade 240ms linear 240ms both;
+  }
+}
+@keyframes tilak-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.patri .sheet {
+  padding-bottom: var(--space-4);
+}
+.patri__back {
+  position: absolute;
+  top: 28px;
+  left: var(--space-3);
+  z-index: 6;
+}
+.flip-stage {
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.chart-wrap .hit-layer {
+  position: absolute;
+  inset: 0;
+}
+.chart-wrap .hit-layer button {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+}
+.chart-wrap .hit-layer button:focus-visible {
+  box-shadow: 0 0 0 2px var(--focus), 0 0 0 4px var(--surface);
+  outline: none;
+}
+.varga-pager {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: var(--space-3) var(--paper-margin) 0;
+  touch-action: pan-x;
+}
+.varga-pager::-webkit-scrollbar {
+  height: 0;
+}
+.varga-pager button {
+  flex: none;
+  min-height: 44px;
+  min-width: 48px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+.varga-pager button[aria-selected="true"] {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+.d9-wrap {
+  max-width: 260px;
+}
+.bhava {
+  margin-top: var(--space-2);
+}
+.patri-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  padding: var(--space-4) var(--paper-margin) 0;
+}
+.foot-list {
+  margin: var(--space-3) var(--paper-margin) 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  font-size: var(--text-sm);
+}
+.foot-list .k {
+  color: var(--ink-muted);
+}
+.sheet-body {
+  padding: 0 0 var(--space-4);
+}
+.loupe-hint {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+@media (min-width: 900px) {
+  .patri .scrollport {
+    padding: 0 var(--space-8);
+  }
+}

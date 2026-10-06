@@ -1,0 +1,281 @@
+/* Today's leaf — the brass dial and the Moon on the indigo cloth, the ledger on paper. */
+
+.today__desk {
+  /* Tithi weather: the cloth takes the paged day's Moon, not the room's. */
+  --moon-fill: color-mix(in oklch, var(--bg-elevated), var(--moon) calc(var(--moon-k) * 14%));
+  padding-bottom: var(--space-6);
+}
+
+.today__cloth {
+  --cloth-text: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--space-3);
+  width: calc(100% - var(--space-6));
+  max-width: 560px;
+  min-height: 120px;
+  margin: var(--space-3) auto 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--moon-fill);
+  background-image: radial-gradient(color-mix(in oklch, var(--surface), transparent 91%) 1px, transparent 1.2px);
+  background-size: 8px 8px;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.35),
+    inset 0 12px 30px rgba(0, 0, 0, 0.35);
+  color: var(--cloth-text);
+}
+:root[data-theme="day"] .today__cloth {
+  --cloth-text: var(--ink);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="night"]) .today__cloth {
+    --cloth-text: var(--ink);
+  }
+}
+
+/* ── the brass dial ─────────────────────────────────────────────────── */
+.dial {
+  position: relative;
+  flex: none;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 210deg,
+    var(--brass-hi),
+    var(--brass-mid) 14%,
+    var(--brass-lo) 30%,
+    var(--brass-mid) 46%,
+    var(--brass-hi) 58%,
+    var(--brass-mid) 72%,
+    var(--brass-dark) 88%,
+    var(--brass-hi)
+  );
+  box-shadow: var(--brass-edge), var(--shadow-2);
+}
+.dial svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.dial--blank {
+  opacity: 0.6;
+}
+.dial__spin {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  transition: transform var(--dur-slow) var(--ease-spring);
+  will-change: transform;
+}
+
+/* ── the Moon pager ─────────────────────────────────────────────────── */
+.moonpager {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  color: var(--cloth-text);
+}
+.moonpager__row {
+  display: flex;
+  align-items: center;
+}
+.moonpager__step {
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  font-size: var(--text-3xl);
+  line-height: 1;
+  color: var(--cloth-text);
+  border-radius: var(--radius-md);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.moonpager__step:active {
+  transform: scale(0.92);
+}
+.moonpager__disc {
+  width: 76px;
+  height: 76px;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.moonpager__disc:active {
+  cursor: grabbing;
+}
+.moon {
+  display: block;
+  width: 76px;
+  height: 76px;
+}
+.moon__dark {
+  fill: color-mix(in oklch, var(--ink), var(--moon) 16%);
+}
+.moon__lit {
+  fill: var(--moon);
+}
+.moon__maria {
+  fill: var(--ink-faint);
+  opacity: 0.2;
+}
+.moon__rim {
+  fill: none;
+  stroke: color-mix(in oklch, var(--moon), transparent 55%);
+  stroke-width: 1;
+}
+.moonpager__cap {
+  margin: 0;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  color: var(--cloth-text);
+}
+.moonpager__today {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--cloth-text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+/* ── the paper ──────────────────────────────────────────────────────── */
+.today__sheet {
+  margin-top: var(--space-3);
+}
+.today__where {
+  padding: var(--space-3) var(--paper-margin) 0;
+}
+.today__where .engraved {
+  display: inline-flex;
+}
+.today__whose {
+  margin-left: 0;
+  margin-right: 0;
+}
+.today-rows {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0 var(--paper-margin);
+}
+.today-rows li {
+  border-bottom: 1px solid var(--border);
+}
+.today-rows li:last-child {
+  border-bottom: 0;
+}
+.today-rows .row {
+  display: grid;
+  grid-template-columns: 6.6em minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: var(--space-3);
+  border-bottom: 0;
+  color: var(--ink);
+}
+.today-rows .row .k {
+  width: auto;
+}
+.today-dev {
+  color: var(--ink);
+  font-size: 0.94em;
+  white-space: nowrap;
+}
+.today-pada,
+.today-muted {
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+}
+.today-num {
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+/* Haldi is never text: a turmeric underline band with ink on top. */
+.haldi-band {
+  background-image: linear-gradient(var(--haldi), var(--haldi));
+  background-repeat: no-repeat;
+  background-size: 100% 7px;
+  background-position: 0 100%;
+  padding: 0 3px 1px;
+}
+.haldi-band--thin {
+  background-size: 100% 3px;
+}
+.today__gap {
+  margin: var(--space-3) var(--paper-margin) 0;
+  border-top: 1px solid var(--border-strong);
+}
+.today-inkline {
+  display: block;
+  width: calc(100% - 2 * var(--paper-margin));
+  height: 6px;
+  margin: var(--space-6) var(--paper-margin);
+}
+.today-inkline path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.25px;
+}
+
+/* ── the footnote sheet ─────────────────────────────────────────────── */
+.footnote {
+  color: var(--ink);
+}
+.footnote__h {
+  margin: var(--space-2) var(--paper-margin) var(--space-2);
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--text-xl);
+  line-height: 1.3;
+}
+.footnote__dl {
+  margin: 0;
+  padding: 0 var(--paper-margin);
+  border-top: 1px solid var(--border-strong);
+}
+.footnote__dl dd {
+  overflow-wrap: anywhere;
+}
+.footnote__num {
+  font-size: var(--text-sm);
+}
+.footnote__close {
+  margin: var(--space-3) var(--paper-margin) 0;
+}
+
+/* ── desktop: the cloth lies beside the paper column ───────────────── */
+@media (min-width: 900px) {
+  .today__desk {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 560px);
+    justify-content: center;
+    align-items: start;
+    gap: var(--space-7);
+    padding: var(--space-6) var(--space-6) var(--space-9);
+  }
+  .today__cloth {
+    position: sticky;
+    top: var(--space-6);
+    flex-direction: column;
+    width: auto;
+    margin: 0;
+    padding: var(--space-6) var(--space-4);
+  }
+  .dial {
+    width: 184px;
+    height: 184px;
+  }
+  .today__sheet {
+    margin: 0;
+    width: 100%;
+    --paper-margin: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dial__spin {
+    transition-duration: 1ms;
+  }
+}

@@ -1,0 +1,35 @@
+// The citations every rule may use. Each one resolves to an entry in src/data/citations.json
+// (asserted by src/engine/citations.test.ts). Chapter-only refs ("ch. 37") are deliberate: a verse
+// number is given only where it is well established across the common translations.
+import type { Citation } from "./types";
+
+const c = (text: string, ref: string): Citation => ({ text, ref });
+
+export const CITE = {
+  // yogas
+  bphs26: c("BPHS", "ch. 26"),
+  bphs36: c("BPHS", "ch. 36"),
+  bphs37: c("BPHS", "ch. 37"),
+  bphs38: c("BPHS", "ch. 38"),
+  bphs39: c("BPHS", "ch. 39"),
+  phaladipika6_1: c("Phaladīpikā", "6.1"),
+  phaladipika6: c("Phaladīpikā", "ch. 6"),
+  phaladipika7: c("Phaladīpikā", "ch. 7"),
+  saravali15: c("Sārāvalī", "ch. 15"),
+  suryaSiddhanta7: c("Sūrya Siddhānta", "ch. 7"),
+  kalaSarpa: c("Later tradition", "Kāla-Sarpa"),
+  kujaDosha: c("Later tradition", "Kuja-doṣa"),
+  kujaDoshaBhanga: c("Later tradition", "Kuja-doṣa bhaṅga"),
+  // Guna Milan
+  muhurtaChintamani6: c("Muhūrta Cintāmaṇi", "ch. 6"),
+  milanCommentary: c("Later tradition", "Aṣṭakūṭa parihāra"),
+  // palm
+  samudrikaHeart: c("Sāmudrika Śāstra", "Hṛdaya-rekhā"),
+  samudrikaHead: c("Sāmudrika Śāstra", "Mastiṣka-rekhā"),
+  samudrikaLife: c("Sāmudrika Śāstra", "Jīvana-rekhā"),
+  samudrikaFingers: c("Sāmudrika Śāstra", "Aṅguli-lakṣaṇa"),
+  cheiroThumb: c("Cheiro, Language of the Hand", "The Thumb"),
+  gettingsElements: c("Gettings, The Book of the Hand", "Hand types"),
+} as const satisfies Record<string, Citation>;
+
+export type CiteKey = keyof typeof CITE;
