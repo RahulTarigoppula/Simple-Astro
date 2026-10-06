@@ -11,7 +11,8 @@ const known = new Set(citations.entries.map((e) => `${e.text}|${e.ref}`));
 
 /** World landmarks for a given element (see geometry.test.ts for the construction). */
 function world(el: PalmElement): Landmark[] {
-  const [wl, fl] = { earth: [0.94, 0.7], air: [0.94, 0.86], fire: [0.84, 0.71], water: [0.84, 0.86] }[el];
+  const table: Record<PalmElement, [number, number]> = { earth: [0.94, 0.7], air: [0.94, 0.86], fire: [0.84, 0.71], water: [0.84, 0.86] };
+  const [wl, fl] = table[el];
   const L = 0.09;
   const W = wl * L;
   const F = fl * L;

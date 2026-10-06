@@ -251,6 +251,7 @@ export interface HandCapture {
   handednessScore: number; // MediaPipe confidence; reject < 0.8
   homography: number[]; // 9 numbers, row-major 3x3, original -> canonical
   quality: { sharpness: number; exposure: number }; // Laplacian variance; luma-histogram score
+  imageSize?: [number, number]; // original photo width × height in px (the homography maps pixels)
   capturedAt: number;
 }
 

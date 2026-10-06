@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import { type FixtureName, fixturePath, loadFixture, loadTruth } from "../../test/palm-fixtures";
 import type { PalmLine } from "../types";
 import { asCv, type CvLike, makeCvOps } from "./cv-ops";
-import { LOW_CONFIDENCE, sqDistToPolyline, type Pt } from "./label";
+import { LOW_CONFIDENCE, sqDistToPolyline } from "./label";
 import { needsTrace, type PipelineResult, runPalmPipeline } from "./pipeline";
 
 const truth = loadTruth();
@@ -108,12 +108,13 @@ describe("line extraction on synthetic palms (§10.5)", () => {
 });
 
 // ─── the OpenCV path (the worker's), in Node ─────────────────────────────────
-let cvPromise: Promise<CvLike | null> | null = null;
-function loadCv(): Promise<CvLike | null> {
+// Boxed: the emscripten Module is a thenable, so resolving a promise WITH it recurses forever.
+let cvPromise: Promise<{ cv: CvLike | null }> | null = null;
+async function loadCv(): Promise<CvLike | null> {
   cvPromise ??= loadCvOnce();
-  return cvPromise;
+  return (await cvPromise).cv;
 }
-async function loadCvOnce(): Promise<CvLike | null> {
+async function loadCvOnce(): Promise<{ cv: CvLike | null }> {
   try {
     const require = createRequire(import.meta.url);
     const mod: unknown = require("@techstark/opencv-js");
@@ -122,9 +123,9 @@ async function loadCvOnce(): Promise<CvLike | null> {
       if (m.Mat) resolve();
       else m.onRuntimeInitialized = () => resolve();
     });
-    return asCv(mod);
+    return { cv: asCv(mod) };
   } catch {
-    return null;
+    return { cv: null };
   }
 }
 
@@ -150,17 +151,11 @@ describe("OpenCV ops (worker path)", () => {
     const cv = await loadCv();
     if (!cv) return ctx.skip();
     const ops = makeCvOps(cv);
-    // a 3 × 3 image cannot be warped by a singular matrix; whatever cv does, nothing may leak
-    try {
-      ops.warp?.({ data: new Uint8ClampedArray(36), width: 3, height: 3 }, [0, 0, 0, 0, 0, 0, 0, 0, 0], 4);
-    } catch {
-      // expected on some builds
-    }
-    try {
-      ops.enhanceGrey?.(new Uint8Array(4), 8, 8); // data shorter than the Mat: set() throws
-    } catch {
-      // expected
-    }
+    // more data than the Mat holds: Mat.data.set() throws after the Mat was constructed
+    expect(() => ops.enhanceGrey?.(new Uint8Array(100), 4, 4)).toThrow();
+    expect(() => ops.close?.(new Uint8Array(100), 4, 4)).toThrow();
+    expect(() => ops.warp?.({ data: new Uint8ClampedArray(400), width: 4, height: 4 }, [1, 0, 0, 0, 1, 0, 0, 0, 1], 8)).toThrow();
+    expect(ops.counter.created).toBeGreaterThan(0);
     expect(ops.counter.created - ops.counter.deleted).toBe(0);
   });
 });

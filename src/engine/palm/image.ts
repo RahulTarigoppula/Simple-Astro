@@ -171,7 +171,10 @@ export function positivePercentile(a: Float32Array, q: number): number {
   const hist = new Uint32Array(BINS);
   for (let i = 0; i < a.length; i++) {
     const v = a[i] ?? 0;
-    if (v > 0) hist[Math.min(BINS - 1, Math.floor((v / max) * BINS))]++;
+    if (v > 0) {
+      const b = Math.min(BINS - 1, Math.floor((v / max) * BINS));
+      hist[b] = (hist[b] ?? 0) + 1;
+    }
   }
   const target = q * n;
   let acc = 0;
