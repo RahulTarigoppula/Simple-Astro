@@ -45,26 +45,23 @@ const CV_LOAD_TIMEOUT_MS = 20_000;
 let cvPromise: Promise<{ cv: CvLike | null }> | null = null;
 
 function loadCv(): Promise<{ cv: CvLike | null }> {
-  cvPromise ??= (async (): Promise<{ cv: CvLike | null }> => {
-    try {
-      const ns: unknown = await import("@techstark/opencv-js");
-      const mod: unknown = (ns as { default?: unknown }).default ?? ns;
-      const m = mod as { Mat?: unknown; onRuntimeInitialized?: () => void };
-      // The emscripten Module is thenable; never `await` it directly (it resolves to itself).
-      await new Promise<void>((resolve, reject) => {
-        const t = setTimeout(() => reject(new Error("opencv init timeout")), CV_LOAD_TIMEOUT_MS);
-        const done = (): void => {
-          clearTimeout(t);
-          resolve();
-        };
-        if (m.Mat) done();
-        else m.onRuntimeInitialized = done;
-      });
-      return { cv: asCv(mod) };
-    } catch {
-      return { cv: null };
-    }
-  })();
+  cvPromise ??= Promise.race([
+    (async (): Promise<{ cv: CvLike | null }> => {
+      try {
+        const { box } = await import("./opencv");
+        const m = box.cv as { Mat?: unknown; onRuntimeInitialized?: () => void };
+        // The emscripten Module is thenable; it is never awaited or resolved with directly.
+        await new Promise<void>((resolve) => {
+          if (m.Mat) resolve();
+          else m.onRuntimeInitialized = () => resolve();
+        });
+        return { cv: asCv(box.cv) };
+      } catch {
+        return { cv: null };
+      }
+    })(),
+    new Promise<{ cv: CvLike | null }>((resolve) => setTimeout(() => resolve({ cv: null }), CV_LOAD_TIMEOUT_MS)),
+  ]);
   return cvPromise;
 }
 

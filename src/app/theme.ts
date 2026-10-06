@@ -47,7 +47,9 @@ export function ThemeController() {
       const root = document.documentElement;
       root.dataset.theme = resolved;
       root.style.setProperty("--moon-k", moonK(now).toFixed(3));
-      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", resolved === "day" ? "#6E4A2E" : "#1A110B");
+      // The status-bar colour is the desk itself: read the token rather than repeating its hex here.
+      const desk = getComputedStyle(root).getPropertyValue("--bg").trim();
+      if (desk) document.querySelector('meta[name="theme-color"]')?.setAttribute("content", desk);
       setResolved(resolved);
       try {
         localStorage.setItem("chowki-theme", resolved);

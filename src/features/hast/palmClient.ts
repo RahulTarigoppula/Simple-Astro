@@ -17,6 +17,9 @@ export interface ExtractResult {
 
 export type Stage = "loading-cv" | "working";
 
+/** OpenCV gets 20 s to load inside the worker; the whole job gets this long before the main thread takes over. */
+const WORKER_TIMEOUT_MS = 45_000;
+
 let worker: Worker | null = null;
 let seq = 1;
 const pending = new Map<
@@ -86,7 +89,20 @@ export async function extractLines(
   const rgba = new Uint8ClampedArray(image.data).buffer;
   const job: PalmJob = { id, rgba, width: image.width, height: image.height, landmarks, hand };
   const msg = await new Promise<Extract<PalmWorkerMessage, { type: "done" }>>((resolve) => {
-    pending.set(id, { resolve, onStage });
+    // Watchdog: a worker that neither answers nor errors is terminated and the job runs here.
+    const timer = setTimeout(() => {
+      if (!pending.delete(id)) return;
+      worker?.terminate();
+      worker = null;
+      resolve({ id, type: "done", ok: false, reason: "worker-timeout" });
+    }, WORKER_TIMEOUT_MS);
+    pending.set(id, {
+      resolve: (m) => {
+        clearTimeout(timer);
+        resolve(m);
+      },
+      onStage,
+    });
     w.postMessage(job, [rgba]);
   });
   if (msg.ok) {
