@@ -53,7 +53,7 @@ export function runPalmPipeline(
   const rm = ridgeMask(enh.ridgeInput, w, h, { close: ops.close ?? close3x3 });
   const thin = zhangSuenStats(Uint8Array.from(rm.mask), w, h);
   const comps = components(thin.mask, w, h);
-  const candidates = labelLines({ skeleton: thin.mask, mask: rm.mask, blackHat: enh.blackHat, width: w, height: h }, comps);
+  const candidates = labelLines({ skeleton: thin.mask, mask: rm.mask, blackHat: enh.blackHat, ridge: rm.response, width: w, height: h }, comps);
   // the fate line is optional: it is only shown when it is actually seen
   const lines = candidates.filter((c) => c.id !== "fate" || c.confidence >= LOW_CONFIDENCE).map(toPalmLine);
   return {

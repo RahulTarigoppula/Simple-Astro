@@ -112,7 +112,7 @@
   height: 76px;
 }
 .moon__dark {
-  fill: color-mix(in oklch, var(--ink), var(--moon) 16%);
+  fill: color-mix(in oklch, var(--ink), var(--moon) 26%);
 }
 .moon__lit {
   fill: var(--moon);
@@ -169,14 +169,34 @@
 }
 .today-rows .row {
   display: grid;
-  grid-template-columns: 6.6em minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "k end"
+    "v v";
   align-items: baseline;
   column-gap: var(--space-3);
+  row-gap: 0;
+  padding: 8px 0 9px;
   border-bottom: 0;
   color: var(--ink);
 }
 .today-rows .row .k {
+  grid-area: k;
   width: auto;
+}
+.today-rows .row .v {
+  grid-area: v;
+  font-size: var(--text-lg);
+  line-height: 1.45;
+}
+.today-rows .row .end {
+  grid-area: end;
+}
+@media (min-width: 600px) {
+  .today-rows .row {
+    grid-template-columns: 7em minmax(0, 1fr) auto;
+    grid-template-areas: "k v end";
+  }
 }
 .today-dev {
   color: var(--ink);
@@ -238,8 +258,9 @@
 .footnote__dl dd {
   overflow-wrap: anywhere;
 }
-.footnote__num {
+.footnote__dl dd.footnote__num {
   font-size: var(--text-sm);
+  line-height: 1.6;
 }
 .footnote__close {
   margin: var(--space-3) var(--paper-margin) 0;

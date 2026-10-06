@@ -64,19 +64,20 @@ const GT = {
     [178, 156],
     [150, 176],
   ],
+  // the head line starts just above the life line, as an "independent" head line does
   head: [
-    [136, 262],
-    [190, 280],
-    [250, 296],
-    [310, 312],
-    [364, 330],
+    [122, 232],
+    [180, 252],
+    [244, 274],
+    [306, 296],
+    [364, 320],
   ],
   life: [
-    [150, 236],
-    [134, 296],
-    [140, 356],
-    [166, 412],
-    [204, 462],
+    [152, 258],
+    [136, 310],
+    [142, 364],
+    [168, 416],
+    [206, 464],
   ],
 };
 const DEPTH = { heart: 0.34, head: 0.32, life: 0.3 };
@@ -256,7 +257,7 @@ function creaseShade(c) {
 /** Smooth skin tone variation + mount highlights + edge falloff, luma 0..255. */
 function skinLuma(c, edgeDist) {
   const [x, y] = c;
-  let L = 176 + 6 * Math.sin(x / 37 + 0.4) * Math.cos(y / 53) + 4 * Math.sin((x + y) / 23);
+  let L = 168 + 6 * Math.sin(x / 37 + 0.4) * Math.cos(y / 53) + 4 * Math.sin((x + y) / 23);
   for (const [mx, my, r] of [
     [140, 150, 50],
     [212, 140, 50],
@@ -481,7 +482,7 @@ const variants = {
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) l[y * W + x] = base.luma[y * W + x] * (1 - (0.4 * x) / (W - 1));
     return quantise(l, base.alpha, noHenna, 12);
   },
-  "synthetic-blur": () => quantise(gaussianBlur(base.luma, W, H, 4.5), base.alpha, noHenna, 13),
+  "synthetic-blur": () => quantise(gaussianBlur(base.luma, W, H, 6), base.alpha, noHenna, 13),
   "synthetic-henna": () => quantise(base.luma, base.alpha, base.henna, 14),
 };
 

@@ -87,9 +87,10 @@ export function exposureOf(g: GreyImage, roi?: Roi): Exposure {
   for (let v = 245; v < 256; v++) hi += hist[v] ?? 0;
   const clippedLow = lo / n;
   const clippedHigh = hi / n;
-  // Comfortable band for skin: median 70..200. Outside it, or with heavy clipping, say so.
+  // Comfortable band for a palm: median 100..205 (auto-exposure puts a frame-filling palm near
+  // 110–170 whatever the skin tone). Outside it, or with heavy clipping, say so.
   const label: ExposureLabel =
-    median < 70 || clippedLow > 0.3 ? "low" : median > 200 || clippedHigh > 0.2 ? "high" : "ok";
+    median < 100 || clippedLow > 0.3 ? "low" : median > 205 || clippedHigh > 0.2 ? "high" : "ok";
   const centre = 135;
   const spread = 95; // distance from the centre at which the score reaches 0
   const s = Math.max(0, 1 - Math.abs(median - centre) / spread) * (1 - Math.min(1, clippedLow + clippedHigh));
@@ -123,9 +124,12 @@ export function sharpnessPips(v: number): number {
 }
 export const exposurePips = (score: number): number => Math.max(0, Math.min(5, Math.round(score * 5)));
 
-/** The palm ROI from landmarks (normalised), padded 10 %: wrist, the MCPs and the thumb base. */
+/**
+ * The palm ROI from landmarks (normalised): the box of the wrist and the four finger MCPs, shrunk
+ * 10 % on each side so it holds skin only — the background must not vote on exposure.
+ */
 export function palmRoi(lm: ReadonlyArray<{ x: number; y: number }>): Roi | undefined {
-  const idx = [0, 1, 2, 5, 9, 13, 17];
+  const idx = [0, 5, 9, 13, 17];
   let minX = 1;
   let minY = 1;
   let maxX = 0;
@@ -140,9 +144,9 @@ export function palmRoi(lm: ReadonlyArray<{ x: number; y: number }>): Roi | unde
   }
   const padX = (maxX - minX) * 0.1;
   const padY = (maxY - minY) * 0.1;
-  const x = Math.max(0, minX - padX);
-  const y = Math.max(0, minY - padY);
-  const w = Math.min(1, maxX + padX) - x;
-  const h = Math.min(1, maxY + padY) - y;
+  const x = Math.max(0, minX + padX);
+  const y = Math.max(0, minY + padY);
+  const w = Math.min(1, maxX - padX) - x;
+  const h = Math.min(1, maxY - padY) - y;
   return w > 0.02 && h > 0.02 ? { x, y, w, h } : undefined;
 }

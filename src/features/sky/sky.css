@@ -1,7 +1,7 @@
 /* Rooftop sky — #/patri/:id/sky. Full-bleed neel cloth, a painted chart of the real sky, an
    engraved brass strip and a brass scrub ring. Colours only from tokens. */
 
-.sky {
+.rooftop {
   --moon-fill: color-mix(in oklch, var(--sky-cloth), var(--moon) calc(var(--moon-k) * 14%));
   position: absolute;
   inset: 0;
@@ -12,7 +12,7 @@
   background-image: radial-gradient(color-mix(in oklch, var(--surface) 8%, transparent) 1px, transparent 1.2px);
   background-size: 8px 8px;
   overflow: hidden;
-  touch-action: pan-x pan-y;
+  touch-action: none; /* swipe-down to the desk; the sky never scrolls */
 }
 
 .sky-head {
@@ -169,6 +169,9 @@
   opacity: 0;
   transition: opacity var(--dur-base) linear;
 }
+.dome-wrap:not(.is-ready) {
+  pointer-events: none;
+}
 .dome-wrap.is-ready {
   opacity: 1;
 }
@@ -292,7 +295,7 @@
   place-items: center;
 }
 
-.sky--missing {
+.rooftop--missing {
   display: grid;
   place-content: center;
   gap: var(--space-4);

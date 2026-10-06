@@ -1,0 +1,447 @@
+/* Guna Milan — two scrolls tied with mauli, the score, the 36-bead mala. */
+
+/* ── the two scrolls ───────────────────────────────────────────────── */
+.milan .pair {
+  padding-top: var(--space-5);
+  gap: var(--space-3);
+}
+.mscroll {
+  position: relative;
+  gap: 2px;
+  padding: 10px 12px 6px;
+  min-height: 112px;
+  background-image: repeating-linear-gradient(180deg, transparent 0 21px, color-mix(in oklch, var(--border), transparent 40%) 21px 22px);
+}
+.mscroll:not(.pair__scroll--empty)::before,
+.mscroll:not(.pair__scroll--empty)::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 7px;
+  border-radius: 4px;
+  background: var(--brass-cyl);
+  box-shadow: var(--brass-edge), var(--shadow-1);
+}
+.mscroll::before {
+  left: -5px;
+}
+.mscroll::after {
+  right: -5px;
+}
+.mscroll span {
+  display: inline;
+  color: inherit;
+}
+.mscroll .mscroll__who {
+  display: block;
+  font-size: var(--text-sm);
+  font-style: italic;
+  color: var(--ink-muted);
+  line-height: 1.3;
+}
+.mscroll .mscroll__moon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-lg);
+  color: var(--ink);
+  line-height: 1.6;
+}
+.mscroll .mscroll__sign {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--brass-plate);
+  box-shadow: var(--brass-edge), var(--shadow-1);
+  color: var(--engraved);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variation-settings: "wdth" 87, "wght" 700;
+  line-height: 1;
+}
+.mscroll .mscroll__lat {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+  line-height: 1.4;
+}
+.mk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+  width: 100%;
+  min-height: 44px;
+  font-size: var(--text-sm);
+  line-height: 1.3;
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+}
+.mscroll .mk__dabs {
+  display: inline-flex;
+  gap: 3px;
+}
+.mscroll .mk__dab {
+  display: inline-block;
+  width: 8px;
+  height: 10px;
+  border-radius: 50% 50% 46% 54% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 40% 35%, color-mix(in oklch, var(--accent), white 14%), var(--accent) 58%, color-mix(in oklch, var(--accent), black 22%));
+}
+.mk__muted,
+.mscroll .mk__muted {
+  color: var(--ink-muted);
+}
+.mscroll--drop {
+  display: grid;
+  place-items: center;
+  font-size: var(--text-sm);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.mscroll--drop.is-over {
+  border-color: var(--accent);
+  border-style: solid;
+  transform: scale(1.03);
+}
+
+.mauli-knot {
+  width: 64px;
+  height: 28px;
+  overflow: visible;
+}
+.mauli-knot__t {
+  fill: none;
+  stroke: var(--thread);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.mauli-knot__tw {
+  fill: none;
+  stroke: var(--haldi);
+  stroke-width: 3;
+  stroke-dasharray: 2.4 4.2;
+}
+.mauli-knot__loop {
+  fill: none;
+  stroke: var(--thread);
+  stroke-width: 2.4;
+}
+.mauli-knot__core {
+  fill: var(--thread);
+}
+
+.milan__swap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-3);
+  margin: var(--space-2) var(--paper-margin) 0;
+}
+.milan__swaphelp {
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+
+/* ── the score, the knot, the lac stamp ────────────────────────────── */
+.mala .score {
+  padding-top: var(--space-5);
+}
+.mala__score {
+  color: var(--ink);
+}
+.mala__of {
+  font-size: 0.5em;
+  color: var(--ink-muted);
+}
+.mala__knot {
+  position: relative;
+  width: 168px;
+  height: 4px;
+  margin: var(--space-3) auto 0;
+  border-radius: 2px;
+  background: repeating-linear-gradient(90deg, var(--thread) 0 5px, var(--haldi) 5px 8px);
+  box-shadow: var(--shadow-1);
+  transform-origin: 50% 50%;
+}
+.mala__knotcore {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border-radius: 50%;
+  background: var(--thread);
+}
+.mala__stampslot {
+  display: grid;
+  place-items: center;
+  min-height: 40px;
+  margin-top: var(--space-2);
+}
+.mala__band {
+  font-size: var(--text-sm);
+  padding: 4px 14px;
+  border-width: 2px;
+}
+.mala__tap {
+  font-size: var(--text-sm);
+  font-style: italic;
+  color: var(--ink-muted);
+}
+
+/* ── the bead rows ─────────────────────────────────────────────────── */
+.mala__beads .krow {
+  grid-template-columns: 78px minmax(0, 1fr) auto;
+}
+.mala__beads .kname {
+  line-height: 1.3;
+}
+.mala__beads .kname__dev {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+  line-height: 1.4;
+}
+.mala__beads li.is-dosha {
+  background: color-mix(in oklch, var(--danger), var(--paper) 94%);
+}
+.mala__beads .kscore i {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.mala__beads .brow {
+  position: relative;
+  flex-wrap: nowrap;
+  align-items: center;
+  height: 26px;
+  padding-left: 14px;
+}
+.brow__thread {
+  position: absolute;
+  left: 2px;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--thread);
+  opacity: 0.85;
+}
+.brow__knot {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin-top: -4.5px;
+  border-radius: 50%;
+  background: var(--thread);
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--thread), transparent 65%);
+  z-index: 2;
+}
+.bd {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 34% 30%,
+    color-mix(in oklch, var(--teak-light), var(--surface) 72%),
+    color-mix(in oklch, var(--teak-light), var(--surface-2) 48%) 64%,
+    color-mix(in oklch, var(--teak-light), black 8%)
+  );
+  box-shadow:
+    inset 0 -2px 3px rgba(0, 0, 0, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.35);
+  will-change: transform;
+}
+.bd--brass,
+.bd--lac {
+  background: radial-gradient(circle at 34% 30%, color-mix(in oklch, var(--teak-light), white 18%), var(--teak-light) 60%, color-mix(in oklch, var(--teak-light), black 35%));
+}
+.bd__metal {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+}
+.bd--brass .bd__metal,
+.bd--half .bd__metal {
+  background: radial-gradient(circle at 34% 30%, color-mix(in oklch, var(--brass), white 34%), var(--brass) 62%, var(--engraved));
+}
+.bd--half .bd__metal {
+  clip-path: inset(0 50% 0 0);
+}
+.bd--lac .bd__metal {
+  background: radial-gradient(circle at 34% 30%, color-mix(in oklch, var(--lac), white 18%), var(--lac) 70%, var(--lac-dark));
+}
+.knote__src {
+  font-style: italic;
+}
+.knote__exc {
+  display: block;
+  margin-top: 2px;
+}
+
+/* ── ten porutham, folded ──────────────────────────────────────────── */
+.porutham {
+  margin: var(--space-6) var(--paper-margin) 0;
+  border-top: 1px solid var(--border-strong);
+}
+.porutham summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  cursor: pointer;
+  color: var(--ink);
+}
+.porutham__meta {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+.porutham__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.porutham__list li {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  gap: 2px var(--space-2);
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+.porutham__bead {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.2);
+}
+.porutham__bead.is-pass {
+  background: radial-gradient(circle at 34% 30%, color-mix(in oklch, var(--brass), white 34%), var(--brass) 62%, var(--engraved));
+}
+.porutham__pass {
+  color: var(--ink-muted);
+}
+.porutham__note {
+  grid-column: 2 / -1;
+  color: var(--ink-muted);
+}
+
+/* ── choosing two leaves ───────────────────────────────────────────── */
+.milan-pick {
+  list-style: none;
+  margin: var(--space-3) var(--paper-margin) 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.milan-pick__leaf {
+  position: relative;
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px 8px 17px;
+  border-radius: var(--radius-md);
+  background-color: var(--surface-2);
+  background-image: repeating-linear-gradient(180deg, transparent 0 21px, var(--border) 21px 22px);
+  box-shadow: var(--shadow-1);
+  color: var(--ink);
+  font-size: var(--text-lg);
+  text-align: left;
+  cursor: grab;
+}
+.milan-pick__leaf[aria-pressed="true"] {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.milan-pick__leaf .leaf__hole {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--ink), transparent 30%);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+.milan-first {
+  margin: var(--space-4) var(--paper-margin) 0;
+}
+.milan-first summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: var(--accent-text);
+  cursor: pointer;
+}
+.milan-first .milan-pick {
+  margin: var(--space-2) 0 0;
+}
+
+/* ── the koota sheet ───────────────────────────────────────────────── */
+.kootasheet {
+  color: var(--ink);
+}
+.kootasheet__h {
+  margin: var(--space-2) var(--paper-margin) 0;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--text-xl);
+  line-height: 1.35;
+}
+.kootasheet__score {
+  margin-left: 6px;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+.kootasheet__dl {
+  margin: var(--space-3) 0 0;
+  padding: 0 var(--paper-margin);
+  border-top: 1px solid var(--border-strong);
+}
+.kootasheet__dl dt {
+  width: 6.5em;
+}
+.kootasheet__list {
+  margin: var(--space-2) var(--paper-margin) 0;
+  padding-left: 1.2em;
+  font-size: var(--text-sm);
+}
+.kootasheet__close {
+  margin: var(--space-3) var(--paper-margin) 0;
+}
+.milan__school {
+  margin: var(--space-2) 0 0;
+}
+
+@media (min-width: 900px) {
+  .milan__sheet {
+    --paper-margin: 32px;
+  }
+  .milan .pair {
+    gap: var(--space-6);
+  }
+  .mscroll {
+    min-height: 140px;
+  }
+}

@@ -1,6 +1,6 @@
 // The D1 figure: the ink-drawn Kundli, the brass loupe that rises under the finger and snaps
 // planet to planet (loupe-rise), the engraved readout, and the North ⇄ South paper flip.
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DigitSet } from "../../components/ui/DigitSet";
 import { GRAHA_CODE, GRAHA_ENGLISH, GRAHA_NAMES, NAKSHATRA_NAMES, SIGN_NAMES } from "../../data/tables/names";
 import { formatArcmin, formatDms } from "../../engine/math";
@@ -45,7 +45,7 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
   const active = useRef(false);
   const swipe = useRef<{ x: number; y: number; t: number } | null>(null);
   const hideTimer = useRef(0);
-  const bodies = bodiesOf(patri);
+  const bodies = useMemo(() => bodiesOf(patri), [patri]);
 
   useEffect(() => {
     const el = wrap.current;

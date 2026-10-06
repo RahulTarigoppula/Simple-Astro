@@ -30,24 +30,23 @@
       "use": "Latitude/longitude to IANA time zone, bundled"
     },
     {
-      "id": "minisearch",
-      "name": "MiniSearch",
-      "licence": "MIT",
-      "url": "https://github.com/lucaong/minisearch",
-      "use": "Fuzzy search over the bundled gazetteer"
-    },
-    {
       "id": "geonames",
-      "name": "GeoNames gazetteer subset (India, Nepal, Sri Lanka, Pakistan, Bangladesh populated places; world cities ≥ 15 000; selected alternate names)",
+      "name": "GeoNames gazetteer subset",
       "author": "GeoNames",
       "licence": "CC BY 4.0",
       "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
       "url": "https://www.geonames.org/",
       "file": "src/data/geonames-in.json.gz",
       "build": "scripts/build-gazetteer.mjs",
-      "modified": "Filtered (feature class P, population/notability thresholds), coordinates rounded to 4 decimals, alternate names reduced to a few historical/English forms, re-encoded as columnar JSON",
+      "modified": "Filtered to populated places, coordinates rounded to 4 decimals, at most three alternate names per place, re-encoded as columnar JSON (82 505 places)",
       "use": "Offline birthplace search",
-      "credit": "Place data © GeoNames (geonames.org), licensed under CC BY 4.0"
+      "credit": "Place data © GeoNames (geonames.org), licensed under CC BY 4.0",
+      "sources": [
+        "cities15000 (world populated places with population ≥ 15 000)",
+        "Full country dumps IN, NP, LK, PK, BD (feature class P; populated places plus admin seats, the rest ranked by alternate-name count to fit the size budget)",
+        "alternatenames/IN, NP, LK, PK, BD, MM (a few English / historical names per place, e.g. Bombay, Madras, Calcutta, Rangoon)",
+        "admin1CodesASCII.txt (state / province names)"
+      ]
     },
     {
       "id": "bsc5",

@@ -154,6 +154,7 @@ export default function SkyScreen() {
     if (!birth) return null;
     const t0 = performance.now();
     const s = rooftopSky(tMs, birth.place.lat, birth.place.lon, preset, nodeMode);
+    performance.clearMeasures?.("sky-frame");
     performance.measure?.("sky-frame", { start: t0 });
     return s;
   }, [birth, tMs, preset, nodeMode]);
@@ -205,7 +206,7 @@ export default function SkyScreen() {
   const swipe = useRef<{ x: number; y: number; t: number } | null>(null);
   const swipeHandlers = {
     onPointerDown: (e: React.PointerEvent) => {
-      if ((e.target as Element).closest?.(".dome.is-ready, .scrub, button")) return;
+      if ((e.target as Element).closest?.(".dome-wrap.is-ready, .scrub, button")) return;
       swipe.current = { x: e.clientX, y: e.clientY, t: e.timeStamp };
     },
     onPointerUp: (e: React.PointerEvent) => {
@@ -245,14 +246,14 @@ export default function SkyScreen() {
   if (profile === undefined) {
     return (
       <Screen label="Rooftop sky" className="sky-screen">
-        <div className="sky" />
+        <div className="rooftop" />
       </Screen>
     );
   }
   if (profile === null || !birth || !sky || !scene) {
     return (
       <Screen label="Rooftop sky" className="sky-screen">
-        <div className="sky sky--missing">
+        <div className="rooftop rooftop--missing">
           <p>This leaf is not in the bundle.</p>
           <button type="button" className="sky-btn" onClick={() => navigate("/")}>
             ⇩ desk
@@ -273,7 +274,7 @@ export default function SkyScreen() {
 
   return (
     <Screen label={`Rooftop sky of ${profile.name}`} className="sky-screen">
-      <div className="sky" style={{ "--moon-k": sky.moonK.toFixed(3) } as React.CSSProperties} {...swipeHandlers}>
+      <div className="rooftop" style={{ "--moon-k": sky.moonK.toFixed(3) } as React.CSSProperties} {...swipeHandlers}>
         <header className="sky-head">
           <h1 className="display">{profile.name}</h1>
           <p>

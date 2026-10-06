@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import * as A from "astronomy-engine";
 import { describe, expect, it } from "vitest";
 import { mulberry32 } from "../math";
+import { altAzXY, eunX, eunY, SKY_R, skyProjection } from "./projection";
 import { rooftopSky, siderealPointEun, starMatrix } from "./rooftop";
 import {
   altAzOfRadec,
@@ -126,6 +127,27 @@ describe("projection", () => {
     const dot = (mine[0] ?? 0) * v.x + (mine[1] ?? 0) * v.y + (mine[2] ?? 0) * v.z;
     expect(Math.acos(Math.min(1, dot)) * R2D * 3600).toBeLessThan(30);
     expect(mul3(P, [1, 0, 0, 0, 1, 0, 0, 0, 1])).toEqual(P);
+  });
+
+  it("the closed-form star projection is the d3-geo stereographic projection (East at the bottom)", () => {
+    const p = skyProjection();
+    for (let k = 0; k < 50; k++) {
+      const alt = rng() * 90;
+      const az = rng() * 360;
+      const a = (alt * Math.PI) / 180;
+      const z = (az * Math.PI) / 180;
+      const e = Math.cos(a) * Math.sin(z);
+      const u = Math.sin(a);
+      const n = Math.cos(a) * Math.cos(z);
+      const d3 = p([az - 90, alt]) ?? [Number.NaN, Number.NaN];
+      expect(eunX(e, u, n)).toBeCloseTo(d3[0], 6);
+      expect(eunY(e, u, n)).toBeCloseTo(d3[1], 6);
+      const [x, y] = altAzXY(alt, az);
+      expect(x).toBeCloseTo(d3[0], 6);
+      expect(y).toBeCloseTo(d3[1], 6);
+    }
+    expect(altAzXY(0, 90)[1]).toBeCloseTo(SKY_R, 9); // East on the horizon → bottom of the disc
+    expect(altAzXY(0, 0)[0]).toBeCloseTo(-SKY_R, 9); // North → left
   });
 
   it("projects every star in under 2 ms", () => {

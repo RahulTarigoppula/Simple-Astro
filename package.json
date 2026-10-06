@@ -46,7 +46,6 @@
     "dexie-export-import": "4.4.0",
     "dexie-react-hooks": "4.4.0",
     "luxon": "3.7.2",
-    "minisearch": "7.2.0",
     "motion": "13.2.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",

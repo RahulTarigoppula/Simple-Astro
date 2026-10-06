@@ -59,7 +59,7 @@ export default defineConfig({
             },
             workbox: {
               globPatterns: ["**/*.{js,css,html,svg,png,woff2,webmanifest,webm,mp3,bin,gz}"],
-              globIgnores: ["**/models/**", "**/mediapipe/**", "**/*.wasm", "**/opencv*.js", "**/cv-*.js", "**/sky-*.js"],
+              globIgnores: ["**/models/**", "**/mediapipe/**", "**/*.wasm", "**/opencv*.js", "**/cv-*.js", "**/SkyDome-*.js"],
               maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
               navigateFallback: `${base}index.html`,
               runtimeCaching: [
@@ -73,7 +73,7 @@ export default defineConfig({
                   handler: "CacheFirst",
                   options: { cacheName: "chowki-cv", expiration: { maxEntries: 12 } },
                 },
-                { urlPattern: /sky-.*\.js$/, handler: "CacheFirst", options: { cacheName: "chowki-sky" } },
+                { urlPattern: /SkyDome-.*\.js$/, handler: "CacheFirst", options: { cacheName: "chowki-sky" } },
                 { urlPattern: /geocoding-api\.open-meteo\.com/, handler: "NetworkOnly" },
                 { urlPattern: /nominatim\.openstreetmap\.org/, handler: "NetworkOnly" },
               ],

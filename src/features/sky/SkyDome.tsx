@@ -369,7 +369,11 @@ function DomeScene({
   onLost: () => void;
   bindInvalidate: (fn: () => void) => void;
 }) {
-  const { gl, invalidate, camera, viewport } = useThree();
+  const { gl, invalidate, camera, viewport, scene } = useThree();
+  const bg = useMemo(() => {
+    const tok = tokens();
+    return { night: new Color(tok("--sky-cloth", "midnightblue")), day: new Color(tok("--sky-day-0", "steelblue")) };
+  }, []);
   const built = useMemo(() => build(stars, tokens(), Math.min(1.5, window.devicePixelRatio || 1)), [stars]);
   const lastK = useRef(-1);
   const readySent = useRef(false);
@@ -412,8 +416,11 @@ function DomeScene({
     built.lagna.rotation.set(0, -sky.lagna.az * D2R, 0);
     const day = Math.max(0, Math.min(1, (sky.sunAlt + 12) / 12));
     built.uFade.value = 1 - 0.55 * day;
+    // Daylight washes the cloth a little, exactly as the painted disc does (no glow, no gradient).
+    const back = scene.background instanceof Color ? scene.background : new Color();
+    scene.background = back.copy(bg.night).lerp(bg.day, 0.3 * day);
     invalidate();
-  }, [sky, built, invalidate]);
+  }, [sky, built, invalidate, scene, bg]);
 
   useFrame((state) => {
     const L = look.current;
@@ -451,6 +458,7 @@ export default function SkyDome({ sky, stars, lookAz, paused, noInertia, onReady
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const root = useRef<ReconcilerRoot<HTMLCanvasElement> | null>(null);
   const [size, setSize] = useState<{ width: number; height: number } | null>(null);
+  const [configured, setConfigured] = useState(false);
 
   useLayoutEffect(() => {
     const el = host.current;
@@ -488,15 +496,20 @@ export default function SkyDome({ sky, stars, lookAz, paused, noInertia, onReady
         },
       })
       .then(() => {
-        if (!live) return;
-        r.render(
-          <DomeScene sky={sky} stars={stars} look={look} onReady={onReady} onLost={onLost} bindInvalidate={bindInvalidate} />,
-        );
+        if (live) setConfigured(true);
       });
     return () => {
       live = false;
     };
-  }, [size, paused, sky, stars, onReady, onLost, bindInvalidate]);
+  }, [size, paused]);
+
+  // The sky changed (a scrub frame): hand the new model to the scene — it invalidates once.
+  useLayoutEffect(() => {
+    if (!configured) return;
+    root.current?.render(
+      <DomeScene sky={sky} stars={stars} look={look} onReady={onReady} onLost={onLost} bindInvalidate={bindInvalidate} />,
+    );
+  }, [configured, sky, stars, onReady, onLost, bindInvalidate]);
 
   useEffect(() => () => cancelAnimationFrame(raf.current), []);
   useEffect(() => {

@@ -75,8 +75,11 @@
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-width: thin;
+  scrollbar-width: none;
   padding: 6px 4px 6px 20px;
+}
+.bundle__viewport::-webkit-scrollbar {
+  width: 0;
 }
 .bundle__stack {
   position: relative;
@@ -127,9 +130,9 @@
 }
 .leaf-tray {
   position: absolute;
-  right: 0;
-  top: 5px;
-  bottom: 5px;
+  right: 6px;
+  top: 6px;
+  bottom: 6px;
   display: flex;
   border-radius: var(--radius-md);
   overflow: hidden;

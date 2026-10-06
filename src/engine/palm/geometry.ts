@@ -22,9 +22,12 @@ export function angleBetween(u: Vec3, v: Vec3): number {
 export const SQUARE_MIN = 0.9;
 export const LONG_FINGERS_MIN = 0.8;
 
+/** Float slack so a ratio that is 0.90 on paper but 0.8999999999 in binary still counts as 0.90. */
+const EPS = 1e-9;
+
 export function elementOf(widthOverLength: number, fingerOverPalm: number): PalmElement {
-  const square = widthOverLength >= SQUARE_MIN;
-  const longFingers = fingerOverPalm >= LONG_FINGERS_MIN;
+  const square = widthOverLength >= SQUARE_MIN - EPS;
+  const longFingers = fingerOverPalm >= LONG_FINGERS_MIN - EPS;
   return square ? (longFingers ? "air" : "earth") : longFingers ? "water" : "fire";
 }
 
@@ -45,8 +48,8 @@ export interface HandGeometry {
   };
 }
 
-const bandWL = (v: number): string => (v >= SQUARE_MIN ? "square palm" : "oblong palm");
-const bandFL = (v: number): string => (v >= LONG_FINGERS_MIN ? "long fingers" : "short fingers");
+const bandWL = (v: number): string => (v >= SQUARE_MIN - EPS ? "square palm" : "oblong palm");
+const bandFL = (v: number): string => (v >= LONG_FINGERS_MIN - EPS ? "long fingers" : "short fingers");
 /** 2D:4D. Within ±3 % the two fingers read as even — no sentence is claimed for "even". */
 export const INDEX_LONG_MIN = 1.0;
 export const RING_LONG_MAX = 0.97;

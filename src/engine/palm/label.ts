@@ -74,7 +74,15 @@ export const LOW_CONFIDENCE = 0.6;
 /** A component must score at least this against a template to be considered for it at all. */
 export const MIN_TEMPLATE_SCORE = 0.45;
 /** Mean black-hat (CLAHE grey levels) that counts as a fully contrasted crease. */
-export const CONTRAST_REF = 22;
+export const CONTRAST_REF = 80;
+/**
+ * Mean ridge vesselness along a path that counts as a crisp crease. Vesselness is built from
+ * second derivatives, so it falls when a print is soft even after CLAHE has restored contrast.
+ * Confidence is multiplied by √(min(1, v̄ / CLARITY_REF)) — a deliberate addition to the §6.13
+ * formula: a line found in a blurred photo is in the right place but is not *seen*, and must not
+ * read as certain. A crisp print scores clarity 1 and the §6.13 formula is unchanged.
+ */
+export const CLARITY_REF = 0.5;
 /** A gap longer than this in the pre-thinning mask is a break (§6.13 [7]). */
 export const BREAK_PX = 8;
 
@@ -223,15 +231,20 @@ export function coverage(path: readonly Pt[], t: Template): number {
   return n / BINS;
 }
 
-// ─── components ──────────────────────────────────────────────────────────────
+// ─── components → segments ───────────────────────────────────────────────────
 
+/**
+ * A simple curve of the skeleton between junctions (or free ends). Creases cross and join — the
+ * head and life lines often share their start — so the skeleton is cut at its junctions and the
+ * labeller reassembles lines from these pieces.
+ */
 export interface Component {
   /** pixel indices, ascending */
   pixels: number[];
-  /** the longest geodesic path through the skeleton, pixel centres in order */
+  /** the curve's pixel centres in order */
   path: Pt[];
-  /** junction pixels (≥ 3 skeleton neighbours), clustered */
-  branches: number;
+  /** ids of the junction clusters this piece touches */
+  junctions: number[];
 }
 
 const N8: ReadonlyArray<[number, number]> = [
@@ -245,12 +258,12 @@ const N8: ReadonlyArray<[number, number]> = [
   [-1, -1],
 ];
 
-/** 8-connected components of a skeleton; those under `minSize` pixels are dropped. */
-export function components(skel: Uint8Array, w: number, h: number, minSize = MIN_COMPONENT_PX): Component[] {
+/** 8-connected components of `mask` as ascending pixel lists. */
+function connected(mask: Uint8Array, w: number, h: number): number[][] {
   const seen = new Uint8Array(w * h);
-  const out: Component[] = [];
+  const out: number[][] = [];
   for (let s = 0; s < w * h; s++) {
-    if (!skel[s] || seen[s]) continue;
+    if (!mask[s] || seen[s]) continue;
     const pixels: number[] = [];
     const stack = [s];
     seen[s] = 1;
@@ -264,15 +277,71 @@ export function components(skel: Uint8Array, w: number, h: number, minSize = MIN
         const yy = y + dy;
         if (xx < 0 || yy < 0 || xx >= w || yy >= h) continue;
         const j = yy * w + xx;
-        if (skel[j] && !seen[j]) {
+        if (mask[j] && !seen[j]) {
           seen[j] = 1;
           stack.push(j);
         }
       }
     }
-    if (pixels.length < minSize) continue;
     pixels.sort((a, b) => a - b);
-    out.push({ pixels, path: longestPath(pixels, skel, w, h), branches: countJunctions(pixels, skel, w, h) });
+    out.push(pixels);
+  }
+  return out;
+}
+
+/** Crossing number: 0→1 transitions around the 8-neighbourhood. ≥ 3 marks a junction. */
+function crossings(i: number, m: Uint8Array, w: number, h: number): number {
+  const x = i % w;
+  const y = (i - x) / w;
+  const v = N8.map(([dx, dy]) => {
+    const xx = x + dx;
+    const yy = y + dy;
+    return xx >= 0 && yy >= 0 && xx < w && yy < h && m[yy * w + xx] ? 1 : 0;
+  });
+  let t = 0;
+  for (let k = 0; k < 8; k++) if (!v[k] && v[(k + 1) % 8]) t++;
+  return t;
+}
+
+/** Minimum length of a piece between junctions that is kept at all. */
+export const MIN_SEGMENT_PX = 10;
+
+/**
+ * Skeleton → components (those under `minSize` px dropped, §6.13) → pieces cut at junctions.
+ * Returns the pieces and the number of junction clusters.
+ */
+export function components(
+  skel: Uint8Array,
+  w: number,
+  h: number,
+  minSize = MIN_COMPONENT_PX,
+): Component[] {
+  const keep = new Uint8Array(w * h);
+  for (const comp of connected(skel, w, h)) if (comp.length >= minSize) for (const i of comp) keep[i] = 1;
+  const junction = new Uint8Array(w * h);
+  for (let i = 0; i < keep.length; i++) if (keep[i] && crossings(i, keep, w, h) >= 3) junction[i] = 1;
+  const clusterOf = new Int32Array(w * h).fill(-1);
+  connected(junction, w, h).forEach((cl, id) => {
+    for (const i of cl) clusterOf[i] = id;
+  });
+  const edges = new Uint8Array(w * h);
+  for (let i = 0; i < keep.length; i++) edges[i] = keep[i] && !junction[i] ? 1 : 0;
+  const out: Component[] = [];
+  for (const pixels of connected(edges, w, h)) {
+    if (pixels.length < MIN_SEGMENT_PX) continue;
+    const touch = new Set<number>();
+    for (const i of pixels) {
+      const x = i % w;
+      const y = (i - x) / w;
+      for (const [dx, dy] of N8) {
+        const xx = x + dx;
+        const yy = y + dy;
+        if (xx < 0 || yy < 0 || xx >= w || yy >= h) continue;
+        const c = clusterOf[yy * w + xx] ?? -1;
+        if (c >= 0) touch.add(c);
+      }
+    }
+    out.push({ pixels, path: longestPath(pixels, edges, w, h), junctions: [...touch].sort((a, b) => a - b) });
   }
   return out;
 }
@@ -291,10 +360,9 @@ function neighbours(i: number, skel: Uint8Array, w: number, h: number): number[]
   return out;
 }
 
-/** Geodesic (Dijkstra, 1 / √2 steps) distances and parents from `start` within the component. */
+/** Geodesic (1 / √2 steps) distances and parents from `start` within the mask. */
 function geodesic(start: number, skel: Uint8Array, w: number, h: number): Map<number, [number, number]> {
   const dist = new Map<number, [number, number]>([[start, [0, -1]]]);
-  // a simple bucketed frontier is enough: components are a few hundred pixels
   let frontier = [start];
   while (frontier.length) {
     const next: number[] = [];
@@ -328,12 +396,12 @@ function farthest(d: Map<number, [number, number]>): number {
   return best;
 }
 
-/** The skeleton's diameter path (two geodesic sweeps), as ordered pixel centres. */
-export function longestPath(pixels: readonly number[], skel: Uint8Array, w: number, h: number): Pt[] {
+/** The diameter path (two geodesic sweeps) through the pixels of `mask`, as ordered centres. */
+export function longestPath(pixels: readonly number[], mask: Uint8Array, w: number, h: number): Pt[] {
   const start = pixels[0];
   if (start === undefined) return [];
-  const a = farthest(geodesic(start, skel, w, h));
-  const d = geodesic(a, skel, w, h);
+  const a = farthest(geodesic(start, mask, w, h));
+  const d = geodesic(a, mask, w, h);
   let b = farthest(d);
   const path: Pt[] = [];
   let guard = 0;
@@ -345,30 +413,6 @@ export function longestPath(pixels: readonly number[], skel: Uint8Array, w: numb
   return path;
 }
 
-function countJunctions(pixels: readonly number[], skel: Uint8Array, w: number, h: number): number {
-  const junction = new Set<number>();
-  for (const i of pixels) if (neighbours(i, skel, w, h).length >= 3) junction.add(i);
-  // cluster adjacent junction pixels into one branch point
-  let clusters = 0;
-  const seen = new Set<number>();
-  for (const i of junction) {
-    if (seen.has(i)) continue;
-    clusters++;
-    const stack = [i];
-    seen.add(i);
-    while (stack.length) {
-      const k = stack.pop() ?? 0;
-      for (const j of neighbours(k, skel, w, h)) {
-        if (junction.has(j) && !seen.has(j)) {
-          seen.add(j);
-          stack.push(j);
-        }
-      }
-    }
-  }
-  return clusters;
-}
-
 // ─── labelling ───────────────────────────────────────────────────────────────
 
 export interface LabelInputs {
@@ -377,6 +421,8 @@ export interface LabelInputs {
   mask: Uint8Array;
   /** unblurred black-hat (for contrast / depth) */
   blackHat: Float32Array;
+  /** ridge vesselness 0..1 (for clarity) */
+  ridge: Float32Array;
   width: number;
   height: number;
 }
@@ -387,6 +433,7 @@ export interface Candidate {
   score: TemplateScore;
   coverage: number;
   contrast: number;
+  clarity: number;
   confidence: number;
   branches: number;
   breaks: number;
@@ -497,17 +544,18 @@ function joinChain(chain: readonly Component[], t: Template): Pt[] {
  */
 export function labelLines(input: LabelInputs, comps: readonly Component[]): Candidate[] {
   const { width: w, height: h } = input;
-  const pairs: Array<{ c: Component; ci: number; id: PalmLineId; s: TemplateScore }> = [];
+  // A short piece can match a template perfectly by accident; rank anchors by score, discounted
+  // for pieces much shorter than a line.
+  const pairs: Array<{ c: Component; ci: number; id: PalmLineId; rank: number }> = [];
   comps.forEach((c, ci) => {
     const rs = resample(c.path, PATH_POINTS);
+    const lengthFactor = Math.min(1, 0.5 + pathLength(c.path) / 200);
     for (const id of LINE_ORDER) {
       const s = score(rs, TEMPLATES[id]);
-      if (s.score >= MIN_TEMPLATE_SCORE) pairs.push({ c, ci, id, s });
+      if (s.score >= MIN_TEMPLATE_SCORE) pairs.push({ c, ci, id, rank: s.score * lengthFactor });
     }
   });
-  pairs.sort(
-    (a, b) => b.s.score - a.s.score || a.ci - b.ci || LINE_ORDER.indexOf(a.id) - LINE_ORDER.indexOf(b.id),
-  );
+  pairs.sort((a, b) => b.rank - a.rank || a.ci - b.ci || LINE_ORDER.indexOf(a.id) - LINE_ORDER.indexOf(b.id));
   const used = new Set<Component>();
   const done = new Set<PalmLineId>();
   const anchors: Array<{ id: PalmLineId; c: Component }> = [];
@@ -527,15 +575,17 @@ export function labelLines(input: LabelInputs, comps: readonly Component[]): Can
     const s = score(path, t);
     const cov = coverage(resample(raw, 256), t);
     const contrast = Math.max(0, Math.min(1, meanResponse(path, input.blackHat, w, h) / CONTRAST_REF));
-    const confidence = Math.max(0, Math.min(1, 0.45 * cov + 0.35 * s.score + 0.2 * contrast));
+    const clarity = Math.sqrt(Math.max(0, Math.min(1, meanResponse(path, input.ridge, w, h) / CLARITY_REF)));
+    const confidence = Math.max(0, Math.min(1, (0.45 * cov + 0.35 * s.score + 0.2 * contrast) * clarity));
     out.push({
       id,
       path,
       score: s,
       coverage: cov,
       contrast,
+      clarity,
       confidence,
-      branches: chain.reduce((n, k) => n + k.branches, 0),
+      branches: Math.max(0, new Set(chain.flatMap((k) => k.junctions)).size - (chain.length - 1)),
       breaks: countBreaks(raw, input.mask, w, h),
     });
   }

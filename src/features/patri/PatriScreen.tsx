@@ -373,7 +373,7 @@ function PatriBody({ patri, zone, style, script, inkKey, skipInk, lit, setLit, o
   return (
     <>
       <TurmericBand dev="जन्म पंचांग" title="Birth panchang" meta={`sunrise ${hhmmss(pc.sunriseMs, zone)}`} />
-      <div className="rows" role="list">
+      <div className="rows">
         {row(
           "Tithi",
           pc.tithi.name,

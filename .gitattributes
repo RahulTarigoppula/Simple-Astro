@@ -8,3 +8,4 @@ android/gradlew text eol=lf
 *.wasm binary
 *.png binary
 e2e/visual/__screenshots__/**/*.png binary
+*.bat text eol=crlf
