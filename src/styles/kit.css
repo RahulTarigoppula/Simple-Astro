@@ -1981,3 +1981,17 @@ dialog.sheet-dialog::backdrop {
     animation: object-open-calm 160ms linear both;
   }
 }
+
+/* "a newer desk is ready — reload": a small paper tab pinned at the top, never an auto-reload. */
+.sw-tab {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 6px);
+  left: 50%;
+  translate: -50% 0;
+  z-index: 25;
+  padding: 8px 14px;
+  min-height: 44px;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  font-size: var(--text-sm);
+  border-bottom: 2px solid var(--accent);
+}
