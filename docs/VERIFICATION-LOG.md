@@ -16,7 +16,8 @@ machine (Windows 11, Node 22.17.0, Chrome via Playwright 1.5x). Phone rows wait 
 | V-9 | Runtime tzdb knows IST war spells and Madras +05:21:10 (Node) | **Pass** in Node 22 under three TZs; phone WebView **open** | tzdb guard test |
 | V-10 | MediaPipe GPU delegate in the Android WebView | **Open** (device) — loads in 0.6 s in desktop Chrome from self-hosted assets | `src/features/hast/mediapipe.ts` |
 | V-11 | Model self-hosted under the sub-path | **Pass** locally (`/jyoti/models/hand_landmarker.task`, 7 819 105 B, runtime-cached) | `src/data/palm-model.json` |
-| V-12 | OpenCV builds under Vite 8 and stays lazy | **Pass** — separate chunk, not requested on `#/` | build output; privacy spec |
+| V-12 | OpenCV builds under Vite 8 and stays lazy | **Pass** — 10.8 MB chunk loaded only inside the palm worker; 13/13 Mats freed per run | build output; privacy spec |
+| V-13 | Palm line extraction | **Pass on synthetic prints** — clean/shadow/henna: three lines ≥ 0.95 within 0.7 px RMS; blur: all < 0.6 → stylus offered; henna: no spurious line > 0.22. OpenCV path 1.3 s in the production build. Real palms: **open** (`fixtures-private/`) | `src/engine/palm/*.test.ts` |
 | V-15 | BSC5 public domain, ≤ 60 kB | **Pass** — 9 096 stars in 45 492 B (5 080 are V ≤ 6.0; the rest fade) | `scripts/build-stars.mjs` |
 | V-16 | Gazetteer ≤ 1.8 MB gz, search ≤ 60 ms | **Pass** — 1 775 407 B, 82 505 places, ≤ 9 ms per search, 12.6 MB heap | `src/data/places.test.ts` |
 | V-17/18/19/21/22/23 | Pages, CORS from github.io, signed APK, predictive back, WebView fonts, developer account | **Open** — need the GitHub repo, keystore and a phone | docs/HANDOFF.md |
@@ -25,9 +26,8 @@ machine (Windows 11, Node 22.17.0, Chrome via Playwright 1.5x). Phone rows wait 
 
 | Gate | Result |
 |---|---|
-| Vitest `engine` project | 470+ tests pass (engine, golden, oracle, data, palm, sky) |
-| Vitest `dom` project | 20 tests pass (Today, Circle, Milan) |
-| Playwright (desktop-chromium + pixel-7) | 18 / 18 pass: smoke, golden numbers on screen, zero leakage, CSP, axe (no serious/critical on 8 routes), offline after one visit |
+| Vitest (all projects) | 549 / 549 pass — engine, 50 golden charts, Ashtakoota oracle, time zones, data layer, palm CV, sky, screens, design rules |
+| Playwright (desktop-chromium + pixel-7) | 20 / 20 pass: smoke, golden numbers on screen, zero leakage, CSP, axe (no serious/critical on 8 routes), offline after one visit |
 | `check-licences.mjs` | 123 production packages, all OSI/OFL/CC0; no banned names |
 | `check-no-biometrics.mjs` | no photographs, no EXIF, synthetic PNGs only |
 | `check-bundle.mjs` | initial JS ≈ 229 kB gz (budget 350), CSS ≈ 13 kB gz (budget 30); no forbidden module |

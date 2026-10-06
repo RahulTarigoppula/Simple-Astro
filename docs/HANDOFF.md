@@ -67,3 +67,14 @@ APK artifact for a smoke test; a tag without secrets fails on purpose.
 | `INTERNET` stays in the Android manifest | It is an install-time *normal* permission needed for the opt-in place search; the only runtime permission is CAMERA. |
 | CSP adds a `sha256-…` for the tiny theme boot script and `data:` in `font-src` | Otherwise the no-flash theme bootstrap is blocked. |
 | Vitest 5 instead of 3 | Vitest 3 does not support Vite 8. |
+| Palm confidence adds a ridge-clarity factor; sharpness gauge uses half the Laplacian | Without them a blurred print scored ~0.95 and a 9×9-blurred checkerboard read as sharp. Calibrate both on real photos in `fixtures-private/`. |
+| MediaPipe's `*_module_internal` wasm is not copied | The non-module loader never uses it; it saved 12 MB of APK. |
+| The Rooftop dome is always night cloth | It shows the sidereal zodiac and the stars at the birth moment even for a daytime birth — a star map, not a weather report. |
+
+## 5. Known gaps (next session)
+
+- Device-only checks: GPU delegate, `getUserMedia` inside the WebView, haptics, predictive back, dome frame rate.
+- Devanagari digits and the Hindi/Tamil/Telugu UI are not built (the Drawer shows them as "on the way").
+- The 10-porutham thread and the Bhāva Chalit table are computed/planned but not rendered.
+- Milan on desktop does not yet show the two full charts side by side.
+- MediaPipe tries to post telemetry to `odml.pa.googleapis.com`; the CSP blocks it (console noise only).
