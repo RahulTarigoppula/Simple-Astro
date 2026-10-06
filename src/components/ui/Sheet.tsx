@@ -32,7 +32,11 @@ export function Sheet({ open, onClose, label, children }: SheetProps) {
         onClose();
       }}
       onClick={(e) => {
-        if (e.target === ref.current) onClose();
+        // Only a tap on the backdrop (outside the sheet's box) closes it, not one on its padding.
+        const d = ref.current;
+        if (!d || e.target !== d) return;
+        const r = d.getBoundingClientRect();
+        if (e.clientY < r.top || e.clientX < r.left || e.clientX > r.right || e.clientY > r.bottom) onClose();
       }}
       onKeyDown={(e) => {
         if (e.key === "Escape") onClose();

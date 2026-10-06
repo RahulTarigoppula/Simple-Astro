@@ -270,6 +270,10 @@ export default function HastScreen() {
                   play("scratch", 0.5);
                 } else if (loupeUp) placeLoupe(e);
               }}
+              onPointerCancel={() => {
+                setLive([]);
+                setLoupeUp(false);
+              }}
               onPointerUp={() => {
                 if (tracing && live.length) {
                   const raw = live;

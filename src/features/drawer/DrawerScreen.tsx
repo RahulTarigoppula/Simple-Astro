@@ -428,7 +428,14 @@ export default function DrawerScreen() {
         </div>
       </div>
 
-      <Sheet open={mode !== "none"} onClose={() => setMode("none")} label={mode === "export" ? "Export the drawer" : "Import an envelope"}>
+      <Sheet
+        open={mode !== "none"}
+        onClose={() => {
+          setMode("none");
+          setPass("");
+          setPass2("");
+          setFile(null);
+        }} label={mode === "export" ? "Export the drawer" : "Import an envelope"}>
         {mode === "export" ? (
           <form
             className="drawer-pass"

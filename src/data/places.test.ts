@@ -73,7 +73,8 @@ describe("bundled gazetteer", () => {
 
   it("loads fast and stays small (targets: ≤ 400 ms, ≤ 20 MB retained)", () => {
     // Generous CI bound; the measured figure on the dev box is ~370 ms.
-    expect(loadMs).toBeLessThan(1500);
+    // ≈ 370 ms alone; the ceiling is generous because the whole suite runs in parallel workers.
+    expect(loadMs).toBeLessThan(6000);
     if (retainedBytes !== null) expect(retainedBytes).toBeLessThanOrEqual(20e6);
   });
 

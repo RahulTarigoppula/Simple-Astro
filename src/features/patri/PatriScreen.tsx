@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { usePatri, useProfile, useSettings } from "../../app/hooks";
+import { usePatri, useProfile, useSettings, useSettingsLoaded } from "../../app/hooks";
 import { Colophon } from "../../components/ui/Colophon";
 import { DigitSet } from "../../components/ui/DigitSet";
 import { Screen } from "../../components/ui/Screen";
@@ -56,9 +56,15 @@ export default function PatriScreen() {
   const navigate = useNavigate();
   const profile = useProfile(id);
   const settings = useSettings();
-  const [rendered, setRendered] = useState<EnginePreset>(settings.preset);
+  const loadedSettings = useSettingsLoaded();
+  // The preset this scroll was cast under: taken once the stored settings have loaded, then kept
+  // until the seal is held — a later Drawer change shows the haldi "recompute" tab instead.
+  const [rendered, setRendered] = useState<EnginePreset | null>(null);
+  useEffect(() => {
+    if (loadedSettings && !rendered) setRendered(loadedSettings.preset);
+  }, [loadedSettings, rendered]);
   const [nonce, setNonce] = useState(0);
-  const { patri, error } = usePatri(profile, rendered, nonce);
+  const { patri, error } = usePatri(rendered ? profile : undefined, rendered ?? settings.preset, nonce);
   const [lit, setLit] = useState<GrahaId | null>(null);
   const [varga, setVarga] = useState<VargaNumber>(9);
   const [foot, setFoot] = useState<Foot>(null);
@@ -81,7 +87,7 @@ export default function PatriScreen() {
     if (profile && settings.activeProfileId !== profile.id) void saveSettings({ activeProfileId: profile.id });
   }, [profile, settings.activeProfileId]);
 
-  const stale = PRESET_HASH(rendered) !== PRESET_HASH(settings.preset);
+  const stale = rendered !== null && PRESET_HASH(rendered) !== PRESET_HASH(settings.preset);
   const inkKey = patri ? `${patri.profileId}|${patri.presetHash}|${patri.computedAt}` : "";
   const skipInk = useMemo(() => {
     if (!inkKey) return false;

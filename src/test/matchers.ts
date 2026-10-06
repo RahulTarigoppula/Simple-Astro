@@ -24,8 +24,10 @@ expect.extend({
 });
 
 declare module "vitest" {
-  interface Assertion<T = unknown> {
-    toBeCloseToArcsec(expected: number, arcsec: number): T;
+  interface Matchers<R extends void | Promise<void> = void | Promise<void>, T = unknown> {
+    toBeCloseToArcsec(expected: number, arcsec: number): R;
+    /** phantom use of T so the merged declaration keeps vitest's parameter list */
+    readonly __arcsecSubject?: T;
   }
   interface AsymmetricMatchersContaining {
     toBeCloseToArcsec(expected: number, arcsec: number): unknown;

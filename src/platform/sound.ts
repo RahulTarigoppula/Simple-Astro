@@ -51,15 +51,24 @@ function ensure(): AudioContext | null {
   return ctx;
 }
 
+const UNLOCK_EVENTS = ["touchstart", "touchend", "pointerdown", "pointerup", "keydown"] as const;
+
+/** Keep trying on every gesture until the context is really running (Chrome honours only some). */
 export function unlockAudioOnFirstGesture(): void {
-  const unlock = (): void => {
-    const c = ensure();
-    if (c && c.state === "suspended") void c.resume();
-    window.removeEventListener("touchstart", unlock);
-    window.removeEventListener("pointerdown", unlock);
+  const removeAll = (): void => {
+    for (const ev of UNLOCK_EVENTS) window.removeEventListener(ev, unlock);
   };
-  window.addEventListener("touchstart", unlock, { passive: true });
-  window.addEventListener("pointerdown", unlock, { passive: true });
+  function unlock(): void {
+    const c = ensure();
+    if (!c || c.state === "running") {
+      removeAll();
+      return;
+    }
+    void c.resume().then(() => {
+      if (c.state === "running") removeAll();
+    });
+  }
+  for (const ev of UNLOCK_EVENTS) window.addEventListener(ev, unlock, { passive: true });
 }
 
 function env(g: GainNode, t: number, peak: number, attack: number, decay: number): void {

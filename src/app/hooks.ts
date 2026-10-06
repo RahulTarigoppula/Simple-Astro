@@ -5,9 +5,17 @@ import { db } from "../data/db";
 import { castPatri } from "../data/repo";
 import { DEFAULT_SETTINGS, type EnginePreset, type Patri, type Profile, type Settings } from "../engine/types";
 
+const mergeRow = (v: Partial<Settings>): Settings => ({ ...DEFAULT_SETTINGS, ...v, preset: { ...DEFAULT_SETTINGS.preset, ...v.preset } });
+
 export function useSettings(): Settings {
-  const row = useLiveQuery(() => db.settings.get("app"), []);
-  return row ? { ...DEFAULT_SETTINGS, ...row.value, preset: { ...DEFAULT_SETTINGS.preset, ...row.value.preset } } : DEFAULT_SETTINGS;
+  return useSettingsLoaded() ?? DEFAULT_SETTINGS;
+}
+
+/** undefined until IndexedDB has answered — use it where a default would be a wrong answer. */
+export function useSettingsLoaded(): Settings | undefined {
+  const row = useLiveQuery(async () => (await db.settings.get("app")) ?? null, []);
+  if (row === undefined) return undefined;
+  return row ? mergeRow(row.value) : DEFAULT_SETTINGS;
 }
 
 /** undefined while loading, [] when the bundle is empty. */

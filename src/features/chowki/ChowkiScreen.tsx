@@ -33,15 +33,19 @@ function useNow(stepMs = 30_000): number {
 function useLongLabel() {
   const [on, setOn] = useState(false);
   const timer = useRef(0);
+  const held = useRef(false);
   const off = () => {
     clearTimeout(timer.current);
     setOn(false);
   };
   return {
     labelled: on,
+    held,
     bind: {
       onPointerDown: () => {
+        held.current = false;
         timer.current = window.setTimeout(() => {
+          held.current = true;
           setOn(true);
           haptics.selection();
         }, 420);
@@ -63,13 +67,19 @@ interface ObjProps {
 }
 
 function DeskObject({ to, name, tip, label, className, children }: ObjProps) {
-  const { labelled, bind } = useLongLabel();
+  const { labelled, held, bind } = useLongLabel();
   return (
     <Link
       to={to}
       className={`deskobj${className ? ` ${className}` : ""}${labelled ? " is-labelled" : ""}`}
       aria-label={name}
       onClick={(e) => {
+        if (held.current) {
+          // a long-press reads the label; it does not open the object
+          e.preventDefault();
+          held.current = false;
+          return;
+        }
         rememberOrigin(e.currentTarget);
         play("tick", 0.6);
       }}
@@ -115,6 +125,7 @@ export default function ChowkiScreen() {
 
   // Swipe up from the dial → the Rooftop.
   const swipe = useRef<{ y: number; t: number } | null>(null);
+  const swiped = useRef(false);
 
   return (
     <Screen className="chowki" label="The Chowki — your desk">
@@ -126,7 +137,7 @@ export default function ChowkiScreen() {
         {p ? (
           <p>
             <span lang="hi" className="dev">
-              {p.tithi.paksha === "shukla" ? "शुक्ल" : "कृष्ण"} {TITHI_DEV[tithiNo]}
+              {p.tithi.index === 30 ? "अमावस्या" : `${p.tithi.paksha === "shukla" ? "शुक्ल" : "कृष्ण"} ${TITHI_DEV[tithiNo] ?? ""}`}
             </span>{" "}
             · {p.tithi.name}, <span lang="sa">{NAKSHATRA_NAMES[p.nakshatra.index]}</span> {p.nakshatra.pada} ·{" "}
             {VARA_NAMES[p.vara.index]} ·{" "}
@@ -148,6 +159,13 @@ export default function ChowkiScreen() {
         </DeskObject>
 
         <div
+          style={{ touchAction: "pan-x" }}
+          onClickCapture={(e) => {
+            if (swiped.current) {
+              e.preventDefault();
+              swiped.current = false;
+            }
+          }}
           onPointerDown={(e) => {
             swipe.current = { y: e.clientY, t: performance.now() };
           }}
@@ -156,6 +174,7 @@ export default function ChowkiScreen() {
             swipe.current = null;
             if (active && s && s.y - e.clientY > 60 && performance.now() - s.t < 600) {
               e.preventDefault();
+              swiped.current = true;
               navigate(`/patri/${active.id}/sky`);
             }
           }}

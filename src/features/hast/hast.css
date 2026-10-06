@@ -143,3 +143,8 @@
   min-width: 56px;
   padding: 0 var(--space-6);
 }
+
+/* The print is a work surface: drags trace or move the loupe, they never scroll the page. */
+.printframe:not(.is-empty) {
+  touch-action: none;
+}

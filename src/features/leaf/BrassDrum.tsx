@@ -37,6 +37,7 @@ export function BrassDrum({ label, short, min, max, value, pad = 2, flex = 1, ca
   const lastDetent = useRef(value);
   const [shown, setShown] = useState(value);
   const [typing, setTyping] = useState(false);
+  const [seed, setSeed] = useState<string | null>(null);
   const [refused, setRefused] = useState(false);
   const [announce, setAnnounce] = useState("");
   const announceTimer = useRef(0);
@@ -142,6 +143,8 @@ export function BrassDrum({ label, short, min, max, value, pad = 2, flex = 1, ca
 
   const commitTyped = (raw: string) => {
     setTyping(false);
+    setSeed(null);
+    window.setTimeout(() => el.current?.focus(), 0);
     const n = Number.parseInt(raw, 10);
     if (!Number.isFinite(n) || n < min || n > max || (accept && !accept(n))) {
       refuse();
@@ -213,7 +216,9 @@ export function BrassDrum({ label, short, min, max, value, pad = 2, flex = 1, ca
         else if (k === "Home") settle(0);
         else if (k === "End") settle(span);
         else if (k === "Enter" || /^[0-9]$/.test(k)) {
+          setSeed(/^[0-9]$/.test(k) ? k : null);
           setTyping(true);
+          e.preventDefault();
           return;
         } else return;
         e.preventDefault();
@@ -238,15 +243,22 @@ export function BrassDrum({ label, short, min, max, value, pad = 2, flex = 1, ca
           className="drum__input"
           inputMode="numeric"
           aria-label={`${label}, type a value`}
-          defaultValue={fmt(shown)}
+          defaultValue={seed ?? fmt(shown)}
           // biome-ignore lint/a11y/noAutofocus: typed entry is an explicit user request
           autoFocus
-          onFocus={(e) => e.currentTarget.select()}
+          onFocus={(e) => {
+            if (seed) e.currentTarget.setSelectionRange(seed.length, seed.length);
+            else e.currentTarget.select();
+          }}
           onBlur={(e) => commitTyped(e.currentTarget.value)}
           onKeyDown={(e) => {
             e.stopPropagation();
             if (e.key === "Enter") commitTyped(e.currentTarget.value);
-            if (e.key === "Escape") setTyping(false);
+            if (e.key === "Escape") {
+              setTyping(false);
+              setSeed(null);
+              window.setTimeout(() => el.current?.focus(), 0);
+            }
           }}
         />
       ) : null}

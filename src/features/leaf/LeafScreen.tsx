@@ -7,7 +7,7 @@ import { HoldStamp } from "../../components/ui/HoldStamp";
 import { Screen } from "../../components/ui/Screen";
 import { Sheet } from "../../components/ui/Sheet";
 import { TurmericBand } from "../../components/ui/TurmericBand";
-import { loadGazetteer, NetError, searchOnline, searchPlaces } from "../../data/places";
+import { loadGazetteer, NetError, searchOnline, searchPlaces, unloadGazetteer } from "../../data/places";
 import { saveSettings, upsertProfile } from "../../data/repo";
 import { SIGN_ENGRAVED, SIGN_MARK } from "../../data/tables/names";
 import { ayanamsa } from "../../engine/ayanamsa";
@@ -108,6 +108,7 @@ export default function LeafScreen() {
     return () => {
       live = false;
       abort.current?.abort();
+      unloadGazetteer(); // the decoded index is ~13 MB; release it when the editor closes
     };
   }, []);
 
@@ -196,10 +197,10 @@ export default function LeafScreen() {
     }
   };
 
-  const goOnline = async () => {
+  const goOnline = async (allowed = settings.onlineLookupAllowed) => {
     const q = query.trim();
     if (!q) return;
-    if (!settings.onlineLookupAllowed) {
+    if (!allowed) {
       setOnline("asking");
       return;
     }
@@ -228,6 +229,8 @@ export default function LeafScreen() {
   };
 
   const pre1955India = draft.y < 1955 && draft.place.country === "IN";
+  const offSign = draft.manualOffsetMin < 0 ? -1 : 1;
+  const offAbs = Math.abs(draft.manualOffsetMin);
   const strip = resolved.m;
   const title = id ? "Edit leaf" : "New leaf";
 
@@ -445,20 +448,17 @@ export default function LeafScreen() {
                 short="± hh"
                 min={-12}
                 max={14}
-                value={Math.trunc(draft.manualOffsetMin / 60)}
+                value={offSign * Math.floor(offAbs / 60)}
                 format={(v) => `${v < 0 ? "−" : "+"}${String(Math.abs(v)).padStart(2, "0")}`}
-                onChange={(v) => set("manualOffsetMin", v * 60 + (draft.manualOffsetMin % 60))}
+                onChange={(v) => set("manualOffsetMin", (v < 0 ? -1 : 1) * (Math.abs(v) * 60 + (offAbs % 60)))}
               />
               <BrassDrum
                 label="Offset minutes"
                 short="mm"
                 min={0}
                 max={59}
-                value={Math.abs(draft.manualOffsetMin % 60)}
-                onChange={(v) => {
-                  const h = Math.trunc(draft.manualOffsetMin / 60);
-                  set("manualOffsetMin", h * 60 + (h < 0 ? -v : v));
-                }}
+                value={offAbs % 60}
+                onChange={(m) => set("manualOffsetMin", offSign * (Math.floor(offAbs / 60) * 60 + m))}
               />
             </div>
           </div>
@@ -530,7 +530,7 @@ export default function LeafScreen() {
             onClick={() => {
               void saveSettings({ onlineLookupAllowed: true }).then(() => {
                 setOnline("idle");
-                window.setTimeout(() => void goOnline(), 0);
+                void goOnline(true);
               });
             }}
           >

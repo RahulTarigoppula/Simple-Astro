@@ -128,7 +128,7 @@ export default function CaptureScreen() {
         const d = await detectHand(small).catch(() => null);
         if (d && d.ok) {
           last.current = { landmarks: d.landmarks, worldLandmarks: d.worldLandmarks, score: d.score };
-          const g = gateHand(d.landmarks, hand, d.score);
+          const g = gateHand(d.landmarks, d.handedness, d.score);
           setGate(g.ok ? { ok: true, copy: "hold still" } : { ok: false, copy: GATE_COPY[g.reason] });
         } else {
           last.current = null;
@@ -149,7 +149,7 @@ export default function CaptureScreen() {
           toast(d.reason === "no-hand" ? "No hand in this picture." : `No hand found — ${d.reason}.`, "warn");
           return;
         }
-        const g = gateHand(d.landmarks, hand, d.score);
+        const g = gateHand(d.landmarks, d.handedness, d.score);
         if (!g.ok) {
           toast(`${GATE_COPY[g.reason]}.`, "warn");
           haptics.notify("warning");

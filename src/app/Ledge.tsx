@@ -50,6 +50,9 @@ export function Ledge() {
         onPointerLeave={() => {
           if (press.current > 0) clearTimeout(press.current);
         }}
+        onPointerCancel={() => {
+          if (press.current > 0) clearTimeout(press.current);
+        }}
         onClick={() => {
           if (press.current === -1) {
             press.current = 0;

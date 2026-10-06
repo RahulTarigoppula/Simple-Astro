@@ -28,15 +28,20 @@ export function Shell() {
   useEffect(() => {
     if (!isNative()) return;
     let remove: (() => void) | undefined;
+    let dead = false;
     void import("@capacitor/app").then(({ App }) => {
-      void App.addListener("backButton", () => {
-        if (window.location.hash === "#/" || window.location.hash === "") void App.exitApp();
+      void App.addListener("backButton", ({ canGoBack }) => {
+        if (!canGoBack || window.location.hash === "#/" || window.location.hash === "") void App.exitApp();
         else navigate(-1);
       }).then((h) => {
-        remove = () => void h.remove();
+        if (dead) void h.remove();
+        else remove = () => void h.remove();
       });
     });
-    return () => remove?.();
+    return () => {
+      dead = true;
+      remove?.();
+    };
   }, [navigate]);
 
   return (
