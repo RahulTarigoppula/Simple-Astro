@@ -129,7 +129,7 @@ function DialSegment({ jdTt, value, onChange }: { jdTt: number; value: AyanamsaP
           return (
             <g key={p}>
               <path d={`M${xx} ${yy - 30}L${xx} ${yy + 12}`} stroke={p === value ? "var(--accent)" : "var(--brass-ink)"} strokeWidth={p === value ? 3 : 1.6} />
-              <text x={xx} y={yy - 36} textAnchor="middle" style={{ fontFamily: "var(--font-mono)", fontSize: 11, fill: "var(--surface)" }}>
+              <text x={xx} y={yy - 36} textAnchor="middle" style={{ fontFamily: "var(--font-mono)", fontSize: 12, fill: "var(--ink-muted)" }}>
                 {p === "se-true" ? "SE-true" : p === "se-mean" ? "SE-mean" : "Drik"}
               </text>
             </g>
