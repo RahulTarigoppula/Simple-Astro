@@ -32,6 +32,20 @@ export function useHold({ ms = 600, disabled = false, onProgress, onFire, onCanc
   const start = useCallback(() => {
     if (disabled || active.current) return;
     active.current = true;
+    // Release anywhere ends the hold — some touch stacks never deliver pointerup to the button.
+    const release = () => {
+      window.removeEventListener("pointerup", release, true);
+      window.removeEventListener("pointercancel", release, true);
+      window.removeEventListener("mouseup", release, true);
+      window.removeEventListener("touchend", release, true);
+      window.removeEventListener("blur", release);
+      if (active.current) stop(true);
+    };
+    window.addEventListener("pointerup", release, true);
+    window.addEventListener("pointercancel", release, true);
+    window.addEventListener("mouseup", release, true);
+    window.addEventListener("touchend", release, true);
+    window.addEventListener("blur", release);
     fired.current = false;
     t0.current = performance.now();
     const tick = () => {

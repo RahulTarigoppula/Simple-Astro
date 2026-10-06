@@ -108,7 +108,12 @@ describe("line extraction on synthetic palms (§10.5)", () => {
 });
 
 // ─── the OpenCV path (the worker's), in Node ─────────────────────────────────
-async function loadCv(): Promise<CvLike | null> {
+let cvPromise: Promise<CvLike | null> | null = null;
+function loadCv(): Promise<CvLike | null> {
+  cvPromise ??= loadCvOnce();
+  return cvPromise;
+}
+async function loadCvOnce(): Promise<CvLike | null> {
   try {
     const require = createRequire(import.meta.url);
     const mod: unknown = require("@techstark/opencv-js");
@@ -123,10 +128,10 @@ async function loadCv(): Promise<CvLike | null> {
   }
 }
 
-describe("OpenCV ops (worker path)", async () => {
-  const cv = await loadCv();
-  it.skipIf(!cv)("every cv.Mat constructed is deleted (delta 0), and the cv path is as honest", () => {
-    if (!cv) return;
+describe("OpenCV ops (worker path)", () => {
+  it("every cv.Mat constructed is deleted (delta 0), and the cv path is as honest", async (ctx) => {
+    const cv = await loadCv();
+    if (!cv) return ctx.skip();
     for (const name of ["synthetic-clean", "synthetic-blur"] as const) {
       const ops = makeCvOps(cv);
       const r = runPalmPipeline(loadFixture(name), truth.landmarks, { hand: "right" }, ops);
@@ -141,8 +146,9 @@ describe("OpenCV ops (worker path)", async () => {
     }
   });
 
-  it.skipIf(!cv)("the delta stays 0 when a step throws mid-way", () => {
-    if (!cv) return;
+  it("the delta stays 0 when a step throws mid-way", async (ctx) => {
+    const cv = await loadCv();
+    if (!cv) return ctx.skip();
     const ops = makeCvOps(cv);
     // a 3 × 3 image cannot be warped by a singular matrix; whatever cv does, nothing may leak
     try {
