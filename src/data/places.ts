@@ -16,12 +16,12 @@ import { PLACE_CACHE_TTL, getPlaceCache, getSettings, putPlaceCache } from "./re
 // A compact, purpose-built index (no MiniSearch): ~80 k places must fit a phone WebView, so
 // every column lives in a typed array or one joined string.
 //
-//   keys      every searchable form, folded ("vaithisvarankoil", "vaitheeswaran koil") plus
-//             each word-start suffix ("koil", "york city"), sorted, joined by "\n" in ONE
-//             string; Uint32 offsets, the owning entry and the kind (name / alt / word).
+//   keys      every searchable form, folded ("vaithisvarankoil", "vaitheeswaran koil"),
+//             sorted, joined by "\n" in ONE string; Uint32 offsets, the owning entry and the
+//             kind (name / alt).
 //   lookup    prefix → binary search over the sorted keys, compared in place with
-//             charCodeAt (no allocation); exact = prefix of equal length; word-start comes
-//             free from the suffix keys; substring = indexOf over the joined string; fuzzy =
+//             charCodeAt (no allocation); exact = prefix of equal length; word-start =
+//             indexOf(" q") and substring = indexOf(q) over the joined string; fuzzy =
 //             a bounded Levenshtein (≤ 1 for 4–6 letters, ≤ 2 for 7+) over keys sharing the
 //             query's first letter.
 //   ranking   match quality tier, then population (log scale, South Asia slightly boosted).
@@ -63,6 +63,21 @@ export function foldTerm(s: string): string {
 
 /** Folded, apostrophe-free, punctuation collapsed to single spaces. */
 export function canonName(s: string): string {
+  // Fast path for the ≈ 99.7 % of strings that are ASCII once Latin accents are stripped.
+  let t = s;
+  if (NON_ASCII.test(t)) {
+    t = t.normalize("NFD").replace(/[̀-ͯ]/g, "");
+    if (NON_ASCII.test(t)) return canonSlow(s);
+  }
+  t = t.toLowerCase();
+  if (CLEAN.test(t)) return t;
+  return t.replace(/['`]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+}
+// biome-ignore lint/suspicious/noControlCharactersInRegex: ASCII range test
+const NON_ASCII = /[^\x00-\x7f]/;
+const CLEAN = /^[a-z0-9]+(?: [a-z0-9]+)*$/;
+
+function canonSlow(s: string): string {
   return foldTerm(s)
     .replace(/'/g, "")
     .replace(/[^\p{L}\p{N}]+/gu, " ")
@@ -74,7 +89,6 @@ const SOUTH_ASIA_BOOST = 0.5; // in log10(population) units — about ×3
 
 const KIND_NAME = 0;
 const KIND_ALT = 1;
-const KIND_WORD = 2;
 
 // Match-quality tiers (higher wins; population breaks ties within a tier).
 const T_EXACT = 10;
@@ -88,6 +102,8 @@ const T_FUZZY_PREFIX = 3;
 const T_SUBSTRING = 1;
 
 const SUBSTRING_CAP = 400;
+const WORD_CAP = 3000;
+const SPAN = 1 << 20; // max rows / keys; also the radix packing (code × SPAN + index) sorts
 const MAX_QUERY = 60;
 
 interface Compact {
@@ -143,6 +159,22 @@ function checkDoc(doc: unknown): { fields: unknown[]; rows: unknown[] } {
 }
 
 /** Build the compact index straight from the file's row arrays (no per-row objects kept). */
+/** Sort symbol of a key character, consistent with UTF-16 string order for canon keys. */
+function sym(ch: number): number {
+  if (ch === 32) return 1;
+  if (ch >= 48 && ch <= 57) return ch - 46; // 2..11
+  if (ch >= 97 && ch <= 122) return ch - 85; // 12..37
+  return 38; // non-ASCII letters/digits sort after "z"; ties are settled by string compare
+}
+
+/** First six characters as a base-39 number; "end of key" is 0, so shorter sorts first. */
+function prefixCode(key: string): number {
+  let v = 0;
+  for (let i = 0; i < 6; i++) v = v * 39 + (i < key.length ? sym(key.charCodeAt(i)) : 0);
+  return v;
+}
+
+/** Build the compact index straight from the file's row arrays (no per-row objects kept). */
 function buildCompact(rows: unknown[], idx: FieldIndex): Compact {
   const valid: unknown[][] = [];
   for (const r of rows) {
@@ -152,6 +184,7 @@ function buildCompact(rows: unknown[], idx: FieldIndex): Compact {
     valid.push(r);
   }
   const n = valid.length;
+  if (n >= SPAN) throw new Error(`gazetteer: ${n} rows exceeds ${SPAN}`);
   const lat = new Int32Array(n);
   const lon = new Int32Array(n);
   const id = new Int32Array(n);
@@ -163,16 +196,17 @@ function buildCompact(rows: unknown[], idx: FieldIndex): Compact {
   const nameOff = new Uint32Array(n + 1);
   const wordsOff = new Uint32Array(n + 1);
   const admin1Names: string[] = [];
+  const admin1Tail: string[] = []; // "| tamil nadu | " per admin1 index, built once
   const countries: string[] = [];
   const tzs: string[] = [];
   const a1Map = new Map<string, number>();
   const ccMap = new Map<string, number>();
   const tzMap = new Map<string, number>();
-  const names: string[] = [];
-  const words: string[] = [];
-  // Packed "key\u0000<kind><entry>" strings: a native (comparator-less) sort orders them
-  // exactly as the "\n"-terminated keys compare, and is several times faster.
-  const packed: string[] = [];
+  const names: string[] = new Array(n);
+  const words: string[] = new Array(n);
+  const keys: string[] = [];
+  const keyEntryTmp: number[] = [];
+  const keyKindTmp: number[] = [];
   let nameLen = 0;
   let wordsLen = 0;
 
@@ -180,67 +214,101 @@ function buildCompact(rows: unknown[], idx: FieldIndex): Compact {
     const r = valid[e] as unknown[];
     const name = String(r[idx.name] ?? "");
     const cc = String(r[idx.country] ?? "");
-    const a1 = String(r[idx.admin1] ?? "");
     const p = Math.max(0, Math.min(0xffffffff, Math.round(Number(r[idx.pop]) || 0)));
     lat[e] = Math.round(Number(r[idx.lat]) * 1e4);
     lon[e] = Math.round(Number(r[idx.lon]) * 1e4);
     id[e] = Number(r[idx.id]);
     pop[e] = p;
     rank[e] = Math.log10(1 + p) + (SOUTH_ASIA.has(cc) ? SOUTH_ASIA_BOOST : 0);
-    admin1[e] = intern(admin1Names, a1Map, a1);
+    const a1 = String(r[idx.admin1] ?? "");
+    let ai = a1Map.get(a1);
+    if (ai === undefined) {
+      ai = admin1Names.length;
+      admin1Names.push(a1);
+      admin1Tail.push(`| ${canonName(a1)} | `);
+      a1Map.set(a1, ai);
+    }
+    admin1[e] = ai;
     country[e] = intern(countries, ccMap, cc);
     tz[e] = intern(tzs, tzMap, String(r[idx.tz] ?? ""));
-    names.push(name);
+    names[e] = name;
     nameOff[e] = nameLen;
     nameLen += name.length;
 
-    const forms: Array<[string, number]> = [[canonName(name), KIND_NAME]];
-    for (const a of String(r[idx.alt] ?? "").split("|")) if (a) forms.push([canonName(a), KIND_ALT]);
     let w = " ";
-    for (const [key, kind] of forms) {
-      if (!key) continue;
+    const key = canonName(name);
+    if (key) {
+      keys.push(key);
+      keyEntryTmp.push(e);
+      keyKindTmp.push(KIND_NAME);
       w += `${key} `;
-      packed.push(`${key}\u0000${kind}${e}`);
-      let sp = key.indexOf(" ");
-      while (sp >= 0) {
-        const suffix = key.slice(sp + 1);
-        if (suffix.length >= 2) packed.push(`${suffix}\u0000${KIND_WORD}${e}`);
-        sp = key.indexOf(" ", sp + 1);
+    }
+    const alt = r[idx.alt];
+    if (typeof alt === "string" && alt) {
+      for (const a of alt.split("|")) {
+        const ak = a ? canonName(a) : "";
+        if (!ak) continue;
+        keys.push(ak);
+        keyEntryTmp.push(e);
+        keyKindTmp.push(KIND_ALT);
+        w += `${ak} `;
       }
     }
-    w += `| ${canonName(a1)} | ${cc.toLowerCase()} `;
-    words.push(w);
+    w += `${admin1Tail[ai]}${cc.toLowerCase()} `;
+    words[e] = w;
     wordsOff[e] = wordsLen;
     wordsLen += w.length;
   }
   nameOff[n] = nameLen;
   wordsOff[n] = wordsLen;
 
-  packed.sort();
-  const K = packed.length;
+  // Sort keys: a numeric sort on (six-character prefix code, key index) — comparator-less
+  // and fast — then settle runs that share a six-character prefix by string compare.
+  const K = keys.length;
+  if (K >= SPAN) throw new Error(`gazetteer: ${K} keys exceeds ${SPAN}`);
+  const codes = new Float64Array(K);
+  for (let k = 0; k < K; k++) codes[k] = prefixCode(keys[k] as string) * SPAN + k;
+  codes.sort();
+  const order = new Int32Array(K);
+  for (let i = 0; i < K; i++) order[i] = (codes[i] as number) % SPAN;
+  const byKey = (x: number, y: number): number => {
+    const a = keys[x] as string;
+    const b = keys[y] as string;
+    return a < b ? -1 : a > b ? 1 : 0;
+  };
+  for (let i = 0; i < K; ) {
+    const group = Math.floor((codes[i] as number) / SPAN);
+    let j = i + 1;
+    while (j < K && Math.floor((codes[j] as number) / SPAN) === group) j++;
+    if (j - i > 1) order.subarray(i, j).sort(byKey);
+    i = j;
+  }
+
   const keyOff = new Uint32Array(K + 1);
   const keyEntry = new Int32Array(K);
   const keyKind = new Uint8Array(K);
-  const keyParts: string[] = new Array(K);
+  const sortedKeys: string[] = new Array(K);
   let off = 0;
-  for (let k = 0; k < K; k++) {
-    const s = packed[k] as string;
-    const z = s.indexOf("\u0000");
-    keyParts[k] = s.slice(0, z);
-    keyKind[k] = s.charCodeAt(z + 1) - 48;
-    keyEntry[k] = Number(s.slice(z + 2));
-    keyOff[k] = off;
-    off += z + 1;
+  for (let i = 0; i < K; i++) {
+    const k = order[i] as number;
+    const key = keys[k] as string;
+    sortedKeys[i] = key;
+    keyEntry[i] = keyEntryTmp[k] as number;
+    keyKind[i] = keyKindTmp[k] as number;
+    keyOff[i] = off;
+    off += key.length + 1;
   }
   keyOff[K] = off;
 
+  // id × 2^20 + entry fits a double exactly (ids < 2^31); a comparator-less typed sort is fast.
+  const idKeys = new Float64Array(n);
+  for (let e = 0; e < n; e++) idKeys[e] = (id[e] as number) * SPAN + e;
+  idKeys.sort();
   const byId = new Int32Array(n);
-  for (let e = 0; e < n; e++) byId[e] = e;
-  byId.sort((a, b) => (id[a] as number) - (id[b] as number));
+  for (let i = 0; i < n; i++) byId[i] = (idKeys[i] as number) % SPAN;
 
   return {
     n,
-    // join() + a round-trip through a flat string keeps one contiguous (non-rope) copy.
     nameText: flatten(names.join("")),
     nameOff,
     wordsText: flatten(words.join("")),
@@ -256,7 +324,7 @@ function buildCompact(rows: unknown[], idx: FieldIndex): Compact {
     countries,
     tz,
     tzs,
-    keyText: flatten(`${keyParts.join("\n")}\n`),
+    keyText: flatten(`${sortedKeys.join("\n")}\n`),
     keyOff,
     keyEntry,
     keyKind,
@@ -361,6 +429,19 @@ function makeGazetteer(c: Compact): Gazetteer {
     return place;
   };
 
+  /** Every key where `tok` starts a non-first word: indexOf(" tok") over the joined keys. */
+  const wordStarts = (tok: string, cb: (e: number, whole: boolean) => void): void => {
+    const needle = ` ${tok}`;
+    let pos = keyText.indexOf(needle);
+    let hits = 0;
+    while (pos >= 0 && hits < WORD_CAP) {
+      const next = keyText.charCodeAt(pos + needle.length);
+      cb(keyEntry[keyAt(pos)] as number, next === 10 || next === 32);
+      hits++;
+      pos = keyText.indexOf(needle, pos + needle.length);
+    }
+  };
+
   const words = (e: number): string => c.wordsText.slice(c.wordsOff[e], c.wordsOff[e + 1]);
 
   function search(q: string, limit = 8): Place[] {
@@ -377,33 +458,33 @@ function makeGazetteer(c: Compact): Gazetteer {
       return s;
     };
 
-    // 1. whole-key exact / prefix, and word-start (suffix keys) — one range scan.
+    // 1. whole-key exact / prefix — one binary-searched range scan.
     const [lo, hi] = prefixRange(qc);
     for (let k = lo; k < hi; k++) {
-      const kind = keyKind[k] as number;
       const e = keyEntry[k] as number;
-      if (kind === KIND_WORD) {
-        // A whole later word ("york" in "new york city") is strong; a partial one
-        // ("madurei…" in "sena madureira") ranks below a one-typo whole-name match.
-        const next = keyText.charCodeAt((keyOff[k] as number) + qc.length);
-        add(e, next === 10 || next === 32 ? T_WORD : T_WORD_PREFIX);
-      }
-      else if (keyLen(k) === qc.length) add(e, T_EXACT);
-      else add(e, kind === KIND_NAME ? T_PREFIX_NAME : T_PREFIX_ALT);
+      if (keyLen(k) === qc.length) add(e, T_EXACT);
+      else add(e, keyKind[k] === KIND_NAME ? T_PREFIX_NAME : T_PREFIX_ALT);
     }
+
+    // 1b. word-start inside a multi-word key. A whole later word ("york" in "new york
+    //     city") is strong; a partial one ("madurei…" in "sena madureira") ranks below a
+    //     one-typo whole-name match.
+    wordStarts(qc, (e, whole) => add(e, whole ? T_WORD : T_WORD_PREFIX));
 
     // 2. several words: the first must start a name word, the rest may start any word of
     //    the names, the admin1 or the country code ("Hyderabad Sindh", "Vaith Koil").
     const tokens = qc.split(" ");
     if (tokens.length > 1 && (tokens[0] as string).length >= 2) {
       const rest = tokens.slice(1).map((t) => ` ${t}`);
-      const [tlo, thi] = prefixRange(tokens[0] as string);
-      for (let k = tlo; k < thi; k++) {
-        const e = keyEntry[k] as number;
-        if (best.has(e)) continue;
+      const first = tokens[0] as string;
+      const consider = (e: number): void => {
+        if ((best.get(e) ?? 0) >= T_TOKENS) return;
         const w = words(e);
         if (rest.every((t) => w.includes(t))) add(e, T_TOKENS);
-      }
+      };
+      const [tlo, thi] = prefixRange(first);
+      for (let k = tlo; k < thi; k++) consider(keyEntry[k] as number);
+      wordStarts(first, (e) => consider(e));
     }
 
     const strong = countStrong(); // entries found at T_TOKENS or better
@@ -428,8 +509,8 @@ function makeGazetteer(c: Compact): Gazetteer {
         if (len < qc.length - maxD) continue;
         const { full, prefix } = fuzzy(k, qc, maxD);
         const e = keyEntry[k] as number;
-        if (full <= maxD) add(e, T_FUZZY_FULL - 0.5 * (full - 1) - (keyKind[k] === KIND_WORD ? 0.25 : 0));
-        else if (prefix <= maxD && qc.length >= 5) add(e, T_FUZZY_PREFIX - 0.5 * (prefix - 1));
+        if (full <= maxD) add(e, T_FUZZY_FULL - 0.5 * (full - 1));
+        else if (prefix <= 1 && qc.length >= 5) add(e, T_FUZZY_PREFIX); // typo while still typing
       }
     }
 
@@ -489,18 +570,17 @@ export async function buildGazetteer(entries: GazetteerEntry[]): Promise<Gazette
   return makeGazetteer(buildCompact(rows, fieldIndex([...REQUIRED_FIELDS])));
 }
 
-async function gunzip(bytes: Uint8Array): Promise<Uint8Array> {
-  const stream = new Blob([new Uint8Array(bytes)]).stream().pipeThrough(new DecompressionStream("gzip"));
-  return new Uint8Array(await new Response(stream).arrayBuffer());
-}
-
 /**
  * Decode the shipped file. Tolerates a server that already stripped the gzip layer
  * (Content-Encoding: gzip on a .gz asset) by sniffing the 1f 8b magic.
  */
 async function decodeBytes(bytes: Uint8Array): Promise<unknown> {
-  const raw = bytes[0] === 0x1f && bytes[1] === 0x8b ? await gunzip(bytes) : bytes;
-  return JSON.parse(new TextDecoder().decode(raw));
+  if (bytes[0] === 0x1f && bytes[1] === 0x8b) {
+    // Decompress, decode and parse in one streamed pass.
+    const stream = new Blob([new Uint8Array(bytes)]).stream().pipeThrough(new DecompressionStream("gzip"));
+    return new Response(stream).json();
+  }
+  return JSON.parse(new TextDecoder().decode(bytes));
 }
 
 /** Decode the file into plain objects (diagnostics; the loader itself never builds these). */

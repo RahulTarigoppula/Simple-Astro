@@ -584,7 +584,7 @@ export const nicaBhangaRaja: YogaRule = {
         const d3 = inKendra(exaltedHere);
         if (d3) found.push(`${gName(exaltedHere)}, exalted in ${signName(gr.sign)}, in a kendra from ${d3}`);
       }
-      if (isOwnSign(id, p.g[dispositor].sign)) found.push(`${gName(id)} and ${gName(dispositor)} exchange signs`);
+      if (isOwnSign(id, p.g[dispositor].sign)) found.push(`the sign exchange of ${gName(id)} and ${gName(dispositor)}`);
       if (found.length === 0) continue;
       lifted.push(id);
       because.push({ grahaId: id, sign: gr.sign, note: `${gName(id)} debilitated in ${signName(gr.sign)}` });

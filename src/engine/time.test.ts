@@ -24,7 +24,7 @@ interface TzRow {
   jdUt?: number;
 }
 
-const ROWS = fixture.rows as TzRow[];
+const ROWS = fixture.rows as unknown as TzRow[];
 const PLACE: Place = { name: "Bengaluru", country: "IN", lat: 12.9716, lon: 77.5946, source: "manual" };
 
 function resolveRow(r: TzRow) {

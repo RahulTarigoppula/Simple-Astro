@@ -7,8 +7,11 @@
 // Nothing here animates by itself: a frame renders only when the sky changes (scrub), when the
 // view is dragged (with BRASS inertia), or on resize — and never while the page is hidden.
 // This module is the ONLY importer of three / @react-three/fiber, so they stay out of the entry.
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+// R3F through `createRoot` rather than <Canvas>: <Canvas> registers the entire THREE namespace in
+// its catalogue (defeating tree-shaking, ~+40 kB gz). The scene is built imperatively and mounted
+// as a <primitive>, so the catalogue can stay empty.
+import { createRoot, type ReconcilerRoot, useFrame, useThree } from "@react-three/fiber";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   BoxGeometry,
   BufferAttribute,
@@ -113,7 +116,8 @@ interface Built {
   starGroup: Group;
   zodiac: Group;
   ecliptic: Group;
-  starMat: ShaderMaterial;
+  uFade: { value: number };
+  uScale: { value: number };
   bodies: Map<GrahaId, Sprite>;
   moonTex: { tex: CanvasTexture; draw: (k: number) => void };
   lagna: Group;
@@ -139,12 +143,14 @@ function build(stars: StarCatalog, tok: Tok, dpr: number): Built {
   sg.setAttribute("position", new BufferAttribute(pos, 3));
   sg.setAttribute("aSize", new BufferAttribute(size, 1));
   sg.setAttribute("aAlpha", new BufferAttribute(alpha, 1));
+  const uScale = { value: dpr };
+  const uFade = { value: 1 };
   const starMat = new ShaderMaterial({
     vertexShader: STAR_VERT,
     fragmentShader: STAR_FRAG,
     transparent: true,
     depthWrite: false,
-    uniforms: { uColor: { value: new Color(tok("--star", "wheat")) }, uScale: { value: dpr }, uFade: { value: 1 } },
+    uniforms: { uColor: { value: new Color(tok("--star", "wheat")) }, uScale, uFade },
   });
   const starGroup = new Group();
   starGroup.matrixAutoUpdate = false;
@@ -171,7 +177,7 @@ function build(stars: StarCatalog, tok: Tok, dpr: number): Built {
     fragmentShader: STAR_FRAG,
     transparent: true,
     depthWrite: false,
-    uniforms: { uColor: { value: new Color(tok("--surface", "wheat")) }, uScale: { value: dpr }, uFade: { value: 1 } },
+    uniforms: { uColor: { value: new Color(tok("--surface", "wheat")) }, uScale, uFade: { value: 1 } },
   });
   const cloth = new Points(cg, clothMat);
   cloth.renderOrder = -1;
@@ -325,7 +331,7 @@ function build(stars: StarCatalog, tok: Tok, dpr: number): Built {
   lagna.add(beam, tilak);
   root.add(lagna);
 
-  return { root, starGroup, zodiac, ecliptic, starMat, bodies, moonTex: { tex: moonTexture, draw: drawMoon }, lagna };
+  return { root, starGroup, zodiac, ecliptic, uFade, uScale, bodies, moonTex: { tex: moonTexture, draw: drawMoon }, lagna };
 }
 
 function disposeAll(o: Object3D): void {
@@ -383,7 +389,7 @@ function DomeScene({
   useEffect(() => () => disposeAll(built.root), [built]);
 
   useEffect(() => {
-    built.starMat.uniforms.uScale = { value: viewport.dpr };
+    built.uScale.value = viewport.dpr;
     invalidate();
   }, [viewport.dpr, built, invalidate]);
 
@@ -405,11 +411,11 @@ function DomeScene({
     }
     built.lagna.rotation.set(0, -sky.lagna.az * D2R, 0);
     const day = Math.max(0, Math.min(1, (sky.sunAlt + 12) / 12));
-    built.starMat.uniforms.uFade = { value: 1 - 0.55 * day };
+    built.uFade.value = 1 - 0.55 * day;
     invalidate();
   }, [sky, built, invalidate]);
 
-  useFrame(() => {
+  useFrame((state) => {
     const L = look.current;
     camera.rotation.set(L.alt * D2R, -L.az * D2R, 0, "YXZ");
     camera.updateMatrixWorld();
@@ -420,7 +426,7 @@ function DomeScene({
       tmp.a.copy(mo.position).project(camera);
       tmp.b.copy(mo.position).lerp(su.position, 0.02).project(camera);
       const sm = mo.material as SpriteMaterial;
-      sm.rotation = Math.atan2((tmp.b.y - tmp.a.y) * viewport.height, (tmp.b.x - tmp.a.x) * viewport.width);
+      sm.rotation = Math.atan2((tmp.b.y - tmp.a.y) * state.size.height, (tmp.b.x - tmp.a.x) * state.size.width);
     }
     if (!readySent.current) {
       readySent.current = true;
@@ -437,6 +443,60 @@ export default function SkyDome({ sky, stars, lookAz, paused, noInertia, onReady
   const drag = useRef<{ id: number; x: number; y: number; t: number } | null>(null);
   const raf = useRef(0);
   const host = useRef<HTMLDivElement>(null);
+
+  const bindInvalidate = useCallback((fn: () => void) => {
+    inv.current = fn;
+  }, []);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const root = useRef<ReconcilerRoot<HTMLCanvasElement> | null>(null);
+  const [size, setSize] = useState<{ width: number; height: number } | null>(null);
+
+  useLayoutEffect(() => {
+    const el = host.current;
+    const canvas = canvasRef.current;
+    if (!el || !canvas) return;
+    root.current = createRoot(canvas);
+    const measure = (): void => {
+      const r = el.getBoundingClientRect();
+      setSize((s) => (s && s.width === r.width && s.height === r.height ? s : { width: r.width, height: r.height }));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      root.current?.unmount();
+      root.current = null;
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    const r = root.current;
+    if (!r || !size || size.width < 2 || size.height < 2) return;
+    let live = true;
+    void r
+      .configure({
+        frameloop: paused ? "never" : "demand",
+        dpr: [1, 1.5],
+        flat: true,
+        gl: { antialias: true, alpha: false, powerPreference: "low-power" },
+        camera: { fov: 80, near: 0.1, far: 400, position: [0, 0, 0] },
+        size: { width: size.width, height: size.height, top: 0, left: 0 },
+        onCreated: ({ scene }) => {
+          scene.background = new Color(tokens()("--sky-cloth", "midnightblue"));
+        },
+      })
+      .then(() => {
+        if (!live) return;
+        r.render(
+          <DomeScene sky={sky} stars={stars} look={look} onReady={onReady} onLost={onLost} bindInvalidate={bindInvalidate} />,
+        );
+      });
+    return () => {
+      live = false;
+    };
+  }, [size, paused, sky, stars, onReady, onLost, bindInvalidate]);
 
   useEffect(() => () => cancelAnimationFrame(raf.current), []);
   useEffect(() => {
@@ -498,27 +558,7 @@ export default function SkyDome({ sky, stars, lookAz, paused, noInertia, onReady
         drag.current = null;
       }}
     >
-      <Canvas
-        frameloop={paused ? "never" : "demand"}
-        dpr={[1, 1.5]}
-        gl={{ antialias: true, alpha: false, powerPreference: "low-power" }}
-        camera={{ fov: 80, near: 0.1, far: 400, position: [0, 0, 0] }}
-        onCreated={({ scene }) => {
-          scene.background = new Color(tokens()("--bg-elevated", "midnightblue"));
-        }}
-        aria-hidden="true"
-      >
-        <DomeScene
-          sky={sky}
-          stars={stars}
-          look={look}
-          onReady={onReady}
-          onLost={onLost}
-          bindInvalidate={(fn) => {
-            inv.current = fn;
-          }}
-        />
-      </Canvas>
+      <canvas ref={canvasRef} className="dome__canvas" aria-hidden="true" />
     </div>
   );
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="chowki_teak">#1A110B</color>
+    <color name="chowki_paper">#F4EAD3</color>
+    <color name="chowki_sindoor">#B5301C</color>
+    <color name="chowki_brass">#C9A24A</color>
+    <color name="chowki_ledge">#241811</color>
+    <color name="colorPrimary">#1A110B</color>
+    <color name="colorPrimaryDark">#1A110B</color>
+    <color name="colorAccent">#B5301C</color>
+</resources>

@@ -98,3 +98,10 @@
   --brass-edge: inset 0 1px 0 rgba(255, 246, 230, 0.55), inset 0 -1px 0 rgba(0, 0, 0, 0.45);
   --grain-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23g)'/%3E%3C/svg%3E");
 }
+
+/* ── Rooftop sky (features/sky). Theme-independent on purpose: the rooftop is always the night
+      cloth — stars are paper dots on neel, whatever the desk's theme. ── */
+:root {
+  --sky-cloth: #1D2748;   /* = night --bg-elevated, held constant for the rooftop */
+  --sky-cloth-deep: #121931; /* the disc of sky laid on the cloth */
+}

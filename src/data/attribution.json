@@ -128,17 +128,11 @@
     },
     {
       "id": "sounds",
-      "name": "howler + CC0 sound sprite (freesound.org CC0 filter, Kenney.nl)",
-      "licence": "MIT + CC0-1.0",
-      "url": "https://howlerjs.com/",
-      "use": "Desk sounds; per-file credits in public/sounds/ATTRIBUTION.md"
-    },
-    {
-      "id": "lucide",
-      "name": "lucide-react",
-      "licence": "ISC",
-      "url": "https://lucide.dev/",
-      "use": "16 px icons inside paper content only"
+      "name": "Desk sounds",
+      "licence": "CC0-1.0",
+      "url": "",
+      "use": "Synthesised on the device with Web Audio — original, no samples shipped",
+      "author": "Chowki"
     },
     {
       "id": "framework",
@@ -152,13 +146,6 @@
       "licence": "MIT",
       "url": "https://capacitorjs.com/",
       "use": "Android shell, camera, haptics, filesystem, share, status bar, splash"
-    },
-    {
-      "id": "shadcn",
-      "name": "shadcn/ui components on Base UI",
-      "licence": "MIT",
-      "url": "https://ui.shadcn.com/",
-      "use": "Dialog, RadioGroup, Switch, Tabs — restyled with tokens"
     },
     {
       "id": "artwork",

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Chowki</string>
+    <string name="title_activity_main">Chowki</string>
+    <string name="package_name">com.rahul.jyoti</string>
+    <string name="custom_url_scheme">com.rahul.jyoti</string>
+</resources>

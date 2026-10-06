@@ -1,4 +1,4 @@
-// The deterministic reading composer (IMPLEMENTATION-PROMPT §6.15). No LLM, no clock, no Math.random:
+// The deterministic reading composer (IMPLEMENTATION-PROMPT §6.15). No LLM, no clock, no unseeded randomness:
 // a sentence is a template chosen by mulberry32(hashString(seed)) and filled with the hit's values.
 //
 // Content care (§2.3.6): every template begins "Tradition says", speaks of temperament and
@@ -88,7 +88,7 @@ export const TEMPLATES: Readonly<Record<string, readonly string[]>> = {
     "Tradition says Candra joined by {grahas} sets the Kemadruma pattern aside.",
   ],
   "kemadruma-bhanga-guru-drishti": [
-    "Tradition says Guru's aspect on Candra, the {house} from Guru, dissolves Kemadruma and steadies the mind.",
+    "Tradition says Guru's aspect on Candra, the {house} from Guru, dissolves Kemadruma and lends the mind composure.",
     "Tradition says that with Guru aspecting Candra, the Kemadruma pattern is read as cancelled.",
   ],
   sunapha: [
@@ -225,11 +225,11 @@ export const TEMPLATES: Readonly<Record<string, readonly string[]>> = {
   ],
   "heart-curved": [
     "Tradition says a heart line that curves upward (curvature {curvature}, {lengthRatio} of palm width) is read as feelings expressed openly and warmly.",
-    "Tradition says a curving heart line (curvature {curvature}) describes an expressive, demonstrative temperament.",
+    "Tradition says a curving heart line (curvature {curvature}, {lengthRatio} of palm width) describes an expressive, demonstrative temperament.",
   ],
   "heart-straight": [
     "Tradition says a straight heart line (curvature {curvature}, {lengthRatio} of palm width) is read as affection guided by thought and loyalty.",
-    "Tradition says a level heart line (curvature {curvature}) describes a calm, considered way with feelings.",
+    "Tradition says a level heart line (curvature {curvature}, {lengthRatio} of palm width) describes a calm, considered way with feelings.",
   ],
   "head-long": [
     "Tradition says a long head line ({lengthRatio} of palm width, depth {depth}) is read as a thorough mind that likes to see things through.",
@@ -356,7 +356,7 @@ function kootaTemplate(k: KootaResult): string {
 }
 
 /** One note per koota; doṣas weigh most, so they lead the paragraph. */
-export function hitsFromMilan(m: MilanResult): Hit[] {
+export function hitsFromMilan(m: Pick<MilanResult, "kootas">): Hit[] {
   return m.kootas.map((k) => ({
     id: `koota-${k.id}`,
     template: kootaTemplate(k),

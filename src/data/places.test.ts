@@ -11,12 +11,14 @@ import {
   type Gazetteer,
   NOMINATIM_GAP_MS,
   NetError,
+  canonName,
   isGazetteerLoaded,
   loadGazetteerFromBytes,
   mapNominatim,
   mapOpenMeteo,
   nominatimUrl,
   openMeteoUrl,
+  parseGazetteerBytes,
   resetNominatimLimiter,
   searchOnline,
   searchPlaces,
@@ -29,6 +31,8 @@ describe("bundled gazetteer", () => {
   let g: Gazetteer;
   let fetchSpy: ReturnType<typeof vi.spyOn>;
   let firstSearchMs = Number.NaN;
+  let loadMs = Number.NaN;
+  let retainedBytes: number | null = null;
 
   beforeAll(async () => {
     fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(() => {
@@ -37,7 +41,17 @@ describe("bundled gazetteer", () => {
     expect(searchPlaces("Madurai")).toEqual([]); // not loaded yet: empty, no throw, no fetch
     const bytes = new Uint8Array(readFileSync(GZ));
     expect(bytes.length).toBeLessThanOrEqual(1_800_000);
+    // Retained heap is only measurable with --expose-gc (NODE_OPTIONS=--expose-gc).
+    const gc = (globalThis as { gc?: () => void }).gc;
+    gc?.();
+    const h0 = process.memoryUsage().heapUsed;
+    const tl = performance.now();
     g = await loadGazetteerFromBytes(bytes);
+    loadMs = performance.now() - tl;
+    if (gc) {
+      gc();
+      retainedBytes = process.memoryUsage().heapUsed - h0;
+    }
     const t0 = performance.now();
     searchPlaces("Madurai");
     firstSearchMs = performance.now() - t0;
@@ -53,8 +67,14 @@ describe("bundled gazetteer", () => {
     expect(g.size).toBeGreaterThan(40_000);
   });
 
-  it("first search after load is ≤ 60 ms", () => {
-    expect(firstSearchMs).toBeLessThanOrEqual(60);
+  it("first search after load is ≤ 20 ms", () => {
+    expect(firstSearchMs).toBeLessThanOrEqual(20);
+  });
+
+  it("loads fast and stays small (targets: ≤ 400 ms, ≤ 20 MB retained)", () => {
+    // Generous CI bound; the measured figure on the dev box is ~370 ms.
+    expect(loadMs).toBeLessThan(1500);
+    if (retainedBytes !== null) expect(retainedBytes).toBeLessThanOrEqual(20e6);
   });
 
   const top = (q: string) => searchPlaces(q)[0];
@@ -69,6 +89,7 @@ describe("bundled gazetteer", () => {
     ["Bombay", "Mumbai", "IN"],
     ["Chennai", "Chennai", "IN"],
     ["Madras", "Chennai", "IN"],
+    ["Bengalru", "Bengaluru", "IN"],
     ["Kolkata", "Kolkata", "IN"],
     ["Calcutta", "Kolkata", "IN"],
     ["New Delhi", "New Delhi", "IN"],
@@ -106,11 +127,30 @@ describe("bundled gazetteer", () => {
     expect(searchPlaces("   ")).toEqual([]);
   });
 
-  it("typing-speed searches stay fast", () => {
-    const qs = ["V", "Va", "Vai", "Vait", "Vaith", "Vaithe", "Vaithee", "Vaithees", "Ch", "Che", "Chen", "Chenn", "Chenna"];
-    const t0 = performance.now();
-    for (const q of qs) searchPlaces(q);
-    expect((performance.now() - t0) / qs.length).toBeLessThan(60);
+  it("typing-speed searches stay fast (≤ 20 ms each)", () => {
+    const qs = ["V", "Va", "Vai", "Vait", "Vaith", "Vaithe", "Vaithee", "Vaithees", "Ch", "Che", "Chen", "Chenn", "Chenna",
+      "Sa", "pur", "abad", "Bengalru", "Thiruvanantapuram", "Hyderabad Sindh", "New Yo"];
+    for (const q of qs) {
+      const t0 = performance.now();
+      searchPlaces(q);
+      expect(performance.now() - t0, q).toBeLessThan(20);
+    }
+  });
+
+  it("finds word starts and inner substrings", () => {
+    expect(searchPlaces("York").map((p) => p.name)).toContain("New York City");
+    expect(top("eeswaran")?.geonameId).toBe(1253530);
+  });
+
+  it("every sampled place is found by its own name (index ordering is sound)", async () => {
+    const entries = await parseGazetteerBytes(new Uint8Array(readFileSync(GZ)));
+    for (let i = 0; i < entries.length; i += 97) {
+      const e = entries[i];
+      if (!e || canonName(e.name).replace(/ /g, "").length < 2) continue;
+      const hits = searchPlaces(e.name, 1);
+      expect(canonName(hits[0]?.name ?? ""), e.name).toBe(canonName(e.name));
+      expect(g.get(e.id)?.name).toBe(e.name);
+    }
   });
 });
 

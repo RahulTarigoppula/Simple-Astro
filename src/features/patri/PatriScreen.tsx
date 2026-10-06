@@ -476,7 +476,7 @@ function PatriBody({ patri, zone, style, script, inkKey, skipInk, lit, setLit, o
 
       <TurmericBand dev="योग" title="Yogas" meta={`${patri.yogas.filter((y) => y.strength !== "cancelled").length} formed`} />
       {patri.yogas.length === 0 ? <p className="p p--muted">No classical yoga in the rule set fires for this chart.</p> : null}
-      {patri.yogas.map((y) => (
+      {patri.yogas.map((y, yi) => (
         <section key={y.id} className={`yoga${y.strength === "cancelled" ? " is-cancelled" : ""}`} aria-label={y.name}>
           <h3>
             {y.name}{" "}
@@ -488,7 +488,7 @@ function PatriBody({ patri, zone, style, script, inkKey, skipInk, lit, setLit, o
           <p>
             {y.reading}
             <button type="button" className="cite" aria-label={`Citation: ${y.citation.text} ${y.citation.ref}`} onClick={() => setFoot({ kind: "yoga", hit: y })}>
-              {y.citation.text === "BPHS" ? "1" : "†"}
+              {yi + 1}
             </button>
           </p>
           <p className="src">

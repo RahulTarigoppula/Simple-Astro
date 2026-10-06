@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Brass diya with a vermilion flame tip, inside the 66dp safe zone of a 108dp adaptive icon. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:pathData="M54,30c7,8 9,12 9,17a9,9 0,0 1,-18 0c0,-5 2,-9 9,-17z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="54" android:startY="56" android:endX="54" android:endY="30">
+                <item android:offset="0" android:color="#FFB5301C"/>
+                <item android:offset="0.45" android:color="#FFE8A33C"/>
+                <item android:offset="1" android:color="#FFFFF0C4"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#D9FFF6E6" android:pathData="M54,41c3,4 3.6,5.6 3.6,7.4a3.6,3.6 0,0 1,-7.2 0c0,-1.8 0.6,-3.4 3.6,-7.4z"/>
+    <path android:fillColor="#FF5C4413" android:pathData="M50,57h8v6h-8z"/>
+    <path android:pathData="M25,63h58c0,10 -13,18 -29,18s-29,-8 -29,-18z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="54" android:startY="63" android:endX="54" android:endY="81">
+                <item android:offset="0" android:color="#FFE2C56B"/>
+                <item android:offset="0.5" android:color="#FFC9A24A"/>
+                <item android:offset="1" android:color="#FF7E5F22"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:strokeColor="#FFE2C56B" android:strokeWidth="2" android:pathData="M25,63h58"/>
+</vector>

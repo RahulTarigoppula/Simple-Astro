@@ -19,14 +19,13 @@ interface ScrubRingProps {
   /** Snap without inertia (reduced motion, Calm desk). */
   noInertia: boolean;
   valueText: string;
-  onReset: () => void;
   resetLabel: string;
 }
 
 const clampMin = (m: number): number => Math.max(-SCRUB_LIMIT_MIN, Math.min(SCRUB_LIMIT_MIN, m));
 const snap = (m: number): number => clampMin(Math.round(m / DETENT_MIN) * DETENT_MIN);
 
-export function ScrubRing({ value, onChange, noInertia, valueText, onReset, resetLabel }: ScrubRingProps) {
+export function ScrubRing({ value, onChange, noInertia, valueText, resetLabel }: ScrubRingProps) {
   const ref = useRef<HTMLDivElement>(null);
   const cur = useRef(value);
   const drag = useRef<{ id: number; angle: number; lastT: number; v: number } | null>(null);
@@ -162,7 +161,6 @@ export function ScrubRing({ value, onChange, noInertia, valueText, onReset, rese
         onClick={() => {
           cancelAnimationFrame(raf.current);
           if (cur.current !== 0) set(0);
-          onReset();
         }}
         aria-label={resetLabel}
       >

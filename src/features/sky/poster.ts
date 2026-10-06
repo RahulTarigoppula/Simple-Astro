@@ -39,7 +39,7 @@ async function fontsReady(): Promise<void> {
 }
 
 function cloth(ctx: CanvasRenderingContext2D, c: (n: string, f?: string) => string, w: number, h: number): void {
-  ctx.fillStyle = c("--bg-elevated", "midnightblue");
+  ctx.fillStyle = c("--sky-cloth", "midnightblue");
   ctx.fillRect(0, 0, w, h);
   ctx.fillStyle = c("--surface", "wheat");
   ctx.globalAlpha = 0.08;

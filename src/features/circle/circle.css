@@ -1,0 +1,504 @@
+/* The leaf bundle — teak boards, palm-leaf paper, a mauli thread. */
+
+.circle__col {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+.circle__head {
+  flex: none;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  padding-bottom: 2px;
+}
+.circle__hint {
+  margin: 6px var(--paper-margin) 2px;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+  line-height: 1.45;
+}
+.circle__hint .linkish {
+  min-height: 44px;
+  font-size: var(--text-sm);
+}
+
+/* ── the bundle ─────────────────────────────────────────────────────── */
+.bundle {
+  position: relative;
+  flex: 0 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 54px; /* room for the thread's loose end */
+}
+.board {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  height: 20px;
+  margin: 0 -2px 0 14px;
+  border-radius: 4px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 235, 200, 0.07) 0 1px, rgba(255, 235, 200, 0) 1px 9px),
+    linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--teak-light), white 12%) 0%,
+      var(--teak-light) 42%,
+      color-mix(in oklch, var(--teak-light), black 38%) 100%
+    );
+  box-shadow:
+    var(--shadow-1),
+    inset 0 1px 0 rgba(255, 235, 200, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+}
+/* the thread passing over the top board, in line with the leaves' holes */
+.board__wrap {
+  position: absolute;
+  left: calc(20px + 22px - 14px - 1.5px);
+  top: -5px;
+  bottom: -5px;
+  width: 3px;
+  border-radius: 2px;
+  background: repeating-linear-gradient(165deg, var(--thread) 0 3px, var(--haldi) 3px 5px);
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.bundle__viewport {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: 6px 4px 6px 20px;
+}
+.bundle__stack {
+  position: relative;
+}
+.bundle__leaves {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  inset: 0;
+}
+.bundle__thread {
+  position: absolute;
+  z-index: 100;
+  left: calc(22px - 1.5px);
+  top: -12px;
+  bottom: -12px;
+  width: 3px;
+  border-radius: 2px;
+  background: repeating-linear-gradient(165deg, var(--thread) 0 3px, var(--haldi) 3px 5px);
+  box-shadow: var(--shadow-1);
+  transform-origin: 50% 100%;
+  transition:
+    transform 360ms var(--ease-spring),
+    opacity var(--dur-base) var(--ease-out);
+  pointer-events: none;
+}
+.bundle__thread.is-off {
+  transform: scaleY(0);
+  opacity: 0;
+}
+.bundle__cover {
+  position: absolute;
+  inset: 0;
+  z-index: 101;
+  width: 100%;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+/* ── a leaf ─────────────────────────────────────────────────────────── */
+.leaf-slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  will-change: transform;
+}
+.leaf-tray {
+  position: absolute;
+  right: 0;
+  top: 5px;
+  bottom: 5px;
+  display: flex;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--ledge);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+.leaf-tray__btn {
+  position: relative;
+  flex: 1 0 auto;
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  color: var(--surface);
+  font-size: var(--text-sm);
+  line-height: 1.2;
+  border-left: 1px solid rgba(255, 235, 200, 0.1);
+}
+.leaf-tray__btn small {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+.leaf-tray__burn {
+  background: var(--danger);
+  color: var(--lac-text);
+}
+.leaf-tray__burn .burnhold__fill {
+  background: var(--lac-dark);
+}
+
+.leaf {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: stretch;
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  background-color: var(--surface-2);
+  background-image: repeating-linear-gradient(180deg, transparent 0 21px, var(--border) 21px 22px);
+  background-position: 0 6px;
+  box-shadow:
+    var(--shadow-1),
+    inset 0 0 0 1px color-mix(in oklch, var(--border-strong), transparent 55%);
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+}
+.leaf--1 {
+  background-color: var(--leaf-face);
+}
+.leaf::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--grain-url);
+  background-size: 256px 256px;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: multiply;
+}
+.leaf__face {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 4px 6px 17px;
+  text-align: left;
+  color: var(--ink);
+  border-radius: var(--radius-md);
+}
+.leaf__hole {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--ink), transparent 30%);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(255, 246, 230, 0.45);
+}
+.leaf__text {
+  display: grid;
+  min-width: 0;
+}
+.leaf__name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.leaf__tilak {
+  flex: none;
+  width: 9px;
+  height: 11px;
+  border-radius: 50% 50% 46% 54% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 40% 35%, color-mix(in oklch, var(--accent), white 14%), var(--accent) 58%, color-mix(in oklch, var(--accent), black 22%));
+}
+.leaf__nak {
+  font-size: var(--text-base);
+  line-height: 1.45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.leaf__muted {
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+}
+.leaf__birth {
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.leaf__more {
+  position: relative;
+  flex: none;
+  align-self: center;
+  width: 44px;
+  min-height: 44px;
+  margin-right: 4px;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink-muted);
+  border-radius: var(--radius-sm);
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.is-tied .leaf__more {
+  opacity: 0;
+}
+.leaf__char {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, var(--lac-dark) 0, color-mix(in oklch, var(--danger), transparent 30%) 4%, transparent 16%, transparent 84%, color-mix(in oklch, var(--danger), transparent 30%) 96%, var(--lac-dark) 100%),
+    radial-gradient(140% 170% at 48% 50%, transparent 50%, color-mix(in oklch, var(--danger), transparent 35%) 82%, var(--lac-dark) 100%);
+}
+
+/* ── the knot and the thread's loose end ───────────────────────────── */
+.knot {
+  position: absolute;
+  left: calc(20px + 22px - 14px - 24px);
+  top: -2px;
+  width: 132px;
+  height: 84px;
+  pointer-events: none;
+}
+.knot__art {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+.knot__wrap {
+  stroke: var(--thread);
+  stroke-width: 3;
+  fill: none;
+}
+.knot__thread {
+  fill: none;
+  stroke: var(--thread);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+}
+.knot__twist {
+  fill: none;
+  stroke: var(--haldi);
+  stroke-width: 2.8;
+  stroke-dasharray: 2.4 4.2;
+}
+.knot__loop {
+  fill: none;
+  stroke: var(--thread);
+  stroke-width: 2.6;
+}
+.knot__core {
+  fill: var(--thread);
+}
+.knot__end {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: grab;
+}
+.knot__end:active {
+  cursor: grabbing;
+}
+.knot__bead {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--brass-hi), var(--brass-mid) 55%, var(--brass-dark));
+  box-shadow: var(--shadow-1);
+}
+
+/* ── the blank leaf and its stylus ─────────────────────────────────── */
+.blankleaf {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  margin: 0 4px 0 20px;
+  padding: 10px 16px 10px 17px;
+  border-radius: var(--radius-md);
+  background-color: var(--surface);
+  background-image: repeating-linear-gradient(180deg, transparent 0 21px, color-mix(in oklch, var(--border), transparent 30%) 21px 22px);
+  box-shadow: var(--shadow-1);
+  color: var(--ink);
+  text-decoration: none;
+  overflow: hidden;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.blankleaf:hover,
+.blankleaf:focus-visible {
+  transform: translate(-1px, -2px);
+}
+.blankleaf__text {
+  position: relative;
+  font-size: var(--text-base);
+}
+.blankleaf__stylus {
+  position: absolute;
+  right: 8px;
+  bottom: 4px;
+  width: 140px;
+  height: 30px;
+  rotate: -4deg;
+  pointer-events: none;
+}
+
+/* ── empty bundle ───────────────────────────────────────────────────── */
+.circle--empty .circle__col {
+  justify-content: center;
+}
+.circle__empty-h {
+  margin: 0;
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
+  color: var(--surface);
+  text-wrap: balance;
+}
+.circle__empty-p {
+  margin: 0 0 var(--space-3);
+  max-width: 44ch;
+  font-size: var(--text-base);
+  color: color-mix(in oklch, var(--surface), transparent 14%);
+}
+.circle--empty .blankleaf {
+  min-height: 160px;
+  margin-left: 0;
+  align-items: flex-start;
+  padding-top: 18px;
+}
+
+/* ── the leaf's sheet ──────────────────────────────────────────────── */
+.leafsheet {
+  color: var(--ink);
+}
+.leafsheet__head {
+  padding: 2px var(--paper-margin) var(--space-2);
+  border-bottom: 1px solid var(--border-strong);
+}
+.leafsheet__h {
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--text-2xl);
+  line-height: 1.2;
+}
+.leafsheet__sub {
+  margin: 2px 0 0;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+.leafsheet__list {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--paper-margin);
+}
+.leafsheet__list li {
+  border-bottom: 1px solid var(--border);
+}
+.leafsheet__row {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 0;
+  text-align: left;
+  color: var(--ink);
+  font-size: var(--text-base);
+}
+.leafsheet__row:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+}
+.leafsheet__muted {
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+}
+.leafsheet__burn {
+  color: var(--danger);
+}
+.leafsheet__back,
+.leafsheet__actions {
+  margin: var(--space-3) var(--paper-margin) 0;
+}
+.leafsheet__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+}
+.leafsheet__export .field label {
+  width: 6.5em;
+}
+.leafsheet__export .field input {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+}
+
+.burnhold {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.burnhold__fill {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklch, var(--danger), transparent 82%);
+  transform-origin: left;
+  transform: scaleX(0);
+  pointer-events: none;
+}
+.burnhold__lbl {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bundle__thread,
+  .blankleaf,
+  .board__wrap {
+    transition-duration: 1ms;
+  }
+}
