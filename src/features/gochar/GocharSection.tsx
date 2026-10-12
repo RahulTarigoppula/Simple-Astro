@@ -1,7 +1,7 @@
 // "गोचर · Transits now" — a section for the Janam Patri scroll: where the nine grahas walk today,
 // counted from the natal Moon (and Lagna), Śani's spells on a 90-year ribbon, and a few calm
 // "Tradition says…" sentences, each with its source.
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TurmericBand } from "../../components/ui/TurmericBand";
 import { GRAHA_DEV, GRAHA_NAMES, ORDINAL, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
 import { CITE } from "../../engine/citations";
@@ -13,6 +13,53 @@ import { PHASE_LABEL, RIBBON_YEARS, SadeSatiRibbon } from "./SadeSatiRibbon";
 import "./gochar.css";
 
 const YEAR_MS = 365.25 * MS_PER_DAY;
+
+// Śani's spells over ninety years take a moment to reckon: done once per leaf, preset and birth
+// instant, after first paint, and kept for the session so a revisit is instant.
+const SS_CACHE = new Map<string, SadeSatiResult>();
+const ssKey = (p: Patri): string => `${p.profileId}|${p.presetHash}|${p.jdUt}`;
+
+/** Forget the session's reckoned spells (tests). */
+export function forgetSadeSati(): void {
+  SS_CACHE.clear();
+}
+
+function reckonSadeSati(patri: Patri): SadeSatiResult {
+  const key = ssKey(patri);
+  const hit = SS_CACHE.get(key);
+  if (hit) return hit;
+  const birthMs = Math.round(jdToMs(patri.jdUt));
+  // Birth − 3 y covers a spell already running at birth.
+  const ss = sadeSati(patri, birthMs - 3 * YEAR_MS, birthMs + (RIBBON_YEARS + 2) * YEAR_MS);
+  SS_CACHE.set(key, ss);
+  return ss;
+}
+
+/** The spells for this patri: from the cache at once, or reckoned when the browser is idle. */
+function useSadeSati(patri: Patri): SadeSatiResult | null {
+  const key = ssKey(patri);
+  const [done, setDone] = useState<{ key: string; ss: SadeSatiResult } | null>(null);
+  useEffect(() => {
+    if (SS_CACHE.has(key)) return;
+    let live = true;
+    const run = (): void => {
+      if (live) setDone({ key, ss: reckonSadeSati(patri) });
+    };
+    if (typeof window.requestIdleCallback === "function") {
+      const h = window.requestIdleCallback(run, { timeout: 1200 });
+      return () => {
+        live = false;
+        window.cancelIdleCallback(h);
+      };
+    }
+    const t = window.setTimeout(run, 0);
+    return () => {
+      live = false;
+      window.clearTimeout(t);
+    };
+  }, [key, patri]);
+  return SS_CACHE.get(key) ?? (done?.key === key ? done.ss : null);
+}
 
 export interface GocharSectionProps {
   patri: Patri;
@@ -28,7 +75,7 @@ interface Reading {
 }
 
 /** The "Tradition says…" sentences for a report and Śani's spells. Exported for tests. */
-export function gocharReadings(report: GocharReport, ss: SadeSatiResult, nowMs: number, zone: string): Reading[] {
+export function gocharReadings(report: GocharReport, ss: SadeSatiResult | null, nowMs: number, zone: string): Reading[] {
   const out: Reading[] = [];
   const moon = SIGN_NAMES[report.moonSign];
   const fav = report.entries.filter((e) => e.favourable);
@@ -42,17 +89,21 @@ export function gocharReadings(report: GocharReport, ss: SadeSatiResult, nowMs: 
         : "."),
     cite: report.citation,
   });
+  if (!ss) return out;
 
   const sade = ss.spells.filter((s) => s.kind === "sade-sati");
   const running = sade.find((s) => nowMs >= s.startMs && nowMs < s.endMs);
   if (running) {
     const iv = running.intervals.find((i) => nowMs >= i.startMs && nowMs < i.endMs);
-    const phase = iv
-      ? `${PHASE_LABEL[iv.phase].toLowerCase()} phase, through ${SIGN_NAMES[iv.sign]}, until ${fmtDate(iv.endMs, zone)}`
-      : "";
+    const back = iv ? undefined : running.intervals.find((i) => i.startMs > nowMs);
+    const where = iv
+      ? `it is now in its ${PHASE_LABEL[iv.phase].toLowerCase()} phase, through ${SIGN_NAMES[iv.sign]}, until ${fmtDate(iv.endMs, zone)}`
+      : back
+        ? `Śani has for now stepped back out of these signs by retrogression and returns to ${SIGN_NAMES[back.sign]} on ${fmtDate(back.startMs, zone)}`
+        : "Śani has for now stepped back out of these signs by retrogression";
     out.push({
       key: "sade",
-      text: `Tradition says Śani's passage over the Moon's sign and its two neighbours is a season that asks for patience and steady, unhurried effort; it is now in its ${phase}, and the whole passage closes around ${fmtMonthYear(running.endMs, zone)}.`,
+      text: `Tradition says Śani's passage over the Moon's sign and its two neighbours is a season that asks for patience and steady, unhurried effort; ${where}, and the whole passage closes around ${fmtMonthYear(running.endMs, zone)}.`,
       cite: running.citation,
     });
   } else {
@@ -82,8 +133,7 @@ export function gocharReadings(report: GocharReport, ss: SadeSatiResult, nowMs: 
 export function GocharSection({ patri, nowMs, zone }: GocharSectionProps) {
   const report = useMemo(() => gocharReport(patri, nowMs), [patri, nowMs]);
   const birthMs = Math.round(jdToMs(patri.jdUt));
-  // Śani's spells over the whole ribbon (birth − 3 y covers a spell already running at birth).
-  const ss = useMemo(() => sadeSati(patri, birthMs - 3 * YEAR_MS, birthMs + (RIBBON_YEARS + 2) * YEAR_MS), [patri, birthMs]);
+  const ss = useSadeSati(patri);
   const readings = useMemo(() => gocharReadings(report, ss, nowMs, zone), [report, ss, nowMs, zone]);
   const moon = report.moonSign;
 
@@ -176,7 +226,21 @@ export function GocharSection({ patri, nowMs, zone }: GocharSectionProps) {
         </span>{" "}
         and {SIGN_NAMES[(moon + 1) % 12]}; dates in {zone}.
       </p>
-      <SadeSatiRibbon result={ss} birthMs={birthMs} nowMs={nowMs} zone={zone} />
+      {ss ? (
+        <SadeSatiRibbon key={ssKey(patri)} result={ss} birthMs={birthMs} nowMs={nowMs} zone={zone} />
+      ) : (
+        <div className="gochar-rib">
+          <div className="gochar-rib__track" aria-hidden="true" data-decorative="true">
+            <div className="gochar-rib__rule" />
+            <span className="gochar-rib__end gochar-rib__end--l">birth</span>
+            <span className="gochar-rib__end gochar-rib__end--r">+{RIBBON_YEARS} y</span>
+          </div>
+          <p className="p p--muted" role="status">
+            Reckoning Śani's spells…
+          </p>
+          <div className="ink-wait" aria-hidden="true" />
+        </div>
+      )}
 
       <div className="gochar__readings">
         {readings.map((r) => (

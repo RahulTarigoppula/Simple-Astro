@@ -149,7 +149,7 @@ export default function ChowkiScreen() {
         ) : null}
       </div>
 
-      {active && activePatri ? (
+      {active && activePatri && activePatri.profileId === active.id ? (
         <div className="chowki__strength">
           <DailyStrengthCard patri={activePatri} nowMs={now} zone={active.birth.zone} />
         </div>

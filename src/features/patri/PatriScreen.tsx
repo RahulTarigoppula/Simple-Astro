@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { usePatri, useProfile, useSettings, useSettingsLoaded } from "../../app/hooks";
+import { useNowMs } from "../../app/useNow";
 import { Colophon } from "../../components/ui/Colophon";
 import { DigitSet } from "../../components/ui/DigitSet";
 import { Screen } from "../../components/ui/Screen";
@@ -21,9 +22,9 @@ import {
 } from "../../data/tables/names";
 import { boundaryNote, PRESET_SHORT } from "../../engine/boundary";
 import { formatDms } from "../../engine/math";
-import { addVarga, computePatri } from "../../engine/patri";
-import { formatOffset, resolveBirthMoment } from "../../engine/time";
-import { type EnginePreset, type GrahaId, type Patri, PRESET_HASH, type Profile, type VargaNumber, type YogaHit } from "../../engine/types";
+import { addVarga } from "../../engine/patri";
+import { formatOffset } from "../../engine/time";
+import { type EnginePreset, type GrahaId, type Patri, PRESET_HASH, type VargaNumber, type YogaHit } from "../../engine/types";
 import { VARGA_NAMES } from "../../engine/vargas";
 import { haptics } from "../../platform/haptics";
 import { isNative, reducedMotion } from "../../platform/native";
@@ -35,6 +36,7 @@ import { AshtakavargaSection } from "./extras/AshtakavargaSection";
 import { BhavaChalitTable } from "./extras/BhavaChalitTable";
 import { GrahaLedger } from "./GrahaLedger";
 import { KundliChart } from "./KundliChart";
+import { TimeUnknownNote } from "./TimeUnknownNote";
 import "./patri.css";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -94,6 +96,7 @@ export default function PatriScreen() {
   const lastScroll = useRef({ y: 0, t: 0 });
   const lastTouch = useRef<{ y: number; top: boolean } | null>(null);
   const wheelT = useRef(0);
+  const nowMs = useNowMs(60_000);
 
   useEffect(() => setStyle(settings.chartStyle), [settings.chartStyle]);
   useEffect(() => {
@@ -185,7 +188,6 @@ export default function PatriScreen() {
   }
 
   const b = profile?.birth;
-  const nowMs = Date.now();
 
   return (
     <Screen className="patri" label={profile ? `Janam Patri of ${profile.name}` : "Janam Patri"}>
@@ -523,7 +525,7 @@ function PatriBody({
         onBoundary={(id) => setFoot({ kind: "boundary", id })}
       />
       {Object.values(patri.grahas).some((g) => g.boundary) || patri.lagna.boundary ? (
-        <p className="note-haldi">
+        <p className="note-haldi note--keep">
           <span aria-hidden="true">⚑</span>
           <span>
             An asterisk marks a body within 2′ of a sign, nakṣatra or pada edge — tap it to see what the other presets would read.
@@ -738,34 +740,5 @@ function FootBody({ foot, patri, zone, onShow }: { foot: NonNullable<Foot>; patr
         {PRESET_SHORT[patri.preset.ayanamsa]}.
       </p>
     </div>
-  );
-}
-
-/** For a leaf without a clock time: say what can and cannot be trusted, and whether the Moon moved. */
-function TimeUnknownNote({ profile, patri }: { profile: Profile; patri: Patri }) {
-  const span = useMemo(() => {
-    const b = profile.birth;
-    const at = (h: number, mi: number) => {
-      try {
-        const m = resolveBirthMoment({ localY: b.localY, localMo: b.localMo, localD: b.localD, localH: h, localMi: mi, place: b.place });
-        return computePatri({ ...profile, birth: m }, patri.preset, 0).grahas.MO;
-      } catch {
-        return null;
-      }
-    };
-    return { dawn: at(0, 0), dusk: at(23, 59) };
-  }, [profile, patri.preset]);
-  const { dawn, dusk } = span;
-  const moved = dawn && dusk && (dawn.sign !== dusk.sign || dawn.nakshatra !== dusk.nakshatra);
-  return (
-    <p className="note-haldi" role="note" style={{ margin: "var(--space-3) 0 0" }}>
-      <span aria-hidden="true">⚑</span>
-      <span>
-        Birth time unknown — cast for local noon. The Lagna, houses, Navāṃśa and daśā dates are not reliable.{" "}
-        {moved && dawn && dusk
-          ? `The Moon moved that day from ${NAKSHATRA_NAMES[dawn.nakshatra]} in ${SIGN_NAMES[dawn.sign]} to ${NAKSHATRA_NAMES[dusk.nakshatra]} in ${SIGN_NAMES[dusk.sign]}, so even its nakṣatra is uncertain.`
-          : `The Moon stayed in ${NAKSHATRA_NAMES[patri.grahas.MO.nakshatra]} (${SIGN_NAMES[patri.grahas.MO.sign]}) all day, so the Moon sign, nakṣatra and Guna Milan hold.`}
-      </span>
-    </p>
   );
 }

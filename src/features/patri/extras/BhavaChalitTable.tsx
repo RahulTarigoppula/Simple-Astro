@@ -107,7 +107,7 @@ export function BhavaChalitTable({ patri }: BhavaChalitTableProps) {
         <p className="p p--muted">Every graha keeps its whole-sign house in Bhāva Chalit.</p>
       )}
 
-      <p className="note-haldi">
+      <p className="note-haldi note--keep">
         <span aria-hidden="true">⚑</span>
         <span>The Rāśi chart stays whole-sign; Bhāva Chalit is shown here as a table only.</span>
       </p>

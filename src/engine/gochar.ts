@@ -41,23 +41,36 @@ export function transitsAt(atMs: number, preset: EnginePreset, eph: Ephemeris = 
   raw.KE = { lon: ketuOf(rahu.lon), speed: rahu.speed };
 
   const out = {} as Record<GrahaId, TransitGraha>;
-  for (const id of GRAHA_IDS) {
-    const r = raw[id];
-    const lonSidereal = norm360(r.lon - ay);
-    const speed = r.speed - ayRate;
-    const n = nakshatraOf(lonSidereal);
-    out[id] = {
-      id,
-      lonSidereal,
-      speed,
-      retrograde: id === "RA" || id === "KE" ? true : speed < 0,
-      sign: signOf(lonSidereal),
-      degInSign: degInSignOf(lonSidereal),
-      nakshatra: n.index,
-      pada: n.pada,
-    };
-  }
+  for (const id of GRAHA_IDS) out[id] = toTransit(id, raw[id], ay, ayRate);
   return out;
+}
+
+function toTransit(id: GrahaId, r: { lon: Deg; speed: number }, ay: Deg, ayRate: number): TransitGraha {
+  const lonSidereal = norm360(r.lon - ay);
+  const speed = r.speed - ayRate;
+  const n = nakshatraOf(lonSidereal);
+  return {
+    id,
+    lonSidereal,
+    speed,
+    retrograde: id === "RA" || id === "KE" ? true : speed < 0,
+    sign: signOf(lonSidereal),
+    degInSign: degInSignOf(lonSidereal),
+    nakshatra: n.index,
+    pada: n.pada,
+  };
+}
+
+/** The Moon alone at `atMs` — identical to `transitsAt(atMs, preset).MO`, without the other eight. */
+export function moonTransitAt(atMs: number, preset: EnginePreset, eph: Ephemeris = astronomyEngineEphemeris): TransitGraha {
+  const t = astroTime(atMs);
+  const jdTt = t.tt + 2451545.0;
+  return toTransit(
+    "MO",
+    { lon: eph.position("MO", t).lon, speed: eph.speed("MO", t) },
+    ayanamsa(jdTt, preset.ayanamsa),
+    ayanamsaRateDegPerDay(jdTt),
+  );
 }
 
 // ─── 2. the gochara report ────────────────────────────────────────────────────

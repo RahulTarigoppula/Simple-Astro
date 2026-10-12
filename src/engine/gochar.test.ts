@@ -7,6 +7,7 @@ import {
   GOCHAR_FAVOURABLE,
   gocharReport,
   isGocharFavourable,
+  moonTransitAt,
   type SadeSatiResult,
   sadeSati,
   saturnSignIntervals,
@@ -59,6 +60,11 @@ describe("transitsAt", () => {
     const a = transitsAt(t, DEFAULT_PRESET);
     expect(transitsAt(t, DEFAULT_PRESET)).toEqual(a);
     expect((a.KE.lonSidereal - a.RA.lonSidereal + 360) % 360).toBeCloseTo(180, 9);
+  });
+  it("moonTransitAt equals transitsAt(...).MO, and differs a day later", () => {
+    const t = Date.UTC(2026, 9, 12, 6);
+    expect(moonTransitAt(t, DEFAULT_PRESET)).toEqual(transitsAt(t, DEFAULT_PRESET).MO);
+    expect(moonTransitAt(t + MS_PER_DAY, DEFAULT_PRESET).lonSidereal).not.toBeCloseTo(moonTransitAt(t, DEFAULT_PRESET).lonSidereal, 1);
   });
 });
 

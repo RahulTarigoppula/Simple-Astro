@@ -6,6 +6,7 @@ import { computePatri, REFERENCE_PROFILE } from "../../engine/patri";
 import { DEFAULT_PRESET, type Patri } from "../../engine/types";
 import { BANNED_WORDS } from "../../test/banned-words";
 import { fmtDate, yearSpan } from "./format";
+import { forgetSadeSati } from "./GocharSection";
 import { DailyStrengthCard, GocharSection, gocharReadings } from "./index";
 
 const NOW = Date.UTC(2026, 9, 12, 6); // 12 Oct 2026, 11:30 IST
@@ -33,8 +34,24 @@ describe("format", () => {
 });
 
 describe("GocharSection", () => {
-  it("renders the band, a nine-row ledger with text marks, and cited readings", () => {
+  it("reckons Śani's spells after first paint, with an ink line meanwhile", async () => {
+    forgetSadeSati();
     const { container } = render(<GocharSection patri={patri} nowMs={NOW} zone="Asia/Kolkata" />);
+    expect(screen.getByRole("status")).toHaveTextContent(/Reckoning Śani's spells/);
+    expect(container.querySelector(".ink-wait")).not.toBeNull();
+    expect(screen.queryAllByRole("tab")).toHaveLength(0);
+    expect(await screen.findAllByRole("tab", {}, { timeout: 5000 })).not.toHaveLength(0);
+    expect(container.querySelector(".ink-wait")).toBeNull();
+  });
+
+  it("is instant on a revisit (the spells are kept for the session)", () => {
+    render(<GocharSection patri={patri} nowMs={NOW} zone="Asia/Kolkata" />);
+    expect(screen.getAllByRole("tab").length).toBeGreaterThan(0);
+  });
+
+  it("renders the band, a nine-row ledger with text marks, and cited readings", async () => {
+    const { container } = render(<GocharSection patri={patri} nowMs={NOW} zone="Asia/Kolkata" />);
+    await screen.findAllByRole("tab", {}, { timeout: 5000 });
     expect(screen.getByRole("heading", { name: /Transits now/ })).toBeInTheDocument();
     const table = screen.getByRole("table");
     const rows = within(table).getAllByRole("row");
@@ -55,9 +72,9 @@ describe("GocharSection", () => {
     for (const el of container.querySelectorAll("[lang]")) expect(["hi", "sa"]).toContain(el.getAttribute("lang"));
   });
 
-  it("opens on the running Sāḍe-sātī and its tabs are keyboard-navigable", () => {
+  it("opens on the running Sāḍe-sātī and its tabs are keyboard-navigable", async () => {
     render(<GocharSection patri={patri} nowMs={NOW} zone="Asia/Kolkata" />);
-    const tabs = screen.getAllByRole("tab");
+    const tabs = await screen.findAllByRole("tab", {}, { timeout: 5000 });
     const selected = tabs.find((t) => t.getAttribute("aria-selected") === "true");
     expect(selected?.getAttribute("aria-label")).toMatch(/Sāḍe-sātī, 29 Apr 2022 .* running now/);
     expect(selected?.tabIndex).toBe(0);
@@ -86,6 +103,70 @@ describe("GocharSection", () => {
     expect(rs.find((r) => r.key === "short")).toBeUndefined();
     const inAshtama = gocharReadings(gocharReport(patri, Date.UTC(2013, 0, 1)), ss, Date.UTC(2013, 0, 1), "UTC");
     expect(inAshtama.find((r) => r.key === "short")?.text).toMatch(/^Tradition says Śani in the 8th/);
+  });
+});
+
+describe("Śani stepped back by retrogression", () => {
+  const birth = REFERENCE_PROFILE.birth.utcMs;
+  const at = Date.UTC(2022, 8, 1); // Sep 2022: Śani back in Makara for a while, inside the 2022–30 spell
+  it("names the return sign and date instead of a broken phase", () => {
+    const ss = sadeSati(patri, birth - 3 * YEAR, birth + 92 * YEAR);
+    const running = ss.spells.find((s) => s.kind === "sade-sati" && at >= s.startMs && at < s.endMs);
+    expect(running).toBeDefined();
+    expect(running?.intervals.some((i) => at >= i.startMs && at < i.endMs)).toBe(false);
+    const sade = gocharReadings(gocharReport(patri, at), ss, at, "Asia/Kolkata").find((r) => r.key === "sade");
+    expect(sade?.text).toMatch(/stepped back out of these signs by retrogression and returns to Kumbha on \d{1,2} \w{3} 2023/);
+    expect(sade?.text).not.toMatch(/its ,/);
+  });
+  it("the ribbon tab says paused, not running now", async () => {
+    render(<GocharSection patri={patri} nowMs={at} zone="Asia/Kolkata" />);
+    const tabs = await screen.findAllByRole("tab", {}, { timeout: 5000 });
+    const labels = tabs.map((t) => t.getAttribute("aria-label") ?? "");
+    expect(labels.some((l) => /paused — Śani stepped back/.test(l))).toBe(true);
+    expect(labels.some((l) => /running now/.test(l))).toBe(false);
+  });
+});
+
+describe("SadeSatiRibbon", () => {
+  it("prints every spell's phases in a print-only table", async () => {
+    const { container } = render(<GocharSection patri={patri} nowMs={NOW} zone="Asia/Kolkata" />);
+    await screen.findAllByRole("tab", {}, { timeout: 5000 });
+    const table = container.querySelector("table.print-only");
+    expect(table).not.toBeNull();
+    expect(table?.textContent).toMatch(/dates in Asia\/Kolkata/);
+    expect(table?.textContent).toMatch(/Sāḍe-sātī · Peak/);
+    expect(table?.textContent).toMatch(/29 Mar 2025 → 3 Jun 2027/);
+  });
+  it("starts afresh on another patri", async () => {
+    const other = computePatri(
+      {
+        ...REFERENCE_PROFILE,
+        id: "other-leaf",
+        birth: {
+          ...REFERENCE_PROFILE.birth,
+          utcMs: REFERENCE_PROFILE.birth.utcMs + 200 * MS_PER_DAY,
+          jdUt: REFERENCE_PROFILE.birth.jdUt + 200,
+        },
+      },
+      DEFAULT_PRESET,
+      0,
+    );
+    const { rerender } = render(<GocharSection patri={patri} nowMs={NOW} zone="Asia/Kolkata" />);
+    const tabs = await screen.findAllByRole("tab", {}, { timeout: 5000 });
+    const last = tabs[tabs.length - 1];
+    if (!last) throw new Error("no tab");
+    fireEvent.keyDown(tabs.find((t) => t.tabIndex === 0) as HTMLElement, { key: "End" });
+    expect(last.getAttribute("aria-selected")).toBe("true");
+    rerender(<GocharSection patri={other} nowMs={NOW} zone="Asia/Kolkata" />);
+    const fresh = await screen.findAllByRole("tab", {}, { timeout: 5000 });
+    const sel = fresh.filter((t) => t.getAttribute("aria-selected") === "true");
+    expect(sel).toHaveLength(1);
+    // the opening spell for the new leaf: the one running at NOW, or else the next one
+    const ob = other.jdUt;
+    const birthMs = Math.round((ob - 2440587.5) * MS_PER_DAY);
+    const os = sadeSati(other, birthMs - 3 * YEAR, birthMs + 92 * YEAR).spells.filter((s) => s.endMs > birthMs);
+    const open = os.find((s) => NOW >= s.startMs && NOW < s.endMs) ?? os.find((s) => s.startMs > NOW);
+    expect(sel[0]?.getAttribute("aria-label")).toContain(fmtDate(open?.startMs ?? 0, "Asia/Kolkata"));
   });
 });
 

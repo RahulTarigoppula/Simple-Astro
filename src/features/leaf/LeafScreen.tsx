@@ -126,6 +126,10 @@ export default function LeafScreen() {
 
   const offsetOverrideMin = draft.override === "bombay" ? BOMBAY_TIME : draft.override === "manual" ? draft.manualOffsetMin : undefined;
 
+  // With the clock time unknown the leaf is cast for 12:00 local; every reading of the drums uses this.
+  const effH = draft.timeUnknown ? 12 : draft.h;
+  const effMi = draft.timeUnknown ? 0 : draft.mi;
+
   // Resolve the written moment: the engraved strip is the contract with reality.
   const resolved = useMemo((): { m: BirthMoment | null; err: EngineError | null; status: string } => {
     try {
@@ -133,8 +137,8 @@ export default function LeafScreen() {
         localY: draft.y,
         localMo: draft.mo,
         localD: draft.d,
-        localH: draft.timeUnknown ? 12 : draft.h,
-        localMi: draft.timeUnknown ? 0 : draft.mi,
+        localH: effH,
+        localMi: effMi,
         place: draft.place,
         ...(offsetOverrideMin != null ? { offsetOverrideMin } : {}),
       });
@@ -142,14 +146,14 @@ export default function LeafScreen() {
     } catch (e) {
       return { m: null, err: e instanceof EngineError ? e : new EngineError("TIME_INVALID", String(e)), status: "err" };
     }
-  }, [draft.y, draft.mo, draft.d, draft.h, draft.mi, draft.timeUnknown, draft.place, offsetOverrideMin]);
+  }, [draft.y, draft.mo, draft.d, effH, effMi, draft.place, offsetOverrideMin]);
 
   // The sky follows the hour drum continuously (sky-scrub); the Lagna re-solves every frame.
   const skyMs = useMemo(() => {
     if (!resolved.m) return Date.now();
-    if (scrubH == null) return resolved.m.utcMs;
-    return resolved.m.utcMs + (scrubH - draft.h) * 3_600_000;
-  }, [resolved.m, scrubH, draft.h]);
+    if (scrubH == null || draft.timeUnknown) return resolved.m.utcMs;
+    return resolved.m.utcMs + (scrubH - effH) * 3_600_000;
+  }, [resolved.m, scrubH, effH, draft.timeUnknown]);
 
   const lg = useMemo(() => {
     if (!resolved.m) return null;
@@ -170,8 +174,8 @@ export default function LeafScreen() {
 
   const localStatus = useMemo(() => {
     if (offsetOverrideMin != null || !resolved.m) return null;
-    return checkLocalTime(draft.y, draft.mo, draft.d, draft.h, draft.mi, resolved.m.zone);
-  }, [offsetOverrideMin, resolved.m, draft.y, draft.mo, draft.d, draft.h, draft.mi]);
+    return checkLocalTime(draft.y, draft.mo, draft.d, effH, effMi, resolved.m.zone);
+  }, [offsetOverrideMin, resolved.m, draft.y, draft.mo, draft.d, effH, effMi]);
 
   const seal = async () => {
     if (!resolved.m) {
@@ -315,13 +319,23 @@ export default function LeafScreen() {
             max={23}
             value={draft.h}
             calm={settings.calmDesk}
+            disabled={draft.timeUnknown}
             onChange={(v) => {
               set("h", v);
               setScrubH(null);
             }}
             onScrub={(pos) => setScrubH(pos)}
           />
-          <BrassDrum label="Minute" short="mm" min={0} max={59} value={draft.mi} calm={settings.calmDesk} onChange={(v) => set("mi", v)} />
+          <BrassDrum
+            label="Minute"
+            short="mm"
+            min={0}
+            max={59}
+            value={draft.mi}
+            calm={settings.calmDesk}
+            disabled={draft.timeUnknown}
+            onChange={(v) => set("mi", v)}
+          />
         </div>
         {draft.timeUnknown ? (
           <p className="note-haldi" role="status">
@@ -330,7 +344,7 @@ export default function LeafScreen() {
           </p>
         ) : null}
         <p className="vh" aria-live="polite">
-          {`${draft.d} ${MONTHS[draft.mo - 1] ?? ""} ${draft.y}, ${String(draft.h).padStart(2, "0")}:${String(draft.mi).padStart(2, "0")}`}
+          {`${draft.d} ${MONTHS[draft.mo - 1] ?? ""} ${draft.y}, ${String(effH).padStart(2, "0")}:${String(effMi).padStart(2, "0")}${draft.timeUnknown ? " (time unknown, cast for noon)" : ""}`}
         </p>
 
         <div className="field leaf-place">

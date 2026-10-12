@@ -42,7 +42,9 @@ export function SadeSatiRibbon({ result, birthMs, nowMs, zone }: SadeSatiRibbonP
   const nowIdx = spells.findIndex((s) => nowMs >= s.startMs && nowMs < s.endMs);
   const nextIdx = spells.findIndex((s) => s.startMs > nowMs);
   const initial = nowIdx >= 0 ? nowIdx : nextIdx >= 0 ? nextIdx : 0;
-  const [sel, setSel] = useState(initial);
+  const [picked, setSel] = useState(initial);
+  // The parent keys this ribbon on the leaf and preset, so a new patri starts afresh; clamp anyway.
+  const sel = Math.min(picked, Math.max(0, spells.length - 1));
   const tabs = useRef<Array<HTMLButtonElement | null>>([]);
   const chosen = spells[sel];
 
@@ -136,7 +138,9 @@ export function SadeSatiRibbon({ result, birthMs, nowMs, zone }: SadeSatiRibbonP
       ) : (
         <div className="ribbon gochar-rib__tabs" role="tablist" aria-label="Śani's spells from the Moon sign">
           {spells.map((s, i) => {
-            const isNow = i === nowIdx;
+            // A spell can be "running" while Śani has retrograded back out of its signs for a while.
+            const inside = i === nowIdx && s.intervals.some((iv) => nowMs >= iv.startMs && nowMs < iv.endMs);
+            const paused = i === nowIdx && !inside;
             return (
               <button
                 key={s.startMs}
@@ -150,8 +154,8 @@ export function SadeSatiRibbon({ result, birthMs, nowMs, zone }: SadeSatiRibbonP
                 aria-expanded={i === sel}
                 aria-controls="gochar-spell-panel"
                 tabIndex={i === sel ? 0 : -1}
-                className={isNow ? "is-now" : undefined}
-                aria-label={`${SPELL_LABEL[s.kind]}, ${fmtDate(s.startMs, zone)} to ${fmtDate(s.endMs, zone)}${isNow ? ", running now" : ""}`}
+                className={inside ? "is-now" : undefined}
+                aria-label={`${SPELL_LABEL[s.kind]}, ${fmtDate(s.startMs, zone)} to ${fmtDate(s.endMs, zone)}${inside ? ", running now" : paused ? ", paused — Śani stepped back" : ""}`}
                 onClick={() => pick(i)}
                 onKeyDown={(e) => onKey(e, i)}
               >
@@ -166,6 +170,36 @@ export function SadeSatiRibbon({ result, birthMs, nowMs, zone }: SadeSatiRibbonP
       )}
 
       {chosen ? <SpellFold spell={chosen} nowMs={nowMs} zone={zone} /> : null}
+
+      {spells.length > 0 ? (
+        <table className="ledger print-only gochar-rib__print" aria-hidden="true">
+          <caption>Śani's spells from the Moon sign; dates in {zone}.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Phase</th>
+              <th scope="col">Sign</th>
+              <th scope="col">From → to</th>
+            </tr>
+          </thead>
+          <tbody>
+            {spells.flatMap((s) =>
+              s.intervals.map((iv) => (
+                <tr key={`${s.startMs}-${iv.startMs}`}>
+                  <td>{s.kind === "sade-sati" ? `${SPELL_LABEL[s.kind]} · ${PHASE_LABEL[iv.phase]}` : SPELL_LABEL[s.kind]}</td>
+                  <td>
+                    {SIGN_NAMES[iv.sign]} ({ORDINAL(PHASE_HOUSE[iv.phase])})
+                  </td>
+                  <td className="num">
+                    {iv.startClipped ? "before " : ""}
+                    {fmtDate(iv.startMs, zone)} → {iv.endClipped ? "beyond " : ""}
+                    {fmtDate(iv.endMs, zone)}
+                  </td>
+                </tr>
+              )),
+            )}
+          </tbody>
+        </table>
+      ) : null}
     </div>
   );
 }

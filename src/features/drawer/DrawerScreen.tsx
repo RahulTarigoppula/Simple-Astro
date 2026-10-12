@@ -17,6 +17,7 @@ import { saveFile } from "../../platform/files";
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
 import { toast } from "../../state/ui";
+import { zoneClock } from "../today/zone";
 import "./drawer.css";
 
 const HEAVY_SCREENS = import.meta.glob(["../hast/*Screen.tsx", "../sky/*Screen.tsx"]);
@@ -441,7 +442,7 @@ export default function DrawerScreen() {
           <p className="p p--muted">
             Export is always encrypted with your passphrase (PBKDF2, 600 000 rounds). There is no unencrypted export.
           </p>
-          <BackupAge />
+          <BackupAge zone={active?.birth.zone ?? null} />
           <div className="tools">
             <button type="button" className="linkish" onClick={() => setMode("export")}>
               Export the drawer ▸
@@ -551,18 +552,29 @@ export default function DrawerScreen() {
   );
 }
 
+const leaves = (n: number): string => (n === 1 ? "1 leaf lives" : `${n} leaves live`);
+
+/** The backup line: counted in calendar days in `zone` (the active leaf's), not in 24-hour spans.
+ *  Exported for tests. */
+export function backupAge(count: number, lastMs: number | null, nowMs: number, zone: string): { days: number | null; text: string } {
+  if (lastMs === null) {
+    return {
+      days: null,
+      text: `${leaves(count)} only on this device and ${count === 1 ? "has" : "have"} never been sealed in an envelope.`,
+    };
+  }
+  const clock = zoneClock(zone);
+  const days = Math.max(0, clock.dayNumber(nowMs) - clock.dayNumber(lastMs));
+  const when = days === 0 ? "today" : days === 1 ? "yesterday" : `${days} days ago`;
+  return { days, text: `Last sealed in an envelope ${when}.` };
+}
+
 /** When was the drawer last sealed in an envelope? Leaves live only on this device. */
-function BackupAge() {
+function BackupAge({ zone }: { zone: string | null }) {
   const last = useLiveQuery(async () => (await db.meta.get("lastExportAt"))?.value ?? null, []);
   const count = useLiveQuery(() => db.profiles.count(), []);
   if (last === undefined || !count) return null;
-  const days = last ? Math.floor((Date.now() - last) / 86_400_000) : null;
-  const text =
-    days === null
-      ? `${count} leaf${count > 1 ? "s live" : " lives"} only on this device and ${count > 1 ? "have" : "has"} never been sealed in an envelope.`
-      : days === 0
-        ? "Last sealed in an envelope today."
-        : `Last sealed in an envelope ${days} day${days > 1 ? "s" : ""} ago.`;
+  const { days, text } = backupAge(count, last, Date.now(), zone ?? Intl.DateTimeFormat().resolvedOptions().timeZone);
   return days === null || days > 30 ? (
     <p className="note-haldi">
       <span aria-hidden="true">⚑</span>

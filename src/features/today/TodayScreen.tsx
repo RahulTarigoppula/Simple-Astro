@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 import { useActiveProfile, usePatri, useSettings } from "../../app/hooks";
+import { useNowMs } from "../../app/useNow";
+import { useWide } from "../../app/useWide";
 import { Colophon } from "../../components/ui/Colophon";
 import { Screen } from "../../components/ui/Screen";
 import { Sheet } from "../../components/ui/Sheet";
@@ -23,7 +25,6 @@ import { ayanaDev, ayanaLatin, karanaDev, masaDev, rituDev, tithiDev, yogaDev } 
 import { MonthGrid, type Ymd } from "./MonthGrid";
 import { MoonPager } from "./MoonPager";
 import { ChoghadiyaPanel, HoraPanel } from "./Periods";
-import { useWide } from "./useWide";
 import { endsLabel, rangeLabel, type ZoneClock, zoneClock } from "./zone";
 import "./today.css";
 
@@ -467,7 +468,7 @@ function Tabs({ tabs, tab, onTab }: { tabs: ReadonlyArray<{ id: Tab; label: stri
           type="button"
           role="tab"
           aria-selected={tab === t.id}
-          aria-controls={`panel-${t.id}`}
+          aria-controls={tab === t.id ? `panel-${t.id}` : undefined}
           tabIndex={tab === t.id ? 0 : -1}
           onClick={() => onTab(t.id)}
         >
@@ -486,7 +487,10 @@ export default function TodayScreen() {
   const presetRef = useRef(settings.preset);
   if (PRESET_HASH(presetRef.current) !== PRESET_HASH(settings.preset)) presetRef.current = settings.preset;
   const preset = presetRef.current;
-  const [baseMs] = useState(() => Date.now());
+  // The base instant is the moment the leaf was opened; a 30 s tick moves "now" (the dial hand and
+  // the Choghaḍiyā/Horā highlight) and, once it passes the next sunrise, re-bases on the new day.
+  const [baseMs, setBaseMs] = useState(() => Date.now());
+  const tickMs = useNowMs(30_000);
   const [offset, setOffset] = useState(0);
   const [foot, setFoot] = useState<Foot | null>(null);
   const [tabSel, setTab] = useState<Tab>("day");
@@ -522,6 +526,11 @@ export default function TodayScreen() {
     }
   }, [place, base, baseMs, offset, preset]);
 
+  const nextSunriseMs = base?.nextSunriseMs ?? null;
+  useEffect(() => {
+    if (offset === 0 && nextSunriseMs !== null && tickMs >= nextSunriseMs) setBaseMs(tickMs);
+  }, [offset, nextSunriseMs, tickMs]);
+
   // A different leaf or preset starts again from today.
   const placeKey = place ? `${place.lat}|${place.lon}|${place.zone}` : "";
   useEffect(() => {
@@ -551,7 +560,7 @@ export default function TodayScreen() {
         : null,
     [p],
   );
-  const nowMs = offset === 0 && leaf ? leaf.atMs : null;
+  const nowMs = offset === 0 && leaf ? Math.max(leaf.atMs, tickMs) : null;
 
   // The month on show follows the leaf; the ‹ › buttons may wander from it.
   const leafYmd = p ? ymdOf(clock, p.sunriseMs) : null;
@@ -613,7 +622,7 @@ export default function TodayScreen() {
                   sunriseH={clock.hours(p.sunriseMs)}
                   sunsetH={clock.hours(p.sunsetMs)}
                   rahuH={[clock.hours(p.rahuKaal[0]), clock.hours(p.rahuKaal[1])]}
-                  nowH={clock.hours(leaf.atMs)}
+                  nowH={clock.hours(nowMs ?? leaf.atMs)}
                   elongation={p.elongation}
                   moonSid={leaf.moonSid}
                   nakIndex={p.nakshatra.index}
@@ -638,9 +647,9 @@ export default function TodayScreen() {
 
         <article className="paper paper--cut sheet-col today__sheet" aria-labelledby="today-h">
           <TurmericBand id="today-h" level={1} dev={head.dev} title={head.title} meta={p ? clock.dateShort(p.sunriseMs) : undefined} />
-          {active && activePatri ? (
+          {active && activePatri && activePatri.profileId === active.id ? (
             <div className="today__mine">
-              <DailyStrengthCard patri={activePatri} nowMs={Date.now()} zone={active.birth.zone} />
+              <DailyStrengthCard patri={activePatri} nowMs={tickMs} zone={active.birth.zone} />
             </div>
           ) : null}
           {place ? (

@@ -2,7 +2,7 @@
 // running daśā (MD · AD · PD) with a thin rule for the pratyantar's elapsed share. ≤ 120 px tall.
 import { useMemo } from "react";
 import { GRAHA_NAMES, ORDINAL } from "../../data/tables/names";
-import { chandraBala, currentDashaSummary, taraBala, transitsAt } from "../../engine/gochar";
+import { chandraBala, currentDashaSummary, moonTransitAt, taraBala } from "../../engine/gochar";
 import type { Patri } from "../../engine/types";
 import { fmtDate, fmtDayMonthEngraved } from "./format";
 import "./gochar.css";
@@ -17,7 +17,7 @@ const TONE_TEXT = { kind: "kind", unkind: "asks care", mixed: "mixed" } as const
 const TONE_MARK = { kind: "✓", unkind: "·", mixed: "~" } as const;
 
 export function DailyStrengthCard({ patri, nowMs, zone }: DailyStrengthCardProps) {
-  const moonNow = useMemo(() => transitsAt(nowMs, patri.preset).MO, [nowMs, patri.preset]);
+  const moonNow = useMemo(() => moonTransitAt(nowMs, patri.preset), [nowMs, patri.preset]);
   const tara = taraBala(patri.grahas.MO.nakshatra, moonNow.nakshatra);
   const chandra = chandraBala(patri.grahas.MO.sign, moonNow.sign);
   const dasha = useMemo(() => currentDashaSummary(patri, nowMs), [patri, nowMs]);

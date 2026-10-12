@@ -1,9 +1,10 @@
 // Guna Milan (§4.9): two small scrolls tied with a mauli thread, the score, and the 36-bead mala.
 // Every bead, number and word of judgement here is milan()'s output — nothing is typed in.
 import { motion } from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
+import { useWide } from "../../app/useWide";
 import { Colophon, DISCLAIMER } from "../../components/ui/Colophon";
 import { Screen } from "../../components/ui/Screen";
 import { Sheet } from "../../components/ui/Sheet";
@@ -44,25 +45,6 @@ const moonOfPatri = (p: Patri): MoonFacts => ({ nak: p.grahas.MO.nakshatra, pada
 export function manglikLabel(m: ManglikStatus): string {
   if (!m.present) return "no Manglik mark";
   return `Manglik (from ${m.from.map((f) => MANGLIK_REF_LABEL[f]).join(", ")})${m.cancellations.length > 0 ? " — bhaṅga noted" : ""}`;
-}
-
-const WIDE = "(min-width: 900px)";
-/** True at desktop widths; the side-by-side charts are only mounted there. */
-function useWide(): boolean {
-  const [wide, setWide] = useState(() => typeof window !== "undefined" && window.matchMedia?.(WIDE).matches === true);
-  useEffect(() => {
-    const mq = window.matchMedia?.(WIDE);
-    if (!mq) return;
-    const on = () => setWide(mq.matches);
-    on();
-    mq.addEventListener("change", on);
-    window.addEventListener("resize", on);
-    return () => {
-      mq.removeEventListener("change", on);
-      window.removeEventListener("resize", on);
-    };
-  }, []);
-  return wide;
 }
 
 const bodiesOfPatri = (p: Patri): ChartBody[] =>

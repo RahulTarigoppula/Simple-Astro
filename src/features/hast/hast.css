@@ -46,40 +46,6 @@
   font-size: var(--text-sm);
   color: var(--ink-muted);
 }
-.ink-wait {
-  height: 2px;
-  margin: var(--space-3) var(--paper-margin) 0;
-  overflow: hidden;
-  position: relative;
-}
-.ink-wait::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--ink);
-  transform-origin: left;
-  animation: ink-wait 1.2s var(--ease-in-out) infinite;
-}
-@keyframes ink-wait {
-  0% {
-    transform: scaleX(0);
-  }
-  60% {
-    transform: scaleX(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scaleX(1);
-    opacity: 0;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ink-wait::after {
-    animation: none;
-    opacity: 0.6;
-  }
-}
-
 /* ── Capture (full-bleed, indigo cloth) ─────────────────────────────── */
 .capture {
   display: flex;

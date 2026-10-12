@@ -1,22 +1,25 @@
 // Zone-true date labels for the gochar components (never the device zone).
 const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
 
-function safeZone(zone: string): string {
-  try {
-    new Intl.DateTimeFormat("en-GB", { timeZone: zone });
-    return zone;
-  } catch {
-    return "UTC";
+const FMT = new Map<string, Intl.DateTimeFormat>();
+
+/** One formatter per zone (an unknown zone falls back to UTC), built once and reused. */
+function fmtFor(zone: string): Intl.DateTimeFormat {
+  let f = FMT.get(zone);
+  if (!f) {
+    const opts = { year: "numeric", month: "numeric", day: "numeric" } as const;
+    try {
+      f = new Intl.DateTimeFormat("en-GB", { ...opts, timeZone: zone });
+    } catch {
+      f = new Intl.DateTimeFormat("en-GB", { ...opts, timeZone: "UTC" });
+    }
+    FMT.set(zone, f);
   }
+  return f;
 }
 
 function parts(ms: number, zone: string): { y: number; m: number; d: number } {
-  const ps = new Intl.DateTimeFormat("en-GB", {
-    timeZone: safeZone(zone),
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-  }).formatToParts(ms);
+  const ps = fmtFor(zone).formatToParts(ms);
   const get = (t: string): number => Number(ps.find((p) => p.type === t)?.value ?? 0);
   return { y: get("year"), m: get("month"), d: get("day") };
 }

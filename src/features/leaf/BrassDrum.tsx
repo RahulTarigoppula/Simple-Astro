@@ -25,6 +25,8 @@ interface BrassDrumProps {
   /** Continuous position while dragging/coasting (for the sky scrub). */
   onScrub?: (pos: number) => void;
   format?: (v: number) => string;
+  /** Set aside (e.g. the hour and minute when the clock time is unknown): dimmed, no drag, no keys. */
+  disabled?: boolean;
 }
 
 export function BrassDrum({
@@ -40,6 +42,7 @@ export function BrassDrum({
   onChange,
   onScrub,
   format,
+  disabled = false,
 }: BrassDrumProps) {
   const el = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
@@ -174,7 +177,7 @@ export function BrassDrum({
   return (
     <div
       ref={el}
-      className={`drum${refused ? " is-refused" : ""}`}
+      className={`drum${refused ? " is-refused" : ""}${disabled ? " is-disabled" : ""}`}
       style={{ flex }}
       role="spinbutton"
       tabIndex={0}
@@ -184,8 +187,9 @@ export function BrassDrum({
       aria-valuenow={shown}
       aria-valuetext={`${label} ${fmt(shown)}`}
       aria-invalid={refused || undefined}
+      aria-disabled={disabled || undefined}
       onPointerDown={(e) => {
-        if (typing) return;
+        if (typing || disabled) return;
         e.currentTarget.setPointerCapture(e.pointerId);
         cancelAnimationFrame(raf.current);
         raf.current = 0;
@@ -218,9 +222,11 @@ export function BrassDrum({
         drag.current = null;
         settle(pos.current);
       }}
-      onDoubleClick={() => setTyping(true)}
+      onDoubleClick={() => {
+        if (!disabled) setTyping(true);
+      }}
       onKeyDown={(e) => {
-        if (typing) return;
+        if (typing || disabled) return;
         const k = e.key;
         if (k === "ArrowUp" || k === "ArrowRight") nudge(1);
         else if (k === "ArrowDown" || k === "ArrowLeft") nudge(-1);
