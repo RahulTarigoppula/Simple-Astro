@@ -8,7 +8,17 @@ import { Sheet } from "../../components/ui/Sheet";
 import { TurmericBand } from "../../components/ui/TurmericBand";
 import { useHold } from "../../components/ui/useHold";
 import { saveSettings } from "../../data/repo";
-import { GRAHA_ENGLISH, NAKSHATRA_DEV, NAKSHATRA_NAMES, SIGN_DEV, SIGN_ENGRAVED, SIGN_MARK, SIGN_NAMES } from "../../data/tables/names";
+import {
+  GRAHA_ABBR_LAT,
+  GRAHA_ENGLISH,
+  GRAHA_NAMES,
+  NAKSHATRA_DEV,
+  NAKSHATRA_NAMES,
+  SIGN_DEV,
+  SIGN_ENGRAVED,
+  SIGN_MARK,
+  SIGN_NAMES,
+} from "../../data/tables/names";
 import { boundaryNote, PRESET_SHORT } from "../../engine/boundary";
 import { formatDms } from "../../engine/math";
 import { addVarga } from "../../engine/patri";
@@ -16,7 +26,7 @@ import { formatOffset } from "../../engine/time";
 import { type EnginePreset, type GrahaId, type Patri, PRESET_HASH, type VargaNumber, type YogaHit } from "../../engine/types";
 import { VARGA_NAMES } from "../../engine/vargas";
 import { haptics } from "../../platform/haptics";
-import { reducedMotion } from "../../platform/native";
+import { isNative, reducedMotion } from "../../platform/native";
 import { play, rustle } from "../../platform/sound";
 import { ChartFigure } from "./ChartFigure";
 import { DashaRibbon } from "./DashaRibbon";
@@ -319,6 +329,8 @@ export default function PatriScreen() {
                 setFoot={setFoot}
                 nowMs={nowMs}
                 profileId={profile?.id ?? ""}
+                devDigits={settings.devanagariDigits}
+                name={profile?.name ?? ""}
               />
             ) : (
               <div className="figure" aria-busy="true">
@@ -382,6 +394,8 @@ interface BodyProps {
   setFoot: (f: Foot) => void;
   nowMs: number;
   profileId: string;
+  devDigits: boolean;
+  name: string;
 }
 
 function PatriBody({
@@ -400,6 +414,8 @@ function PatriBody({
   setFoot,
   nowMs,
   profileId,
+  devDigits,
+  name,
 }: BodyProps) {
   const pc = patri.birthPanchang;
   const p = patri.preset;
@@ -495,7 +511,13 @@ function PatriBody({
       </p>
 
       <TurmericBand dev="ग्रह" title="Grahas" meta={`sidereal · ${PRESET_SHORT[p.ayanamsa]}`} />
-      <GrahaLedger patri={patri} lit={lit} onRead={(g) => setLit(g)} onBoundary={(id) => setFoot({ kind: "boundary", id })} />
+      <GrahaLedger
+        devDigits={devDigits}
+        patri={patri}
+        lit={lit}
+        onRead={(g) => setLit(g)}
+        onBoundary={(id) => setFoot({ kind: "boundary", id })}
+      />
       {Object.values(patri.grahas).some((g) => g.boundary) || patri.lagna.boundary ? (
         <p className="note-haldi">
           <span aria-hidden="true">⚑</span>
@@ -551,6 +573,19 @@ function PatriBody({
 
       <TurmericBand dev="दशा" title="Viṃśottarī" meta={`${p.dashaYearDays} d year`} />
       <DashaRibbon tree={patri.dasha} nowMs={nowMs} zone={zone} yearDays={p.dashaYearDays} />
+      <table className="ledger print-only" aria-hidden="true">
+        <tbody>
+          {patri.dasha.map((md) => (
+            <tr key={md.startMs}>
+              <td>{GRAHA_NAMES[md.lord]}</td>
+              <td className="num">
+                {fullDate(md.startMs, zone)} → {fullDate(md.endMs, zone)}
+              </td>
+              <td className="pd">{(md.children ?? []).map((ad) => GRAHA_ABBR_LAT[ad.lord]).join(" · ")}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       <TurmericBand dev="योग" title="Yogas" meta={`${patri.yogas.filter((y) => y.strength !== "cancelled").length} formed`} />
       {patri.yogas.length === 0 ? <p className="p p--muted">No classical yoga in the rule set fires for this chart.</p> : null}
@@ -594,6 +629,20 @@ function PatriBody({
         <Link className="linkish" to={`/leaf/${profileId}/edit`}>
           Edit this leaf
         </Link>
+        {isNative() ? null : (
+          <button
+            type="button"
+            className="linkish"
+            onClick={() => {
+              const before = document.title;
+              document.title = `Janam Patri — ${name}`;
+              window.addEventListener("afterprint", () => (document.title = before), { once: true });
+              window.print();
+            }}
+          >
+            Print · save as PDF
+          </button>
+        )}
       </div>
 
       <Colophon

@@ -2020,3 +2020,93 @@ dialog.sheet-dialog::backdrop {
   font-size: var(--text-sm);
   border-bottom: 2px solid var(--accent);
 }
+
+/* Devanagari digits are Tiro, not mono: they sit in the ledger cells at text size. */
+.ledger .num--dev {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-variant-numeric: normal;
+}
+
+/* ── Print: the patri as a manuscript on plain paper (save as PDF from the browser) ───────── */
+.print-only {
+  display: none;
+}
+@media print {
+  @page {
+    margin: 14mm 12mm;
+  }
+  html,
+  body {
+    background: white !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+  .desk,
+  .screens,
+  .screen,
+  .patri,
+  .scrollport {
+    position: static !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: none !important;
+    inset: auto !important;
+  }
+  .desk::after,
+  .ledge,
+  .roller,
+  .seal-slot,
+  .loupe,
+  .readout,
+  .chart-tools,
+  .varga-pager,
+  .ribbon,
+  .fold,
+  .patri-links,
+  .toast-wrap,
+  .sw-tab,
+  .note-haldi,
+  .hit-layer,
+  .desk__top {
+    display: none !important;
+  }
+  .print-only {
+    display: table;
+  }
+  .paper {
+    box-shadow: none !important;
+    background: white !important;
+  }
+  .paper::before {
+    display: none;
+  }
+  .sheet {
+    max-width: none;
+    transform: none !important;
+  }
+  .screen-enter {
+    animation: none !important;
+  }
+  .band {
+    break-after: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .figure,
+  .yoga,
+  .ledger tr,
+  .colophon {
+    break-inside: avoid;
+  }
+  .chart-wrap {
+    max-width: 120mm;
+  }
+  .chart .stroke {
+    stroke-dashoffset: 0 !important;
+  }
+  .chart [data-settle] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

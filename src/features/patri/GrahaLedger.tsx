@@ -1,14 +1,16 @@
+import { digitsFor } from "../../app/digits";
 import { GRAHA_ABBR_DEV, GRAHA_ABBR_LAT, GRAHA_ENGLISH, GRAHA_NAMES, NAKSHATRA_SHORT, SIGN_NAMES } from "../../data/tables/names";
 import { dms, formatArcmin } from "../../engine/math";
 import { GRAHA_IDS, type GrahaId, type Patri } from "../../engine/types";
 
-function Degree({ x }: { x: number }) {
+function Degree({ x, dev }: { x: number; dev: boolean }) {
   const [d, m, s] = dms(x);
+  const n = digitsFor(dev);
   return (
-    <span className="num">
-      {d}°{String(m).padStart(2, "0")}
+    <span className={dev ? "num num--dev" : "num"} lang={dev ? "hi" : undefined}>
+      {n(d)}°{n(String(m).padStart(2, "0"))}
       <span className="min">′</span>
-      {String(s).padStart(2, "0")}
+      {n(String(s).padStart(2, "0"))}
       <span className="sec">″</span>
     </span>
   );
@@ -19,10 +21,11 @@ interface GrahaLedgerProps {
   lit: GrahaId | null;
   onRead: (g: GrahaId) => void;
   onBoundary: (g: GrahaId | "LAGNA") => void;
+  devDigits?: boolean;
 }
 
 /** The graha ledger: tabular degrees, ′ ″ muted, ℞, and the vermilion asterisk ONLY within 2′ of an edge. */
-export function GrahaLedger({ patri, lit, onRead, onBoundary }: GrahaLedgerProps) {
+export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false }: GrahaLedgerProps) {
   const L = patri.lagna;
   return (
     <table className="ledger">
@@ -46,7 +49,7 @@ export function GrahaLedger({ patri, lit, onRead, onBoundary }: GrahaLedgerProps
           </th>
           <td>{SIGN_NAMES[L.sign]}</td>
           <td>
-            <Degree x={L.degInSign} />
+            <Degree x={L.degInSign} dev={devDigits} />
           </td>
           <td>
             {NAKSHATRA_SHORT[L.nakshatra]} <span className="pd">{L.pada}</span>
@@ -89,7 +92,7 @@ export function GrahaLedger({ patri, lit, onRead, onBoundary }: GrahaLedgerProps
               </td>
               <td>{SIGN_NAMES[g.sign]}</td>
               <td>
-                <Degree x={g.degInSign} />
+                <Degree x={g.degInSign} dev={devDigits} />
               </td>
               <td>
                 {NAKSHATRA_SHORT[g.nakshatra]} <span className="pd">{g.pada}</span>

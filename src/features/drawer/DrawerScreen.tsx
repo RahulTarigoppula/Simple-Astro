@@ -390,6 +390,12 @@ export default function DrawerScreen() {
             ]}
             onChange={(v) => set({ handFraming: v })}
           />
+          <Toggle
+            label="Devanagari digits"
+            help="Ledger degrees as ०–९; engraved brass stays Latin."
+            on={settings.devanagariDigits}
+            onChange={(v) => set({ devanagariDigits: v })}
+          />
           <Toggle label="Sound" on={settings.sound} onChange={(v) => set({ sound: v })} />
           <Toggle label="Haptics" on={settings.haptics} onChange={(v) => set({ haptics: v })} />
           <Toggle
