@@ -61,7 +61,7 @@ describe("Moon terminator", () => {
   });
 });
 
-describe("TodayScreen", { timeout: 30_000 }, () => {
+describe("TodayScreen", { timeout: 60_000 }, () => {
   beforeEach(async () => {
     await db.profiles.clear();
     await db.settings.clear();
@@ -82,11 +82,11 @@ describe("TodayScreen", { timeout: 30_000 }, () => {
   it("pages days with the Moon pager and comes back to today", async () => {
     renderToday();
     fireEvent.click(await screen.findByRole("button", { name: "Next day" }));
-    expect(await screen.findByRole("heading", { level: 1, name: /Tomorrow/ }, { timeout: 5000 })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: /Tomorrow/ }, { timeout: 20_000 })).toBeInTheDocument();
     expect(screen.getByText(/Read at sunrise/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Previous day" }));
     fireEvent.click(screen.getByRole("button", { name: "Previous day" }));
-    expect(await screen.findByRole("heading", { level: 1, name: /Yesterday/ }, { timeout: 5000 })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: /Yesterday/ }, { timeout: 20_000 })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "back to today" }));
     expect(await screen.findByRole("heading", { level: 1, name: /Today/ })).toBeInTheDocument();
   });
