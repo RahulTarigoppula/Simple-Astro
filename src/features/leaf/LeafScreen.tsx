@@ -38,6 +38,7 @@ interface Draft {
   override: "none" | "bombay" | "manual";
   manualOffsetMin: number;
   handedness: "right" | "left";
+  timeUnknown: boolean;
 }
 
 function draftFromProfile(p: Profile): Draft {
@@ -54,6 +55,7 @@ function draftFromProfile(p: Profile): Draft {
     override,
     manualOffsetMin: b.offsetOverrideMin ?? b.offsetMin,
     handedness: p.handedness,
+    timeUnknown: p.timeUnknown === true,
   };
 }
 
@@ -70,6 +72,7 @@ function freshDraft(): Draft {
     override: "none",
     manualOffsetMin: 330,
     handedness: "right",
+    timeUnknown: false,
   };
 }
 
@@ -130,8 +133,8 @@ export default function LeafScreen() {
         localY: draft.y,
         localMo: draft.mo,
         localD: draft.d,
-        localH: draft.h,
-        localMi: draft.mi,
+        localH: draft.timeUnknown ? 12 : draft.h,
+        localMi: draft.timeUnknown ? 0 : draft.mi,
         place: draft.place,
         ...(offsetOverrideMin != null ? { offsetOverrideMin } : {}),
       });
@@ -139,7 +142,7 @@ export default function LeafScreen() {
     } catch (e) {
       return { m: null, err: e instanceof EngineError ? e : new EngineError("TIME_INVALID", String(e)), status: "err" };
     }
-  }, [draft.y, draft.mo, draft.d, draft.h, draft.mi, draft.place, offsetOverrideMin]);
+  }, [draft.y, draft.mo, draft.d, draft.h, draft.mi, draft.timeUnknown, draft.place, offsetOverrideMin]);
 
   // The sky follows the hour drum continuously (sky-scrub); the Lagna re-solves every frame.
   const skyMs = useMemo(() => {
@@ -183,6 +186,7 @@ export default function LeafScreen() {
       name,
       birth: resolved.m,
       handedness: draft.handedness,
+      ...(draft.timeUnknown ? { timeUnknown: true } : {}),
       createdAt: editing?.createdAt ?? now,
       updatedAt: now,
     };
@@ -319,6 +323,12 @@ export default function LeafScreen() {
           />
           <BrassDrum label="Minute" short="mm" min={0} max={59} value={draft.mi} calm={settings.calmDesk} onChange={(v) => set("mi", v)} />
         </div>
+        {draft.timeUnknown ? (
+          <p className="note-haldi" role="status">
+            <span aria-hidden="true">⚑</span>
+            <span>Clock time unknown — the hour and minute drums are set aside and the leaf is cast for 12:00 local.</span>
+          </p>
+        ) : null}
         <p className="vh" aria-live="polite">
           {`${draft.d} ${MONTHS[draft.mo - 1] ?? ""} ${draft.y}, ${String(draft.h).padStart(2, "0")}:${String(draft.mi).padStart(2, "0")}`}
         </p>
@@ -470,6 +480,27 @@ export default function LeafScreen() {
             </div>
           </div>
         ) : null}
+
+        <div className="toggle-row">
+          <span className="v">
+            Birth time unknown
+            <span className="help">
+              Cast for local noon. The Moon's sign and the panchang stay meaningful; the Lagna, houses and daśā dates do not, and the patri
+              will say so.
+            </span>
+          </span>
+          <button
+            type="button"
+            role="switch"
+            className="switch"
+            aria-checked={draft.timeUnknown}
+            aria-label="Birth time unknown"
+            onClick={() => {
+              set("timeUnknown", !draft.timeUnknown);
+              play("tick");
+            }}
+          />
+        </div>
 
         <div className="radio-row" role="radiogroup" aria-label="Dominant hand">
           <span className="v">

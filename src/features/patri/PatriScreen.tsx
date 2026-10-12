@@ -21,9 +21,9 @@ import {
 } from "../../data/tables/names";
 import { boundaryNote, PRESET_SHORT } from "../../engine/boundary";
 import { formatDms } from "../../engine/math";
-import { addVarga } from "../../engine/patri";
-import { formatOffset } from "../../engine/time";
-import { type EnginePreset, type GrahaId, type Patri, PRESET_HASH, type VargaNumber, type YogaHit } from "../../engine/types";
+import { addVarga, computePatri } from "../../engine/patri";
+import { formatOffset, resolveBirthMoment } from "../../engine/time";
+import { type EnginePreset, type GrahaId, type Patri, PRESET_HASH, type Profile, type VargaNumber, type YogaHit } from "../../engine/types";
 import { VARGA_NAMES } from "../../engine/vargas";
 import { haptics } from "../../platform/haptics";
 import { isNative, reducedMotion } from "../../platform/native";
@@ -304,6 +304,7 @@ export default function PatriScreen() {
                   <span>The seal cracked: {error.message}. The last cast stays on the desk.</span>
                 </p>
               ) : null}
+              {profile?.timeUnknown && patri ? <TimeUnknownNote profile={profile} patri={patri} /> : null}
               {stale ? (
                 <p className="note-haldi" style={{ margin: "var(--space-3) 0 0" }}>
                   <span aria-hidden="true">⚑</span>
@@ -730,5 +731,34 @@ function FootBody({ foot, patri, zone, onShow }: { foot: NonNullable<Foot>; patr
         {PRESET_SHORT[patri.preset.ayanamsa]}.
       </p>
     </div>
+  );
+}
+
+/** For a leaf without a clock time: say what can and cannot be trusted, and whether the Moon moved. */
+function TimeUnknownNote({ profile, patri }: { profile: Profile; patri: Patri }) {
+  const span = useMemo(() => {
+    const b = profile.birth;
+    const at = (h: number, mi: number) => {
+      try {
+        const m = resolveBirthMoment({ localY: b.localY, localMo: b.localMo, localD: b.localD, localH: h, localMi: mi, place: b.place });
+        return computePatri({ ...profile, birth: m }, patri.preset, 0).grahas.MO;
+      } catch {
+        return null;
+      }
+    };
+    return { dawn: at(0, 0), dusk: at(23, 59) };
+  }, [profile, patri.preset]);
+  const { dawn, dusk } = span;
+  const moved = dawn && dusk && (dawn.sign !== dusk.sign || dawn.nakshatra !== dusk.nakshatra);
+  return (
+    <p className="note-haldi" role="note" style={{ margin: "var(--space-3) 0 0" }}>
+      <span aria-hidden="true">⚑</span>
+      <span>
+        Birth time unknown — cast for local noon. The Lagna, houses, Navāṃśa and daśā dates are not reliable.{" "}
+        {moved && dawn && dusk
+          ? `The Moon moved that day from ${NAKSHATRA_NAMES[dawn.nakshatra]} in ${SIGN_NAMES[dawn.sign]} to ${NAKSHATRA_NAMES[dusk.nakshatra]} in ${SIGN_NAMES[dusk.sign]}, so even its nakṣatra is uncertain.`
+          : `The Moon stayed in ${NAKSHATRA_NAMES[patri.grahas.MO.nakshatra]} (${SIGN_NAMES[patri.grahas.MO.sign]}) all day, so the Moon sign, nakṣatra and Guna Milan hold.`}
+      </span>
+    </p>
   );
 }

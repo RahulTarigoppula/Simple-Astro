@@ -38,6 +38,8 @@ export interface Profile {
   name: string;
   birth: BirthMoment;
   handedness: "right" | "left"; // dominant hand, for the palm framing
+  /** The clock time was not recorded: the leaf is cast for local noon and says so everywhere. */
+  timeUnknown?: boolean;
   gender?: "a" | "b"; // labels the two sides of a Milan; never a rule input
   createdAt: number;
   updatedAt: number;
@@ -309,3 +311,56 @@ export const DEFAULT_SETTINGS: Settings = {
   handFraming: "dominant",
   bhakootCancellation: false,
 };
+
+// ─── muhūrta divisions and the month leaf ────────────────────────────────────
+export type MuhurtaQuality = "good" | "neutral" | "bad";
+export type ChoghadiyaName = "Udvega" | "Cara" | "Lābha" | "Amṛta" | "Kāla" | "Śubha" | "Roga";
+
+export interface Choghadiya {
+  name: ChoghadiyaName;
+  dev: string;
+  quality: MuhurtaQuality;
+  startMs: number;
+  endMs: number;
+  part: number; // 1..8 within its half
+  half: "day" | "night";
+}
+
+export interface Hora {
+  lord: GrahaId;
+  startMs: number;
+  endMs: number;
+  part: number; // 1..12 within its half
+  half: "day" | "night";
+}
+
+export type CalendarMark = "ekadashi" | "purnima" | "amavasya" | "sankranti";
+
+export interface Sankranti {
+  ms: number;
+  sign: SignIdx; // the sign the sidereal Sun enters
+  day: number; // civil date in the place's zone
+}
+
+export interface CalendarDay {
+  day: number; // 1..31
+  weekday: 0 | 1 | 2 | 3 | 4 | 5 | 6; // civil weekday, 0 = Sunday
+  sunriseMs: number;
+  tithi: { index: number; name: string; paksha: "shukla" | "krishna" }; // at sunrise
+  kshaya?: number[]; // tithis that begin and end before the next sunrise
+  nakshatra: number; // 0..26, the Moon's at sunrise
+  elongation: number;
+  moonK: number; // illuminated fraction, 0..1
+  marks: CalendarMark[];
+  sankranti?: Sankranti;
+  polar?: boolean;
+}
+
+export interface MonthCalendar {
+  year: number;
+  month: number; // 1..12
+  zone: string;
+  leadingBlanks: number; // weekday of the 1st, Sunday first
+  days: CalendarDay[];
+  sankranti: Sankranti[];
+}
