@@ -2,8 +2,8 @@
 
 *Your Janam Patri, written in ink under one lamp.*
 
-**Codename:** Jyoti (project 02 of 8) · **Repo:** `jyoti` · **App / brand:** Chowki (चौकी)
-**Status: v0.1.0 built (2026-10-06)** — the MVP plus most of v1 is implemented and tested locally; deployment needs the owner's GitHub account and keystore (see [docs/HANDOFF.md](docs/HANDOFF.md)). What changed versus the plan, and why, is in [CHANGELOG.md](CHANGELOG.md) and [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
+**Codename:** Jyoti (project 02 of 8) · **Repo:** [Simple-Astro](https://github.com/RahulTarigoppula/Simple-Astro) · **App / brand:** Chowki (चौकी) · **Live:** https://rahultarigoppula.github.io/Simple-Astro/
+**Status: v0.2.0 (2026-10-12), live at https://rahultarigoppula.github.io/Simple-Astro/** — install it from the browser menu ("Install app") and it works offline. The Android APK is built by CI from a `v*` tag once the signing secrets exist (see [docs/HANDOFF.md](docs/HANDOFF.md)). What changed is in [CHANGELOG.md](CHANGELOG.md); what was measured is in [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
 
 ## Summary
 
@@ -34,7 +34,7 @@
 npm ci
 npm run dev            # http://localhost:5173 — the desk, fully offline after first load
 npm run test:unit      # engine (golden charts, oracle, time zones), data layer, palm, screens
-npm run build          # tsc + vite build into dist/ (add VITE_BASE_PATH=/jyoti/ for Pages)
+npm run build          # tsc + vite build into dist/ (Pages builds with VITE_BASE_PATH=/<repo>/)
 npx playwright test    # smoke, zero-leakage privacy, axe, offline — against `vite preview --base /jyoti/`
 ```
 
@@ -52,11 +52,11 @@ Useful one-off scripts (all outside-the-repo downloads are cached in `%TEMP%`):
 | `scripts/copy-mediapipe.mjs` | runs as `prebuild`: copies the MediaPipe wasm into `public/mediapipe/` |
 | `scripts/check-licences.mjs` · `check-bundle.mjs` · `check-no-biometrics.mjs` | the three blocking gates CI runs |
 
-## Ship it (owner steps — see [docs/HANDOFF.md](docs/HANDOFF.md))
+## Ship it
 
-The repository, workflows and Android shell are ready; what remains needs your accounts and keys:
-create the public GitHub repo `jyoti`, push `main`, set Pages → Source "GitHub Actions", generate the
-release keystore outside the repo and set the four `ANDROID_*` secrets, then `git tag v0.1.0 && git push --tags`.
+- **Web:** every push to `main` runs `.github/workflows/pages.yml` and deploys to https://rahultarigoppula.github.io/Simple-Astro/.
+- **Android:** see [docs/HANDOFF.md](docs/HANDOFF.md) §2 — generate the release keystore once, add the four
+  `ANDROID_*` secrets, then `git tag v0.2.0 && git push --tags` to get a signed APK on the Release.
 
 ## Attribution
 

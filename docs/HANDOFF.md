@@ -4,19 +4,14 @@ Written 2026-10-06 at the end of the first build session. The code, tests, CI wo
 Android shell are in this repository and committed on `main` locally. **Nothing has been pushed
 anywhere** — creating a public repo, a keystore and secrets needs your accounts and your decisions.
 
-## 1. Publish the web build (≈ 10 minutes)
+## 1. The web build — live
 
-```powershell
-winget install GitHub.cli          # gh was not installed on this machine
-gh auth login
-cd C:\Work\Personal_Projects\02-jyoti-astrology-palmistry
-gh repo create jyoti --public --source . --push
-gh api -X POST repos/{owner}/jyoti/pages -f build_type=workflow
-gh run watch                       # "Deploy to GitHub Pages" → https://<owner>.github.io/jyoti/
-```
+The code is on https://github.com/RahulTarigoppula/Simple-Astro (`main`). GitHub Pages deploys every push to `main` through
+`.github/workflows/pages.yml` to **https://rahultarigoppula.github.io/Simple-Astro/**. On the phone: open it in Chrome → menu → *Install app*.
+It works offline after the first load; Drawer → **Prepare for offline** also caches the palm model and the sky.
 
-Then on the phone: open the URL in Chrome → *Install app*. It works offline after the first load;
-Drawer → **Prepare for offline** also caches the palm model and the sky.
+`.github/workflows/ci.yml` runs Biome, the scanners, all unit tests and the Playwright suite on every push;
+a red CI run does not block the Pages deploy.
 
 ## 2. The Android APK (once, for the life of the app)
 
@@ -31,11 +26,12 @@ rm jyoti.key.pem jyoti.cert.pem
 ```
 
 ```powershell
+# GitHub → Simple-Astro → Settings → Secrets and variables → Actions, or with the gh CLI:
 gh secret set ANDROID_KEYSTORE_BASE64 --body (Get-Content "C:\Work\jyoti-release.p12.b64" -Raw).Trim()
 gh secret set ANDROID_KEYSTORE_PASSWORD     # the passphrase you typed
 gh secret set ANDROID_KEY_ALIAS --body release
 gh secret set ANDROID_KEY_PASSWORD          # the same passphrase
-git tag v0.1.0; git push origin v0.1.0      # → signed APK + SHA256SUMS on the Release
+git tag v0.2.0; git push origin v0.2.0      # → signed APK + SHA256SUMS on the Release
 ```
 
 Back up `jyoti-release.p12` and its passphrase in two places before anything else — a lost key means
