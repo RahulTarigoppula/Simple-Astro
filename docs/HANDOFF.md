@@ -44,10 +44,6 @@ APK artifact for a smoke test; a tag without secrets fails on purpose.
 
 ## 3. Things to run once on your own machine
 
-- **Biome** could not start in this session (Windows blocked `biome.exe` with `spawnSync UNKNOWN` —
-  probably Smart App Control / Defender on a freshly downloaded binary). CI runs `npx biome ci .` on
-  Linux. Run `npx biome check --write .` once locally (or let the first CI run tell you) and commit
-  the formatting.
 - **The phone checklist** (docs/IMPLEMENTATION-PROMPT.md §10.7) needs a real device: camera, haptics,
   edge-to-edge, predictive back, dome frame rate, install-over-update.
 - **Drik Panchang comparison** (V-1, V-4): read 30 days of Bengaluru/Delhi/Chennai panchang names by
@@ -74,7 +70,6 @@ APK artifact for a smoke test; a tag without secrets fails on purpose.
 ## 5. Known gaps (next session)
 
 - Device-only checks: GPU delegate, `getUserMedia` inside the WebView, haptics, predictive back, dome frame rate.
-- Devanagari digits and the Hindi/Tamil/Telugu UI are not built (the Drawer shows them as "on the way").
-- The 10-porutham thread and the Bhāva Chalit table are computed/planned but not rendered.
-- Milan on desktop does not yet show the two full charts side by side.
+- The Hindi/Tamil/Telugu UI is not built (the Drawer shows them as "on the way").
+- The porutham tables follow one Tamil school from memory — worth a read by someone who practises it.
 - MediaPipe tries to post telemetry to `odml.pa.googleapis.com`; the CSP blocks it (console noise only).

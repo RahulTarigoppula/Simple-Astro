@@ -2110,3 +2110,11 @@ dialog.sheet-dialog::backdrop {
     transform: none !important;
   }
 }
+
+/* A visually hidden table still lays out at its content width; as a block it honours the 1 px box. */
+table.vh {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}

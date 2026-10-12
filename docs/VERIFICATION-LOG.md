@@ -5,10 +5,10 @@ machine (Windows 11, Node 22.17.0, Chrome via Playwright 1.5x). Phone rows wait 
 
 | # | Claim | Result | Evidence |
 |---|---|---|---|
-| V-1 | Drik's Lahiri = SE-mean + 24.3″ | **Open** — needs 10 dates read by hand from drikpanchang.com | `drik-mean` preset ships as specified |
+| V-1 | Drik's Lahiri = SE-mean + 24.3″ | **Pass (indirect)** — under `drik-mean` all angas and end times match Drik on 6 days × 3 cities to ≤ 2 min | `src/engine/panchang.drik.test.ts` |
 | V-2 | JHora/SE Lahiri at 2000-01-01 0h UT ≈ 23°51′11″ | **Pass** — SE gives 23°51′11.53″ (doc 11.3″) | `src/engine/__fixtures__/oracle-notes.md` |
 | V-3 | Node type of the reference numbers | **Found:** §0.1a used the **mean** node; true node gives Rāhu 211.8219° (Viśākhā 4) | oracle-notes.md; default stays `true` |
-| V-4 | Panchang sunrise convention vs Drik | **Open** — needs 25 hand-read sunrise times | both conventions ship; footnotes name the one used |
+| V-4 | Panchang sunrise convention vs Drik | **Pass** — upper limb + refraction matches Drik's sunrise/sunset within a minute (disc-centre is 3–4 min off) | `src/engine/__fixtures__/panchang-drik.json` |
 | V-5 | Ashtakoota 100 % vs PyJHora | **Partial:** 6 436 / 11 664 raw; 11 664 / 11 664 once three PyJHora defects are modelled (inverted Tārā, Karka×Kumbha Bhakūṭa cell, pada-split Vaśya) | `src/engine/ashtakoota.oracle.test.ts` |
 | V-6 | astronomy-engine under Vite 8 + TS strict, true-of-date | **Pass** — 50 charts within 20″ of Swiss Ephemeris (Moon 4″, Lagna 0.3″) | `src/engine/golden.test.ts` |
 | V-7 | panchangam-js runs in Node tests and never reaches `dist/` | **Pass** | oracle project; `scripts/check-bundle.mjs` |
@@ -26,11 +26,11 @@ machine (Windows 11, Node 22.17.0, Chrome via Playwright 1.5x). Phone rows wait 
 
 | Gate | Result |
 |---|---|
-| Vitest (all projects) | 549 / 549 pass — engine, 50 golden charts, Ashtakoota oracle, time zones, data layer, palm CV, sky, screens, design rules |
-| Playwright (desktop-chromium + pixel-7) | 20 / 20 pass: smoke, golden numbers on screen, zero leakage, CSP, axe (no serious/critical on 8 routes), offline after one visit |
+| Vitest (all projects) | 654 / 654 pass — engine, 50 golden charts, Ashtakoota oracle, time zones, data layer, palm CV, sky, screens, design rules |
+| Playwright (desktop-chromium + pixel-7) | 22 / 22 pass (adds no-horizontal-overflow on 9 routes): smoke, golden numbers on screen, zero leakage, CSP, axe (no serious/critical on 8 routes), offline after one visit |
 | `check-licences.mjs` | 123 production packages, all OSI/OFL/CC0; no banned names |
 | `check-no-biometrics.mjs` | no photographs, no EXIF, synthetic PNGs only |
 | `check-bundle.mjs` | initial JS ≈ 229 kB gz (budget 350), CSS ≈ 13 kB gz (budget 30); no forbidden module |
 | Precache | ≈ 4.2 MB (budget 6 MB); model, wasm, OpenCV and the dome are runtime-cached |
 | `computePatri` | median 3.8–5.7 ms in Node (budget 60 ms) |
-| Biome | **not run** — `biome.exe` is blocked on this machine; CI runs it on Linux |
+| Biome | clean (2026-10-12) |

@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.2.0 — 2026-10-12
+
+Engine defaults unchanged (`ENGINE_EPOCH = 1`); no existing chart moves.
+
+### New
+- **Gochar** on the patri: transits now, house from the natal Moon and the Lagna, favourable houses and
+  vedha (Phaladīpikā ch. 26), and a **Sāḍe-sātī ribbon** from birth to +90 years with Kaṇṭaka/Aṣṭama
+  Śani, exact ingress dates (retrograde re-entries included).
+- **Daily card** on the desk and Today's leaf: the person's Tārā-bala and Candra-bala for today and the
+  running daśā (MD · AD · PD, until when).
+- **Aṣṭakavarga** (BPHS ch. 66): Sarvāṣṭakavarga drawn as a chart, the seven Bhinnāṣṭakavargas as a
+  matrix, invariants 48/49/39/54/56/52/39 and 337 enforced; **Bhāva Chalit** table with graha shifts.
+- **Today's leaf**: Choghaḍiyā (day and night), Horā, a **month calendar** (tithi at sunrise, Moon phase,
+  Ekādaśī / Pūrṇimā / Amāvasyā / saṅkrānti marks, keyboard grid), Brahma-muhūrta and Godhūli.
+- **Guna Milan**: the **Daśa Porutham** thread (Rajju and Vedha weighed heaviest), both charts side by
+  side on desktop, "what the tradition weighs" and exception notes per koota, and Copy summary.
+- **Birth time unknown**: a leaf can be cast for local noon; the patri says what still holds and whether
+  the Moon changed nakṣatra that day.
+- **Print · save as PDF** for the patri (a clean manuscript stylesheet with the full daśā table).
+- **Devanagari digits** for ledger degrees; a backup-age reminder in the Drawer.
+
+### Verified
+- Panchang against drikpanchang.com on 6 days × 3 cities under the Drik preset: every name matches; sunrise,
+  sunset and all five end times within 2 minutes (Drik prints minutes). The upper-limb sunrise is Drik's.
+- Biome now runs locally and is clean; 654 unit tests and 22 end-to-end tests pass (incl. a no-sideways-
+  overflow check on every route at phone width).
+
+
 ## 0.1.0 — 2026-10-06 (first build; not yet tagged)
 
 **Engine defaults:** ayanāṃśa Lahiri SE-true · true node · 365.25-day daśā year · upper-limb sunrise
