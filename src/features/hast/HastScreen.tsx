@@ -122,6 +122,7 @@ export default function HastScreen() {
     };
   }, [capture]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the print frame mounts once a capture exists
   useEffect(() => {
     const el = frame.current;
     if (!el) return;
@@ -131,7 +132,7 @@ export default function HastScreen() {
   }, [capture]);
 
   const landmarks = useMemo<Array<[number, number]>>(() => {
-    if (!capture || capture.homography.length !== 9) return [];
+    if (capture?.homography.length !== 9) return [];
     const H = capture.homography as Mat3;
     // Landmarks are normalised in the original frame; the homography maps original pixels → print.
     const [w, h] = capture.imageSize ?? [1, 1];

@@ -120,7 +120,7 @@ if (bin.length > BUDGET_BYTES) throw new Error(`bsc5.bin is ${bin.length} B, ove
 
 // Sanity: Sirius (HR 2491) must be the brightest and sit near RA 6h45m, Dec −16°43′.
 const sirius = stars[0];
-if (!sirius || sirius.hr !== 2491) throw new Error("Sirius is not the brightest star — parse error");
+if (sirius?.hr !== 2491) throw new Error("Sirius is not the brightest star — parse error");
 
 writeFileSync(OUT, bin);
 console.log(

@@ -186,7 +186,10 @@ async function main() {
       if (c[7] === "1") score += 2; // isHistoric — Bombay, Madras, Calcutta
       if (c[6] === "1") score += 1; // isColloquial
       let m = altScores.get(id);
-      if (!m) altScores.set(id, (m = new Map()));
+      if (!m) {
+        m = new Map();
+        altScores.set(id, m);
+      }
       const key = squash(text);
       const prev = m.get(key);
       if (prev) prev.score += score;

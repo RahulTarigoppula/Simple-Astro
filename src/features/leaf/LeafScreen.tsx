@@ -382,7 +382,7 @@ export default function LeafScreen() {
         ) : null}
 
         <div className="leaf-strip-wrap">
-          <div className="engraved leaf-strip" aria-live="polite" aria-label="Resolved zone, offset, Julian Day and Lagna">
+          <div className="engraved leaf-strip" role="status" aria-label="Resolved zone, offset, Julian Day and Lagna">
             {strip ? (
               <>
                 <b>{strip.zone.toUpperCase()}</b>

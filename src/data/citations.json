@@ -137,6 +137,66 @@
       "ref": "Hand types",
       "title": "The four elemental hands",
       "description": "Earth (square palm, short fingers), air (square palm, long fingers), fire (oblong palm, short fingers), water (oblong palm, long fingers)."
+    },
+    {
+      "text": "BPHS",
+      "ref": "ch. 66",
+      "title": "Aṣṭakavarga",
+      "description": "The benefic places (bindus) each of the seven grahas and the Lagna contributes to every graha's Bhinnāṣṭakavarga, counted from the contributor's own sign."
+    },
+    {
+      "text": "BPHS",
+      "ref": "ch. 67",
+      "title": "Trikoṇa-śodhana",
+      "description": "The trinal reduction: in each group of trinal signs the least bindu count is taken from all three; a zero leaves the group as it is."
+    },
+    {
+      "text": "Phaladīpikā",
+      "ref": "ch. 24",
+      "title": "Aṣṭakavarga in transit",
+      "description": "A graha moving through a sign where its own Aṣṭakavarga holds more bindus is read as passing more smoothly; fewer bindus, as asking more care."
+    },
+    {
+      "text": "Later tradition",
+      "ref": "Sarvāṣṭakavarga 28",
+      "title": "The 28-bindu mark",
+      "description": "Manuals read a sign of the Sarvāṣṭakavarga with 28 or more bindus (about the mean of 337 ÷ 12) as supportive, and one below 25 as asking for more effort."
+    },
+    {
+      "text": "Phaladīpikā",
+      "ref": "ch. 26",
+      "title": "Gocara-phala",
+      "description": "Transits are counted from the natal Moon's sign. Favourable houses: Sūrya 3, 6, 10, 11; Candra 1, 3, 6, 7, 10, 11; Maṅgala, Śani, Rāhu and Ketu 3, 6, 11; Budha 2, 4, 6, 8, 10, 11; Guru 2, 5, 7, 9, 11; Śukra 1–5, 8, 9, 11, 12. A favourable transit is obstructed (vedha) by another graha in its paired house, except between Sūrya and Śani or Candra and Budha."
+    },
+    {
+      "text": "Muhūrta Cintāmaṇi",
+      "ref": "Tārā-bala",
+      "title": "Tārā-bala",
+      "description": "Count from the birth nakṣatra to the day's nakṣatra and reduce by nine: Janma, Sampat, Vipat, Kṣema, Pratyari, Sādhaka, Vadha, Mitra, Parama-Mitra. The 3rd, 5th and 7th are the unkind tārās; the 1st is mixed."
+    },
+    {
+      "text": "Muhūrta Cintāmaṇi",
+      "ref": "Candra-bala",
+      "title": "Candra-bala",
+      "description": "The day's Moon is supportive when it transits the 1st, 3rd, 6th, 7th, 10th or 11th sign counted from the natal Moon's sign."
+    },
+    {
+      "text": "Later tradition",
+      "ref": "Sāḍe-sātī",
+      "title": "Śani's seven and a half years",
+      "description": "Śani's passage through the 12th, 1st and 2nd signs from the natal Moon, about two and a half years each (rising, peak, setting), read as a season asking for patience and steady effort."
+    },
+    {
+      "text": "Later tradition",
+      "ref": "Kaṇṭaka and Aṣṭama Śani",
+      "title": "Śani in the 4th and 8th from the Moon",
+      "description": "Śani's transit of the 4th (Kaṇṭaka or Ardhāṣṭama) and 8th (Aṣṭama) signs from the natal Moon, each read as a shorter stretch of the same patient tone as the Sāḍe-sātī."
+    },
+    {
+      "text": "BPHS",
+      "ref": "ch. 46",
+      "title": "Viṃśottarī daśā",
+      "description": "The 120-year cycle of nine planetary periods, starting from the lord of the Moon's birth nakṣatra, each divided in proportion into antar- and pratyantardaśās."
     }
   ]
 }

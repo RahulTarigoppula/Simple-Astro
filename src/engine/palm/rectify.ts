@@ -71,7 +71,7 @@ export function getPerspectiveTransform(src: readonly Pt[], dst: readonly Pt[]):
     b.push(v);
   }
   const h = solveLinear(A, b);
-  if (!h || !h.every(Number.isFinite)) return null;
+  if (!h?.every(Number.isFinite)) return null;
   const [a = 0, bb = 0, c = 0, d = 0, e = 0, f = 0, g = 0, hh = 0] = h;
   return [a, bb, c, d, e, f, g, hh, 1];
 }

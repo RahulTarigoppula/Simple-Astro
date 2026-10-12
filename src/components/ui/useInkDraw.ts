@@ -10,22 +10,26 @@ const SPRING = "linear(0, 0.36 10%, 0.78 21%, 1.02 34%, 1.06 42%, 1.01 58%, 0.99
  * the ink fades in 240 ms. `skip` renders the finished drawing at once (cached revisit).
  */
 export function useInkDraw(root: React.RefObject<Element | null>, deps: unknown[], opts?: { step?: number; skip?: boolean }) {
-  // biome-ignore lint/correctness/useExhaustiveDependencies: callers pass the data that changes the drawing
+  // Callers pass the values that change the drawing; their joined form is the effect's key.
+  const sig = deps.map((d) => String(d)).join("|");
+  const step = opts?.step;
+  const skip = opts?.skip;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `sig` stands for the caller's deps; `root` is a stable ref
   useLayoutEffect(() => {
     const el = root.current;
     if (!el) return;
-    const step = opts?.step ?? 60;
+    const stepMs = step ?? 60;
     const reduced = reducedMotion();
     const marks = Array.from(el.querySelectorAll<SVGGeometryElement>("[data-ink]"));
     const anims: Animation[] = [];
     marks.forEach((p, i) => {
       p.setAttribute("pathLength", "1");
       p.style.strokeDasharray = "1";
-      if (opts?.skip) {
+      if (skip) {
         p.style.strokeDashoffset = "0";
         return;
       }
-      const delay = p.dataset.delay !== undefined ? Number(p.dataset.delay) : i * step;
+      const delay = p.dataset.delay !== undefined ? Number(p.dataset.delay) : i * stepMs;
       if (reduced) {
         p.style.strokeDashoffset = "0";
         anims.push(p.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, fill: "backwards", easing: EASE }));
@@ -52,10 +56,10 @@ export function useInkDraw(root: React.RefObject<Element | null>, deps: unknown[
         );
       }
     });
-    if (!opts?.skip) {
+    if (!skip) {
       const bodies = Array.from(el.querySelectorAll<SVGElement | HTMLElement>("[data-settle]"));
       bodies.forEach((b, i) => {
-        const d = marks.length * step + 220 + i * 40;
+        const d = marks.length * stepMs + 220 + i * 40;
         anims.push(
           reduced
             ? b.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, delay: 120, fill: "backwards", easing: EASE })
@@ -77,5 +81,5 @@ export function useInkDraw(root: React.RefObject<Element | null>, deps: unknown[
     return () => {
       for (const a of anims) a.cancel();
     };
-  }, deps);
+  }, [sig, step, skip]);
 }

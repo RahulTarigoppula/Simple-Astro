@@ -126,7 +126,7 @@ export default function CaptureScreen() {
       tick++;
       if (model === "ready" && tick % 2 === 0) {
         const d = await detectHand(small).catch(() => null);
-        if (d && d.ok) {
+        if (d?.ok) {
           last.current = { landmarks: d.landmarks, worldLandmarks: d.worldLandmarks, score: d.score };
           const g = gateHand(d.landmarks, d.handedness, d.score);
           setGate(g.ok ? { ok: true, copy: "hold still" } : { ok: false, copy: GATE_COPY[g.reason] });
@@ -137,7 +137,7 @@ export default function CaptureScreen() {
       }
     }, 250);
     return () => clearInterval(id);
-  }, [camera, model, hand, busy]);
+  }, [camera, model, busy]);
 
   const process = useCallback(
     async (canvas: HTMLCanvasElement) => {
@@ -257,8 +257,9 @@ export default function CaptureScreen() {
       </div>
 
       <div className="capture__frame">
-        {/* biome-ignore lint/a11y/useMediaCaption: a live camera preview has no audio track */}
-        <video ref={video} playsInline muted aria-label="Camera preview" />
+        <video ref={video} playsInline muted aria-label="Camera preview">
+          <track kind="captions" />
+        </video>
         <svg
           className={`capture__outline${gate.ok ? " is-ok" : ""}`}
           viewBox="0 0 100 120"

@@ -30,6 +30,18 @@ export const CITE = {
   samudrikaFingers: c("Sāmudrika Śāstra", "Aṅguli-lakṣaṇa"),
   cheiroThumb: c("Cheiro, Language of the Hand", "The Thumb"),
   gettingsElements: c("Gettings, The Book of the Hand", "Hand types"),
+  // Aṣṭakavarga
+  bphs66: c("BPHS", "ch. 66"),
+  bphs67: c("BPHS", "ch. 67"),
+  phaladipika24: c("Phaladīpikā", "ch. 24"),
+  sav28: c("Later tradition", "Sarvāṣṭakavarga 28"),
+  // Gochara (transits)
+  phaladipika26: c("Phaladīpikā", "ch. 26"),
+  taraBala: c("Muhūrta Cintāmaṇi", "Tārā-bala"),
+  chandraBala: c("Muhūrta Cintāmaṇi", "Candra-bala"),
+  sadeSati: c("Later tradition", "Sāḍe-sātī"),
+  kantakaAshtama: c("Later tradition", "Kaṇṭaka and Aṣṭama Śani"),
+  bphs46: c("BPHS", "ch. 46"),
 } as const satisfies Record<string, Citation>;
 
 export type CiteKey = keyof typeof CITE;

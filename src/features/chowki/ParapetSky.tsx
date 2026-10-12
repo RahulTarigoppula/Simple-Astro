@@ -99,12 +99,12 @@ export function ParapetSky({ utcMs, lat, lon, className }: ParapetSkyProps) {
   useLayoutEffect(() => {
     const el = host.current;
     if (!el) return;
-    const fit = () => {
+    const measure = () => {
       const r = el.getBoundingClientRect();
       setVw(Math.max(160, r.height > 0 ? (r.width * 90) / r.height : 390));
     };
-    fit();
-    const ro = new ResizeObserver(fit);
+    measure();
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
   }, []);

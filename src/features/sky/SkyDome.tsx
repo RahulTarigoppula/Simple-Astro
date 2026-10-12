@@ -571,7 +571,7 @@ export default function SkyDome({ sky, stars, lookAz, paused, noInertia, onReady
         drag.current = null;
       }}
     >
-      <canvas ref={canvasRef} className="dome__canvas" aria-hidden="true" />
+      <canvas ref={canvasRef} className="dome__canvas" aria-hidden="true" tabIndex={-1} />
     </div>
   );
 }

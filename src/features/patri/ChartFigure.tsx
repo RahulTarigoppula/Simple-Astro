@@ -56,7 +56,8 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
     return () => ro.disconnect();
   }, []);
 
-  // Tilak haptic: impact Medium when the dab lands.
+  // Tilak haptic: impact Medium when the dab lands — once per ink-draw.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: inkKey identifies a new drawing
   useEffect(() => {
     if (skipInk) return;
     const t = window.setTimeout(
@@ -88,7 +89,7 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
       let bd = 1e9;
       let at: readonly [number, number] = [0, 0];
       for (const c of chips) {
-        const p = toPx(c.x, c.y);
+        const p = [(c.x + 4) * scale, (c.y + 4) * scale] as const;
         const d = Math.hypot(p[0] - px, p[1] - py);
         if (d < bd) {
           bd = d;
@@ -98,7 +99,6 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
       }
       return { id: best, d: bd, at };
     },
-    // biome-ignore lint/correctness/useExhaustiveDependencies: toPx depends only on scale
     [scale, chips],
   );
 

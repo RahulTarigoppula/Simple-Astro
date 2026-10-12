@@ -113,6 +113,7 @@ export default function PatriScreen() {
     lastScroll.current = { y: el.scrollTop, t: now };
     rustle(v);
   }, []);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new patri changes the scroll length
   useEffect(() => {
     requestAnimationFrame(unroll);
   }, [unroll, patri]);
@@ -194,7 +195,7 @@ export default function PatriScreen() {
         onTouchMove={(e) => {
           const t = e.touches[0];
           const s = lastTouch.current;
-          if (!t || !s || !s.top) return;
+          if (!t || !s?.top) return;
           const dy = t.clientY - s.y;
           if (dy > 0 && (port.current?.scrollTop ?? 1) <= 0) setPull(Math.min(96, dy * 0.55));
         }}
@@ -600,7 +601,7 @@ function PatriBody({
           ["Engine", `astronomy-engine ${patri.engine.version} (MIT) · ±1′`],
           ["Ayanāṃśa", `${presetLabel(p)} · ${formatDms(patri.ayanamsa)}`],
           ["Node", `${p.node === "true" ? "true (osculating)" : "mean"} Rāhu/Ketu`],
-          ["Houses", "whole-sign (Rāśi); daśā year " + p.dashaYearDays + " days"],
+          ["Houses", `whole-sign (Rāśi); daśā year ${p.dashaYearDays} days`],
           ["Sunrise", p.sunrise === "upper-limb-refracted" ? "upper limb + refraction" : "disc centre, no refraction"],
           ["Julian Day", `${patri.jdUt.toFixed(6)} UT · ${patri.jdTt.toFixed(6)} TT`],
           ["Cast", `${patri.computeMs.toFixed(1)} ms on this device · ${fullDate(patri.computedAt, zone)}`],

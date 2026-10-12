@@ -307,6 +307,7 @@ export default function SkyScreen() {
         <div className="sky-foot">
           <p
             className="engraved sky-strip"
+            role="status"
             aria-label={`${st.time} ${zone}, Lagna ${SIGN_NAMES[L.sign] ?? ""}, ${NAKSHATRA_NAMES[L.nakshatra] ?? ""}`}
           >
             <DigitSet text={st.time} /> <span>{zone}</span>

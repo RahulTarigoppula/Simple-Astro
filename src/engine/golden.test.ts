@@ -122,7 +122,7 @@ describe("golden-charts.json — fixture integrity", () => {
         band,
       ).toHaveLength(10);
     }
-    expect(CHARTS[0]!.input.utcIso).toBe("1994-03-14T01:55:00Z");
+    expect(CHARTS[0]?.input.utcIso).toBe("1994-03-14T01:55:00Z");
     expect(CHARTS.filter((c) => c.tags.includes("war-time-ist"))).toHaveLength(6);
     expect(CHARTS.filter((c) => c.tags.includes("nakshatra-boundary"))).toHaveLength(4);
     expect(CHARTS.filter((c) => Math.abs(c.input.lat) < 1).length).toBeGreaterThanOrEqual(2);

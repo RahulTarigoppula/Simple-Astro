@@ -146,9 +146,10 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
       SOUTH_CELL.forEach(([row, col], sign) => {
         const x0 = col * 100;
         const y0 = row * 100;
+        const signKey = `sn-${SIGN_NAMES[sign] ?? sign}`;
         out.push(
           <text
-            key={`sn-${sign}`}
+            key={signKey}
             className="signname"
             x={x0 + 96}
             y={y0 + 94}
