@@ -40,6 +40,7 @@ import { naturalRelation, type SevenId } from "../data/tables/rulership";
 import { gName, houseFrom, ord, signLord, signName } from "./chart-helpers";
 import { CITE } from "./citations";
 import { manglikStatus } from "./manglik";
+import { poruthams } from "./porutham";
 import type { KootaId, KootaResult, ManglikStatus, MilanResult, PatriCore, Profile, ProfileId, SignIdx } from "./types";
 
 export interface MoonPlacement {
@@ -274,7 +275,7 @@ export function moonOf(core: Pick<PatriCore, "grahas">): MoonPlacement {
   return { nak: mo.nakshatra, pada: mo.pada, sign: mo.sign, deg: mo.degInSign };
 }
 
-/** Full Milan: the eight kootas plus both charts' Manglik status (with the "both charts" cancellation). */
+/** Full Milan: the eight kootas, both charts' Manglik status (with the "both charts" cancellation) and the ten poruthams. */
 export function milan(a: Profile, b: Profile, pa: PatriCore, pb: PatriCore, opts: AshtakootaOptions = {}): MilanResult {
   const base = ashtakoota(a.id, b.id, moonOf(pa), moonOf(pb), pa.presetHash, opts);
   const ma: ManglikStatus = manglikStatus(pa);
@@ -283,5 +284,5 @@ export function milan(a: Profile, b: Profile, pa: PatriCore, pb: PatriCore, opts
     ma.cancellations = [...ma.cancellations, "manglik-bhanga-both-charts"];
     mb.cancellations = [...mb.cancellations, "manglik-bhanga-both-charts"];
   }
-  return { ...base, manglik: { a: ma, b: mb } };
+  return { ...base, manglik: { a: ma, b: mb }, porutham: poruthams(moonOf(pa), moonOf(pb)) };
 }

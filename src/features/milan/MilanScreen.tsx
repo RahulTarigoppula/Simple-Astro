@@ -1,10 +1,10 @@
 // Guna Milan (§4.9): two small scrolls tied with a mauli thread, the score, and the 36-bead mala.
 // Every bead, number and word of judgement here is milan()'s output — nothing is typed in.
 import { motion } from "motion/react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
-import { Colophon } from "../../components/ui/Colophon";
+import { Colophon, DISCLAIMER } from "../../components/ui/Colophon";
 import { Screen } from "../../components/ui/Screen";
 import { Sheet } from "../../components/ui/Sheet";
 import { TurmericBand } from "../../components/ui/TurmericBand";
@@ -12,11 +12,23 @@ import { NAKSHATRA_DEV, NAKSHATRA_NAMES, SIGN_DEV, SIGN_NAMES } from "../../data
 import { milan } from "../../engine/ashtakoota";
 import { AYANAMSA_LABEL } from "../../engine/ayanamsa";
 import { MANGLIK_CANCELLATIONS, MANGLIK_REF_LABEL } from "../../engine/manglik";
-import type { KootaResult, ManglikStatus, MilanResult, Patri, Profile, SignIdx } from "../../engine/types";
+import { isPoruthamResult, type PoruthamResult } from "../../engine/porutham";
+import {
+  GRAHA_IDS,
+  type KootaResult,
+  type ManglikStatus,
+  type MilanResult,
+  type Patri,
+  type Profile,
+  type SignIdx,
+} from "../../engine/types";
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
+import { toast } from "../../state/ui";
+import { type ChartBody, KundliChart } from "../patri/KundliChart";
 import { Mala } from "./Mala";
-import { becauseBody, doshaLine, exceptionText, fmtPts, RULE_TEXT } from "./rules";
+import { PoruthamThread } from "./PoruthamThread";
+import { becauseBody, doshaLine, exceptionLine, fmtPts, RULE_TEXT, summaryText, WEIGHS } from "./rules";
 import "./milan.css";
 
 const MANGLIK_NAME = new Map(MANGLIK_CANCELLATIONS.map((c) => [c.id, c.name]));
@@ -27,6 +39,86 @@ interface MoonFacts {
   sign: SignIdx;
 }
 const moonOfPatri = (p: Patri): MoonFacts => ({ nak: p.grahas.MO.nakshatra, pada: p.grahas.MO.pada, sign: p.grahas.MO.sign });
+
+/** "Manglik (from Lagna, Candra) — bhaṅga noted" / "no Manglik mark". */
+export function manglikLabel(m: ManglikStatus): string {
+  if (!m.present) return "no Manglik mark";
+  return `Manglik (from ${m.from.map((f) => MANGLIK_REF_LABEL[f]).join(", ")})${m.cancellations.length > 0 ? " — bhaṅga noted" : ""}`;
+}
+
+const WIDE = "(min-width: 900px)";
+/** True at desktop widths; the side-by-side charts are only mounted there. */
+function useWide(): boolean {
+  const [wide, setWide] = useState(() => typeof window !== "undefined" && window.matchMedia?.(WIDE).matches === true);
+  useEffect(() => {
+    const mq = window.matchMedia?.(WIDE);
+    if (!mq) return;
+    const on = () => setWide(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    window.addEventListener("resize", on);
+    return () => {
+      mq.removeEventListener("change", on);
+      window.removeEventListener("resize", on);
+    };
+  }, []);
+  return wide;
+}
+
+const bodiesOfPatri = (p: Patri): ChartBody[] =>
+  GRAHA_IDS.map((id) => {
+    const g = p.grahas[id];
+    return { id, sign: g.sign, degInSign: g.degInSign, retro: g.retrograde, nakshatra: g.nakshatra, pada: g.pada };
+  });
+
+/** One leaf's Rāśi chart, static, the Moon lit; captioned with the Moon nakshatra and Manglik status. */
+function LeafChart({
+  who,
+  profile,
+  patri,
+  manglik,
+  style,
+  script,
+}: {
+  who: string;
+  profile: Profile;
+  patri: Patri;
+  manglik: ManglikStatus | null;
+  style: "north" | "south";
+  script: "devanagari" | "latin";
+}) {
+  const bodies = useMemo(() => bodiesOfPatri(patri), [patri]);
+  const m = moonOfPatri(patri);
+  return (
+    <figure className="milan-chart">
+      <div className="milan-chart__frame">
+        <KundliChart
+          title=""
+          style={style}
+          script={script}
+          lagnaSign={patri.lagna.sign}
+          bodies={bodies}
+          lit="MO"
+          showDegrees={false}
+          static
+        />
+      </div>
+      <figcaption className="milan-chart__cap">
+        <span className="milan-chart__who">
+          {who} · <b>{profile.name}</b> · Rāśi chart, Moon lit
+        </span>
+        <span>
+          Moon in{" "}
+          <span lang="hi" className="dev">
+            {NAKSHATRA_DEV[m.nak]}
+          </span>{" "}
+          {NAKSHATRA_NAMES[m.nak]} pada {m.pada} · {SIGN_NAMES[m.sign]}
+        </span>
+        <span className={`milan-chart__mk${manglik?.present ? " is-present" : ""}`}>{manglik ? manglikLabel(manglik) : "—"}</span>
+      </figcaption>
+    </figure>
+  );
+}
 
 function ManglikMarks({ m, onOpen }: { m: ManglikStatus; onOpen: () => void }) {
   const cancelled = m.cancellations.length > 0;
@@ -203,7 +295,7 @@ function Picker({
   );
 }
 
-type SheetState = { kind: "koota"; k: KootaResult } | { kind: "manglik"; side: "a" | "b" } | null;
+type SheetState = { kind: "koota"; k: KootaResult } | { kind: "manglik"; side: "a" | "b" } | { kind: "porutham"; p: PoruthamResult } | null;
 
 /** Keyed by the pair, so a new pair (or a swap) starts a fresh count and closes any sheet. */
 export default function MilanRoute() {
@@ -250,6 +342,27 @@ function MilanScreen() {
   const ma = patA ? moonOfPatri(patA) : null;
   const mb = patB ? moonOfPatri(patB) : null;
   const err = result.err ?? A.error?.message ?? B.error?.message ?? null;
+  const wide = useWide();
+  const poruthamList = useMemo(() => (r?.porutham ?? []).filter(isPoruthamResult), [r]);
+
+  const copySummary = async () => {
+    if (!r || !pa || !pb) return;
+    const text = summaryText({
+      result: r,
+      first: { name: pa.name, moon: ma },
+      second: { name: pb.name, moon: mb },
+      manglikLabel,
+      disclaimer: DISCLAIMER,
+    });
+    try {
+      if (!navigator.clipboard) throw new Error("no clipboard");
+      await navigator.clipboard.writeText(text);
+      haptics.selection();
+      toast("Summary copied — plain text, with the disclaimer.");
+    } catch {
+      toast("This browser would not let Chowki copy. Nothing was sent anywhere.", "warn");
+    }
+  };
 
   return (
     <Screen className="milan" scroll label="Guna Milan — the 36-bead mala">
@@ -310,6 +423,27 @@ function MilanScreen() {
               <span className="milan__swaphelp">The classical tables read the two sides differently.</span>
             </p>
 
+            {wide && patA && patB ? (
+              <div className="milan-charts">
+                <LeafChart
+                  who="first leaf"
+                  profile={pa}
+                  patri={patA}
+                  manglik={r?.manglik.a ?? null}
+                  style={settings.chartStyle}
+                  script={settings.chartScript}
+                />
+                <LeafChart
+                  who="second leaf"
+                  profile={pb}
+                  patri={patB}
+                  manglik={r?.manglik.b ?? null}
+                  style={settings.chartStyle}
+                  script={settings.chartScript}
+                />
+              </div>
+            ) : null}
+
             {err ? (
               <div className="note-lac" role="alert">
                 The mala would not count: {err}
@@ -326,25 +460,15 @@ function MilanScreen() {
               </p>
             )}
 
-            {r?.porutham && r.porutham.length > 0 ? (
-              <details className="porutham">
-                <summary>
-                  <span lang="ta">பொருத்தம்</span> · Ten Porutham{" "}
-                  <span className="porutham__meta">
-                    {r.porutham.filter((x) => x.pass).length} / {r.porutham.length}
-                  </span>
-                </summary>
-                <ul className="porutham__list">
-                  {r.porutham.map((x) => (
-                    <li key={x.id}>
-                      <span className={`porutham__bead${x.pass ? " is-pass" : ""}`} aria-hidden="true" />
-                      <span className="porutham__name">{x.name}</span>
-                      <span className="porutham__pass">{x.pass ? "agrees" : "does not agree"}</span>
-                      <span className="porutham__note">{x.note}</span>
-                    </li>
-                  ))}
-                </ul>
-              </details>
+            {poruthamList.length > 0 ? <PoruthamThread list={poruthamList} onOpen={(p) => setSheet({ kind: "porutham", p })} /> : null}
+
+            {r ? (
+              <p className="milan__share">
+                <button type="button" className="linkish" onClick={() => void copySummary()}>
+                  Copy summary
+                </button>
+                <span className="milan__swaphelp">Plain text to the clipboard — names, score, doṣas, poruthams.</span>
+              </p>
             ) : null}
           </>
         ) : null}
@@ -374,10 +498,19 @@ function MilanScreen() {
       <Sheet
         open={sheet !== null}
         onClose={() => setSheet(null)}
-        label={sheet?.kind === "koota" ? `${sheet.k.name} — the rule` : "Manglik — Kuja doṣa"}
+        label={
+          sheet?.kind === "koota"
+            ? `${sheet.k.name} — the rule`
+            : sheet?.kind === "porutham"
+              ? `${sheet.p.name} porutham — the rule`
+              : "Manglik — Kuja doṣa"
+        }
       >
         {sheet?.kind === "koota" && pa && pb ? (
-          <KootaSheet k={sheet.k} pa={pa} pb={pb} ma={ma} mb={mb} onClose={() => setSheet(null)} />
+          <KootaSheet k={sheet.k} all={r?.kootas ?? []} pa={pa} pb={pb} ma={ma} mb={mb} onClose={() => setSheet(null)} />
+        ) : null}
+        {sheet?.kind === "porutham" && pa && pb ? (
+          <PoruthamSheet p={sheet.p} pa={pa} pb={pb} ma={ma} mb={mb} onClose={() => setSheet(null)} />
         ) : null}
         {sheet?.kind === "manglik" && r && pa && pb ? (
           <ManglikSheet
@@ -418,6 +551,7 @@ function MoonLine({ who, p, m }: { who: string; p: Profile; m: MoonFacts | null 
 
 function KootaSheet({
   k,
+  all,
   pa,
   pb,
   ma,
@@ -425,12 +559,14 @@ function KootaSheet({
   onClose,
 }: {
   k: KootaResult;
+  all: readonly KootaResult[];
   pa: Profile;
   pb: Profile;
   ma: MoonFacts | null;
   mb: MoonFacts | null;
   onClose: () => void;
 }) {
+  const exc = exceptionLine(k, all);
   return (
     <div className="kootasheet">
       <h2 className="kootasheet__h">
@@ -451,22 +587,81 @@ function KootaSheet({
           <dd>{becauseBody(k)}</dd>
         </div>
         <div className="row">
+          <dt>Weighs</dt>
+          <dd>Tradition weighs {WEIGHS[k.id]}.</dd>
+        </div>
+        <div className="row">
           <dt>Source</dt>
           <dd>
             {k.citation.text}, {k.citation.ref}
           </dd>
         </div>
-        {k.cancellation ? (
+        {exc ? (
           <div className="row">
             <dt>Exception</dt>
             <dd>
-              {exceptionText(k.cancellation.rule)} — {k.cancellation.applied ? "applied (Drawer setting)" : "recorded, not applied"} ·{" "}
-              {k.cancellation.citation.text}, {k.cancellation.citation.ref}
+              {exc.text}
+              {exc.source ? <span className="kootasheet__src"> · {exc.source}</span> : null}
             </dd>
           </div>
         ) : null}
       </dl>
       {k.dosha ? <p className="note-lac">{doshaLine(k)}</p> : null}
+      <p className="kootasheet__close">
+        <button type="button" className="linkish" onClick={onClose}>
+          Close
+        </button>
+      </p>
+    </div>
+  );
+}
+
+function PoruthamSheet({
+  p,
+  pa,
+  pb,
+  ma,
+  mb,
+  onClose,
+}: {
+  p: PoruthamResult;
+  pa: Profile;
+  pb: Profile;
+  ma: MoonFacts | null;
+  mb: MoonFacts | null;
+  onClose: () => void;
+}) {
+  return (
+    <div className="kootasheet">
+      <h2 className="kootasheet__h">
+        <span lang="sa" className="dev">
+          {p.nameDev}
+        </span>{" "}
+        · {p.name} porutham <span className={`kootasheet__score pstate${p.pass ? "" : " is-open"}`}>{p.pass ? "tied" : "open ×"}</span>
+      </h2>
+      <p className="p">{p.rule}</p>
+      <dl className="kootasheet__dl">
+        <MoonLine who="First leaf" p={pa} m={ma} />
+        <MoonLine who="Second leaf" p={pb} m={mb} />
+        <div className="row">
+          <dt>Because</dt>
+          <dd>{p.because}</dd>
+        </div>
+        <div className="row">
+          <dt>Weighs</dt>
+          <dd>
+            Tradition weighs {p.weighs}.{p.weighty ? " Rajju and Vedha are the two the tradition weighs heaviest." : ""}
+          </dd>
+        </div>
+        <div className="row">
+          <dt>Source</dt>
+          <dd>
+            {p.citation.text}, {p.citation.ref}
+          </dd>
+        </div>
+      </dl>
+      {p.pass ? null : <p className="note-lac">Tradition says this knot stays open: {p.because}</p>}
+      <p className="p p--muted">Counted from the second leaf (the kanyā column) to the first, as the tables are read.</p>
       <p className="kootasheet__close">
         <button type="button" className="linkish" onClick={onClose}>
           Close

@@ -1,12 +1,14 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DISCLAIMER } from "../../components/ui/Colophon";
 import { db } from "../../data/db";
 import { upsertProfile } from "../../data/repo";
 import { milan } from "../../engine/ashtakoota";
 import { computePatri, REFERENCE_PROFILE } from "../../engine/patri";
 import { resolveBirthMoment } from "../../engine/time";
 import { DEFAULT_PRESET, type KootaResult, type Profile } from "../../engine/types";
+import { BANNED_WORDS } from "../../test/banned-words";
 import { beadsOf } from "./Mala";
 import MilanScreen from "./MilanScreen";
 import { BAND_LABEL, fmtPts } from "./rules";
@@ -141,5 +143,68 @@ describe("MilanScreen", () => {
     const { router } = renderAt("/milan");
     fireEvent.click(await screen.findByRole("button", { name: /Lay .*'s leaf beside/ }));
     await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/milan\/[^/]+\/[^/]+$/));
+  });
+});
+
+describe("MilanScreen — porutham, compare and summary", () => {
+  beforeEach(async () => {
+    await db.profiles.clear();
+    await db.patris.clear();
+    await db.settings.clear();
+    await upsertProfile(REFERENCE_PROFILE);
+    await upsertProfile(PRIYA);
+  });
+
+  it("strings the ten poruthams as knots — tied or open, as milan() says — and opens each rule", async () => {
+    const want = engineResult(REFERENCE_PROFILE, PRIYA).porutham ?? [];
+    expect(want).toHaveLength(10);
+    renderAt(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`);
+    await screen.findByRole("img", { name: /^Nāḍī:/ }, { timeout: 5000 });
+    fireEvent.pointerDown(document.body);
+    for (const p of want) {
+      const name = new RegExp(`^${p.name}: ${p.pass ? "tied" : "open"}`);
+      expect(screen.getByRole("button", { name })).toBeInTheDocument();
+    }
+    expect(screen.getByText(`${want.filter((p) => p.pass).length} / 10 tied`)).toBeInTheDocument();
+    const rajju = want.find((p) => p.id === "rajju");
+    if (!rajju) throw new Error("no rajju");
+    fireEvent.click(screen.getByRole("button", { name: /^Rajju:/ }));
+    const dlg = await screen.findByRole("dialog");
+    expect(within(dlg).getByText(/five cords/)).toBeInTheDocument();
+    expect(within(dlg).getByText(rajju.note)).toBeInTheDocument();
+    expect(within(dlg).getByText(/weighs heaviest/)).toBeInTheDocument();
+    expect(within(dlg).getByText(/Porutham tradition \(Tamil jyotiṣa\)/)).toBeInTheDocument();
+  });
+
+  it("a koota sheet says what the tradition weighs and whether the exception holds", async () => {
+    renderAt(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`);
+    const img = await screen.findByRole("img", { name: /^Nāḍī:/ }, { timeout: 5000 });
+    fireEvent.pointerDown(document.body);
+    await new Promise((r) => setTimeout(r, 450));
+    const row = img.closest("button");
+    if (!row) throw new Error("bead row is not a button");
+    fireEvent.click(row);
+    const dlg = await screen.findByRole("dialog");
+    expect(within(dlg).getByText(/^Tradition weighs the constitution/)).toBeInTheDocument();
+    // Revatī × Rohiṇī: both Antya, different signs, Guru and Śukra not friends — no exception holds.
+    expect(within(dlg).getByText("None of the classical exceptions holds for this pair.")).toBeInTheDocument();
+  });
+
+  it("copies a plain-text summary with the disclaimer", async () => {
+    const writeText = vi.fn(async (_: string) => {});
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    const want = engineResult(REFERENCE_PROFILE, PRIYA);
+    renderAt(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`);
+    await screen.findByRole("img", { name: /^Nāḍī:/ }, { timeout: 5000 });
+    fireEvent.pointerDown(document.body);
+    fireEvent.click(await screen.findByRole("button", { name: "Copy summary" }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
+    const text = writeText.mock.calls[0]?.[0] ?? "";
+    expect(text).toContain(`${REFERENCE_PROFILE.name} and ${PRIYA.name}`);
+    expect(text).toContain(`${fmtPts(want.total)} / 36 — ${BAND_LABEL[want.band]}`);
+    expect(text).toContain("Doṣas: Nāḍī");
+    expect(text).toMatch(/Ten Porutham: \d+ \/ 10 tied/);
+    expect(text).toContain(DISCLAIMER);
+    for (const w of BANNED_WORDS) expect(text.toLowerCase()).not.toContain(w);
   });
 });

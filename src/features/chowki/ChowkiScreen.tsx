@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { useActiveProfile, useProfiles, useSettings } from "../../app/hooks";
+import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { rememberOrigin } from "../../app/origin";
 import { useLamp } from "../../app/theme";
 import { Screen } from "../../components/ui/Screen";
@@ -10,6 +10,7 @@ import type { Panchang } from "../../engine/types";
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
 import { useUi } from "../../state/ui";
+import { DailyStrengthCard } from "../gochar";
 import { DialArt, DiyaArt, DrawerKnobArt, LeafBundleArt, LoupeArt, RolledPatriArt } from "./art";
 import { ParapetSky } from "./ParapetSky";
 import "./chowki.css";
@@ -104,6 +105,7 @@ export default function ChowkiScreen() {
   const { toggle } = useLamp();
   const navigate = useNavigate();
   const now = useNow();
+  const { patri: activePatri } = usePatri(active, settings.preset);
   const lat = active?.birth.place.lat ?? BENGALURU.lat;
   const lon = active?.birth.place.lon ?? BENGALURU.lon;
   const zone = active?.birth.zone ?? BENGALURU.zone;
@@ -147,6 +149,11 @@ export default function ChowkiScreen() {
         ) : null}
       </div>
 
+      {active && activePatri ? (
+        <div className="chowki__strength">
+          <DailyStrengthCard patri={activePatri} nowMs={now} zone={active.birth.zone} />
+        </div>
+      ) : null}
       <div className="cloth">
         <DeskObject
           to="/circle"

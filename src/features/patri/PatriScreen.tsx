@@ -28,6 +28,7 @@ import { VARGA_NAMES } from "../../engine/vargas";
 import { haptics } from "../../platform/haptics";
 import { isNative, reducedMotion } from "../../platform/native";
 import { play, rustle } from "../../platform/sound";
+import { GocharSection } from "../gochar";
 import { ChartFigure } from "./ChartFigure";
 import { DashaRibbon } from "./DashaRibbon";
 import { AshtakavargaSection } from "./extras/AshtakavargaSection";
@@ -619,6 +620,7 @@ function PatriBody({
         </section>
       ))}
 
+      <GocharSection patri={patri} nowMs={nowMs} zone={zone} />
       <AshtakavargaSection patri={patri} script={script} style={style} skipInk={skipInk} />
       <BhavaChalitTable patri={patri} />
 

@@ -82,3 +82,14 @@
     font-size: 11px;
   }
 }
+
+.chowki__strength {
+  flex: none;
+  margin: var(--space-2) var(--space-4) 0;
+}
+@media (min-width: 900px) {
+  .chowki__strength {
+    width: min(560px, calc(100% - var(--space-8)));
+    margin: var(--space-2) auto 0;
+  }
+}

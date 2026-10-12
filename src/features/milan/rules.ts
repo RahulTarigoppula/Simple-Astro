@@ -1,6 +1,8 @@
 // What each koota row's sheet says. Descriptions of the classical rules only — the scores themselves
 // come from engine/ashtakoota.ts and are never computed here.
-import type { KootaId, KootaResult, MilanResult } from "../../engine/types";
+import { NAKSHATRA_NAMES, SIGN_NAMES } from "../../data/tables/names";
+import { ganaParihara } from "../../engine/porutham";
+import type { KootaId, KootaResult, ManglikStatus, MilanResult } from "../../engine/types";
 
 export const RULE_TEXT: Record<KootaId, string> = {
   varna:
@@ -46,3 +48,85 @@ export const BAND_LABEL: Record<MilanResult["band"], string> = {
 };
 
 export const fmtPts = (n: number): string => (Number.isInteger(n) ? String(n) : n.toFixed(1));
+
+/** One line per koota: what the tradition weighs in it. Shown as "Tradition weighs …". */
+export const WEIGHS: Record<KootaId, string> = {
+  varna: "the bent of work and outlook each nature leans to — the lightest of the eight",
+  vashya: "mutual regard — which of the two is drawn to the other",
+  tara: "the kindness of the two birth stars toward each other, the tone of shared days",
+  yoni: "instinctive nature and closeness",
+  maitri: "friendship of mind, read through the two Moon-sign lords",
+  gana: "temperament — how a Deva, Manuṣya or Rākṣasa nature meets the other",
+  bhakoot: "the ease of the shared household course, from the two Moon signs",
+  nadi: "the constitution (prakṛti) the two share — the heaviest of the eight",
+};
+
+/** The kootas that carry a classical exception. */
+export const HAS_EXCEPTION: ReadonlySet<KootaId> = new Set<KootaId>(["gana", "bhakoot", "nadi"]);
+
+export interface ExceptionLine {
+  text: string;
+  source: string | null;
+}
+
+/**
+ * Whether a classical exception applies to this pair, from engine data only: Bhakūṭa and Nāḍī carry
+ * `cancellation` from kootas(); Gaṇa's parihāra comes from ganaParihara(). Null for the other kootas.
+ */
+export function exceptionLine(k: KootaResult, ks: readonly KootaResult[]): ExceptionLine | null {
+  if (!HAS_EXCEPTION.has(k.id)) return null;
+  const none = { text: "No doṣa here, so no exception is needed.", source: null };
+  if (k.id === "gana") {
+    const g = ganaParihara(ks);
+    if (!g) return none;
+    return {
+      text: g.holds
+        ? `The classical exception holds for this pair — ${g.because}. Recorded, not applied: the score stands.`
+        : `The classical exception does not hold for this pair — ${g.because}.`,
+      source: `${g.citation.text}, ${g.citation.ref}`,
+    };
+  }
+  if (k.cancellation) {
+    const c = k.cancellation;
+    return {
+      text: `The classical exception holds for this pair — ${exceptionText(c.rule)}. ${c.applied ? "Applied (Drawer setting)." : "Recorded, not applied."}`,
+      source: `${c.citation.text}, ${c.citation.ref}`,
+    };
+  }
+  if (!k.dosha) return none;
+  return { text: "None of the classical exceptions holds for this pair.", source: null };
+}
+
+export interface SummaryInput {
+  result: MilanResult;
+  first: { name: string; moon: { nak: number; pada: number; sign: number } | null };
+  second: { name: string; moon: { nak: number; pada: number; sign: number } | null };
+  manglikLabel: (m: ManglikStatus) => string;
+  disclaimer: string;
+}
+
+/** The plain-text summary for "Copy summary". Nothing is computed here; it reads milan()'s result. */
+export function summaryText({ result: r, first, second, manglikLabel, disclaimer }: SummaryInput): string {
+  const moonText = (m: SummaryInput["first"]["moon"]): string =>
+    m ? `Moon in ${NAKSHATRA_NAMES[m.nak] ?? m.nak} pada ${m.pada}, ${SIGN_NAMES[m.sign] ?? m.sign}` : "Moon not cast";
+  const doshas = r.kootas.filter((k) => k.dosha);
+  const lines = [
+    `Guna Milan — ${first.name} and ${second.name}`,
+    `First leaf: ${first.name} — ${moonText(first.moon)}; ${manglikLabel(r.manglik.a)}`,
+    `Second leaf: ${second.name} — ${moonText(second.moon)}; ${manglikLabel(r.manglik.b)}`,
+    `Aṣṭakūṭa: ${fmtPts(r.total)} / 36 — ${BAND_LABEL[r.band]}`,
+    ...r.kootas.map((k) => `  ${k.name}: ${fmtPts(k.score)} / ${k.max}${k.dosha ? " (doṣa)" : ""}`),
+    `Doṣas: ${doshas.length ? doshas.map((k) => `${k.name} — ${becauseBody(k)}`).join("; ") : "none"}`,
+  ];
+  if (r.porutham && r.porutham.length > 0) {
+    const tied = r.porutham.filter((p) => p.pass);
+    const open = r.porutham.filter((p) => !p.pass);
+    lines.push(
+      `Ten Porutham: ${tied.length} / ${r.porutham.length} tied — ${tied.map((p) => p.name).join(", ") || "none"}${
+        open.length ? `; open: ${open.map((p) => p.name).join(", ")}` : ""
+      }`,
+    );
+  }
+  lines.push("", disclaimer, "Computed on this device by Chowki.");
+  return lines.join("\n");
+}

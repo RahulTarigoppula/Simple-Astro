@@ -69,9 +69,9 @@ function useTally(total: number, totalPoints: number, onFinish: () => void) {
   };
 
   // Reduced motion: no count, but the knot still sounds once.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: run once on mount
   useEffect(() => {
     if (instant && phase === "done") knot();
-    // biome-ignore lint/correctness/useExhaustiveDependencies: run once on mount
   }, []);
 
   useEffect(() => {
@@ -91,6 +91,7 @@ function useTally(total: number, totalPoints: number, onFinish: () => void) {
     return () => clearTimeout(t);
   }, [phase, launched, total, step]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: knot is stable for the mount
   useEffect(() => {
     if (phase !== "knot") return;
     const t = window.setTimeout(() => {
@@ -98,7 +99,6 @@ function useTally(total: number, totalPoints: number, onFinish: () => void) {
       knot();
     }, 260);
     return () => clearTimeout(t);
-    // biome-ignore lint/correctness/useExhaustiveDependencies: knot is stable for the mount
   }, [phase]);
 
   const skip = () => {
