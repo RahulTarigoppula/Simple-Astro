@@ -9,17 +9,7 @@ import { norm360 } from "./math";
 import { angasAt, solveCrossing } from "./panchang";
 import { type GeoPoint, hinduDay, observerOf, sunEvent } from "./sunrise";
 import { daysInMonth } from "./time";
-import type {
-  AyanamsaPreset,
-  CalendarDay,
-  CalendarMark,
-  Citation,
-  Deg,
-  EnginePreset,
-  MonthCalendar,
-  Sankranti,
-  SignIdx,
-} from "./types";
+import type { AyanamsaPreset, CalendarDay, CalendarMark, Citation, Deg, EnginePreset, MonthCalendar, Sankranti, SignIdx } from "./types";
 
 export interface CalendarPlace extends GeoPoint {
   /** IANA zone whose civil calendar names the dates. */
@@ -81,7 +71,10 @@ export function monthCalendar(year: number, month: number, place: CalendarPlace,
   const zone = DateTime.fromMillis(0, { zone: place.zone }).isValid ? place.zone : "UTC";
   const obs = observerOf(place);
   const n = daysInMonth(year, month);
-  const midnight = (d: number): number => DateTime.fromObject({ year, month, day: 1 }, { zone }).plus({ days: d - 1 }).toMillis();
+  const midnight = (d: number): number =>
+    DateTime.fromObject({ year, month, day: 1 }, { zone })
+      .plus({ days: d - 1 })
+      .toMillis();
 
   const rises: Array<{ ms: number; polar: boolean }> = [];
   for (let d = 1; d <= n + 1; d++) {

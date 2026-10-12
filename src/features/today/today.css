@@ -270,15 +270,19 @@
 @media (min-width: 900px) {
   .today__desk {
     display: grid;
-    grid-template-columns: 260px minmax(0, 560px);
+    grid-template-columns: minmax(300px, 372px) minmax(0, 560px);
     justify-content: center;
     align-items: start;
     gap: var(--space-7);
     padding: var(--space-6) var(--space-6) var(--space-9);
   }
+  .today__side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    min-width: 0;
+  }
   .today__cloth {
-    position: sticky;
-    top: var(--space-6);
     flex-direction: column;
     width: auto;
     margin: 0;
@@ -299,4 +303,313 @@
   .dial__spin {
     transition-duration: 1ms;
   }
+}
+
+/* ── side column: the cloth, and on the desk-wide layout the month leaf ── */
+@media (max-width: 899.98px) {
+  .today__side {
+    display: contents;
+  }
+}
+.today__monthsheet {
+  padding-bottom: var(--space-4);
+}
+
+/* ── the section switch ─────────────────────────────────────────────── */
+.today-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  margin: var(--space-4) var(--paper-margin) 0;
+}
+.today-tabs button {
+  flex: 1 1 auto;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+.today-tabs button[aria-selected="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+.today-panel {
+  min-height: 120px;
+}
+.today-panel > .band--plain:first-child {
+  margin-top: var(--space-4);
+}
+
+/* ── choghaḍiyā and horā lists ──────────────────────────────────────── */
+.today-sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-2);
+  margin: var(--space-4) var(--paper-margin) 0;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--text-base);
+  color: var(--ink);
+}
+.today-sub__meta {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+.today-periods {
+  list-style: none;
+  margin: var(--space-1) 0 0;
+  padding: 0 var(--paper-margin);
+}
+.today-periods li {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 5.2em auto;
+  align-items: baseline;
+  column-gap: var(--space-2);
+  min-height: 40px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink);
+}
+.today-periods li:last-child {
+  border-bottom: 0;
+}
+.today-periods__name {
+  min-width: 0;
+  font-size: var(--text-base);
+}
+.today-periods__n {
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+.today-periods__aside {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+.today-periods__t {
+  grid-column: 3;
+  text-align: right;
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  color: var(--ink);
+}
+.today-periods li.is-now {
+  background: color-mix(in oklch, var(--paper-band), transparent 45%);
+  margin: 0 calc(-1 * var(--space-2));
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+}
+/* The brass "now" clip, as on the daśā ribbon — pinned over the row's left edge. */
+.today-periods li.is-now::before {
+  content: "";
+  position: absolute;
+  left: -14px;
+  top: 50%;
+  translate: 0 -50%;
+  width: 20px;
+  height: 16px;
+  border-radius: 4px 8px 8px 4px;
+  background: linear-gradient(180deg, var(--brass-lo), var(--brass-hi) 40%, var(--brass-dark));
+  box-shadow: var(--shadow-1);
+}
+.today-periods__now {
+  margin-left: var(--space-2);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-text);
+}
+.qmark {
+  flex: none;
+  width: 11px;
+  height: 11px;
+}
+.qmark--good circle {
+  fill: var(--ink);
+}
+.qmark--neutral circle {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.4;
+}
+.qmark--bad path {
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.today-cite {
+  margin: var(--space-4) var(--paper-margin) 0;
+  font-size: var(--text-sm);
+}
+.today-cite cite {
+  font-style: italic;
+}
+
+/* ── the month leaf ─────────────────────────────────────────────────── */
+.month__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--space-2) var(--paper-margin) 0;
+}
+.month__step {
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  font-size: var(--text-2xl);
+  line-height: 1;
+  color: var(--ink);
+  border-radius: var(--radius-md);
+}
+.month__title {
+  margin: 0;
+  font-size: var(--text-lg);
+  color: var(--ink);
+}
+.month__grid {
+  display: grid;
+  gap: 2px;
+  margin: var(--space-1) calc(var(--paper-margin) - 4px) 0;
+}
+.month__row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+}
+.month__wd {
+  padding: 2px 0 2px;
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+  text-align: center;
+}
+.mcell {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto auto;
+  align-items: start;
+  width: 100%;
+  min-height: 60px;
+  padding: 3px 4px 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  text-align: left;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.mcell:active {
+  transform: scale(0.96);
+}
+.mcell__d {
+  font-size: var(--text-xs);
+  line-height: 1.3;
+}
+.mglyph {
+  width: 13px;
+  height: 13px;
+  margin-top: 1px;
+}
+.mglyph__dark {
+  fill: color-mix(in oklch, var(--ink), var(--moon) 30%);
+}
+.mglyph__lit {
+  fill: var(--moon);
+}
+.mglyph__rim {
+  fill: none;
+  stroke: var(--ink-muted);
+  stroke-width: 5;
+}
+.mcell__t {
+  grid-column: 1 / -1;
+  font-size: var(--text-sm);
+  line-height: 1.35;
+  white-space: nowrap;
+}
+.mcell__m {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 2px;
+  min-height: 15px;
+}
+.mmark {
+  display: inline-block;
+  padding: 0 3px;
+  font-style: normal;
+  font-size: var(--text-xs);
+  line-height: 1.3;
+  border: 1px solid var(--border-strong);
+  border-radius: 3px;
+  color: var(--ink);
+}
+.mmark--sun {
+  border-style: dashed;
+}
+.mcell--purnima .mcell__t,
+.mcell--amavasya .mcell__t {
+  font-weight: 700;
+}
+/* Today: a double rule round the cell, and "today" in its name. */
+.mcell[aria-current="date"] {
+  border: 3px double var(--accent);
+}
+/* The leaf on show: a filled cell. */
+.mcell[aria-selected="true"] {
+  background: var(--paper-band);
+  border-color: var(--border-strong);
+  box-shadow: inset 0 -3px 0 var(--accent);
+}
+.month__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--space-3);
+  margin: var(--space-2) var(--paper-margin) 0;
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+.month__legend .mmark {
+  color: var(--ink-muted);
+}
+.month__pick {
+  margin: var(--space-3) var(--paper-margin) 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--brass);
+  background: color-mix(in oklch, var(--surface-2), transparent 40%);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.month__pick-h {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+.month__pick-v {
+  margin: 2px 0 0;
+  font-size: var(--text-base);
+  color: var(--ink);
+}
+.month__open {
+  min-height: 44px;
+}
+@media (min-width: 900px) {
+  .today__monthsheet {
+    --paper-margin: 16px;
+  }
+  .today__monthsheet .month > .band--plain:first-child {
+    margin-top: 0;
+  }
+}
+.today-periods--plain li {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.today-periods--plain .today-periods__t {
+  grid-column: 2;
+}
+
+.today__mine {
+  padding: var(--space-3) var(--paper-margin) 0;
 }

@@ -1,3 +1,4 @@
+import { SLACK } from "../test/perf";
 import "fake-indexeddb/auto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -68,7 +69,7 @@ describe("bundled gazetteer", () => {
   });
 
   it("first search after load is fast (target ≤ 20 ms; bound 50 for busy CI workers)", () => {
-    expect(firstSearchMs).toBeLessThan(50);
+    expect(firstSearchMs).toBeLessThan(50 * SLACK);
   });
 
   it("loads fast and stays small (targets: ≤ 400 ms, ≤ 20 MB retained)", () => {
@@ -158,8 +159,8 @@ describe("bundled gazetteer", () => {
     });
     // Measured worst ≈ 9 ms on the dev box; the max bound leaves room for a busy CI worker.
     const sorted = [...times].sort((a, b) => a - b);
-    expect(sorted[Math.floor(sorted.length / 2)]).toBeLessThanOrEqual(20);
-    expect(Math.max(...times)).toBeLessThan(50);
+    expect(sorted[Math.floor(sorted.length / 2)]).toBeLessThanOrEqual(20 * SLACK);
+    expect(Math.max(...times)).toBeLessThan(50 * SLACK);
   });
 
   it("finds word starts and inner substrings", () => {

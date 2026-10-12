@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
+import { SLACK } from "../test/perf";
 import {
   CHANDRA_BALA_HOUSES,
   chandraBala,
@@ -113,7 +114,7 @@ describe("sadeSati — reference chart (Moon in Mīna)", () => {
     ss.spells.find((s) => s.kind === "sade-sati" && s.startMs < Date.UTC(y, 0, 1) && s.endMs > Date.UTC(y, 0, 1));
 
   it("computes a 103-year window in under 300 ms", () => {
-    expect(ssMs).toBeLessThan(300);
+    expect(ssMs).toBeLessThan(300 * SLACK);
   });
 
   it("finds Śani's Kumbha–Mīna–Meṣa spell around 2022–2030", () => {

@@ -2,7 +2,7 @@
 // device. The brass dial and the Moon sit on the indigo cloth; the ledger is ruled paper.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
-import { useActiveProfile, useSettings } from "../../app/hooks";
+import { useActiveProfile, usePatri, useSettings } from "../../app/hooks";
 import { Colophon } from "../../components/ui/Colophon";
 import { Screen } from "../../components/ui/Screen";
 import { Sheet } from "../../components/ui/Sheet";
@@ -10,14 +10,20 @@ import { TurmericBand } from "../../components/ui/TurmericBand";
 import { useInkDraw } from "../../components/ui/useInkDraw";
 import { NAKSHATRA_DEV, NAKSHATRA_NAMES, VARA_DEV, VARA_NAMES } from "../../data/tables/names";
 import { AYANAMSA_LABEL } from "../../engine/ayanamsa";
+import type { CalendarPlace } from "../../engine/calendar";
 import { ASTRONOMY_ENGINE_VERSION } from "../../engine/ephemeris";
+import { brahmaMuhurta, choghadiya, godhuli, horas, MUHURTA_KALA_CITATION } from "../../engine/muhurta";
 import { angasAt, computePanchang } from "../../engine/panchang";
-import type { EnginePreset, Panchang, Profile, SunriseMode } from "../../engine/types";
+import { type EnginePreset, type Panchang, PRESET_HASH, type Profile, type SunriseMode } from "../../engine/types";
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
+import { DailyStrengthCard } from "../gochar";
 import { BrassDial } from "./BrassDial";
 import { ayanaDev, ayanaLatin, karanaDev, masaDev, rituDev, tithiDev, yogaDev } from "./dev";
+import { MonthGrid, type Ymd } from "./MonthGrid";
 import { MoonPager } from "./MoonPager";
+import { ChoghadiyaPanel, HoraPanel } from "./Periods";
+import { useWide } from "./useWide";
 import { endsLabel, rangeLabel, type ZoneClock, zoneClock } from "./zone";
 import "./today.css";
 
@@ -306,6 +312,28 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
             note: "By convention the Abhijit muhūrta is not observed on a Wednesday.",
           },
         },
+    {
+      id: "brahma",
+      k: "Brahma-muhūrta",
+      v: <span className="mono today-num">{rangeLabel(clock, brahmaMuhurta(p.sunriseMs))}</span>,
+      foot: range(
+        "Brahma-muhūrta",
+        "ब्राह्म मुहूर्त",
+        brahmaMuhurta(p.sunriseMs),
+        `The second-to-last muhūrta of the night before this sunrise: 96 to 48 minutes before it. — ${MUHURTA_KALA_CITATION.text}.`,
+      ),
+    },
+    {
+      id: "godhuli",
+      k: "Godhūli",
+      v: <span className="mono today-num">{rangeLabel(clock, godhuli(p.sunsetMs))}</span>,
+      foot: range(
+        "Godhūli",
+        "गोधूलि",
+        godhuli(p.sunsetMs),
+        `The hour of cow-dust: one ghaṭī (24 minutes) centred on sunset. — ${MUHURTA_KALA_CITATION.text}.`,
+      ),
+    },
   ];
 
   const masa: RowSpec[] = [
@@ -402,16 +430,78 @@ function InkLine() {
   );
 }
 
+type Tab = "day" | "chog" | "hora" | "month";
+const TABS: ReadonlyArray<{ id: Tab; label: string }> = [
+  { id: "day", label: "Day" },
+  { id: "chog", label: "Choghaḍiyā" },
+  { id: "hora", label: "Horā" },
+  { id: "month", label: "Month" },
+];
+
+/** The civil date of an instant on the place's calendar. */
+function ymdOf(clock: ZoneClock, ms: number): Ymd {
+  const d = new Date(clock.dayNumber(ms) * DAY);
+  return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate() };
+}
+const dayNumberOf = (v: Ymd): number => Math.round(Date.UTC(v.y, v.m - 1, v.d) / DAY);
+
+function Tabs({ tabs, tab, onTab }: { tabs: ReadonlyArray<{ id: Tab; label: string }>; tab: Tab; onTab: (t: Tab) => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const onKey = (e: React.KeyboardEvent) => {
+    const i = tabs.findIndex((t) => t.id === tab);
+    const j =
+      e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : null;
+    if (j === null) return;
+    e.preventDefault();
+    const next = tabs[(j + tabs.length) % tabs.length];
+    if (!next) return;
+    onTab(next.id);
+    ref.current?.querySelector<HTMLButtonElement>(`#tab-${next.id}`)?.focus();
+  };
+  return (
+    <div ref={ref} className="seg today-tabs" role="tablist" aria-label="Leaf sections" onKeyDown={onKey}>
+      {tabs.map((t) => (
+        <button
+          key={t.id}
+          id={`tab-${t.id}`}
+          type="button"
+          role="tab"
+          aria-selected={tab === t.id}
+          aria-controls={`panel-${t.id}`}
+          tabIndex={tab === t.id ? 0 : -1}
+          onClick={() => onTab(t.id)}
+        >
+          {t.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function TodayScreen() {
   const active = useActiveProfile();
   const settings = useSettings();
-  const preset = settings.preset;
+  const { patri: activePatri } = usePatri(active, settings.preset);
+  // The settings row is re-merged on every read; hold the preset by value so memos stay put.
+  const presetRef = useRef(settings.preset);
+  if (PRESET_HASH(presetRef.current) !== PRESET_HASH(settings.preset)) presetRef.current = settings.preset;
+  const preset = presetRef.current;
   const [baseMs] = useState(() => Date.now());
   const [offset, setOffset] = useState(0);
   const [foot, setFoot] = useState<Foot | null>(null);
+  const [tabSel, setTab] = useState<Tab>("day");
+  const wide = useWide();
+  const tab: Tab = wide && tabSel === "month" ? "day" : tabSel;
 
   const place = useMemo(() => (active === undefined ? null : placeOf(active)), [active]);
   const clock = zoneClock(place?.zone ?? BENGALURU.zone);
+  const calPlace = useMemo<CalendarPlace | null>(
+    () =>
+      place
+        ? { lat: place.lat, lon: place.lon, zone: place.zone, ...(place.elevation !== undefined ? { elevation: place.elevation } : {}) }
+        : null,
+    [place],
+  );
 
   const base = useMemo(() => {
     if (!place) return null;
@@ -451,6 +541,36 @@ export default function TodayScreen() {
   const masa = rows.filter((r) => r.id.startsWith("masa-"));
 
   const p = leaf?.p;
+  const periods = useMemo(
+    () =>
+      p
+        ? {
+            chog: choghadiya(p.sunriseMs, p.sunsetMs, p.nextSunriseMs, p.vara.index),
+            hora: horas(p.sunriseMs, p.sunsetMs, p.nextSunriseMs, p.vara.index),
+          }
+        : null,
+    [p],
+  );
+  const nowMs = offset === 0 && leaf ? leaf.atMs : null;
+
+  // The month on show follows the leaf; the ‹ › buttons may wander from it.
+  const leafYmd = p ? ymdOf(clock, p.sunriseMs) : null;
+  const todayYmd = ymdOf(clock, baseMs);
+  const [ym, setYm] = useState<{ y: number; m: number } | null>(null);
+  const leafMonthKey = leafYmd ? `${leafYmd.y}-${leafYmd.m}` : "";
+  useEffect(() => {
+    if (!leafMonthKey) return;
+    const [y = 0, m = 1] = leafMonthKey.split("-").map(Number);
+    setYm({ y, m });
+  }, [leafMonthKey]);
+  const shownYm = ym ?? (leafYmd ? { y: leafYmd.y, m: leafYmd.m } : null);
+
+  const pick = (v: Ymd) => {
+    if (!base) return;
+    const target = dayNumberOf(v) - clock.dayNumber(base.sunriseMs);
+    step(target - offset);
+  };
+
   const head =
     offset === 0
       ? { dev: "आज", title: "Today" }
@@ -466,39 +586,63 @@ export default function TodayScreen() {
     ? `Brass dial: ${p.tithi.name}; Moon in ${NAKSHATRA_NAMES[p.nakshatra.index] ?? ""}; daylight ${clock.hm(p.sunriseMs)} to ${clock.hm(p.sunsetMs)}; Rāhu Kāla ${rangeLabel(clock, p.rahuKaal)}`
     : "Brass dial";
 
+  const month =
+    calPlace && shownYm && p ? (
+      <MonthGrid
+        place={calPlace}
+        preset={preset}
+        clock={clock}
+        ym={shownYm}
+        onMonth={setYm}
+        today={todayYmd}
+        selected={leafYmd}
+        south={south}
+        onPick={pick}
+        {...(wide ? {} : { onOpenLeaf: () => setTab("day") })}
+      />
+    ) : null;
+
   return (
     <Screen className="today" scroll label="Today's leaf — the pañcāṅga">
       <div className="today__desk" style={style}>
-        <div className="today__cloth">
-          {p && leaf ? (
-            <>
-              <BrassDial
-                sunriseH={clock.hours(p.sunriseMs)}
-                sunsetH={clock.hours(p.sunsetMs)}
-                rahuH={[clock.hours(p.rahuKaal[0]), clock.hours(p.rahuKaal[1])]}
-                nowH={clock.hours(leaf.atMs)}
-                elongation={p.elongation}
-                moonSid={leaf.moonSid}
-                nakIndex={p.nakshatra.index}
-                label={dialLabel}
-              />
-              <MoonPager
-                offset={offset}
-                k={p.moonIllumination}
-                waxing={waxing}
-                south={south}
-                onStep={step}
-                onToday={() => step(-offset)}
-                caption={`${Math.round(p.moonIllumination * 100)}% · ${waxing ? "waxing" : "waning"}`}
-              />
-            </>
-          ) : (
-            <div className="dial dial--blank" aria-hidden="true" />
-          )}
+        <div className="today__side">
+          <div className="today__cloth">
+            {p && leaf ? (
+              <>
+                <BrassDial
+                  sunriseH={clock.hours(p.sunriseMs)}
+                  sunsetH={clock.hours(p.sunsetMs)}
+                  rahuH={[clock.hours(p.rahuKaal[0]), clock.hours(p.rahuKaal[1])]}
+                  nowH={clock.hours(leaf.atMs)}
+                  elongation={p.elongation}
+                  moonSid={leaf.moonSid}
+                  nakIndex={p.nakshatra.index}
+                  label={dialLabel}
+                />
+                <MoonPager
+                  offset={offset}
+                  k={p.moonIllumination}
+                  waxing={waxing}
+                  south={south}
+                  onStep={step}
+                  onToday={() => step(-offset)}
+                  caption={`${Math.round(p.moonIllumination * 100)}% · ${waxing ? "waxing" : "waning"}`}
+                />
+              </>
+            ) : (
+              <div className="dial dial--blank" aria-hidden="true" />
+            )}
+          </div>
+          {wide && month ? <div className="paper paper--cut today__monthsheet">{month}</div> : null}
         </div>
 
         <article className="paper paper--cut sheet-col today__sheet" aria-labelledby="today-h">
           <TurmericBand id="today-h" level={1} dev={head.dev} title={head.title} meta={p ? clock.dateShort(p.sunriseMs) : undefined} />
+          {active && activePatri ? (
+            <div className="today__mine">
+              <DailyStrengthCard patri={activePatri} nowMs={Date.now()} zone={active.birth.zone} />
+            </div>
+          ) : null}
           {place ? (
             <div className="today__where">
               <div className="engraved">
@@ -526,23 +670,36 @@ export default function TodayScreen() {
 
           {!place ? (
             <InkLine />
-          ) : !p ? (
+          ) : !p || !periods ? (
             <div className="note-haldi" role="status">
               The dial is stuck — check the date and the leaf's place.
             </div>
           ) : (
             <>
-              {p.polar ? (
-                <div className="note-haldi">
-                  The Sun neither rises nor sets here today ({p.polar === "midnight-sun" ? "midnight sun" : "polar night"}); the day is
-                  taken as local noon ± 6 hours.
-                </div>
-              ) : null}
-              <Rows rows={angas} onOpen={(r) => setFoot(r.foot)} />
-              <TurmericBand plain level={2} dev="काल" title="Kāla" meta={clock.zone} />
-              <Rows rows={kala} onOpen={(r) => setFoot(r.foot)} />
-              <div className="today__gap" aria-hidden="true" />
-              <Rows rows={masa} onOpen={(r) => setFoot(r.foot)} />
+              <Tabs tabs={wide ? TABS.filter((t) => t.id !== "month") : TABS} tab={tab} onTab={setTab} />
+              <div className="today-panel" role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
+                {tab === "day" ? (
+                  <>
+                    {p.polar ? (
+                      <div className="note-haldi">
+                        The Sun neither rises nor sets here today ({p.polar === "midnight-sun" ? "midnight sun" : "polar night"}); the day
+                        is taken as local noon ± 6 hours.
+                      </div>
+                    ) : null}
+                    <Rows rows={angas} onOpen={(r) => setFoot(r.foot)} />
+                    <TurmericBand plain level={2} dev="काल" title="Kāla" meta={clock.zone} />
+                    <Rows rows={kala} onOpen={(r) => setFoot(r.foot)} />
+                    <div className="today__gap" aria-hidden="true" />
+                    <Rows rows={masa} onOpen={(r) => setFoot(r.foot)} />
+                  </>
+                ) : tab === "chog" ? (
+                  <ChoghadiyaPanel day={periods.chog.day} night={periods.chog.night} clock={clock} dayMs={p.sunriseMs} nowMs={nowMs} />
+                ) : tab === "hora" ? (
+                  <HoraPanel day={periods.hora.day} night={periods.hora.night} clock={clock} dayMs={p.sunriseMs} nowMs={nowMs} />
+                ) : (
+                  month
+                )}
+              </div>
             </>
           )}
 

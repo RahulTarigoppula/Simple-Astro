@@ -3,11 +3,83 @@
   "preset": { "ayanamsa": "drik-mean", "sunrise": "upper-limb-refracted" },
   "note": "Drik prints minutes; tolerance 120 s on times (Drik rounds to the minute). Angas are those prevailing at sunrise (local 06:50 is after every sunrise here).",
   "days": [
-    { "city": "Bengaluru", "lat": 12.9716, "lon": 77.5946, "date": "2026-10-12", "sunrise": "06:10", "sunset": "18:03", "tithi": ["Dvitīyā", "22:13"], "nakshatra": ["Svātī", "23:52"], "yoga": ["Viṣkambha", "20:32"], "karana": ["Bālava", "09:48"], "vara": "Somavāra" },
-    { "city": "Bengaluru", "lat": 12.9716, "lon": 77.5946, "date": "2026-01-01", "sunrise": "06:42", "sunset": "18:05", "tithi": ["Trayodaśī", "22:22"], "nakshatra": ["Rohiṇī", "22:48"], "yoga": ["Śubha", "17:12"], "karana": ["Kaulava", "12:05"], "vara": "Guruvāra" },
-    { "city": "Bengaluru", "lat": 12.9716, "lon": 77.5946, "date": "2026-04-15", "sunrise": "06:07", "sunset": "18:32", "tithi": ["Trayodaśī", "22:31"], "nakshatra": ["Pūrva Bhādrapadā", "15:22"], "yoga": ["Brahmā", "13:25"], "karana": ["Gara", "11:27"], "vara": "Budhavāra" },
-    { "city": "Bengaluru", "lat": 12.9716, "lon": 77.5946, "date": "2026-07-20", "sunrise": "06:02", "sunset": "18:50", "tithi": ["Saptamī", "+04:02"], "nakshatra": ["Hasta", "19:09"], "yoga": ["Śiva", "18:37"], "karana": ["Gara", "15:40"], "vara": "Somavāra" },
-    { "city": "New Delhi", "lat": 28.6139, "lon": 77.209, "date": "2026-10-12", "sunrise": "06:20", "sunset": "17:55", "tithi": ["Dvitīyā", "22:13"], "nakshatra": ["Svātī", "23:52"], "yoga": ["Viṣkambha", "20:32"], "karana": ["Bālava", "09:48"], "vara": "Somavāra" },
-    { "city": "Chennai", "lat": 13.0827, "lon": 80.2707, "date": "2026-03-05", "sunrise": "06:23", "sunset": "18:18", "tithi": ["Dvitīyā", "17:03"], "nakshatra": ["Uttara Phalgunī", "08:17"], "yoga": ["Śūla", "07:46"], "karana": ["Gara", "17:03"], "vara": "Guruvāra" }
+    {
+      "city": "Bengaluru",
+      "lat": 12.9716,
+      "lon": 77.5946,
+      "date": "2026-10-12",
+      "sunrise": "06:10",
+      "sunset": "18:03",
+      "tithi": ["Dvitīyā", "22:13"],
+      "nakshatra": ["Svātī", "23:52"],
+      "yoga": ["Viṣkambha", "20:32"],
+      "karana": ["Bālava", "09:48"],
+      "vara": "Somavāra"
+    },
+    {
+      "city": "Bengaluru",
+      "lat": 12.9716,
+      "lon": 77.5946,
+      "date": "2026-01-01",
+      "sunrise": "06:42",
+      "sunset": "18:05",
+      "tithi": ["Trayodaśī", "22:22"],
+      "nakshatra": ["Rohiṇī", "22:48"],
+      "yoga": ["Śubha", "17:12"],
+      "karana": ["Kaulava", "12:05"],
+      "vara": "Guruvāra"
+    },
+    {
+      "city": "Bengaluru",
+      "lat": 12.9716,
+      "lon": 77.5946,
+      "date": "2026-04-15",
+      "sunrise": "06:07",
+      "sunset": "18:32",
+      "tithi": ["Trayodaśī", "22:31"],
+      "nakshatra": ["Pūrva Bhādrapadā", "15:22"],
+      "yoga": ["Brahmā", "13:25"],
+      "karana": ["Gara", "11:27"],
+      "vara": "Budhavāra"
+    },
+    {
+      "city": "Bengaluru",
+      "lat": 12.9716,
+      "lon": 77.5946,
+      "date": "2026-07-20",
+      "sunrise": "06:02",
+      "sunset": "18:50",
+      "tithi": ["Saptamī", "+04:02"],
+      "nakshatra": ["Hasta", "19:09"],
+      "yoga": ["Śiva", "18:37"],
+      "karana": ["Gara", "15:40"],
+      "vara": "Somavāra"
+    },
+    {
+      "city": "New Delhi",
+      "lat": 28.6139,
+      "lon": 77.209,
+      "date": "2026-10-12",
+      "sunrise": "06:20",
+      "sunset": "17:55",
+      "tithi": ["Dvitīyā", "22:13"],
+      "nakshatra": ["Svātī", "23:52"],
+      "yoga": ["Viṣkambha", "20:32"],
+      "karana": ["Bālava", "09:48"],
+      "vara": "Somavāra"
+    },
+    {
+      "city": "Chennai",
+      "lat": 13.0827,
+      "lon": 80.2707,
+      "date": "2026-03-05",
+      "sunrise": "06:23",
+      "sunset": "18:18",
+      "tithi": ["Dvitīyā", "17:03"],
+      "nakshatra": ["Uttara Phalgunī", "08:17"],
+      "yoga": ["Śūla", "07:46"],
+      "karana": ["Gara", "17:03"],
+      "vara": "Guruvāra"
+    }
   ]
 }

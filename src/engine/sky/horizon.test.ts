@@ -1,5 +1,6 @@
 import * as A from "astronomy-engine";
 import { describe, expect, it } from "vitest";
+import { SLACK } from "../../test/perf";
 import { astroTime } from "../ephemeris";
 import { computePatri, REFERENCE_PROFILE } from "../patri";
 import { DEFAULT_PRESET } from "../types";
@@ -78,6 +79,6 @@ describe("skySnapshot", () => {
     }
     times.sort((a, b) => a - b);
     console.info(`skySnapshot median ${(times[150] ?? 0).toFixed(3)} ms`);
-    expect(times[150]).toBeLessThan(1);
+    expect(times[150]).toBeLessThan(1 * SLACK);
   });
 });

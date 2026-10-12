@@ -66,10 +66,10 @@ export function BrassDial({ sunriseH, sunsetH, rahuH, nowH, elongation, moonSid,
         <circle cx={C} cy={C} r="46" fill="none" stroke="var(--brass-shadow)" strokeWidth=".7" />
         <path d={arc(nakIndex * NAK, (nakIndex + 1) * NAK, 51)} stroke="var(--brass-ink)" strokeWidth="9" fill="none" opacity=".26" />
         <g stroke="var(--brass-shadow)" strokeWidth=".8">
-          {Array.from({ length: 27 }, (_, i) => {
+          {Array.from({ length: 27 }, (_, n) => n).map((i) => {
             const [x0, y0] = pt(i * NAK, 47);
             const [x1, y1] = pt(i * NAK, i % 9 === 0 ? 56 : 54);
-            return <line key={i} x1={x0} y1={y0} x2={x1} y2={y1} strokeWidth={i % 9 === 0 ? 1.4 : 0.8} />;
+            return <line key={`nak-${i}`} x1={x0} y1={y0} x2={x1} y2={y1} strokeWidth={i % 9 === 0 ? 1.4 : 0.8} />;
           })}
         </g>
         <g className="dial__spin" style={{ transform: `rotate(${moon}deg)` }}>

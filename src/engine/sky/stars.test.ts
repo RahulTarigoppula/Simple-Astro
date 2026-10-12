@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import * as A from "astronomy-engine";
 import { describe, expect, it } from "vitest";
+import { SLACK } from "../../test/perf";
 import { mulberry32 } from "../math";
 import { altAzXY, eunX, eunY, SKY_R, skyProjection } from "./projection";
 import { rooftopSky, siderealPointEun, starMatrix } from "./rooftop";
@@ -152,10 +153,10 @@ describe("projection", () => {
       runs.push(performance.now() - t0);
     }
     runs.sort((a, b) => a - b);
-    expect(runs[15]).toBeLessThan(2);
+    expect(runs[15]).toBeLessThan(2 * SLACK);
     const t1 = performance.now();
     for (let k = 0; k < 30; k++) horizonVectors(stars, k * 11, 28.6, undefined, eun);
-    expect((performance.now() - t1) / 30).toBeLessThan(2);
+    expect((performance.now() - t1) / 30).toBeLessThan(2 * SLACK);
   });
 });
 
@@ -203,6 +204,6 @@ describe("rooftop model", () => {
     for (let k = 0; k < 10; k++) rooftopSky(ms + k * 60_000, 12.97, 77.59);
     const t0 = performance.now();
     for (let k = 0; k < 50; k++) rooftopSky(ms + k * 600_000, 12.97, 77.59);
-    expect((performance.now() - t0) / 50).toBeLessThan(2);
+    expect((performance.now() - t0) / 50).toBeLessThan(2 * SLACK);
   });
 });

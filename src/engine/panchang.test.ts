@@ -151,16 +151,16 @@ describe("PA-1: end instants are where the aṅga really changes", () => {
   it.each(instants.map((ms) => [new Date(ms).toISOString(), ms] as const))("%s", (_iso, ms) => {
     const p = computePanchang(ms, BENGALURU, DEFAULT_PRESET);
     const ap = DEFAULT_PRESET.ayanamsa;
-    const before = (end: number) => angasAt(end - 1000, ap);
-    const after = (end: number) => angasAt(end + 1000, ap);
-    expect(before(p.tithi.endMs).tithi.index).toBe(p.tithi.index);
-    expect(after(p.tithi.endMs).tithi.index).toBe((p.tithi.index % 30) + 1);
-    expect(before(p.karana.endMs).karana.index).toBe(p.karana.index);
-    expect(after(p.karana.endMs).karana.index).toBe((p.karana.index % 60) + 1);
-    expect(before(p.nakshatra.endMs).nakshatra.index).toBe(p.nakshatra.index);
-    expect(after(p.nakshatra.endMs).nakshatra.index).toBe((p.nakshatra.index + 1) % 27);
-    expect(before(p.yoga.endMs).yoga.index).toBe(p.yoga.index);
-    expect(after(p.yoga.endMs).yoga.index).toBe((p.yoga.index % 27) + 1);
+    const justBefore = (end: number) => angasAt(end - 1000, ap);
+    const justAfter = (end: number) => angasAt(end + 1000, ap);
+    expect(justBefore(p.tithi.endMs).tithi.index).toBe(p.tithi.index);
+    expect(justAfter(p.tithi.endMs).tithi.index).toBe((p.tithi.index % 30) + 1);
+    expect(justBefore(p.karana.endMs).karana.index).toBe(p.karana.index);
+    expect(justAfter(p.karana.endMs).karana.index).toBe((p.karana.index % 60) + 1);
+    expect(justBefore(p.nakshatra.endMs).nakshatra.index).toBe(p.nakshatra.index);
+    expect(justAfter(p.nakshatra.endMs).nakshatra.index).toBe((p.nakshatra.index + 1) % 27);
+    expect(justBefore(p.yoga.endMs).yoga.index).toBe(p.yoga.index);
+    expect(justAfter(p.yoga.endMs).yoga.index).toBe((p.yoga.index % 27) + 1);
   });
 });
 
