@@ -5,17 +5,17 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vites
 
 vi.mock("../engine/patri", () => ({ computePatri: () => ({}) }));
 
-import { TABLE_NAMES, db } from "./db";
+import { db, TABLE_NAMES } from "./db";
 import {
+  canonName,
   type FetchLike,
   type Gazetteer,
-  NOMINATIM_GAP_MS,
-  NetError,
-  canonName,
   isGazetteerLoaded,
   loadGazetteerFromBytes,
   mapNominatim,
   mapOpenMeteo,
+  NetError,
+  NOMINATIM_GAP_MS,
   nominatimUrl,
   openMeteoUrl,
   parseGazetteerBytes,
@@ -23,7 +23,7 @@ import {
   searchOnline,
   searchPlaces,
 } from "./places";
-import { PLACE_CACHE_TTL, getPlaceCache, putPlaceCache, saveSettings } from "./repo";
+import { getPlaceCache, PLACE_CACHE_TTL, putPlaceCache, saveSettings } from "./repo";
 
 const GZ = fileURLToPath(new URL("./geonames-in.json.gz", import.meta.url));
 
@@ -129,8 +129,28 @@ describe("bundled gazetteer", () => {
   });
 
   it("typing-speed searches stay fast (≤ 20 ms each)", () => {
-    const qs = ["V", "Va", "Vai", "Vait", "Vaith", "Vaithe", "Vaithee", "Vaithees", "Ch", "Che", "Chen", "Chenn", "Chenna",
-      "Sa", "pur", "abad", "Bengalru", "Thiruvanantapuram", "Hyderabad Sindh", "New Yo"];
+    const qs = [
+      "V",
+      "Va",
+      "Vai",
+      "Vait",
+      "Vaith",
+      "Vaithe",
+      "Vaithee",
+      "Vaithees",
+      "Ch",
+      "Che",
+      "Chen",
+      "Chenn",
+      "Chenna",
+      "Sa",
+      "pur",
+      "abad",
+      "Bengalru",
+      "Thiruvanantapuram",
+      "Hyderabad Sindh",
+      "New Yo",
+    ];
     const times = qs.map((q) => {
       const t0 = performance.now();
       searchPlaces(q);
@@ -154,7 +174,10 @@ describe("bundled gazetteer", () => {
       if (!e || canonName(e.name).replace(/ /g, "").length < 2) continue;
       const hits = searchPlaces(e.name, 5000);
       expect(canonName(hits[0]?.name ?? "").length, e.name).toBeGreaterThan(0);
-      expect(hits.some((h) => h.geonameId === e.id), e.name).toBe(true);
+      expect(
+        hits.some((h) => h.geonameId === e.id),
+        e.name,
+      ).toBe(true);
       expect(g.get(e.id)?.name).toBe(e.name);
     }
   });
@@ -210,8 +233,10 @@ describe("mappers", () => {
     ]);
     expect(mapOpenMeteo({})).toEqual([]);
     expect(mapOpenMeteo({ results: [{ name: "x" }, null, 3] })).toEqual([]);
-    expect(mapOpenMeteo({ results: [{ name: "No zone", latitude: 51.5, longitude: -0.12, country_code: "gb" }] })[0])
-      .toMatchObject({ country: "GB", timezone: "Europe/London" });
+    expect(mapOpenMeteo({ results: [{ name: "No zone", latitude: 51.5, longitude: -0.12, country_code: "gb" }] })[0]).toMatchObject({
+      country: "GB",
+      timezone: "Europe/London",
+    });
   });
 
   it("mapNominatim parses string coordinates and looks the zone up", () => {

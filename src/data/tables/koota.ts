@@ -91,17 +91,7 @@ export const VASHYA: Record<VashyaClass, Record<VashyaClass, number>> = {
 
 // ─── Tārā (3) ────────────────────────────────────────────────────────────────
 /** The nine tārās, counted inclusively from one Moon's nakshatra to the other's, modulo 9. */
-export const TARA_NAMES = [
-  "Janma",
-  "Sampat",
-  "Vipat",
-  "Kṣema",
-  "Pratyari",
-  "Sādhaka",
-  "Vadha",
-  "Mitra",
-  "Parama-Mitra",
-] as const;
+export const TARA_NAMES = ["Janma", "Sampat", "Vipat", "Kṣema", "Pratyari", "Sādhaka", "Vadha", "Mitra", "Parama-Mitra"] as const;
 /** Tārās 3, 5 and 7 (Vipat, Pratyari, Vadha) are the unkind ones (Muhūrta Cintāmaṇi ch. 6). */
 export const TARA_UNKIND: readonly number[] = [3, 5, 7];
 

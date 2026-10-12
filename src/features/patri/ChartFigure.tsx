@@ -72,18 +72,15 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
   const scale = width / 408; // viewBox is 408 wide (−4…404)
   const toPx = (x: number, y: number) => [(x + 4) * scale, (y + 4) * scale] as const;
 
-  const place = useCallback(
-    (px: number, py: number) => {
-      const l = loupe.current;
-      const g = lens.current;
-      if (l) {
-        l.style.left = `${px}px`;
-        l.style.top = `${py}px`;
-      }
-      if (g) g.style.transform = `translate(${R - px * Z}px, ${R - py * Z}px)`;
-    },
-    [],
-  );
+  const place = useCallback((px: number, py: number) => {
+    const l = loupe.current;
+    const g = lens.current;
+    if (l) {
+      l.style.left = `${px}px`;
+      l.style.top = `${py}px`;
+    }
+    if (g) g.style.transform = `translate(${R - px * Z}px, ${R - py * Z}px)`;
+  }, []);
 
   const nearest = useCallback(
     (px: number, py: number) => {
@@ -120,12 +117,21 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
         const [tx, ty] = n.at;
         const dur = reducedMotion() ? 160 : 420;
         const easing = reducedMotion() ? "ease-out" : SPRING;
-        l?.animate([{ left: `${px}px`, top: `${py}px` }, { left: `${tx}px`, top: `${ty}px` }], { duration: dur, easing, fill: "forwards" });
-        g?.animate([{ transform: `translate(${R - px * Z}px, ${R - py * Z}px)` }, { transform: `translate(${R - tx * Z}px, ${R - ty * Z}px)` }], {
-          duration: dur,
-          easing,
-          fill: "forwards",
-        });
+        l?.animate(
+          [
+            { left: `${px}px`, top: `${py}px` },
+            { left: `${tx}px`, top: `${ty}px` },
+          ],
+          { duration: dur, easing, fill: "forwards" },
+        );
+        g?.animate(
+          [{ transform: `translate(${R - px * Z}px, ${R - py * Z}px)` }, { transform: `translate(${R - tx * Z}px, ${R - ty * Z}px)` }],
+          {
+            duration: dur,
+            easing,
+            fill: "forwards",
+          },
+        );
       }
     },
     [lit, nearest, onLit, place],
@@ -238,15 +244,7 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
         <div className={`loupe${up ? " is-up" : ""}`} ref={loupe} aria-hidden="true" data-decorative="true">
           <div className="loupe__glass">
             <div ref={lens} style={{ width: width * Z, height: width * Z }}>
-              <KundliChart
-                title=""
-                style={style}
-                script={script}
-                lagnaSign={patri.lagna.sign}
-                bodies={bodies}
-                lit={lit}
-                static
-              />
+              <KundliChart title="" style={style} script={script} lagnaSign={patri.lagna.sign} bodies={bodies} lit={lit} static />
             </div>
           </div>
           <div className="loupe__rim" />
@@ -271,7 +269,11 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
               <span className="sep">·</span>
               <span>LORD {(GRAHA_NAMES[g.nakshatraLord] ?? "").toUpperCase()}</span>
               {g.retrograde ? <span>℞</span> : null}
-              {g.boundary ? <span className="badge-bound">≤2′ · {formatArcmin(g.boundary.arcminutesTo)} to {g.boundary.otherSide}</span> : null}
+              {g.boundary ? (
+                <span className="badge-bound">
+                  ≤2′ · {formatArcmin(g.boundary.arcminutesTo)} to {g.boundary.otherSide}
+                </span>
+              ) : null}
             </>
           ) : (
             <span className="loupe-hint">Touch a graha — the loupe rises</span>

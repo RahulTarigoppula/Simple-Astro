@@ -32,20 +32,7 @@ export const SIGN_ENGRAVED = [
   "MEENA",
 ] as const;
 
-export const SIGN_DEV = [
-  "मेष",
-  "वृषभ",
-  "मिथुन",
-  "कर्क",
-  "सिंह",
-  "कन्या",
-  "तुला",
-  "वृश्चिक",
-  "धनु",
-  "मकर",
-  "कुम्भ",
-  "मीन",
-] as const;
+export const SIGN_DEV = ["मेष", "वृषभ", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुम्भ", "मीन"] as const;
 
 /** The engraved strip prints the sign glyph only as a Unicode mark for the sidereal rāśi index. */
 export const SIGN_MARK = ["♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"] as const;
@@ -251,15 +238,7 @@ export const TITHI_DEV = [
   "पूर्णिमा",
 ] as const;
 
-export const VARA_NAMES = [
-  "Ravivāra",
-  "Somavāra",
-  "Maṅgalavāra",
-  "Budhavāra",
-  "Guruvāra",
-  "Śukravāra",
-  "Śanivāra",
-] as const;
+export const VARA_NAMES = ["Ravivāra", "Somavāra", "Maṅgalavāra", "Budhavāra", "Guruvāra", "Śukravāra", "Śanivāra"] as const;
 
 export const VARA_DEV = ["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"] as const;
 

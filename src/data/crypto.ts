@@ -11,7 +11,7 @@
 // Node and in some worker contexts) and its typeson layer is opaque to tests. This codec is
 // small, deterministic and restores every table byte-identically (see crypto.test.ts).
 
-import { type TableName, SCHEMA_VERSION, TABLE_NAMES, db } from "./db";
+import { db, SCHEMA_VERSION, TABLE_NAMES, type TableName } from "./db";
 import { clearPatriCache, getSettings, setMeta } from "./repo";
 
 export const ENVELOPE_VERSION = 1;
@@ -72,26 +72,13 @@ function normalisePassphrase(p: string): string {
   return p.normalize("NFC");
 }
 
-async function deriveKey(
-  passphrase: string,
-  salt: Uint8Array<ArrayBuffer>,
-  iterations: number,
-  usage: KeyUsage,
-): Promise<CryptoKey> {
-  const base = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(normalisePassphrase(passphrase)),
-    "PBKDF2",
-    false,
-    ["deriveKey"],
-  );
-  return crypto.subtle.deriveKey(
-    { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
-    base,
-    { name: "AES-GCM", length: 256 },
-    false,
-    [usage],
-  );
+async function deriveKey(passphrase: string, salt: Uint8Array<ArrayBuffer>, iterations: number, usage: KeyUsage): Promise<CryptoKey> {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(normalisePassphrase(passphrase)), "PBKDF2", false, [
+    "deriveKey",
+  ]);
+  return crypto.subtle.deriveKey({ name: "PBKDF2", salt, iterations, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, [
+    usage,
+  ]);
 }
 
 export interface SealMeta {
@@ -130,16 +117,16 @@ export async function seal(plain: Blob, passphrase: string, meta: SealMeta = def
     alg: "AES-GCM-256",
   };
   const headerBytes = new TextEncoder().encode(JSON.stringify(header));
-  const ct = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv, additionalData: headerBytes },
-    key,
-    await plain.arrayBuffer(),
-  );
+  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv, additionalData: headerBytes }, key, await plain.arrayBuffer());
   return new Blob([headerBytes, "\n", new Uint8Array(ct)], { type: "application/octet-stream" });
 }
 
 /** Read and validate the header line without touching the key. */
-export function readHeader(bytes: Uint8Array): { header: EnvelopeHeader; headerBytes: Uint8Array<ArrayBuffer>; body: Uint8Array<ArrayBuffer> } {
+export function readHeader(bytes: Uint8Array): {
+  header: EnvelopeHeader;
+  headerBytes: Uint8Array<ArrayBuffer>;
+  body: Uint8Array<ArrayBuffer>;
+} {
   const nl = bytes.subarray(0, MAX_HEADER_BYTES).indexOf(0x0a);
   if (nl <= 0) throw new ImportError("NOT_AN_ENVELOPE");
   const headerBytes = new Uint8Array(bytes.subarray(0, nl));
@@ -188,11 +175,7 @@ export async function unseal(file: Blob, passphrase: string): Promise<{ header: 
   }
   const key = await deriveKey(passphrase, b64decode(header.salt), header.iter, "decrypt");
   try {
-    const plain = await crypto.subtle.decrypt(
-      { name: "AES-GCM", iv: b64decode(header.iv), additionalData: headerBytes },
-      key,
-      body,
-    );
+    const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64decode(header.iv), additionalData: headerBytes }, key, body);
     consecutiveFailures = 0;
     return { header, plain: new Uint8Array(plain) };
   } catch (e) {
@@ -282,11 +265,15 @@ export interface BackupDocument {
 
 /** Snapshot every table inside one read transaction, then encode outside it. */
 export async function exportPlaintext(now: number = Date.now()): Promise<string> {
-  const snapshot = await db.transaction("r", TABLE_NAMES.map((t) => db.table(t)), async () => {
-    const out: Partial<Record<TableName, unknown[]>> = {};
-    for (const t of TABLE_NAMES) out[t] = await db.table(t).toArray();
-    return out;
-  });
+  const snapshot = await db.transaction(
+    "r",
+    TABLE_NAMES.map((t) => db.table(t)),
+    async () => {
+      const out: Partial<Record<TableName, unknown[]>> = {};
+      for (const t of TABLE_NAMES) out[t] = await db.table(t).toArray();
+      return out;
+    },
+  );
   const tables: Partial<Record<TableName, Json[]>> = {};
   for (const t of TABLE_NAMES) {
     const rows: Json[] = [];
@@ -342,13 +329,17 @@ export async function importPlaintext(text: string): Promise<Record<TableName, n
   }
 
   const counts = {} as Record<TableName, number>;
-  await db.transaction("rw", TABLE_NAMES.map((t) => db.table(t)), async () => {
-    for (const t of TABLE_NAMES) await db.table(t).clear();
-    for (const t of TABLE_NAMES) {
-      await db.table(t).bulkAdd(decoded[t]);
-      counts[t] = decoded[t].length;
-    }
-  });
+  await db.transaction(
+    "rw",
+    TABLE_NAMES.map((t) => db.table(t)),
+    async () => {
+      for (const t of TABLE_NAMES) await db.table(t).clear();
+      for (const t of TABLE_NAMES) {
+        await db.table(t).bulkAdd(decoded[t]);
+        counts[t] = decoded[t].length;
+      }
+    },
+  );
   clearPatriCache();
   return counts;
 }

@@ -13,7 +13,7 @@ import { boundaryNote, PRESET_SHORT } from "../../engine/boundary";
 import { formatDms } from "../../engine/math";
 import { addVarga } from "../../engine/patri";
 import { formatOffset } from "../../engine/time";
-import { type EnginePreset, type GrahaId, PRESET_HASH, type Patri, type VargaNumber, type YogaHit } from "../../engine/types";
+import { type EnginePreset, type GrahaId, type Patri, PRESET_HASH, type VargaNumber, type YogaHit } from "../../engine/types";
 import { VARGA_NAMES } from "../../engine/vargas";
 import { haptics } from "../../platform/haptics";
 import { reducedMotion } from "../../platform/native";
@@ -125,7 +125,8 @@ export default function PatriScreen() {
     const from = pull.current;
     if (!from) return;
     setPull(0);
-    if (!reducedMotion()) sheet.current?.animate([{ transform: `translateY(${from}px)` }, { transform: "none" }], { duration: 480, easing: SPRING });
+    if (!reducedMotion())
+      sheet.current?.animate([{ transform: `translateY(${from}px)` }, { transform: "none" }], { duration: 480, easing: SPRING });
     haptics.impact("light");
   };
 
@@ -136,7 +137,10 @@ export default function PatriScreen() {
       if (sealBtn.current) sealBtn.current.style.transform = k > 0 ? `scale(${1 - 0.06 * k})` : "";
     },
     onFire: () => {
-      sealBtn.current?.animate([{ transform: "scale(1.08)" }, { transform: "scale(1)" }], { duration: reducedMotion() ? 160 : 480, easing: SPRING });
+      sealBtn.current?.animate([{ transform: "scale(1.08)" }, { transform: "scale(1)" }], {
+        duration: reducedMotion() ? 160 : 480,
+        easing: SPRING,
+      });
       play("thunk");
       haptics.impact("medium");
       setRendered(settings.preset);
@@ -218,7 +222,14 @@ export default function PatriScreen() {
             >
               <svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true">
                 {patri ? (
-                  <text x="23" y="29" textAnchor="middle" fill="var(--lac-text)" style={{ fontFamily: "var(--font-display)", fontSize: 15 }} lang="hi">
+                  <text
+                    x="23"
+                    y="29"
+                    textAnchor="middle"
+                    fill="var(--lac-text)"
+                    style={{ fontFamily: "var(--font-display)", fontSize: 15 }}
+                    lang="hi"
+                  >
                     {(NAKSHATRA_DEV[patri.grahas.MO.nakshatra] ?? "").slice(0, 2)}
                   </text>
                 ) : null}
@@ -254,8 +265,8 @@ export default function PatriScreen() {
               </h1>
               {b ? (
                 <p className="birthline">
-                  {b.localD} {MONTHS[b.localMo - 1]} {b.localY} · {String(b.localH).padStart(2, "0")}:{String(b.localMi).padStart(2, "0")} local ·{" "}
-                  {[b.place.name, b.place.admin1, b.place.country].filter(Boolean).join(", ")}
+                  {b.localD} {MONTHS[b.localMo - 1]} {b.localY} · {String(b.localH).padStart(2, "0")}:{String(b.localMi).padStart(2, "0")}{" "}
+                  local · {[b.place.name, b.place.admin1, b.place.country].filter(Boolean).join(", ")}
                 </p>
               ) : null}
               {b && patri ? (
@@ -328,7 +339,17 @@ export default function PatriScreen() {
       </div>
 
       <Sheet open={foot !== null} onClose={() => setFoot(null)} label="Footnote">
-        {foot && patri ? <FootBody foot={foot} patri={patri} zone={b?.zone ?? "UTC"} onShow={(g) => { setFoot(null); setLit(g); }} /> : null}
+        {foot && patri ? (
+          <FootBody
+            foot={foot}
+            patri={patri}
+            zone={b?.zone ?? "UTC"}
+            onShow={(g) => {
+              setFoot(null);
+              setLit(g);
+            }}
+          />
+        ) : null}
         <div className="tools" style={{ paddingBottom: "var(--space-3)" }}>
           <button type="button" className="linkish" onClick={() => setFoot(null)}>
             Close
@@ -342,9 +363,7 @@ export default function PatriScreen() {
       </Sheet>
     </Screen>
   );
-
 }
-
 
 interface BodyProps {
   patri: Patri;
@@ -364,7 +383,23 @@ interface BodyProps {
   profileId: string;
 }
 
-function PatriBody({ patri, zone, style, script, inkKey, skipInk, lit, setLit, onFlip, varga, setVarga, vchart, setFoot, nowMs, profileId }: BodyProps) {
+function PatriBody({
+  patri,
+  zone,
+  style,
+  script,
+  inkKey,
+  skipInk,
+  lit,
+  setLit,
+  onFlip,
+  varga,
+  setVarga,
+  vchart,
+  setFoot,
+  nowMs,
+  profileId,
+}: BodyProps) {
   const pc = patri.birthPanchang;
   const p = patri.preset;
   const moon = patri.grahas.MO;
@@ -388,7 +423,14 @@ function PatriBody({ patri, zone, style, script, inkKey, skipInk, lit, setLit, o
           pc.tithi.endMs,
           `Moon − Sun elongation ${pc.elongation.toFixed(4)}° at birth; each tithi is 12°.`,
         )}
-        {row("Vāra", pc.vara.name, `sunrise ${hhmmss(pc.sunriseMs, zone)}`, `Vāra — ${pc.vara.name}`, null, "The weekday of the governing sunrise, not of the calendar date.")}
+        {row(
+          "Vāra",
+          pc.vara.name,
+          `sunrise ${hhmmss(pc.sunriseMs, zone)}`,
+          `Vāra — ${pc.vara.name}`,
+          null,
+          "The weekday of the governing sunrise, not of the calendar date.",
+        )}
         {row(
           "Nakṣatra",
           <>
@@ -402,8 +444,22 @@ function PatriBody({ patri, zone, style, script, inkKey, skipInk, lit, setLit, o
           pc.nakshatra.endMs,
           "The Moon's sidereal mansion; each is 13°20′, each pada 3°20′.",
         )}
-        {row("Yoga", pc.yoga.name, `no. ${pc.yoga.index}`, `Yoga — ${pc.yoga.name}`, pc.yoga.endMs, "Sun + Moon sidereal longitudes, in 13°20′ steps.")}
-        {row("Karaṇa", pc.karana.name, `half-tithi ${pc.karana.index}`, `Karaṇa — ${pc.karana.name}`, pc.karana.endMs, "Half a tithi: 6° of elongation.")}
+        {row(
+          "Yoga",
+          pc.yoga.name,
+          `no. ${pc.yoga.index}`,
+          `Yoga — ${pc.yoga.name}`,
+          pc.yoga.endMs,
+          "Sun + Moon sidereal longitudes, in 13°20′ steps.",
+        )}
+        {row(
+          "Karaṇa",
+          pc.karana.name,
+          `half-tithi ${pc.karana.index}`,
+          `Karaṇa — ${pc.karana.name}`,
+          pc.karana.endMs,
+          "Half a tithi: 6° of elongation.",
+        )}
         {row(
           "Candra",
           <>
@@ -421,11 +477,20 @@ function PatriBody({ patri, zone, style, script, inkKey, skipInk, lit, setLit, o
 
       <TurmericBand dev="राशि चक्र" title="Fig. 1 — D1" meta={style === "north" ? "whole sign · north" : "whole sign · south"} />
       <div className="figure">
-        <ChartFigure patri={patri} style={style} script={script} inkKey={inkKey} skipInk={skipInk} lit={lit} onLit={setLit} onFlip={onFlip} />
+        <ChartFigure
+          patri={patri}
+          style={style}
+          script={script}
+          inkKey={inkKey}
+          skipInk={skipInk}
+          lit={lit}
+          onLit={setLit}
+          onFlip={onFlip}
+        />
       </div>
       <p className="figcap">
-        Fig. 1 — Rāśi (D1), {presetLabel(p)}, whole-sign houses, {p.node} node. Ayanāṃśa at birth {formatDms(patri.ayanamsa)}. The tilak marks the
-        Lagna in {SIGN_NAMES[patri.lagna.sign]} {formatDms(patri.lagna.degInSign)}.
+        Fig. 1 — Rāśi (D1), {presetLabel(p)}, whole-sign houses, {p.node} node. Ayanāṃśa at birth {formatDms(patri.ayanamsa)}. The tilak
+        marks the Lagna in {SIGN_NAMES[patri.lagna.sign]} {formatDms(patri.lagna.degInSign)}.
       </p>
 
       <TurmericBand dev="ग्रह" title="Grahas" meta={`sidereal · ${PRESET_SHORT[p.ayanamsa]}`} />
@@ -433,7 +498,9 @@ function PatriBody({ patri, zone, style, script, inkKey, skipInk, lit, setLit, o
       {Object.values(patri.grahas).some((g) => g.boundary) || patri.lagna.boundary ? (
         <p className="note-haldi">
           <span aria-hidden="true">⚑</span>
-          <span>An asterisk marks a body within 2′ of a sign, nakṣatra or pada edge — tap it to see what the other presets would read.</span>
+          <span>
+            An asterisk marks a body within 2′ of a sign, nakṣatra or pada edge — tap it to see what the other presets would read.
+          </span>
         </p>
       ) : null}
 
@@ -464,7 +531,11 @@ function PatriBody({ patri, zone, style, script, inkKey, skipInk, lit, setLit, o
                 style={style}
                 script={script}
                 lagnaSign={vchart.ascendantSign}
-                bodies={(Object.keys(vchart.placements) as GrahaId[]).map((g) => ({ id: g, sign: vchart.placements[g], retro: patri.grahas[g].retrograde }))}
+                bodies={(Object.keys(vchart.placements) as GrahaId[]).map((g) => ({
+                  id: g,
+                  sign: vchart.placements[g],
+                  retro: patri.grahas[g].retrograde,
+                }))}
                 showDegrees={false}
                 inkKey={`${inkKey}|D${varga}`}
                 skipInk={skipInk}
@@ -493,7 +564,12 @@ function PatriBody({ patri, zone, style, script, inkKey, skipInk, lit, setLit, o
           </h3>
           <p>
             {y.reading}
-            <button type="button" className="cite" aria-label={`Citation: ${y.citation.text} ${y.citation.ref}`} onClick={() => setFoot({ kind: "yoga", hit: y })}>
+            <button
+              type="button"
+              className="cite"
+              aria-label={`Citation: ${y.citation.text} ${y.citation.ref}`}
+              onClick={() => setFoot({ kind: "yoga", hit: y })}
+            >
               {yi + 1}
             </button>
           </p>
@@ -555,7 +631,9 @@ function FootBody({ foot, patri, zone, onShow }: { foot: NonNullable<Foot>; patr
             </li>
           ))}
         </ul>
-        <p className="p p--muted">The three Lahiri presets differ by up to 41″; a body this close to an edge is classified honestly, not hidden.</p>
+        <p className="p p--muted">
+          The three Lahiri presets differ by up to 41″; a body this close to an edge is classified honestly, not hidden.
+        </p>
       </div>
     );
   }
@@ -590,13 +668,17 @@ function FootBody({ foot, patri, zone, onShow }: { foot: NonNullable<Foot>; patr
       <p className="p">{foot.detail}</p>
       {foot.endMs ? (
         <p className="p">
-          Ends <span className="mono">{fullDate(foot.endMs, zone)} {hhmmss(foot.endMs, zone, true)}</span> ({zone}).
+          Ends{" "}
+          <span className="mono">
+            {fullDate(foot.endMs, zone)} {hhmmss(foot.endMs, zone, true)}
+          </span>{" "}
+          ({zone}).
         </p>
       ) : null}
       <p className="p p--muted">
-        Sunrise convention: {patri.preset.sunrise === "upper-limb-refracted" ? "upper limb with refraction" : "disc centre"} · ayanāṃśa {PRESET_SHORT[patri.preset.ayanamsa]}.
+        Sunrise convention: {patri.preset.sunrise === "upper-limb-refracted" ? "upper limb with refraction" : "disc centre"} · ayanāṃśa{" "}
+        {PRESET_SHORT[patri.preset.ayanamsa]}.
       </p>
     </div>
   );
 }
-

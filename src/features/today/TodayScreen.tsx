@@ -33,7 +33,14 @@ interface DeskPlace {
   whose: string | null;
 }
 
-export const BENGALURU: DeskPlace = { name: "Bengaluru, Karnataka, IN", lat: 12.9716, lon: 77.5946, elevation: 920, zone: "Asia/Kolkata", whose: null };
+export const BENGALURU: DeskPlace = {
+  name: "Bengaluru, Karnataka, IN",
+  lat: 12.9716,
+  lon: 77.5946,
+  elevation: 920,
+  zone: "Asia/Kolkata",
+  whose: null,
+};
 
 function placeOf(p: Profile | null): DeskPlace {
   if (!p) return BENGALURU;
@@ -99,7 +106,13 @@ function instantLines(clock: ZoneClock, label: string, ms: number): Array<[strin
   return [
     [label, `${clock.hms(ms)} · ${clock.dateLong(ms)}`],
     ["Zone", `${clock.zone} · ${clock.offset(ms)}`],
-    ["UTC", new Date(ms).toISOString().replace("T", " ").replace(/\.\d+Z$/, "Z")],
+    [
+      "UTC",
+      new Date(ms)
+        .toISOString()
+        .replace("T", " ")
+        .replace(/\.\d+Z$/, "Z"),
+    ],
   ];
 }
 
@@ -175,7 +188,12 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
         </>
       ),
       end: endsLabel(clock, p.nakshatra.endMs, dayMs),
-      foot: ending(`${nName}, pada ${p.nakshatra.pada}`, nDev, p.nakshatra.endMs, "The Moon's sidereal mansion — 13°20′ each, four padas of 3°20′."),
+      foot: ending(
+        `${nName}, pada ${p.nakshatra.pada}`,
+        nDev,
+        p.nakshatra.endMs,
+        "The Moon's sidereal mansion — 13°20′ each, four padas of 3°20′.",
+      ),
     },
     {
       id: "yoga",
@@ -186,7 +204,12 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
         </>
       ),
       end: endsLabel(clock, p.yoga.endMs, dayMs),
-      foot: ending(p.yoga.name, yDev, p.yoga.endMs, `Yoga ${p.yoga.index} of 27 — the sum of the sidereal Sun and Moon in steps of 13°20′.`),
+      foot: ending(
+        p.yoga.name,
+        yDev,
+        p.yoga.endMs,
+        `Yoga ${p.yoga.index} of 27 — the sum of the sidereal Sun and Moon in steps of 13°20′.`,
+      ),
     },
     {
       id: "karana",
@@ -211,7 +234,14 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
         </span>
       ),
       end: `${Math.floor((p.sunsetMs - p.sunriseMs) / 3_600_000)}h ${String(Math.round(((p.sunsetMs - p.sunriseMs) % 3_600_000) / 60_000)).padStart(2, "0")}m light`,
-      foot: range("Sunrise and sunset", "सूर्योदय · सूर्यास्त", [p.sunriseMs, p.sunsetMs], p.polar ? `The Sun neither rises nor sets here today (${p.polar}); the day is local apparent noon ± 6 hours.` : "Daylight at the leaf's place, under the sunrise convention below."),
+      foot: range(
+        "Sunrise and sunset",
+        "सूर्योदय · सूर्यास्त",
+        [p.sunriseMs, p.sunsetMs],
+        p.polar
+          ? `The Sun neither rises nor sets here today (${p.polar}); the day is local apparent noon ± 6 hours.`
+          : "Daylight at the leaf's place, under the sunrise convention below.",
+      ),
     },
     {
       id: "moon",
@@ -237,7 +267,12 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
       k: "Rāhu Kāla",
       v: <span className="mono today-num haldi-band">{rangeLabel(clock, p.rahuKaal)}</span>,
       haldi: true,
-      foot: range("Rāhu Kāla", "राहु काल", p.rahuKaal, "One eighth of the daylight, its slot fixed by the weekday. Tradition sets new undertakings aside in it."),
+      foot: range(
+        "Rāhu Kāla",
+        "राहु काल",
+        p.rahuKaal,
+        "One eighth of the daylight, its slot fixed by the weekday. Tradition sets new undertakings aside in it.",
+      ),
     },
     {
       id: "yama",
@@ -475,9 +510,7 @@ export default function TodayScreen() {
               </div>
               <p className="p p--muted today__whose">
                 {place.whose ? (
-                  <>
-                    At {place.whose}'s birthplace — a pañcāṅga belongs to a place.{" "}
-                  </>
+                  <>At {place.whose}'s birthplace — a pañcāṅga belongs to a place. </>
                 ) : (
                   <>
                     No leaf in the bundle yet, so the dial reads Bengaluru.{" "}

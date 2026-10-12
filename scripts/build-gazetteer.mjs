@@ -15,7 +15,7 @@
 // `fields` order. Gzipped at level 9; the script asserts the size budget and that the
 // must-resolve names (including historical names such as Bombay / Madras) are present.
 
-import { mkdirSync, existsSync, readFileSync, writeFileSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -62,9 +62,7 @@ const MUST_RESOLVE = [
   ["London", "GB", []],
 ];
 
-const SKIP_ALT_LANGS = new Set([
-  "link", "iata", "icao", "faac", "unlc", "post", "wkdt", "abbr", "fr_1793", "tcid", "phon", "piny",
-]);
+const SKIP_ALT_LANGS = new Set(["link", "iata", "icao", "faac", "unlc", "post", "wkdt", "abbr", "fr_1793", "tcid", "phon", "piny"]);
 
 // ─── download + unzip ──────────────────────────────────────────────────────────
 
@@ -128,7 +126,12 @@ function* tsv(buf) {
 // ─── text helpers ──────────────────────────────────────────────────────────────
 
 const fold = (s) =>
-  s.normalize("NFD").replace(/\p{M}/gu, "").replace(/[‘’ʼ`]/g, "'").toLowerCase().trim();
+  s
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .replace(/[‘’ʼ`]/g, "'")
+    .toLowerCase()
+    .trim();
 const squash = (s) => fold(s).replace(/[^a-z0-9]/g, "");
 const isLatin = (s) => /^[A-Za-z][A-Za-z .'-]*$/.test(s.normalize("NFD").replace(/\p{M}/gu, ""));
 
@@ -256,9 +259,7 @@ async function main() {
 
   const fields = ["name", "alt", "admin1", "country", "lat", "lon", "tz", "id", "pop"];
   const encode = (rows) => {
-    const sorted = [...rows].sort(
-      (a, b) => a[3].localeCompare(b[3]) || a[2].localeCompare(b[2]) || b[8] - a[8] || a[7] - b[7],
-    );
+    const sorted = [...rows].sort((a, b) => a[3].localeCompare(b[3]) || a[2].localeCompare(b[2]) || b[8] - a[8] || a[7] - b[7]);
     const doc = {
       v: 1,
       fields,

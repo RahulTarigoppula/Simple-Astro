@@ -26,14 +26,7 @@ export function HoldStamp({ label, ms = 600, disabled, className, ariaLabel, onF
     ...(onCancel ? { onCancel } : {}),
   });
   return (
-    <button
-      ref={btn}
-      type="button"
-      className={`stamp ${className ?? ""}`}
-      disabled={disabled}
-      aria-label={ariaLabel}
-      {...handlers}
-    >
+    <button ref={btn} type="button" className={`stamp ${className ?? ""}`} disabled={disabled} aria-label={ariaLabel} {...handlers}>
       <span className="fill" ref={fill} aria-hidden="true" />
       <span>{label}</span>
     </button>

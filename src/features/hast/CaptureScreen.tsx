@@ -227,7 +227,12 @@ export default function CaptureScreen() {
     if (isNative()) {
       try {
         const { Camera, CameraResultType, CameraSource } = await import("@capacitor/camera");
-        const photo = await Camera.getPhoto({ resultType: CameraResultType.Uri, quality: 90, width: MAX_SIDE, source: CameraSource.Prompt });
+        const photo = await Camera.getPhoto({
+          resultType: CameraResultType.Uri,
+          quality: 90,
+          width: MAX_SIDE,
+          source: CameraSource.Prompt,
+        });
         if (photo.webPath) await fromBlob(await (await fetch(photo.webPath)).blob());
       } catch {
         // the person closed the picker
@@ -254,7 +259,12 @@ export default function CaptureScreen() {
       <div className="capture__frame">
         {/* biome-ignore lint/a11y/useMediaCaption: a live camera preview has no audio track */}
         <video ref={video} playsInline muted aria-label="Camera preview" />
-        <svg className={`capture__outline${gate.ok ? " is-ok" : ""}`} viewBox="0 0 100 120" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <svg
+          className={`capture__outline${gate.ok ? " is-ok" : ""}`}
+          viewBox="0 0 100 120"
+          preserveAspectRatio="xMidYMid meet"
+          aria-hidden="true"
+        >
           <path d="M30 118c-8-14-12-26-12-34V56a5 5 0 0 1 10 0v14V30a5 5 0 0 1 10 0v34V22a5 5 0 0 1 10 0v40V28a5 5 0 0 1 10 0v38V42a5 5 0 0 1 10 0v34c0 18-4 30-10 42" />
         </svg>
         {camera !== "live" ? (
@@ -281,7 +291,12 @@ export default function CaptureScreen() {
           </>
         ) : null}
         <div className="tools">
-          <Gauge label="sharpness" pips={quality ? sharpnessPips(quality.sharpness.value) : 0} low={!sharpOk} value={quality ? quality.sharpness.value.toFixed(0) : "—"} />
+          <Gauge
+            label="sharpness"
+            pips={quality ? sharpnessPips(quality.sharpness.value) : 0}
+            low={!sharpOk}
+            value={quality ? quality.sharpness.value.toFixed(0) : "—"}
+          />
           <Gauge
             label="exposure"
             pips={quality ? exposurePips(quality.exposure.score) : 0}

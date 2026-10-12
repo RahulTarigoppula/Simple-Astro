@@ -3,9 +3,9 @@ import citations from "../../data/citations.json";
 import { BANNED_WORDS } from "../../test/banned-words";
 import { loadTruth } from "../../test/palm-fixtures";
 import type { Landmark, PalmElement, PalmLine, PalmReading } from "../types";
-import { LM } from "./landmarks";
 import { TEMPLATES, tracedLine } from "./label";
-import { composeReading, framingNote, palmHits, PALM_RULE_TABLE, withLineReplaced } from "./rules";
+import { LM } from "./landmarks";
+import { composeReading, framingNote, PALM_RULE_TABLE, palmHits, withLineReplaced } from "./rules";
 
 const known = new Set(citations.entries.map((e) => `${e.text}|${e.ref}`));
 
@@ -144,7 +144,10 @@ describe("palm rules and reading text (§6.13 [7], §10.5)", () => {
       "s",
     );
     expect(hits.map((h) => h.ruleId)).toEqual(["element-fire", "ring-long", "thumb-firm"]);
-    expect(composeReading({ captureId: "x", worldLandmarks: loadTruth().worldLandmarks, lines: [], framing: "dominant", computedAt: 0 })?.element).toBe("fire");
+    expect(
+      composeReading({ captureId: "x", worldLandmarks: loadTruth().worldLandmarks, lines: [], framing: "dominant", computedAt: 0 })
+        ?.element,
+    ).toBe("fire");
   });
 
   it("every rule id in the table has a template (no silent gaps)", () => {

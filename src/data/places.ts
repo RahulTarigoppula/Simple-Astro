@@ -9,7 +9,7 @@
 
 import tzLookup from "@photostructure/tz-lookup";
 import type { Place } from "../engine/types";
-import { PLACE_CACHE_TTL, getPlaceCache, getSettings, putPlaceCache } from "./repo";
+import { getPlaceCache, getSettings, PLACE_CACHE_TTL, putPlaceCache } from "./repo";
 
 // ─── the bundled gazetteer ─────────────────────────────────────────────────────
 //
@@ -71,7 +71,10 @@ export function canonName(s: string): string {
   }
   t = t.toLowerCase();
   if (CLEAN.test(t)) return t;
-  return t.replace(/['`]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+  return t
+    .replace(/['`]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }
 // biome-ignore lint/suspicious/noControlCharactersInRegex: ASCII range test
 const NON_ASCII = /[^\x00-\x7f]/;
@@ -179,8 +182,7 @@ function buildCompact(rows: unknown[], idx: FieldIndex): Compact {
   const valid: unknown[][] = [];
   for (const r of rows) {
     if (!Array.isArray(r)) continue;
-    if (!Number.isFinite(Number(r[idx.id])) || !Number.isFinite(Number(r[idx.lat])) || !Number.isFinite(Number(r[idx.lon])))
-      continue;
+    if (!Number.isFinite(Number(r[idx.id])) || !Number.isFinite(Number(r[idx.lat])) || !Number.isFinite(Number(r[idx.lon]))) continue;
     valid.push(r);
   }
   const n = valid.length;
@@ -519,8 +521,7 @@ function makeGazetteer(c: Compact): Gazetteer {
       (a, b) =>
         b[1] - a[1] ||
         (c.rank[b[0]] as number) - (c.rank[a[0]] as number) ||
-        (c.nameOff[a[0] + 1] as number) - (c.nameOff[a[0]] as number) -
-          ((c.nameOff[b[0] + 1] as number) - (c.nameOff[b[0]] as number)) ||
+        (c.nameOff[a[0] + 1] as number) - (c.nameOff[a[0]] as number) - ((c.nameOff[b[0] + 1] as number) - (c.nameOff[b[0]] as number)) ||
         (c.id[a[0]] as number) - (c.id[b[0]] as number),
     );
     const out: Place[] = [];

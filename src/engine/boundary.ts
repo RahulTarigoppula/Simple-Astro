@@ -3,7 +3,7 @@
 // other ayanāṃśa presets and says whether any of them would read differently.
 import { AYANAMSA_PRESETS, ayanamsa } from "./ayanamsa";
 import { formatArcmin, norm360 } from "./math";
-import { PADA_SPAN, nakshatraName, nakshatraOf, padaIndexOf, signName, signOf } from "./nakshatra";
+import { nakshatraName, nakshatraOf, PADA_SPAN, padaIndexOf, signName, signOf } from "./nakshatra";
 import type { AyanamsaPreset, BoundaryFlag, Deg, Jd, SignIdx } from "./types";
 
 /** The vermilion asterisk threshold. */
@@ -128,4 +128,3 @@ export function boundaryNote(lonTropical: Deg, jdTt: Jd, active: AyanamsaPreset)
   }
   return { distanceArcsec, kind: e.kind, here: e.here, otherSide: e.otherSide, flips, text };
 }
-

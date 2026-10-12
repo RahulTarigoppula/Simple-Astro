@@ -148,10 +148,8 @@ function morph(src: Float32Array, w: number, h: number, half: readonly number[],
   return out;
 }
 
-export const dilate = (src: Float32Array, w: number, h: number, half: readonly number[]): Float32Array =>
-  morph(src, w, h, half, true);
-export const erode = (src: Float32Array, w: number, h: number, half: readonly number[]): Float32Array =>
-  morph(src, w, h, half, false);
+export const dilate = (src: Float32Array, w: number, h: number, half: readonly number[]): Float32Array => morph(src, w, h, half, true);
+export const erode = (src: Float32Array, w: number, h: number, half: readonly number[]): Float32Array => morph(src, w, h, half, false);
 
 /** Black-hat = closing − image: the dark creases narrower than the kernel, as bright on dark. */
 export function blackHat(src: Float32Array, w: number, h: number, k = 25): Float32Array {
@@ -310,12 +308,7 @@ export function enhanceGrey(grey: Uint8Array, w: number, h: number): { blackHat:
 }
 
 /** Apply the palm and pigment masks to the enhancement output (shared by the TS and cv paths). */
-export function maskEnhanced(
-  img: ImageLike,
-  grey: Uint8Array,
-  bh: Float32Array,
-  blurred: Float32Array,
-): Enhanced {
+export function maskEnhanced(img: ImageLike, grey: Uint8Array, bh: Float32Array, blurred: Float32Array): Enhanced {
   const { width: w, height: h } = img;
   const palm = palmMask(grey, w, h);
   const pigment = pigmentMask(img, palm);

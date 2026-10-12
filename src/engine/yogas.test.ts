@@ -228,15 +228,9 @@ describe("Manglik (Kuja doṣa) and its cancellations", () => {
 
 describe("Graha Yuddha", () => {
   it("two star-planets within 1°: the northern one is the victor", () => {
-    const h = find(
-      yogasOf(0, { MA: { sign: 10, deg: 11.52, lat: 0.4 }, SA: { sign: 10, deg: 11.9, lat: -1.2 } }),
-      "graha-yuddha",
-    );
+    const h = find(yogasOf(0, { MA: { sign: 10, deg: 11.52, lat: 0.4 }, SA: { sign: 10, deg: 11.9, lat: -1.2 } }), "graha-yuddha");
     expect(h?.because.some((b) => b.note.includes("Maṅgala lies further north"))).toBe(true);
-    const flipped = find(
-      yogasOf(0, { MA: { sign: 10, deg: 11.52, lat: -1.2 }, SA: { sign: 10, deg: 11.9, lat: 0.4 } }),
-      "graha-yuddha",
-    );
+    const flipped = find(yogasOf(0, { MA: { sign: 10, deg: 11.52, lat: -1.2 }, SA: { sign: 10, deg: 11.9, lat: 0.4 } }), "graha-yuddha");
     expect(flipped?.because.some((b) => b.note.includes("Śani lies further north"))).toBe(true);
   });
   it("negative: 1.5° apart", () => {
@@ -269,9 +263,7 @@ describe("Nīca-Bhaṅga Rāja", () => {
     expect(h?.because[0]).toMatchObject({ grahaId: "SU", note: "Sūrya debilitated in Tulā" });
   });
   it("negative: debilitated Sūrya with no helper in a kendra", () => {
-    expect(
-      find(yogasOf(0, { SU: 6, MO: 1, VE: 2, MA: 5, SA: 8, ME: 5, JU: 1 }), "nica-bhanga-raja"),
-    ).toBeUndefined();
+    expect(find(yogasOf(0, { SU: 6, MO: 1, VE: 2, MA: 5, SA: 8, ME: 5, JU: 1 }), "nica-bhanga-raja")).toBeUndefined();
   });
 });
 

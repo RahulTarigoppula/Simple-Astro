@@ -139,8 +139,7 @@ export default function ChowkiScreen() {
             <span lang="hi" className="dev">
               {p.tithi.index === 30 ? "अमावस्या" : `${p.tithi.paksha === "shukla" ? "शुक्ल" : "कृष्ण"} ${TITHI_DEV[tithiNo] ?? ""}`}
             </span>{" "}
-            · {p.tithi.name}, <span lang="sa">{NAKSHATRA_NAMES[p.nakshatra.index]}</span> {p.nakshatra.pada} ·{" "}
-            {VARA_NAMES[p.vara.index]} ·{" "}
+            · {p.tithi.name}, <span lang="sa">{NAKSHATRA_NAMES[p.nakshatra.index]}</span> {p.nakshatra.pada} · {VARA_NAMES[p.vara.index]} ·{" "}
             <span className="mono">
               Rāhu Kāla {hhmm(p.rahuKaal[0], zone)}–{hhmm(p.rahuKaal[1], zone)}
             </span>
@@ -244,7 +243,12 @@ export default function ChowkiScreen() {
           </span>
         </button>
 
-        <Link to="/drawer" className="deskobj chowki__drawer" aria-label="The drawer — presets, export and the colophon" onClick={() => haptics.impact("light")}>
+        <Link
+          to="/drawer"
+          className="deskobj chowki__drawer"
+          aria-label="The drawer — presets, export and the colophon"
+          onClick={() => haptics.impact("light")}
+        >
           <DrawerKnobArt />
           <span className="lbl" aria-hidden="true">
             Drawer

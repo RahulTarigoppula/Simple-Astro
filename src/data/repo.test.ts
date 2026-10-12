@@ -1,18 +1,18 @@
 import "fake-indexeddb/auto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_PRESET, DEFAULT_SETTINGS, PRESET_HASH, type EnginePreset, type Profile } from "../engine/types";
+import { DEFAULT_PRESET, DEFAULT_SETTINGS, type EnginePreset, PRESET_HASH, type Profile } from "../engine/types";
 import { fakePatri, makeCapture, makeMilan, makeProfile, makeReading, photoBytes } from "../test/data-fixtures";
 
 const computePatri = vi.hoisted(() => vi.fn());
 vi.mock("../engine/patri", () => ({ computePatri }));
 
-import { SCHEMA_V1, TABLE_NAMES, db } from "./db";
+import { db, SCHEMA_V1, TABLE_NAMES } from "./db";
 import {
   burnProfile,
   castPatri,
   clearPatriCache,
-  deleteProfile,
   deletePalmCapture,
+  deleteProfile,
   getBlob,
   getBlobUrl,
   getMilan,

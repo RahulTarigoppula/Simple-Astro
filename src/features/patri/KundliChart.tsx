@@ -4,7 +4,7 @@ import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef } fr
 import { useInkDraw } from "../../components/ui/useInkDraw";
 import { GRAHA_ABBR_DEV, GRAHA_ABBR_LAT, GRAHA_ENGLISH, NAKSHATRA_NAMES, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
 import { GRAHA_IDS, type GrahaId, type SignIdx } from "../../engine/types";
-import { layoutChips, NORTH_ANCHOR, signInHouse, SOUTH_CELL, tilakPath } from "./geometry";
+import { layoutChips, NORTH_ANCHOR, SOUTH_CELL, signInHouse, tilakPath } from "./geometry";
 
 export interface ChartBody {
   id: GrahaId;
@@ -44,7 +44,19 @@ export interface KundliHandle {
 const abbr = (id: GrahaId, script: "devanagari" | "latin") => (script === "devanagari" ? GRAHA_ABBR_DEV[id] : GRAHA_ABBR_LAT[id]);
 
 export const KundliChart = forwardRef<KundliHandle, KundliProps>(function KundliChart(
-  { title, style, script, lagnaSign, bodies, showDegrees = true, lit = null, inkKey = "", skipInk = false, static: isStatic = false, onChips },
+  {
+    title,
+    style,
+    script,
+    lagnaSign,
+    bodies,
+    showDegrees = true,
+    lit = null,
+    inkKey = "",
+    skipInk = false,
+    static: isStatic = false,
+    onChips,
+  },
   ref,
 ) {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -79,8 +91,16 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
           lang={script === "devanagari" ? "hi" : undefined}
         >
           {abbr(b.id, script)}
-          {deg && b.degInSign != null ? <tspan className="grahadeg" dx="2">{Math.floor(b.degInSign)}</tspan> : null}
-          {b.retro ? <tspan className="retro" fontSize={size * 0.62} dy={-size * 0.35}>℞</tspan> : null}
+          {deg && b.degInSign != null ? (
+            <tspan className="grahadeg" dx="2">
+              {Math.floor(b.degInSign)}
+            </tspan>
+          ) : null}
+          {b.retro ? (
+            <tspan className="retro" fontSize={size * 0.62} dy={-size * 0.35}>
+              ℞
+            </tspan>
+          ) : null}
         </text>,
       );
     };
@@ -127,7 +147,15 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
         const x0 = col * 100;
         const y0 = row * 100;
         out.push(
-          <text key={`sn-${sign}`} className="signname" x={x0 + 96} y={y0 + 94} textAnchor="end" data-settle="" lang={script === "devanagari" ? "hi" : undefined}>
+          <text
+            key={`sn-${sign}`}
+            className="signname"
+            x={x0 + 96}
+            y={y0 + 94}
+            textAnchor="end"
+            data-settle=""
+            lang={script === "devanagari" ? "hi" : undefined}
+          >
             {script === "devanagari" ? SIGN_DEV[sign] : SIGN_NAMES[sign]}
           </text>,
         );

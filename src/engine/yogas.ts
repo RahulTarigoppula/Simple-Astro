@@ -13,19 +13,7 @@ import {
   type SevenId,
   TARA_GRAHAS,
 } from "../data/tables/rulership";
-import {
-  aspects,
-  DUSTHANA,
-  gName,
-  houseFrom,
-  joinNames,
-  KENDRA,
-  lordOfHouse,
-  ord,
-  signLord,
-  signName,
-  signOfHouse,
-} from "./chart-helpers";
+import { aspects, DUSTHANA, gName, houseFrom, joinNames, KENDRA, lordOfHouse, ord, signLord, signName, signOfHouse } from "./chart-helpers";
 import { CITE } from "./citations";
 import { MANGLIK_CANCELLATIONS, MANGLIK_REF_LABEL, manglikChartCancellations, manglikReferences } from "./manglik";
 import { norm360, signedDelta } from "./math";
@@ -257,49 +245,37 @@ function kemadrumaBhanga(
   };
 }
 
-export const kemadrumaBhangaKendraLagna = kemadrumaBhanga(
-  "kemadruma-bhanga-kendra-lagna",
-  "Kemadruma-bhaṅga (kendra from Lagna)",
-  (p) => {
-    const gs = TARA_GRAHAS.filter((id) => KENDRA.includes(houseFrom(p.lagna, p.g[id].sign)));
-    return {
-      grahas: gs,
-      because: gs.map((id) => ({
-        grahaId: id,
-        house: houseFrom(p.lagna, p.g[id].sign),
-        note: `${gName(id)} in the ${ord(houseFrom(p.lagna, p.g[id].sign))} from the Lagna, a kendra`,
-      })),
-    };
-  },
-);
+export const kemadrumaBhangaKendraLagna = kemadrumaBhanga("kemadruma-bhanga-kendra-lagna", "Kemadruma-bhaṅga (kendra from Lagna)", (p) => {
+  const gs = TARA_GRAHAS.filter((id) => KENDRA.includes(houseFrom(p.lagna, p.g[id].sign)));
+  return {
+    grahas: gs,
+    because: gs.map((id) => ({
+      grahaId: id,
+      house: houseFrom(p.lagna, p.g[id].sign),
+      note: `${gName(id)} in the ${ord(houseFrom(p.lagna, p.g[id].sign))} from the Lagna, a kendra`,
+    })),
+  };
+});
 
-export const kemadrumaBhangaKendraMoon = kemadrumaBhanga(
-  "kemadruma-bhanga-kendra-moon",
-  "Kemadruma-bhaṅga (kendra from Candra)",
-  (p) => {
-    const gs = TARA_GRAHAS.filter((id) => [4, 7, 10].includes(houseFrom(p.g.MO.sign, p.g[id].sign)));
-    return {
-      grahas: gs,
-      because: gs.map((id) => ({
-        grahaId: id,
-        house: houseFrom(p.g.MO.sign, p.g[id].sign),
-        note: `${gName(id)} in the ${ord(houseFrom(p.g.MO.sign, p.g[id].sign))} from Candra, a kendra`,
-      })),
-    };
-  },
-);
+export const kemadrumaBhangaKendraMoon = kemadrumaBhanga("kemadruma-bhanga-kendra-moon", "Kemadruma-bhaṅga (kendra from Candra)", (p) => {
+  const gs = TARA_GRAHAS.filter((id) => [4, 7, 10].includes(houseFrom(p.g.MO.sign, p.g[id].sign)));
+  return {
+    grahas: gs,
+    because: gs.map((id) => ({
+      grahaId: id,
+      house: houseFrom(p.g.MO.sign, p.g[id].sign),
+      note: `${gName(id)} in the ${ord(houseFrom(p.g.MO.sign, p.g[id].sign))} from Candra, a kendra`,
+    })),
+  };
+});
 
-export const kemadrumaBhangaConjunct = kemadrumaBhanga(
-  "kemadruma-bhanga-conjunct",
-  "Kemadruma-bhaṅga (graha with Candra)",
-  (p) => {
-    const gs = TARA_GRAHAS.filter((id) => p.g[id].sign === p.g.MO.sign);
-    return {
-      grahas: gs,
-      because: gs.map((id) => ({ grahaId: id, sign: p.g[id].sign, note: `${gName(id)} joins Candra in ${signName(p.g[id].sign)}` })),
-    };
-  },
-);
+export const kemadrumaBhangaConjunct = kemadrumaBhanga("kemadruma-bhanga-conjunct", "Kemadruma-bhaṅga (graha with Candra)", (p) => {
+  const gs = TARA_GRAHAS.filter((id) => p.g[id].sign === p.g.MO.sign);
+  return {
+    grahas: gs,
+    because: gs.map((id) => ({ grahaId: id, sign: p.g[id].sign, note: `${gName(id)} joins Candra in ${signName(p.g[id].sign)}` })),
+  };
+});
 
 export const kemadrumaBhangaGuruDrishti = kemadrumaBhanga(
   "kemadruma-bhanga-guru-drishti",
@@ -733,8 +709,7 @@ export function contextOf(core: PatriCore): PatriContext {
 }
 
 /** Seed for a hit's sentence: the chart identity plus the rule, so the same chart always reads the same. */
-const readingSeed = (core: PatriCore, id: string): string =>
-  `${core.profileId}|${core.presetHash}|yogas-v${YOGA_RULES_VERSION}|${id}`;
+const readingSeed = (core: PatriCore, id: string): string => `${core.profileId}|${core.presetHash}|yogas-v${YOGA_RULES_VERSION}|${id}`;
 
 /**
  * Evaluate every rule; then the cancellation pass; then order (full, partial, cancelled; by id).

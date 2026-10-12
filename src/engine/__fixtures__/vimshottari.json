@@ -10,7 +10,17 @@
     "balanceDays": 5044.03,
     "mdEndUtc": "2008-01-04T02:32:00Z",
     "nominalMdStartDate": "1991-01-04",
-    "adLengthsInBudha": { "ME": 2.408333, "KE": 0.991667, "VE": 2.833333, "SU": 0.85, "MO": 1.416667, "MA": 0.991667, "RA": 2.55, "JU": 2.266667, "SA": 2.691667 },
+    "adLengthsInBudha": {
+      "ME": 2.408333,
+      "KE": 0.991667,
+      "VE": 2.833333,
+      "SU": 0.85,
+      "MO": 1.416667,
+      "MA": 0.991667,
+      "RA": 2.55,
+      "JU": 2.266667,
+      "SA": 2.691667
+    },
     "elapsedYears": 3.19021,
     "adAtBirth": { "lord": "KE", "startDate": "1993-06-01", "endUtc": "1994-05-29T16:56:00Z" },
     "pdAtBirth": { "lord": "SA", "years": 0.157014, "startDate": "1994-02-10", "endDate": "1994-04-08" }
@@ -24,7 +34,17 @@
     "balanceDays365Note": "§6.8 prints 2006.55 d; 5.4950 yr × 365.25 = 2007.05 d (arithmetic slip in the doc). The 360-day figure 1978.20 d is correct.",
     "balanceDays360": 1978.2,
     "mdOrder": ["MA", "RA", "JU", "SA", "ME", "KE", "VE", "SU", "MO"],
-    "adLengthsInMangala": { "MA": 0.408333, "RA": 1.05, "JU": 0.933333, "SA": 1.108333, "ME": 0.991667, "KE": 0.408333, "VE": 1.166667, "SU": 0.35, "MO": 0.583333 },
+    "adLengthsInMangala": {
+      "MA": 0.408333,
+      "RA": 1.05,
+      "JU": 0.933333,
+      "SA": 1.108333,
+      "ME": 0.991667,
+      "KE": 0.408333,
+      "VE": 1.166667,
+      "SU": 0.35,
+      "MO": 0.583333
+    },
     "adAtBirth": "JU",
     "adRemainingYears": 0.886667
   }

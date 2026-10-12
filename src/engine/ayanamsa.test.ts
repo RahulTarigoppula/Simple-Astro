@@ -62,8 +62,7 @@ describe("AY-1…AY-7", () => {
   it("AY-2: se-mean rate 5028.80″ ± 0.5″ per century", () => {
     // Centred on J2000: a one-sided J2000 → J2000+1c difference also picks up the 1.105″·T² term
     // (5029.90″), so the rate is measured symmetrically, which isolates the 5028.796″ leading term.
-    const rate =
-      (ayanamsa(2451545.0 + 36525 / 2, "se-mean") - ayanamsa(2451545.0 - 36525 / 2, "se-mean")) * 3600;
+    const rate = (ayanamsa(2451545.0 + 36525 / 2, "se-mean") - ayanamsa(2451545.0 - 36525 / 2, "se-mean")) * 3600;
     expect(Math.abs(rate - 5028.8)).toBeLessThan(0.5);
     expect(ayanamsaRateDegPerDay(2451545.0) * 36525 * 3600).toBeCloseTo(5028.796, 2);
   });

@@ -22,7 +22,14 @@ export function LeafBundleArt({ count = 3 }: { count?: number }) {
         const h = Math.max(6, 36 / leaves - 2);
         return (
           <g key={y}>
-            <rect x={i % 2 ? 10 : 8} y={y} width={i % 2 ? 76 : 80} height={h} rx="3" fill={i % 2 ? "var(--leaf-face)" : "var(--surface-2)"} />
+            <rect
+              x={i % 2 ? 10 : 8}
+              y={y}
+              width={i % 2 ? 76 : 80}
+              height={h}
+              rx="3"
+              fill={i % 2 ? "var(--leaf-face)" : "var(--surface-2)"}
+            />
             <path d={`M16 ${y + h / 2}h${52 + ((i * 7) % 12)}`} stroke="var(--border)" strokeWidth="1" />
           </g>
         );
@@ -34,7 +41,17 @@ export function LeafBundleArt({ count = 3 }: { count?: number }) {
   );
 }
 
-export function DialArt({ hourAngle = 0, minuteAngle = 0, rahuFrom = 0, rahuTo = 0 }: { hourAngle?: number; minuteAngle?: number; rahuFrom?: number; rahuTo?: number }) {
+export function DialArt({
+  hourAngle = 0,
+  minuteAngle = 0,
+  rahuFrom = 0,
+  rahuTo = 0,
+}: {
+  hourAngle?: number;
+  minuteAngle?: number;
+  rahuFrom?: number;
+  rahuTo?: number;
+}) {
   const arc = (a0: number, a1: number, r: number) => {
     const p = (a: number) => [43 + r * Math.sin((a * Math.PI) / 180), 43 - r * Math.cos((a * Math.PI) / 180)] as const;
     const [x0, y0] = p(a0);
@@ -142,11 +159,22 @@ export function DiyaArt({ lit }: { lit: boolean }) {
           <ellipse className="diya-glow" cx="44" cy="30" rx="34" ry="26" fill={`url(#${glow})`} />
           <g className="flame" data-flame="">
             <path d="M44 16c7 8 9 12 9 17a9 9 0 0 1-18 0c0-5 2-9 9-17Z" fill={`url(#${fl})`} />
-            <path d="M44 27c3 4 3.6 5.6 3.6 7.4A3.7 3.7 0 0 1 44 38a3.7 3.7 0 0 1-3.6-3.6c0-1.8.6-3.4 3.6-7.4Z" fill="var(--flame-core)" opacity=".85" />
+            <path
+              d="M44 27c3 4 3.6 5.6 3.6 7.4A3.7 3.7 0 0 1 44 38a3.7 3.7 0 0 1-3.6-3.6c0-1.8.6-3.4 3.6-7.4Z"
+              fill="var(--flame-core)"
+              opacity=".85"
+            />
           </g>
         </>
       ) : (
-        <path d="M44 38c-2-6 3-9 1-15M46 30c3-3 1-7 3-10" stroke="var(--ink-faint)" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity=".7" />
+        <path
+          d="M44 38c-2-6 3-9 1-15M46 30c3-3 1-7 3-10"
+          stroke="var(--ink-faint)"
+          strokeWidth="1.2"
+          fill="none"
+          strokeLinecap="round"
+          opacity=".7"
+        />
       )}
       <path d="M40 40h8v6h-8z" fill="var(--brass-shadow)" />
       <path d="M14 46h60c0 10-13 18-30 18S14 56 14 46Z" fill={`url(#${bowl})`} />

@@ -23,9 +23,7 @@ export const centuriesTt = (jdTt: Jd): number => (jdTt - 2451545.0) / 36525;
 
 /** General precession in longitude since J2000, arcsec (IAU 2006 p_A). */
 export function precessionArcsec(T: number): number {
-  return (
-    5028.796195 * T + 1.1054348 * T ** 2 + 0.00007964 * T ** 3 - 0.000023857 * T ** 4 - 0.0000000383 * T ** 5
-  );
+  return 5028.796195 * T + 1.1054348 * T ** 2 + 0.00007964 * T ** 3 - 0.000023857 * T ** 4 - 0.0000000383 * T ** 5;
 }
 
 /** Nutation in longitude Δψ, arcsec (Meeus ch. 22 short series, ±0.5″). */

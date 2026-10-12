@@ -27,7 +27,20 @@ interface BrassDrumProps {
   format?: (v: number) => string;
 }
 
-export function BrassDrum({ label, short, min, max, value, pad = 2, flex = 1, calm = false, accept, onChange, onScrub, format }: BrassDrumProps) {
+export function BrassDrum({
+  label,
+  short,
+  min,
+  max,
+  value,
+  pad = 2,
+  flex = 1,
+  calm = false,
+  accept,
+  onChange,
+  onScrub,
+  format,
+}: BrassDrumProps) {
   const el = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
   const pos = useRef(value - min);
@@ -187,7 +200,7 @@ export function BrassDrum({ label, short, min, max, value, pad = 2, flex = 1, ca
         const dt = Math.max(8, now - d.t);
         drag.current = { y: e.clientY, t: now };
         pos.current = Math.max(-0.6, Math.min(span + 0.6, pos.current - dy / CELL));
-        vel.current = Math.max(-4, Math.min(4, ((-dy / CELL) / dt) * 16));
+        vel.current = Math.max(-4, Math.min(4, (-dy / CELL / dt) * 16));
         paint();
       }}
       onPointerUp={(e) => {

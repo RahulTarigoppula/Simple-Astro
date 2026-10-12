@@ -271,7 +271,12 @@
   width: 9px;
   height: 11px;
   border-radius: 50% 50% 46% 54% / 60% 60% 40% 40%;
-  background: radial-gradient(circle at 40% 35%, color-mix(in oklch, var(--accent), white 14%), var(--accent) 58%, color-mix(in oklch, var(--accent), black 22%));
+  background: radial-gradient(
+    circle at 40% 35%,
+    color-mix(in oklch, var(--accent), white 14%),
+    var(--accent) 58%,
+    color-mix(in oklch, var(--accent), black 22%)
+  );
 }
 .leaf__nak {
   min-width: 0;
@@ -318,7 +323,15 @@
   opacity: 0;
   border-radius: inherit;
   background:
-    linear-gradient(90deg, var(--lac-dark) 0, color-mix(in oklch, var(--danger), transparent 30%) 4%, transparent 16%, transparent 84%, color-mix(in oklch, var(--danger), transparent 30%) 96%, var(--lac-dark) 100%),
+    linear-gradient(
+      90deg,
+      var(--lac-dark) 0,
+      color-mix(in oklch, var(--danger), transparent 30%) 4%,
+      transparent 16%,
+      transparent 84%,
+      color-mix(in oklch, var(--danger), transparent 30%) 96%,
+      var(--lac-dark) 100%
+    ),
     radial-gradient(140% 170% at 48% 50%, transparent 50%, color-mix(in oklch, var(--danger), transparent 35%) 82%, var(--lac-dark) 100%);
 }
 

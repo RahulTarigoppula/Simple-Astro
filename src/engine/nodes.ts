@@ -3,7 +3,7 @@
 // choice is a preset printed in the colophon.
 import * as A from "astronomy-engine";
 import type { AstroTime } from "./ephemeris";
-import { R2D, norm360, signedDelta } from "./math";
+import { norm360, R2D, signedDelta } from "./math";
 import type { Deg, Jd } from "./types";
 
 /** Mean daily motion of the mean node, deg/day (Meeus 47.7 leading term ÷ 36525). */

@@ -6,8 +6,8 @@ import { saveFile } from "../../platform/files";
 import { play } from "../../platform/sound";
 import { toast } from "../../state/ui";
 import { BurnHold } from "./BurnHold";
-import { birthLine, leafMoon } from "./leafFacts";
 import type { LeafTool } from "./Leaf";
+import { birthLine, leafMoon } from "./leafFacts";
 
 export type SheetMode = "menu" | "milan" | "export";
 
@@ -166,8 +166,8 @@ function ExportForm({ onDone, onBack }: { onDone: () => void; onBack: () => void
       }}
     >
       <p className="p p--muted">
-        The envelope carries the whole bundle — every leaf, chart and palm print — sealed with your passphrase (AES-GCM, PBKDF2 600 000 rounds). Nothing is
-        sent anywhere; the file is handed to you.
+        The envelope carries the whole bundle — every leaf, chart and palm print — sealed with your passphrase (AES-GCM, PBKDF2 600 000
+        rounds). Nothing is sent anywhere; the file is handed to you.
       </p>
       <div className="field">
         <label htmlFor="env-pass">Passphrase</label>

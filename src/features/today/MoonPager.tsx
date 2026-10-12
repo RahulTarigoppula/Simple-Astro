@@ -16,7 +16,7 @@ export function litPath(k: number, waxing: boolean, south: boolean): string {
   const rightLit = waxing !== south;
   const rx = Math.abs(1 - 2 * kk) * R;
   const limb = rightLit ? 1 : 0;
-  const term = (kk < 0.5) === rightLit ? 0 : 1;
+  const term = kk < 0.5 === rightLit ? 0 : 1;
   return `M${CX} ${CX - R}A${R} ${R} 0 0 ${limb} ${CX} ${CX + R}A${rx.toFixed(2)} ${R} 0 0 ${term} ${CX} ${CX - R}Z`;
 }
 

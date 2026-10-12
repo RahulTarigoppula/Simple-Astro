@@ -4,8 +4,8 @@ import { LedgeArt } from "../features/chowki/art";
 import { haptics } from "../platform/haptics";
 import { play } from "../platform/sound";
 import { useUi } from "../state/ui";
-import { rememberOrigin } from "./origin";
 import { useActiveProfile } from "./hooks";
+import { rememberOrigin } from "./origin";
 import { useLamp } from "./theme";
 
 /** The Ledge: five miniature objects — Scroll · Leaves · Dial · Loupe · Lamp. */

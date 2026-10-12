@@ -34,6 +34,10 @@ test("the CSP allows exactly the two place-lookup origins", async ({ page }) => 
   const csp = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute("content");
   expect(csp).toContain("'wasm-unsafe-eval'");
   expect(csp).toContain("worker-src 'self' blob:");
-  const connect = csp?.match(/connect-src ([^;]+)/)?.[1]?.trim().split(/\s+/) ?? [];
+  const connect =
+    csp
+      ?.match(/connect-src ([^;]+)/)?.[1]
+      ?.trim()
+      .split(/\s+/) ?? [];
   expect(connect.sort()).toEqual(["'self'", "https://geocoding-api.open-meteo.com", "https://nominatim.openstreetmap.org"].sort());
 });

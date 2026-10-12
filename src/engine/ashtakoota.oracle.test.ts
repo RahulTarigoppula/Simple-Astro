@@ -122,7 +122,7 @@ describe("Aṣṭakūṭa vs the PyJHora oracle (all_nak_pad_boy_girl.csv)", () 
   it("the §6.11 showcase pair agrees exactly: Revatī × Rohiṇī = 19, acceptable", () => {
     const a: MoonPlacement = { nak: 26, pada: 1, sign: 11 };
     const b: MoonPlacement = { nak: 3, pada: 1, sign: 1 };
-    const o = oracle[(26 * 4) * 108 + 3 * 4];
+    const o = oracle[26 * 4 * 108 + 3 * 4];
     const r = ashtakoota("a", "b", a, b, "x");
     expect(o?.total).toBe(19);
     expect(r.total).toBe(19);

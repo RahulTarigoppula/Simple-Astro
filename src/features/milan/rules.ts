@@ -7,8 +7,7 @@ export const RULE_TEXT: Record<KootaId, string> = {
     "Each Moon sign belongs to one of four varṇas — Brāhmaṇa, Kṣatriya, Vaiśya, Śūdra. The single point is given when the first leaf's varṇa ranks at or above the second's.",
   vashya:
     "Each Moon sign falls in one of five classes — quadruped, human, water-born, wild, insect. A table of the two classes gives 0, ½, 1 or 2. This is the one table that varies from school to school.",
-  tara:
-    "Count the nakṣatras from one Moon to the other, both ways, and reduce by nines. The 3rd, 5th and 7th tārās (Vipat, Pratyari, Vadha) are unkind; each kind direction earns 1.5.",
+  tara: "Count the nakṣatras from one Moon to the other, both ways, and reduce by nines. The 3rd, 5th and 7th tārās (Vipat, Pratyari, Vadha) are unkind; each kind direction earns 1.5.",
   yoni: "Each nakṣatra carries an animal yoni. The same animal earns 4, friendly 3, neutral 2, inimical 1, and the seven sworn pairs 0.",
   maitri:
     "The lords of the two Moon signs are read for natural friendship, each way round: friend and friend 5, friend and neutral 4, neutral and neutral 3, friend and enemy 1, neutral and enemy ½, enemy and enemy 0.",

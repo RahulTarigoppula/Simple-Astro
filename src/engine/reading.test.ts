@@ -63,7 +63,12 @@ describe("compose()", () => {
   const milan = ashtakoota("a", "b", { nak: 26, pada: 1, sign: 11 }, { nak: 3, pada: 1, sign: signOfPada(3, 1) }, "h");
   const palmHits: Hit[] = [
     { id: "heart-long", weight: 2, values: { lengthRatio: "0.92", depth: "0.61" }, citation: PALM_RULES["heart-long"].citation },
-    { id: "element-water", weight: 2, values: { widthOverLength: "0.81", fingerOverPalm: "0.93" }, citation: PALM_RULES["element-water"].citation },
+    {
+      id: "element-water",
+      weight: 2,
+      values: { widthOverLength: "0.81", fingerOverPalm: "0.93" },
+      citation: PALM_RULES["element-water"].citation,
+    },
     { id: "thumb-firm", weight: 1, values: { thumbAngleDeg: "38" }, citation: PALM_RULES["thumb-firm"].citation },
   ];
   const all = [...yogaHits, ...hitsFromMilan(milan), ...palmHits];
@@ -112,9 +117,7 @@ describe("compose()", () => {
 describe("palmSentence()", () => {
   it("prints the measurement inside the canonical sentence", () => {
     const s = palmSentence("heart-long", { lengthRatio: 0.92, depth: 0.61 });
-    expect(s.text).toBe(
-      "Tradition says a long, deep heart line (0.92 of palm width, depth 0.61) speaks of steadiness in affection.",
-    );
+    expect(s.text).toBe("Tradition says a long, deep heart line (0.92 of palm width, depth 0.61) speaks of steadiness in affection.");
     expect(s.measured).toBe("lengthRatio 0.92 · depth 0.61");
     expect(s.citation).toEqual({ text: "Sāmudrika Śāstra", ref: "Hṛdaya-rekhā" });
   });

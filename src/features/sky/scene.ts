@@ -3,7 +3,7 @@
 // rebuild on every scrub frame: one matrix over the star vectors, string building for the dots
 // above the horizon, and d3-geo for a few clipped great circles.
 import { geoCircle, geoPath } from "d3-geo";
-import { SKY_R, eunX, eunY, rhoOfAlt, skyProjection } from "../../engine/sky/projection";
+import { eunX, eunY, rhoOfAlt, SKY_R, skyProjection } from "../../engine/sky/projection";
 import { altAzOfEun, type Eun, type RooftopSky, siderealPointEun, starMatrix } from "../../engine/sky/rooftop";
 import { type StarCatalog, transformStars } from "../../engine/sky/stars";
 import type { GrahaId } from "../../engine/types";
@@ -188,14 +188,9 @@ export function buildScene(sky: RooftopSky, stars: StarCatalog | null): PaintedS
   const ring: Array<[number, number]> = [];
   for (let l = 0; l <= 360; l += 3) ring.push(toGeo(siderealPointEun(sky, l)));
   const ecliptic = geo({ type: "LineString", coordinates: ring }) ?? "";
-  const tick = (l: number, h: number): Array<[number, number]> => [
-    toGeo(siderealPointEun(sky, l, -h)),
-    toGeo(siderealPointEun(sky, l, h)),
-  ];
-  const rasiTicks =
-    geo({ type: "MultiLineString", coordinates: Array.from({ length: 12 }, (_, k) => tick(k * 30, 3.4)) }) ?? "";
-  const nakTicks =
-    geo({ type: "MultiLineString", coordinates: Array.from({ length: 27 }, (_, k) => tick((k * 360) / 27, 1.7)) }) ?? "";
+  const tick = (l: number, h: number): Array<[number, number]> => [toGeo(siderealPointEun(sky, l, -h)), toGeo(siderealPointEun(sky, l, h))];
+  const rasiTicks = geo({ type: "MultiLineString", coordinates: Array.from({ length: 12 }, (_, k) => tick(k * 30, 3.4)) }) ?? "";
+  const nakTicks = geo({ type: "MultiLineString", coordinates: Array.from({ length: 27 }, (_, k) => tick((k * 360) / 27, 1.7)) }) ?? "";
   const rasiLabels: PaintedScene["rasiLabels"] = [];
   for (let k = 0; k < 12; k++) {
     const v = siderealPointEun(sky, k * 30 + 15, 8);

@@ -160,7 +160,13 @@ export function Leaf(props: LeafProps) {
             </span>
           </span>
         </button>
-        <button type="button" className="leaf__more" aria-label={`Actions for ${name}'s leaf`} aria-haspopup="dialog" onClick={props.onMenu}>
+        <button
+          type="button"
+          className="leaf__more"
+          aria-label={`Actions for ${name}'s leaf`}
+          aria-haspopup="dialog"
+          onClick={props.onMenu}
+        >
           <span aria-hidden="true">⋯</span>
         </button>
         <span className="leaf__char" ref={char} aria-hidden="true" />

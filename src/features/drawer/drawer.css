@@ -63,7 +63,9 @@
   font-family: var(--font-mono);
   font-size: 11px;
   fill: var(--engraved);
-  font-variation-settings: "wdth" 87, "wght" 600;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 600;
 }
 .dial-seg .tickbtn[aria-checked="true"] .needle {
   stroke: var(--accent);

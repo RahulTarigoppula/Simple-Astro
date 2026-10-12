@@ -61,7 +61,9 @@ a {
 .mono {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-variation-settings: "wdth" var(--mono-wdth), "wght" 500;
+  font-variation-settings:
+    "wdth" var(--mono-wdth),
+    "wght" 500;
   letter-spacing: var(--tracking-mono);
 }
 .dev,
@@ -178,7 +180,9 @@ a {
   font-size: 9px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-variation-settings: "wdth" 87, "wght" 500;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 500;
   opacity: 0.78;
   line-height: 1;
 }
@@ -295,7 +299,9 @@ a {
   letter-spacing: var(--tracking-mono);
   text-transform: uppercase;
   color: var(--ink-muted);
-  font-variation-settings: "wdth" 87, "wght" 500;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 500;
   white-space: nowrap;
 }
 .band .dev,
@@ -349,7 +355,9 @@ a {
   color: var(--ink-muted);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  font-variation-settings: "wdth" 87, "wght" 400;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 400;
 }
 .row--button {
   width: 100%;
@@ -503,11 +511,15 @@ button.cite:hover {
   font-size: var(--text-xs);
   letter-spacing: var(--tracking-mono);
   text-transform: uppercase;
-  font-variation-settings: "wdth" 87, "wght" 600;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 600;
   line-height: 1.5;
 }
 .engraved b {
-  font-variation-settings: "wdth" 87, "wght" 800;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 800;
   font-weight: 400;
 }
 .engraved .sep {
@@ -707,7 +719,9 @@ button.cite:hover {
   font-size: 9.5px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-variation-settings: "wdth" 87, "wght" 500;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 500;
   opacity: 0.85;
   text-align: center;
 }
@@ -951,7 +965,9 @@ button.cite:hover {
   fill: var(--ink-muted);
   font-family: var(--font-mono);
   font-size: 15px;
-  font-variation-settings: "wdth" 87, "wght" 500;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 500;
 }
 .chart .graha {
   fill: var(--ink);
@@ -967,7 +983,9 @@ button.cite:hover {
   fill: var(--ink-muted);
   font-family: var(--font-mono);
   font-size: 11px;
-  font-variation-settings: "wdth" 75, "wght" 400;
+  font-variation-settings:
+    "wdth" 75,
+    "wght" 400;
 }
 .chart .tilak {
   fill: var(--tilak);
@@ -1074,7 +1092,9 @@ button.cite:hover {
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  font-variation-settings: "wdth" 87, "wght" 600;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 600;
 }
 .chart-tools {
   display: flex;
@@ -1105,7 +1125,9 @@ button.cite:hover {
   text-transform: uppercase;
   color: var(--ink-muted);
   font-weight: 400;
-  font-variation-settings: "wdth" 87, "wght" 500;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 500;
   padding: 6px var(--space-2) 4px;
   border-bottom: 1px solid var(--border-strong);
 }
@@ -1140,7 +1162,9 @@ button.cite:hover {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  font-variation-settings: "wdth" 75, "wght" 400;
+  font-variation-settings:
+    "wdth" 75,
+    "wght" 400;
   letter-spacing: 0;
 }
 .ledger .pd {
@@ -1193,7 +1217,9 @@ button.cite:hover {
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--ink-muted);
-  font-variation-settings: "wdth" 75, "wght" 400;
+  font-variation-settings:
+    "wdth" 75,
+    "wght" 400;
   font-variant-numeric: tabular-nums;
 }
 .ribbon button.is-now {
@@ -1298,7 +1324,9 @@ button.cite:hover {
   color: var(--ink-muted);
   letter-spacing: var(--tracking-mono);
   text-transform: uppercase;
-  font-variation-settings: "wdth" 87, "wght" 500;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 500;
 }
 .yoga.is-cancelled h3,
 .yoga.is-cancelled p {
@@ -1400,7 +1428,9 @@ button.cite:hover {
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--ink-muted);
-  font-variation-settings: "wdth" 75, "wght" 400;
+  font-variation-settings:
+    "wdth" 75,
+    "wght" 400;
 }
 .drums {
   display: flex;
@@ -1459,7 +1489,9 @@ button.cite:hover {
   font-family: var(--font-mono);
   font-size: 19px;
   color: var(--engraved);
-  font-variation-settings: "wdth" 87, "wght" 600;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 600;
   font-variant-numeric: tabular-nums;
 }
 .drum__shade {
@@ -1467,13 +1499,7 @@ button.cite:hover {
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
-  background: linear-gradient(
-    180deg,
-    rgba(20, 10, 4, 0.55),
-    rgba(20, 10, 4, 0) 26%,
-    rgba(20, 10, 4, 0) 74%,
-    rgba(20, 10, 4, 0.55)
-  );
+  background: linear-gradient(180deg, rgba(20, 10, 4, 0.55), rgba(20, 10, 4, 0) 26%, rgba(20, 10, 4, 0) 74%, rgba(20, 10, 4, 0.55));
 }
 .drum__detent {
   position: absolute;
@@ -1498,7 +1524,9 @@ button.cite:hover {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-muted);
-  font-variation-settings: "wdth" 87, "wght" 500;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 500;
 }
 .drum__input {
   position: absolute;
@@ -1552,7 +1580,9 @@ button.cite:hover {
   font-size: 10px;
   color: var(--ink-muted);
   white-space: nowrap;
-  font-variation-settings: "wdth" 75, "wght" 400;
+  font-variation-settings:
+    "wdth" 75,
+    "wght" 400;
 }
 
 /* ── Hast Rekha ────────────────────────────────────────────────────────── */
@@ -1826,12 +1856,7 @@ button.cite:hover {
     0 1px 0 rgba(255, 255, 255, 0.35);
 }
 .beads i.on {
-  background: radial-gradient(
-    circle at 34% 30%,
-    color-mix(in oklch, var(--brass), white 34%),
-    var(--brass) 62%,
-    var(--engraved)
-  );
+  background: radial-gradient(circle at 34% 30%, color-mix(in oklch, var(--brass), white 34%), var(--brass) 62%, var(--engraved));
 }
 .beads i.half {
   background: linear-gradient(90deg, var(--brass) 0 50%, var(--surface-2) 50%);

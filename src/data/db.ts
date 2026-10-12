@@ -2,16 +2,7 @@
 // Reads may happen anywhere (useLiveQuery); WRITES go only through ./repo.ts.
 
 import Dexie, { type EntityTable, type Table } from "dexie";
-import type {
-  HandCapture,
-  MilanResult,
-  PalmReading,
-  Patri,
-  Place,
-  Profile,
-  ProfileId,
-  Settings,
-} from "../engine/types";
+import type { HandCapture, MilanResult, PalmReading, Patri, Place, Profile, ProfileId, Settings } from "../engine/types";
 
 export const DB_NAME = "chowki";
 /** Bumped together with a new `db.version(n)` block + upgrade function + migration test. */

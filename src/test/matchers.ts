@@ -12,7 +12,7 @@ function fmt(deg: number): string {
 
 expect.extend({
   toBeCloseToArcsec(received: number, expected: number, arcsec: number) {
-    let diff = (((received - expected) % 360) + 540) % 360 - 180;
+    let diff = ((((received - expected) % 360) + 540) % 360) - 180;
     if (Object.is(diff, -0)) diff = 0;
     const pass = Math.abs(diff) * 3600 <= arcsec;
     return {

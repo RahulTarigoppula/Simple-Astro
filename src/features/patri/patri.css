@@ -58,7 +58,9 @@
   border-radius: 50%;
 }
 .chart-wrap .hit-layer button:focus-visible {
-  box-shadow: 0 0 0 2px var(--focus), 0 0 0 4px var(--surface);
+  box-shadow:
+    0 0 0 2px var(--focus),
+    0 0 0 4px var(--surface);
   outline: none;
 }
 .varga-pager {

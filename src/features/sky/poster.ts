@@ -2,10 +2,11 @@
 // in Yatra One, the birth line, the Lagna, the engraved strip and a colophon. Canvas 2D only, drawn
 // from the same PaintedScene the SVG uses (both renderers export this one poster). No network:
 // web saves through an anchor with a data: URL; Android writes to the cache and opens the share sheet.
-import { SKY_R } from "../../engine/sky/projection";
+
 import { GRAHA_ABBR_DEV, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
+import { SKY_R } from "../../engine/sky/projection";
 import { isNative } from "../../platform/native";
-import { ALT_RINGS, CARDINALS, moonLitPath, type PaintedScene, PARAPET } from "./scene";
+import { ALT_RINGS, CARDINALS, moonLitPath, PARAPET, type PaintedScene } from "./scene";
 
 export const POSTER_W = 1080;
 export const POSTER_H = 1920;
@@ -141,10 +142,17 @@ function drawSky(
     disc(s.sun.x, s.sun.y, 10, c("--sun-disc", "moccasin"), c("--brass-mid", "goldenrod"), GRAHA_ABBR_DEV.SU, c("--brass-label", "black"));
   for (const b of s.bodies) {
     if (!b.up || b.id === "SU" || b.id === "MO") continue;
-    if (b.id === "RA" || b.id === "KE")
-      disc(b.x, b.y, 8, "", c("--brass-hi", "khaki"), GRAHA_ABBR_DEV[b.id], c("--brass-hi", "khaki"));
+    if (b.id === "RA" || b.id === "KE") disc(b.x, b.y, 8, "", c("--brass-hi", "khaki"), GRAHA_ABBR_DEV[b.id], c("--brass-hi", "khaki"));
     else
-      disc(b.x, b.y, 9.5, c("--brass-mid", "goldenrod"), c("--brass-dark", "saddlebrown"), GRAHA_ABBR_DEV[b.id], c("--brass-label", "black"));
+      disc(
+        b.x,
+        b.y,
+        9.5,
+        c("--brass-mid", "goldenrod"),
+        c("--brass-dark", "saddlebrown"),
+        GRAHA_ABBR_DEV[b.id],
+        c("--brass-label", "black"),
+      );
   }
   if (s.moon.up) {
     ctx.save();
@@ -248,10 +256,7 @@ export async function renderPoster(scene: PaintedScene, text: PosterText): Promi
 export async function savePoster(canvas: HTMLCanvasElement, filename: string): Promise<void> {
   const dataUrl = canvas.toDataURL("image/png");
   if (isNative()) {
-    const [{ Filesystem, Directory }, { Share }] = await Promise.all([
-      import("@capacitor/filesystem"),
-      import("@capacitor/share"),
-    ]);
+    const [{ Filesystem, Directory }, { Share }] = await Promise.all([import("@capacitor/filesystem"), import("@capacitor/share")]);
     const res = await Filesystem.writeFile({
       path: filename,
       data: dataUrl.slice(dataUrl.indexOf(",") + 1),

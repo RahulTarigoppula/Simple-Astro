@@ -1,45 +1,28 @@
 import "fake-indexeddb/auto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_PRESET, type EnginePreset, type Profile } from "../engine/types";
-import {
-  SECRET_NAME,
-  SECRET_PLACE,
-  fakePatri,
-  makeCapture,
-  makeMilan,
-  makeProfile,
-  makeReading,
-  photoBytes,
-} from "../test/data-fixtures";
+import { fakePatri, makeCapture, makeMilan, makeProfile, makeReading, photoBytes, SECRET_NAME, SECRET_PLACE } from "../test/data-fixtures";
 
 vi.mock("../engine/patri", () => ({
   computePatri: (p: Profile, preset: EnginePreset, now: number) => fakePatri(p, preset, now),
 }));
 
 import {
-  ENVELOPE_VERSION,
-  ITERATIONS,
-  ImportError,
   b64decode,
   b64encode,
+  ENVELOPE_VERSION,
   exportEnvelope,
   exportPlaintext,
+  ImportError,
+  ITERATIONS,
   importEnvelope,
   readHeader,
   resetUnsealThrottle,
   seal,
   unseal,
 } from "./crypto";
-import { SCHEMA_VERSION, TABLE_NAMES, db } from "./db";
-import {
-  castPatri,
-  putPlaceCache,
-  saveMilan,
-  savePalmCapture,
-  saveReading,
-  saveSettings,
-  upsertProfile,
-} from "./repo";
+import { db, SCHEMA_VERSION, TABLE_NAMES } from "./db";
+import { castPatri, putPlaceCache, saveMilan, savePalmCapture, saveReading, saveSettings, upsertProfile } from "./repo";
 
 const PASS = "haldi and lac, 1987";
 

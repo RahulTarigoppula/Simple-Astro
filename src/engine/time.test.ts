@@ -52,8 +52,7 @@ function codeOf(fn: () => unknown): string | null {
 
 describe("tzdb guard", () => {
   it("the runtime IANA data knows India's war-time and Madras history", () => {
-    const probe = (iso: string, zone: string): string =>
-      formatOffset(DateTime.fromISO(iso, { zone }).offset);
+    const probe = (iso: string, zone: string): string => formatOffset(DateTime.fromISO(iso, { zone }).offset);
     const cases: Array<[string, string, string]> = [
       ["1943-06-01T06:00", "Asia/Kolkata", "+06:30"],
       ["1942-07-01T12:00", "Asia/Kolkata", "+05:30"],
@@ -63,9 +62,7 @@ describe("tzdb guard", () => {
     for (const [iso, zone, expected] of cases) {
       const got = probe(iso, zone);
       if (got !== expected) {
-        throw new Error(
-          `Runtime tzdb is too old: ${zone} ${iso.slice(0, 10)} resolved to ${got}, expected ${expected}`,
-        );
+        throw new Error(`Runtime tzdb is too old: ${zone} ${iso.slice(0, 10)} resolved to ${got}, expected ${expected}`);
       }
     }
   });
@@ -134,9 +131,7 @@ describe("invalid, non-existent and ambiguous local times", () => {
 
   it("throws TIME_INVALID for 31 February and for a DST gap; TIME_AMBIGUOUS for a fold", () => {
     const base = { place: PLACE, zoneOverride: "America/New_York" };
-    expect(codeOf(() => resolveBirthMoment({ ...base, localY: 2021, localMo: 2, localD: 31, localH: 9, localMi: 0 }))).toBe(
-      "TIME_INVALID",
-    );
+    expect(codeOf(() => resolveBirthMoment({ ...base, localY: 2021, localMo: 2, localD: 31, localH: 9, localMi: 0 }))).toBe("TIME_INVALID");
     expect(codeOf(() => resolveBirthMoment({ ...base, localY: 2021, localMo: 3, localD: 14, localH: 2, localMi: 30 }))).toBe(
       "TIME_INVALID",
     );
@@ -148,23 +143,24 @@ describe("invalid, non-existent and ambiguous local times", () => {
     expect(new Date(b.utcMs).toISOString()).toBe("2021-11-07T06:30:00.000Z");
     // Invalid date is refused even with an override (no silent normalisation to 3 March).
     expect(
-      codeOf(() =>
-        resolveBirthMoment({ ...base, localY: 2021, localMo: 2, localD: 31, localH: 9, localMi: 0, offsetOverrideMin: 330 }),
-      ),
+      codeOf(() => resolveBirthMoment({ ...base, localY: 2021, localMo: 2, localD: 31, localH: 9, localMi: 0, offsetOverrideMin: 330 })),
     ).toBe("TIME_INVALID");
-    expect(codeOf(() => resolveBirthMoment({ ...base, zoneOverride: "Not/AZone", localY: 2021, localMo: 2, localD: 1, localH: 9, localMi: 0 }))).toBe(
-      "TIME_INVALID",
-    );
+    expect(
+      codeOf(() => resolveBirthMoment({ ...base, zoneOverride: "Not/AZone", localY: 2021, localMo: 2, localD: 1, localH: 9, localMi: 0 })),
+    ).toBe("TIME_INVALID");
   });
 
   it("throws EPHEMERIS_RANGE outside 1600–2400 and PLACE_MISSING for bad coordinates", () => {
-    const mk = (y: number) => () => resolveBirthMoment({ localY: y, localMo: 1, localD: 1, localH: 0, localMi: 0, place: PLACE, offsetOverrideMin: 0 });
+    const mk = (y: number) => () =>
+      resolveBirthMoment({ localY: y, localMo: 1, localD: 1, localH: 0, localMi: 0, place: PLACE, offsetOverrideMin: 0 });
     expect(codeOf(mk(1599))).toBe("EPHEMERIS_RANGE");
     expect(codeOf(mk(2401))).toBe("EPHEMERIS_RANGE");
     expect(codeOf(mk(1600))).toBeNull();
     expect(codeOf(mk(2400))).toBeNull();
     expect(
-      codeOf(() => resolveBirthMoment({ localY: 2000, localMo: 1, localD: 1, localH: 0, localMi: 0, place: { ...PLACE, lat: Number.NaN } })),
+      codeOf(() =>
+        resolveBirthMoment({ localY: 2000, localMo: 1, localD: 1, localH: 0, localMi: 0, place: { ...PLACE, lat: Number.NaN } }),
+      ),
     ).toBe("PLACE_MISSING");
   });
 });

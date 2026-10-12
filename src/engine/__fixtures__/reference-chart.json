@@ -7,7 +7,13 @@
     "place": { "name": "Bengaluru", "lat": 12.9716, "lon": 77.5946 },
     "utcIso": "1994-03-14T01:55:00Z"
   },
-  "preset": { "ayanamsa": "se-true", "node": "true", "dashaYearDays": 365.25, "sunrise": "upper-limb-refracted", "houseSystem": "whole-sign" },
+  "preset": {
+    "ayanamsa": "se-true",
+    "node": "true",
+    "dashaYearDays": 365.25,
+    "sunrise": "upper-limb-refracted",
+    "houseSystem": "whole-sign"
+  },
   "expected": {
     "jdUt": 2449425.579861,
     "jdUtDisplay": "2449425.5799",
@@ -18,13 +24,83 @@
     "lagna": { "lonSidereal": 345.657, "sign": 11, "nakshatra": 25, "pada": 4, "lord": "SA", "d9": 7 },
     "mc": { "lonSidereal": 253.3907, "sign": 8 },
     "grahas": {
-      "SU": { "doc": 329.4811, "oracle": 329.4780848, "sign": 10, "nakshatra": 24, "pada": 3, "lord": "JU", "house": 12, "retrograde": false, "d9": 2 },
-      "MO": { "doc": 349.1688, "oracle": 349.1689392, "sign": 11, "nakshatra": 26, "pada": 1, "lord": "ME", "house": 1, "retrograde": false, "d9": 8 },
-      "MA": { "doc": 311.5233, "oracle": 311.4271427, "sign": 10, "nakshatra": 23, "pada": 2, "lord": "RA", "house": 12, "retrograde": false, "d9": 9 },
-      "ME": { "doc": 302.4901, "oracle": 302.4097691, "sign": 10, "nakshatra": 22, "pada": 3, "lord": "MA", "house": 12, "retrograde": false, "d9": 6 },
-      "JU": { "doc": 200.603, "oracle": 200.5903866, "sign": 6, "nakshatra": 15, "pada": 1, "lord": "JU", "house": 8, "retrograde": true, "d9": 0 },
-      "VE": { "doc": 343.1253, "oracle": 343.0336402, "sign": 11, "nakshatra": 25, "pada": 3, "lord": "SA", "house": 1, "retrograde": false, "d9": 6 },
-      "SA": { "doc": 311.5169, "oracle": 311.5134259, "sign": 10, "nakshatra": 23, "pada": 2, "lord": "RA", "house": 12, "retrograde": false, "d9": 9 }
+      "SU": {
+        "doc": 329.4811,
+        "oracle": 329.4780848,
+        "sign": 10,
+        "nakshatra": 24,
+        "pada": 3,
+        "lord": "JU",
+        "house": 12,
+        "retrograde": false,
+        "d9": 2
+      },
+      "MO": {
+        "doc": 349.1688,
+        "oracle": 349.1689392,
+        "sign": 11,
+        "nakshatra": 26,
+        "pada": 1,
+        "lord": "ME",
+        "house": 1,
+        "retrograde": false,
+        "d9": 8
+      },
+      "MA": {
+        "doc": 311.5233,
+        "oracle": 311.4271427,
+        "sign": 10,
+        "nakshatra": 23,
+        "pada": 2,
+        "lord": "RA",
+        "house": 12,
+        "retrograde": false,
+        "d9": 9
+      },
+      "ME": {
+        "doc": 302.4901,
+        "oracle": 302.4097691,
+        "sign": 10,
+        "nakshatra": 22,
+        "pada": 3,
+        "lord": "MA",
+        "house": 12,
+        "retrograde": false,
+        "d9": 6
+      },
+      "JU": {
+        "doc": 200.603,
+        "oracle": 200.5903866,
+        "sign": 6,
+        "nakshatra": 15,
+        "pada": 1,
+        "lord": "JU",
+        "house": 8,
+        "retrograde": true,
+        "d9": 0
+      },
+      "VE": {
+        "doc": 343.1253,
+        "oracle": 343.0336402,
+        "sign": 11,
+        "nakshatra": 25,
+        "pada": 3,
+        "lord": "SA",
+        "house": 1,
+        "retrograde": false,
+        "d9": 6
+      },
+      "SA": {
+        "doc": 311.5169,
+        "oracle": 311.5134259,
+        "sign": 10,
+        "nakshatra": 23,
+        "pada": 2,
+        "lord": "RA",
+        "house": 12,
+        "retrograde": false,
+        "d9": 9
+      }
     },
     "nodes": {
       "mean": {
@@ -36,7 +112,21 @@
         "KE": { "oracle": 31.8219301, "sign": 1, "nakshatra": 2, "pada": 2, "lord": "SU", "house": 3, "d9": 9 }
       }
     },
-    "panchang": { "tithi": "Śukla Dvitīyā", "tithiIndex": 2, "vara": "Somavāra", "nakshatra": "Revatī", "pada": 1, "yoga": "Śukla", "yogaIndex": 24, "karana": "Kaulava", "karanaIndex": 4, "elongation": 19.6877, "moonLitPercent": 2.9, "masaAmanta": "Phālguna", "sunriseIst": "06:29" },
+    "panchang": {
+      "tithi": "Śukla Dvitīyā",
+      "tithiIndex": 2,
+      "vara": "Somavāra",
+      "nakshatra": "Revatī",
+      "pada": 1,
+      "yoga": "Śukla",
+      "yogaIndex": 24,
+      "karana": "Kaulava",
+      "karanaIndex": 4,
+      "elongation": 19.6877,
+      "moonLitPercent": 2.9,
+      "masaAmanta": "Phālguna",
+      "sunriseIst": "06:29"
+    },
     "vimshottari": {
       "lord": "ME",
       "fraction": 0.187659,

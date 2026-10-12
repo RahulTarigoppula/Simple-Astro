@@ -1,12 +1,12 @@
 // Shared fixtures for the src/data tests (excluded from the app build via tsconfig.app.json).
 import {
   DEFAULT_PRESET,
-  PRESET_HASH,
   type EnginePreset,
   type HandCapture,
   type MilanResult,
   type PalmReading,
   type Patri,
+  PRESET_HASH,
   type Profile,
 } from "../engine/types";
 

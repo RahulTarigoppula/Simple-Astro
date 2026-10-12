@@ -14,7 +14,8 @@
       "!**/public/mediapipe",
       "!**/design",
       "!**/*.json.gz",
-      "!**/coverage"
+      "!**/coverage",
+      "!**/index.html"
     ]
   },
   "formatter": {
@@ -34,10 +35,14 @@
         "useSemanticElements": "off"
       },
       "style": {
-        "noNonNullAssertion": "error"
+        "noNonNullAssertion": "error",
+        "noDescendingSpecificity": "off"
       },
       "suspicious": {
         "noExplicitAny": "error"
+      },
+      "complexity": {
+        "noImportantStyles": "off"
       }
     }
   }

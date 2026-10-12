@@ -38,10 +38,7 @@ import { gunzipSync } from "node:zlib";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = resolve(HERE, "../src/data/bsc5.bin");
 const CACHE = process.env.BSC5_CACHE ?? join(tmpdir(), "claude", "bsc5");
-const SOURCES = [
-  "https://cdsarc.cds.unistra.fr/ftp/V/50/catalog.gz",
-  "http://tdc-www.harvard.edu/catalogs/bsc5.dat.gz",
-];
+const SOURCES = ["https://cdsarc.cds.unistra.fr/ftp/V/50/catalog.gz", "http://tdc-www.harvard.edu/catalogs/bsc5.dat.gz"];
 const REFRESH = process.argv.includes("--refresh");
 const limitArg = process.argv.indexOf("--mag-limit");
 const MAG_LIMIT = limitArg > 0 ? Number(process.argv[limitArg + 1]) : Number.POSITIVE_INFINITY;
@@ -85,8 +82,7 @@ function parse(text) {
     }
     const ra = ((Number(rah) + Number(col(line, 78, 79)) / 60 + Number(col(line, 80, 83)) / 3600) * 15 * Math.PI) / 180;
     const sign = col(line, 84, 84) === "-" ? -1 : 1;
-    const dec =
-      (sign * (Number(ded) + Number(col(line, 87, 88)) / 60 + Number(col(line, 89, 90)) / 3600) * Math.PI) / 180;
+    const dec = (sign * (Number(ded) + Number(col(line, 87, 88)) / 60 + Number(col(line, 89, 90)) / 3600) * Math.PI) / 180;
     const mag = Number(vmag);
     if (!Number.isFinite(ra) || !Number.isFinite(dec) || !Number.isFinite(mag)) {
       skipped++;
@@ -127,4 +123,6 @@ const sirius = stars[0];
 if (!sirius || sirius.hr !== 2491) throw new Error("Sirius is not the brightest star — parse error");
 
 writeFileSync(OUT, bin);
-console.log(`bsc5.bin: ${stars.length} stars (${Number.isFinite(MAG_LIMIT) ? `V ≤ ${MAG_LIMIT}` : "whole catalogue"}), ${skipped} records without a position, ${bin.length} bytes`);
+console.log(
+  `bsc5.bin: ${stars.length} stars (${Number.isFinite(MAG_LIMIT) ? `V ≤ ${MAG_LIMIT}` : "whole catalogue"}), ${skipped} records without a position, ${bin.length} bytes`,
+);

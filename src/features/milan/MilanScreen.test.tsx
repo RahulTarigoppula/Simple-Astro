@@ -76,7 +76,11 @@ describe("MilanScreen", () => {
     renderAt(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`);
 
     for (const k of want.kootas) {
-      const img = await screen.findByRole("img", { name: new RegExp(`^${k.name}: ${fmtPts(k.score).replace(".", "\\.")} of ${k.max} points`) }, { timeout: 5000 });
+      const img = await screen.findByRole(
+        "img",
+        { name: new RegExp(`^${k.name}: ${fmtPts(k.score).replace(".", "\\.")} of ${k.max} points`) },
+        { timeout: 5000 },
+      );
       expect(img).toBeInTheDocument();
     }
     // Tap anywhere to finish the count.
@@ -119,7 +123,9 @@ describe("MilanScreen", () => {
     const swapped = engineResult(PRIYA, REFERENCE_PROFILE);
     const first = swapped.kootas[0];
     if (!first) throw new Error("no kootas");
-    expect(await screen.findByRole("img", { name: new RegExp(`^${first.name}: ${fmtPts(first.score)} of`) }, { timeout: 5000 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("img", { name: new RegExp(`^${first.name}: ${fmtPts(first.score)} of`) }, { timeout: 5000 }),
+    ).toBeInTheDocument();
   });
 
   it("with one leaf, the second scroll is a dotted outline asking for another", async () => {

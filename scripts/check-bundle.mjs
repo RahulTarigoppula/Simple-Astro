@@ -41,12 +41,15 @@ for (const e of new Set(entry)) gz += gzipSync(readFileSync(join(DIST, e))).leng
 const css = [...html.matchAll(/href="[^"]*?(assets\/[^"]+\.css)"/g)].map((m) => m[1]);
 let cssGz = 0;
 for (const c of new Set(css)) cssGz += gzipSync(readFileSync(join(DIST, c))).length;
-console.log(`check-bundle: initial JS ${(gz / 1024).toFixed(1)} kB gz across ${new Set(entry).size} file(s); CSS ${(cssGz / 1024).toFixed(1)} kB gz`);
+console.log(
+  `check-bundle: initial JS ${(gz / 1024).toFixed(1)} kB gz across ${new Set(entry).size} file(s); CSS ${(cssGz / 1024).toFixed(1)} kB gz`,
+);
 if (gz > 350 * 1024) errors.push(`initial JS ${(gz / 1024).toFixed(1)} kB gz exceeds 350 kB`);
 if (cssGz > 30 * 1024) errors.push(`initial CSS ${(cssGz / 1024).toFixed(1)} kB gz exceeds 30 kB`);
 for (const e of entry) {
   const src = readFileSync(join(DIST, e), "utf8");
-  if (/HandLandmarker|cv\.Mat|WebGLRenderer/.test(src)) errors.push(`${e}: a lazy-only module (MediaPipe/OpenCV/three) leaked into the entry graph`);
+  if (/HandLandmarker|cv\.Mat|WebGLRenderer/.test(src))
+    errors.push(`${e}: a lazy-only module (MediaPipe/OpenCV/three) leaked into the entry graph`);
 }
 if (process.env.VITE_PLATFORM === "android" && existsSync(join(DIST, "sw.js"))) errors.push("android build contains sw.js");
 

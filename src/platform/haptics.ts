@@ -33,9 +33,7 @@ export const haptics = {
   notify(kind: "success" | "warning"): void {
     if (!enabled) return;
     if (isNative())
-      void Haptics.notification({ type: kind === "success" ? NotificationType.Success : NotificationType.Warning }).catch(
-        () => undefined,
-      );
+      void Haptics.notification({ type: kind === "success" ? NotificationType.Success : NotificationType.Warning }).catch(() => undefined);
     else vibrate(kind === "success" ? [12, 60, 18] : [30, 40, 30]);
   },
 };

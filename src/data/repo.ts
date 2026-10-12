@@ -5,18 +5,18 @@
 import { computePatri } from "../engine/patri";
 import {
   DEFAULT_SETTINGS,
-  PRESET_HASH,
   type EnginePreset,
   type HandCapture,
   type MilanResult,
   type PalmReading,
   type Patri,
   type Place,
+  PRESET_HASH,
   type Profile,
   type ProfileId,
   type Settings,
 } from "../engine/types";
-import { type BlobRow, type MetaKey, type PlaceCacheRow, type ReadingRow, db } from "./db";
+import { type BlobRow, db, type MetaKey, type PlaceCacheRow, type ReadingRow } from "./db";
 
 // ─── errors ────────────────────────────────────────────────────────────────────
 
@@ -83,27 +83,23 @@ export async function upsertProfile(profile: Profile, now: number = Date.now()):
  * Clears `settings.activeProfileId` when it pointed at the burnt profile.
  */
 export async function burnProfile(id: ProfileId): Promise<void> {
-  await db.transaction(
-    "rw",
-    [db.profiles, db.patris, db.palms, db.blobs, db.readings, db.milans, db.settings],
-    async () => {
-      const palms = await db.palms.where("profileId").equals(id).toArray();
-      const blobKeys = palms.flatMap((p) => [p.originalBlobKey, p.rectifiedBlobKey]);
-      await db.blobs.bulkDelete(blobKeys);
-      // Sweep anything else filed under the profile's key prefix (orphans, future kinds).
-      await db.blobs.where("key").startsWith(`${id}/`).delete();
-      await db.readings.where("profileId").equals(id).delete();
-      await db.readings.bulkDelete(palms.map((p) => p.id));
-      await db.palms.where("profileId").equals(id).delete();
-      await db.patris.where("profileId").equals(id).delete();
-      await db.milans.filter((m) => m.a === id || m.b === id).delete();
-      await db.profiles.delete(id);
-      const s = await db.settings.get("app");
-      if (s && s.value.activeProfileId === id) {
-        await db.settings.put({ key: "app", value: { ...s.value, activeProfileId: null } });
-      }
-    },
-  );
+  await db.transaction("rw", [db.profiles, db.patris, db.palms, db.blobs, db.readings, db.milans, db.settings], async () => {
+    const palms = await db.palms.where("profileId").equals(id).toArray();
+    const blobKeys = palms.flatMap((p) => [p.originalBlobKey, p.rectifiedBlobKey]);
+    await db.blobs.bulkDelete(blobKeys);
+    // Sweep anything else filed under the profile's key prefix (orphans, future kinds).
+    await db.blobs.where("key").startsWith(`${id}/`).delete();
+    await db.readings.where("profileId").equals(id).delete();
+    await db.readings.bulkDelete(palms.map((p) => p.id));
+    await db.palms.where("profileId").equals(id).delete();
+    await db.patris.where("profileId").equals(id).delete();
+    await db.milans.filter((m) => m.a === id || m.b === id).delete();
+    await db.profiles.delete(id);
+    const s = await db.settings.get("app");
+    if (s && s.value.activeProfileId === id) {
+      await db.settings.put({ key: "app", value: { ...s.value, activeProfileId: null } });
+    }
+  });
   dropPatriCacheFor(id);
 }
 
@@ -208,11 +204,7 @@ export function isPatriStale(row: Patri, preset: EnginePreset, profile?: Profile
  * The cast path: memo → db.patris → computePatri(). Pure engine work stays synchronous; the
  * only awaits are IndexedDB. `force` skips both caches (the "recompute" tab on the seal).
  */
-export async function castPatri(
-  profile: Profile,
-  preset: EnginePreset,
-  opts: { force?: boolean; now?: number } = {},
-): Promise<Patri> {
+export async function castPatri(profile: Profile, preset: EnginePreset, opts: { force?: boolean; now?: number } = {}): Promise<Patri> {
   const hash = PRESET_HASH(preset);
   const key = cacheKey(profile.id, hash);
   if (!opts.force) {
@@ -239,11 +231,7 @@ export const blobKey = (profileId: ProfileId, captureId: string, kind: "original
  * Store a capture and its two photos atomically. Blob keys are assigned here
  * (`profileId/captureId/kind`) so Burn can sweep by prefix; the stored capture is returned.
  */
-export async function savePalmCapture(
-  capture: HandCapture,
-  originalBlob: Blob,
-  rectifiedBlob: Blob,
-): Promise<HandCapture> {
+export async function savePalmCapture(capture: HandCapture, originalBlob: Blob, rectifiedBlob: Blob): Promise<HandCapture> {
   const stored: HandCapture = {
     ...capture,
     originalBlobKey: blobKey(capture.profileId, capture.id, "original"),
@@ -335,7 +323,10 @@ export async function putPlaceCache(q: string, results: Place[], now: number = D
 
 /** Drop cache rows older than the TTL (housekeeping; never called on a hot path). */
 export async function prunePlaceCache(now: number = Date.now()): Promise<number> {
-  return db.places.where("fetchedAt").below(now - PLACE_CACHE_TTL).delete();
+  return db.places
+    .where("fetchedAt")
+    .below(now - PLACE_CACHE_TTL)
+    .delete();
 }
 
 // ─── storage ───────────────────────────────────────────────────────────────────

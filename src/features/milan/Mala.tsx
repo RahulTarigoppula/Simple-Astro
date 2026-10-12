@@ -80,11 +80,14 @@ function useTally(total: number, totalPoints: number, onFinish: () => void) {
       const t = window.setTimeout(() => setPhase("knot"), 240);
       return () => clearTimeout(t);
     }
-    const t = window.setTimeout(() => {
-      setLaunched((n) => n + 1);
-      play("bead");
-      haptics.selection();
-    }, launched === 0 ? 260 : step);
+    const t = window.setTimeout(
+      () => {
+        setLaunched((n) => n + 1);
+        play("bead");
+        haptics.selection();
+      },
+      launched === 0 ? 260 : step,
+    );
     return () => clearTimeout(t);
   }, [phase, launched, total, step]);
 
@@ -224,7 +227,11 @@ export function Mala({ result, onOpen }: MalaProps) {
                     {k.nameDev}
                   </span>
                 </span>
-                <span className="brow" role="img" aria-label={`${k.name}: ${fmtPts(k.score)} of ${k.max} points${k.dosha ? ", a doṣa" : ""}`}>
+                <span
+                  className="brow"
+                  role="img"
+                  aria-label={`${k.name}: ${fmtPts(k.score)} of ${k.max} points${k.dosha ? ", a doṣa" : ""}`}
+                >
                   <span className="brow__thread" />
                   <span className="brow__knot" />
                   {row.map((b) => (

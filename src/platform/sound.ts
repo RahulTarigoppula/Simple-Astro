@@ -77,7 +77,16 @@ function env(g: GainNode, t: number, peak: number, attack: number, decay: number
   g.gain.exponentialRampToValueAtTime(0.0001, t + attack + decay);
 }
 
-function tone(c: AudioContext, out: AudioNode, freq: number, t: number, peak: number, decay: number, type: OscillatorType = "sine", endFreq?: number): void {
+function tone(
+  c: AudioContext,
+  out: AudioNode,
+  freq: number,
+  t: number,
+  peak: number,
+  decay: number,
+  type: OscillatorType = "sine",
+  endFreq?: number,
+): void {
   const o = c.createOscillator();
   const g = c.createGain();
   o.type = type;
@@ -89,7 +98,16 @@ function tone(c: AudioContext, out: AudioNode, freq: number, t: number, peak: nu
   o.stop(t + decay + 0.05);
 }
 
-function burst(c: AudioContext, out: AudioNode, t: number, peak: number, decay: number, filter: BiquadFilterType, freq: number, q = 1): void {
+function burst(
+  c: AudioContext,
+  out: AudioNode,
+  t: number,
+  peak: number,
+  decay: number,
+  filter: BiquadFilterType,
+  freq: number,
+  q = 1,
+): void {
   if (!noise) return;
   const s = c.createBufferSource();
   s.buffer = noise;

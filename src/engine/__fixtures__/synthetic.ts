@@ -2,26 +2,10 @@
 // Dignity and combustion are derived here with the rule layer's own tables so a fixture only states
 // where each graha sits.
 import { NAK_LORDS } from "../../data/tables/names";
-import {
-  COMBUSTION_ORB,
-  isDebilitated,
-  isExalted,
-  isOwnSign,
-  isSeven,
-  naturalRelation,
-} from "../../data/tables/rulership";
+import { COMBUSTION_ORB, isDebilitated, isExalted, isOwnSign, isSeven, naturalRelation } from "../../data/tables/rulership";
 import { houseFrom, signLord } from "../chart-helpers";
 import { norm360, signedDelta } from "../math";
-import {
-  DEFAULT_PRESET,
-  type Dignity,
-  type Graha,
-  type GrahaId,
-  type Panchang,
-  type PatriCore,
-  PRESET_HASH,
-  type SignIdx,
-} from "../types";
+import { DEFAULT_PRESET, type Dignity, type Graha, type GrahaId, type Panchang, type PatriCore, PRESET_HASH, type SignIdx } from "../types";
 
 export interface PlacementSpec {
   sign: number;
@@ -112,7 +96,7 @@ export function synth(spec: SynthSpec): PatriCore {
   const out = {} as Record<GrahaId, Graha>;
   for (const id of ids) {
     const s = toSpec(spec.at[id]);
-    out[id] = graha(id, s.sign * 30 + (s.deg ?? 15), s.lat ?? 0, s.retro ?? (id === "RA"), lagna);
+    out[id] = graha(id, s.sign * 30 + (s.deg ?? 15), s.lat ?? 0, s.retro ?? id === "RA", lagna);
   }
   out.KE = graha("KE", out.RA.lonSidereal + 180, 0, true, lagna);
   // Combustion by the classical orbs from the Sun.
@@ -142,7 +126,7 @@ export function synth(spec: SynthSpec): PatriCore {
       nakshatraLord: NAK_LORDS[lagnaNak % 9] ?? "KE",
       boundary: null,
     },
-    mc: { lonSidereal: norm360(lagnaLon + 270), sign: (((lagna + 9) % 12) as SignIdx) },
+    mc: { lonSidereal: norm360(lagnaLon + 270), sign: ((lagna + 9) % 12) as SignIdx },
     ramc: 0,
     obliquity: 23.44,
     grahas: out,

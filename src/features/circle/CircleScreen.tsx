@@ -154,7 +154,11 @@ export default function CircleScreen() {
   };
 
   if (profiles === undefined) {
-    return <Screen className="circle" label="The leaf bundle">{null}</Screen>;
+    return (
+      <Screen className="circle" label="The leaf bundle">
+        {null}
+      </Screen>
+    );
   }
 
   if (n === 0) {
@@ -187,7 +191,9 @@ export default function CircleScreen() {
           />
           <div className="circle__hintrow">
             <p className="circle__hint">
-              {tied ? "Pull the thread's end — or press Untie — to fan the leaves." : "Tap a leaf to open its patri · swipe left or ⋯ for more."}
+              {tied
+                ? "Pull the thread's end — or press Untie — to fan the leaves."
+                : "Tap a leaf to open its patri · swipe left or ⋯ for more."}
             </p>
             <button type="button" className="circle__toggle" onClick={toggle} aria-pressed={!tied}>
               {tied ? "Untie" : "Tie it up"}
@@ -196,58 +202,62 @@ export default function CircleScreen() {
         </header>
 
         <div className="circle__desk">
-        <section className={`bundle${tied ? " is-tied" : " is-untied"}`} aria-label={`Bundle of ${n} ${n === 1 ? "leaf" : "leaves"}`}>
-          <div className="board board--top" aria-hidden="true" data-decorative="true">
-            <span className="board__wrap" style={{ opacity: tied ? 1 : 0 }} />
-          </div>
-          <div className="bundle__viewport">
-            <div className="bundle__stack" ref={setStackEl} style={{ height: layout.height }}>
-              <ul className="bundle__leaves" inert={tied} aria-label="Leaves">
-                {list.map((p, i) => (
-                  <Leaf
-                    key={p.id}
-                    profile={p}
-                    moon={leafMoon(p, settings.preset.ayanamsa)}
-                    pose={layout.poses[i] ?? { x: 0, y: 0, rotate: 0, delay: 0 }}
-                    z={i + 1}
-                    tied={tied}
-                    active={active?.id === p.id}
-                    tone={(i % 2) as 0 | 1}
-                    trayOpen={tray === p.id}
-                    exportReady
-                    onTray={(o) => setTray(o ? p.id : null)}
-                    onOpen={(el) => open(p, el)}
-                    onMenu={() => {
-                      setTray(null);
-                      setSheet({ id: p.id, mode: "menu" });
-                    }}
-                    onTool={(t) => tool(p, t)}
-                    onBurn={() => void burn(p)}
-                    registerChar={registers.get(p.id) ?? register(p.id)}
-                  />
-                ))}
-              </ul>
-              <div className={`bundle__thread${tied ? "" : " is-off"}`} aria-hidden="true" data-decorative="true" />
-              {tied ? (
-                <button
-                  type="button"
-                  className="bundle__cover"
-                  aria-label={`Untie the bundle — ${n} ${n === 1 ? "leaf" : "leaves"}: ${list.map((p) => p.name).join(", ")}`}
-                  onClick={toggle}
-                />
-              ) : null}
+          <section className={`bundle${tied ? " is-tied" : " is-untied"}`} aria-label={`Bundle of ${n} ${n === 1 ? "leaf" : "leaves"}`}>
+            <div className="board board--top" aria-hidden="true" data-decorative="true">
+              <span className="board__wrap" style={{ opacity: tied ? 1 : 0 }} />
             </div>
-          </div>
-          <div className="board board--bottom">
-            <ThreadKnot tied={tied} onToggle={toggle} count={n} />
-          </div>
-        </section>
+            <div className="bundle__viewport">
+              <div className="bundle__stack" ref={setStackEl} style={{ height: layout.height }}>
+                <ul className="bundle__leaves" inert={tied} aria-label="Leaves">
+                  {list.map((p, i) => (
+                    <Leaf
+                      key={p.id}
+                      profile={p}
+                      moon={leafMoon(p, settings.preset.ayanamsa)}
+                      pose={layout.poses[i] ?? { x: 0, y: 0, rotate: 0, delay: 0 }}
+                      z={i + 1}
+                      tied={tied}
+                      active={active?.id === p.id}
+                      tone={(i % 2) as 0 | 1}
+                      trayOpen={tray === p.id}
+                      exportReady
+                      onTray={(o) => setTray(o ? p.id : null)}
+                      onOpen={(el) => open(p, el)}
+                      onMenu={() => {
+                        setTray(null);
+                        setSheet({ id: p.id, mode: "menu" });
+                      }}
+                      onTool={(t) => tool(p, t)}
+                      onBurn={() => void burn(p)}
+                      registerChar={registers.get(p.id) ?? register(p.id)}
+                    />
+                  ))}
+                </ul>
+                <div className={`bundle__thread${tied ? "" : " is-off"}`} aria-hidden="true" data-decorative="true" />
+                {tied ? (
+                  <button
+                    type="button"
+                    className="bundle__cover"
+                    aria-label={`Untie the bundle — ${n} ${n === 1 ? "leaf" : "leaves"}: ${list.map((p) => p.name).join(", ")}`}
+                    onClick={toggle}
+                  />
+                ) : null}
+              </div>
+            </div>
+            <div className="board board--bottom">
+              <ThreadKnot tied={tied} onToggle={toggle} count={n} />
+            </div>
+          </section>
 
-        <BlankLeaf first={false} />
+          <BlankLeaf first={false} />
         </div>
       </div>
 
-      <Sheet open={sheet !== null && sheetProfile !== undefined} onClose={() => setSheet(null)} label={sheetProfile ? `Leaf — ${sheetProfile.name}` : "Leaf"}>
+      <Sheet
+        open={sheet !== null && sheetProfile !== undefined}
+        onClose={() => setSheet(null)}
+        label={sheetProfile ? `Leaf — ${sheetProfile.name}` : "Leaf"}
+      >
         {sheet && sheetProfile ? (
           <LeafSheet
             profile={sheetProfile}

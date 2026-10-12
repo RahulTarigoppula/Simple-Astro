@@ -33,7 +33,17 @@ const ELEMENT: Record<string, string> = { earth: "Earth", air: "Air", fire: "Fir
 const pathD = (pts: ReadonlyArray<readonly [number, number]>) =>
   pts.length ? `M${pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" L")}` : "";
 
-function LineOverlay({ lines, landmarks, inkKey, live }: { lines: PalmLine[]; landmarks: Array<[number, number]>; inkKey: string; live?: string }) {
+function LineOverlay({
+  lines,
+  landmarks,
+  inkKey,
+  live,
+}: {
+  lines: PalmLine[];
+  landmarks: Array<[number, number]>;
+  inkKey: string;
+  live?: string;
+}) {
   const ref = useRef<SVGSVGElement>(null);
   useInkDraw(ref, [inkKey], { step: 200 });
   return (
@@ -167,7 +177,11 @@ export default function HastScreen() {
     if (!reading) return;
     const l = lines.find((x) => x.id === selected);
     if (!l) return;
-    const moved = tracedLine(selected, l.path.map(([x, y]) => [x + dx, y + dy] as [number, number]), l.metrics.depth);
+    const moved = tracedLine(
+      selected,
+      l.path.map(([x, y]) => [x + dx, y + dy] as [number, number]),
+      l.metrics.depth,
+    );
     await saveReading(withLineReplaced(reading, moved, Date.now()));
   };
 
@@ -188,7 +202,9 @@ export default function HastScreen() {
       });
     },
     onCancel: () => {
-      burnEdge.current?.animate([{ opacity: burnEdge.current.style.opacity || "0" }, { opacity: 0 }], { duration: reducedMotion() ? 1 : 320 });
+      burnEdge.current?.animate([{ opacity: burnEdge.current.style.opacity || "0" }, { opacity: 0 }], {
+        duration: reducedMotion() ? 1 : 320,
+      });
       if (burnEdge.current) burnEdge.current.style.opacity = "0";
     },
   });
@@ -215,7 +231,11 @@ export default function HastScreen() {
         <i style={{ width: `${Math.round(l.confidence * 100)}%` }} />
       </span>{" "}
       <span className="num">{l.confidence.toFixed(2)}</span>
-      {l.source === "traced" ? <span className="pd"> traced</span> : l.confidence < LOW_CONFIDENCE ? <span className="flag"> ⚑</span> : null}
+      {l.source === "traced" ? (
+        <span className="pd"> traced</span>
+      ) : l.confidence < LOW_CONFIDENCE ? (
+        <span className="flag"> ⚑</span>
+      ) : null}
     </>
   );
 
@@ -294,7 +314,11 @@ export default function HastScreen() {
                         <img src={url} alt="" style={{ width: "100%", height: "100%", filter: "grayscale(.35) contrast(1.15)" }} />
                         <svg className="print-lines" viewBox={`0 0 ${S} ${S}`} style={{ width: "100%", height: "100%" }}>
                           {lines.map((l) => (
-                            <path key={l.id} className={`ln${l.confidence < LOW_CONFIDENCE ? " ln--faint" : ""}${l.source === "traced" ? " ln--traced" : ""}`} d={pathD(l.path)} />
+                            <path
+                              key={l.id}
+                              className={`ln${l.confidence < LOW_CONFIDENCE ? " ln--faint" : ""}${l.source === "traced" ? " ln--traced" : ""}`}
+                              d={pathD(l.path)}
+                            />
                           ))}
                         </svg>
                       </div>
@@ -305,7 +329,15 @@ export default function HastScreen() {
                 </>
               ) : (
                 <div className="empty-note">
-                  <svg width="74" height="74" viewBox="0 0 74 74" fill="none" stroke="var(--ink-muted)" strokeWidth="1.4" aria-hidden="true">
+                  <svg
+                    width="74"
+                    height="74"
+                    viewBox="0 0 74 74"
+                    fill="none"
+                    stroke="var(--ink-muted)"
+                    strokeWidth="1.4"
+                    aria-hidden="true"
+                  >
                     <path d="M22 62c-6-9-9-16-9-22V26a4 4 0 0 1 8 0v10V16a4 4 0 0 1 8 0v20V12a4 4 0 0 1 8 0v24V18a4 4 0 0 1 8 0v22c0 10-2 16-6 22" />
                   </svg>
                   <b>Lay your hand here</b>
@@ -362,7 +394,12 @@ export default function HastScreen() {
                   aria-label={`Nudge the ${NAME[selected]} line with the arrow keys; Shift moves 10 pixels`}
                   onKeyDown={(e) => {
                     const step = e.shiftKey ? 10 : 1;
-                    const m: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
+                    const m: Record<string, [number, number]> = {
+                      ArrowLeft: [-step, 0],
+                      ArrowRight: [step, 0],
+                      ArrowUp: [0, -step],
+                      ArrowDown: [0, step],
+                    };
                     const d = m[e.key];
                     if (d) {
                       e.preventDefault();
@@ -402,7 +439,10 @@ export default function HastScreen() {
                       </td>
                     </tr>
                     {lines.map((l) => (
-                      <tr key={l.id} aria-label={`${NAME[l.id]} line, confidence ${l.confidence.toFixed(2)}${l.source === "traced" ? ", traced" : ""}`}>
+                      <tr
+                        key={l.id}
+                        aria-label={`${NAME[l.id]} line, confidence ${l.confidence.toFixed(2)}${l.source === "traced" ? ", traced" : ""}`}
+                      >
                         <th scope="row" style={{ textAlign: "left", fontWeight: 400, paddingLeft: "var(--paper-margin)" }}>
                           {LETTER[l.id]}. {NAME[l.id]}
                         </th>
@@ -429,7 +469,12 @@ export default function HastScreen() {
                   {reading.hits.map((h, i) => (
                     <p className="hit" key={h.ruleId}>
                       {h.text}
-                      <button type="button" className="cite" aria-label={`Citation: ${h.citation.text}, ${h.citation.ref}`} onClick={() => setFoot(h)}>
+                      <button
+                        type="button"
+                        className="cite"
+                        aria-label={`Citation: ${h.citation.text}, ${h.citation.ref}`}
+                        onClick={() => setFoot(h)}
+                      >
                         {i + 1}
                       </button>
                       <span className="measured">{h.measured}</span>
@@ -441,7 +486,8 @@ export default function HastScreen() {
               <p className="p">This print has landmarks but no reading yet — retake it to read the lines.</p>
             ) : (
               <p className="p p--muted">
-                The palm is photographed, rectified and read on this device. The photo is kept only in this drawer and burns away in one hold.
+                The palm is photographed, rectified and read on this device. The photo is kept only in this drawer and burns away in one
+                hold.
               </p>
             )}
 

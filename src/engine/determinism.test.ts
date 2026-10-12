@@ -21,9 +21,7 @@ function sources(dir: string): string[] {
 
 /** Blank out comments (keeping line numbers) so prose such as "never uses Math.random" is not a hit. */
 function stripComments(src: string): string {
-  return src
-    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "))
-    .replace(/(^|[^:"'`])\/\/.*$/gm, "$1");
+  return src.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " ")).replace(/(^|[^:"'`])\/\/.*$/gm, "$1");
 }
 
 const BANNED: Array<[string, RegExp]> = [

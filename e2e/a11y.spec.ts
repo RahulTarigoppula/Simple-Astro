@@ -12,7 +12,12 @@ test("no serious or critical axe violations on the main screens", async ({ page 
     await page.waitForTimeout(2000);
     const res = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).exclude('[data-decorative="true"]').analyze();
     for (const v of res.violations.filter((x) => x.impact === "serious" || x.impact === "critical")) {
-      report.push(`${r} · ${v.id} (${v.impact}): ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(" | ")}`);
+      report.push(
+        `${r} · ${v.id} (${v.impact}): ${v.nodes
+          .slice(0, 3)
+          .map((n) => n.target.join(" "))
+          .join(" | ")}`,
+      );
     }
   }
   expect(report, report.join("\n")).toEqual([]);

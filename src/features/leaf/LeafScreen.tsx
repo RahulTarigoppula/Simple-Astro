@@ -74,7 +74,8 @@ function freshDraft(): Draft {
 }
 
 const placeLabel = (p: Place) => [p.name, p.admin1, p.country].filter(Boolean).join(", ");
-const latLon = (p: Place) => `${Math.abs(p.lat).toFixed(4)} ${p.lat >= 0 ? "N" : "S"} · ${Math.abs(p.lon).toFixed(4)} ${p.lon >= 0 ? "E" : "W"}`;
+const latLon = (p: Place) =>
+  `${Math.abs(p.lat).toFixed(4)} ${p.lat >= 0 ? "N" : "S"} · ${Math.abs(p.lon).toFixed(4)} ${p.lon >= 0 ? "E" : "W"}`;
 
 export default function LeafScreen() {
   const { id } = useParams();
@@ -359,7 +360,9 @@ export default function LeafScreen() {
         ) : null}
         {query.trim().length >= 2 && results.length === 0 ? (
           <div className="leaf-online">
-            <span style={{ fontSize: "var(--text-sm)", color: "var(--ink-muted)" }}>{gazReady ? "Not in the bundle." : "Opening the gazetteer…"}</span>
+            <span style={{ fontSize: "var(--text-sm)", color: "var(--ink-muted)" }}>
+              {gazReady ? "Not in the bundle." : "Opening the gazetteer…"}
+            </span>
             <button type="button" className="online-stamp" disabled={online === "busy"} onClick={() => void goOnline()}>
               {online === "busy" ? "asking the wire…" : "search online ⌑"}
             </button>
@@ -401,7 +404,9 @@ export default function LeafScreen() {
                 </span>
               </>
             ) : (
-              <span>{resolved.err?.code === "TIME_AMBIGUOUS" || resolved.err?.code === "TIME_INVALID" ? "THE CLOCK NEEDS THE OFFSET DRUM" : "—"}</span>
+              <span>
+                {resolved.err?.code === "TIME_AMBIGUOUS" || resolved.err?.code === "TIME_INVALID" ? "THE CLOCK NEEDS THE OFFSET DRUM" : "—"}
+              </span>
             )}
           </div>
         </div>
@@ -429,7 +434,9 @@ export default function LeafScreen() {
           <span className="v">
             Offset
             <span className="help">
-              {pre1955India ? "Before 1955 some Indian births used Bombay Time (+04:51), which is not in the tzdb." : "The tzdb resolves historical offsets; override only when you know better."}
+              {pre1955India
+                ? "Before 1955 some Indian births used Bombay Time (+04:51), which is not in the tzdb."
+                : "The tzdb resolves historical offsets; override only when you know better."}
             </span>
           </span>
           <span className="seg">
@@ -481,8 +488,9 @@ export default function LeafScreen() {
         <div className="field" style={{ borderBottom: 0 }}>
           <span className="k">Ayanāṃśa</span>
           <span className="v" style={{ flex: 1, fontSize: "var(--text-sm)" }}>
-            Lahiri ({settings.preset.ayanamsa === "se-true" ? "SE-true" : settings.preset.ayanamsa === "se-mean" ? "SE-mean" : "Drik-compatible"}) · node:{" "}
-            {settings.preset.node}
+            Lahiri (
+            {settings.preset.ayanamsa === "se-true" ? "SE-true" : settings.preset.ayanamsa === "se-mean" ? "SE-mean" : "Drik-compatible"}) ·
+            node: {settings.preset.node}
           </span>
           <Link className="linkish" to="/drawer">
             change
@@ -520,8 +528,8 @@ export default function LeafScreen() {
       <Sheet open={online === "asking"} onClose={() => setOnline("idle")} label="Search online?">
         <TurmericBand title="Search online?" level={2} />
         <p className="p">
-          Chowki works offline. To look up “{query.trim()}”, only the place name would be sent to Open-Meteo’s geocoder (and, if that finds nothing, to
-          OpenStreetMap Nominatim). No birth details, no names of people. You will be asked once.
+          Chowki works offline. To look up “{query.trim()}”, only the place name would be sent to Open-Meteo’s geocoder (and, if that finds
+          nothing, to OpenStreetMap Nominatim). No birth details, no names of people. You will be asked once.
         </p>
         <div className="tools" style={{ paddingBottom: "var(--space-4)" }}>
           <button
@@ -570,7 +578,9 @@ function ManualPlace({ initial, onSet }: { initial: Place; onSet: (p: Place) => 
         type="button"
         className="linkish"
         disabled={!ok}
-        onClick={() => onSet({ name: name.trim() || `${la.toFixed(2)}, ${lo.toFixed(2)}`, country: "", lat: la, lon: lo, source: "manual" })}
+        onClick={() =>
+          onSet({ name: name.trim() || `${la.toFixed(2)}, ${lo.toFixed(2)}`, country: "", lat: la, lon: lo, source: "manual" })
+        }
       >
         use these
       </button>

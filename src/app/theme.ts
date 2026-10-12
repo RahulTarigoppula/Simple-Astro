@@ -42,8 +42,7 @@ export function ThemeController() {
   useEffect(() => {
     const apply = () => {
       const now = new Date();
-      const resolved =
-        settings.theme === "auto" ? (sunAltitude(lat, lon, now) > 0 ? "day" : "night") : settings.theme;
+      const resolved = settings.theme === "auto" ? (sunAltitude(lat, lon, now) > 0 ? "day" : "night") : settings.theme;
       const root = document.documentElement;
       root.dataset.theme = resolved;
       root.style.setProperty("--moon-k", moonK(now).toFixed(3));

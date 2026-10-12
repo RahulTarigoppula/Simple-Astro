@@ -6,8 +6,20 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const ALLOWED = /^(MIT|ISC|Apache-2\.0|BSD-2-Clause|BSD-3-Clause|0BSD|MPL-2\.0|Unlicense|CC0-1\.0|OFL-1\.1|BlueOak-1\.0\.0|CC-BY-4\.0|Python-2\.0)$/i;
-const BANNED = ["@kuntay/swisseph", "@swisseph/browser", "swisseph-wasm", "sweph-wasm", "@fusionstrings/swisseph-wasm", "swisseph", "pyswisseph", "PyJHora", "gsap", "rita"];
+const ALLOWED =
+  /^(MIT|ISC|Apache-2\.0|BSD-2-Clause|BSD-3-Clause|0BSD|MPL-2\.0|Unlicense|CC0-1\.0|OFL-1\.1|BlueOak-1\.0\.0|CC-BY-4\.0|Python-2\.0)$/i;
+const BANNED = [
+  "@kuntay/swisseph",
+  "@swisseph/browser",
+  "swisseph-wasm",
+  "sweph-wasm",
+  "@fusionstrings/swisseph-wasm",
+  "swisseph",
+  "pyswisseph",
+  "PyJHora",
+  "gsap",
+  "rita",
+];
 const errors = [];
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const all = { ...pkg.dependencies, ...pkg.devDependencies, ...pkg.optionalDependencies };
@@ -16,7 +28,10 @@ if (pkg.dependencies?.["@ishubhamx/panchangam-js"]) errors.push("@ishubhamx/panc
 
 function licenceOf(dir) {
   const p = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
-  const l = typeof p.license === "string" ? p.license : p.license?.type ?? (Array.isArray(p.licenses) ? p.licenses.map((x) => x.type).join(" OR ") : "");
+  const l =
+    typeof p.license === "string"
+      ? p.license
+      : (p.license?.type ?? (Array.isArray(p.licenses) ? p.licenses.map((x) => x.type).join(" OR ") : ""));
   let licence = l;
   if (!licence) {
     // Some packages ship only a LICENSE file; read its first line.

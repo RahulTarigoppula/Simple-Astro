@@ -61,7 +61,9 @@
   color: var(--engraved);
   font-family: var(--font-mono);
   font-size: 11px;
-  font-variation-settings: "wdth" 87, "wght" 700;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 700;
   line-height: 1;
 }
 .mscroll .mscroll__lat {
@@ -92,7 +94,12 @@
   width: 8px;
   height: 10px;
   border-radius: 50% 50% 46% 54% / 60% 60% 40% 40%;
-  background: radial-gradient(circle at 40% 35%, color-mix(in oklch, var(--accent), white 14%), var(--accent) 58%, color-mix(in oklch, var(--accent), black 22%));
+  background: radial-gradient(
+    circle at 40% 35%,
+    color-mix(in oklch, var(--accent), white 14%),
+    var(--accent) 58%,
+    color-mix(in oklch, var(--accent), black 22%)
+  );
 }
 .mk__muted,
 .mscroll .mk__muted {
@@ -268,7 +275,12 @@
 }
 .bd--brass,
 .bd--lac {
-  background: radial-gradient(circle at 34% 30%, color-mix(in oklch, var(--teak-light), white 18%), var(--teak-light) 60%, color-mix(in oklch, var(--teak-light), black 35%));
+  background: radial-gradient(
+    circle at 34% 30%,
+    color-mix(in oklch, var(--teak-light), white 18%),
+    var(--teak-light) 60%,
+    color-mix(in oklch, var(--teak-light), black 35%)
+  );
 }
 .bd__metal {
   position: absolute;

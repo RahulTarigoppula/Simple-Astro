@@ -310,12 +310,7 @@ export const MIN_SEGMENT_PX = 10;
  * Skeleton → components (those under `minSize` px dropped, §6.13) → pieces cut at junctions.
  * Returns the pieces and the number of junction clusters.
  */
-export function components(
-  skel: Uint8Array,
-  w: number,
-  h: number,
-  minSize = MIN_COMPONENT_PX,
-): Component[] {
+export function components(skel: Uint8Array, w: number, h: number, minSize = MIN_COMPONENT_PX): Component[] {
   const keep = new Uint8Array(w * h);
   for (const comp of connected(skel, w, h)) if (comp.length >= minSize) for (const i of comp) keep[i] = 1;
   const junction = new Uint8Array(w * h);

@@ -34,13 +34,7 @@ export function ascMcFromRamc(ramc: Deg, eps: Deg, lat: number): { asc: Deg; mc:
  * obliquity is the IAU 2006 mean obliquity plus the IAU 2000B Δε — the same frame the planet
  * longitudes are rotated into, so the Lagna and the grahas share one ecliptic.
  */
-export function lagna(
-  t: AstroTime,
-  lat: number,
-  lon: number,
-  ay: Deg,
-  eph: Ephemeris = astronomyEngineEphemeris,
-): LagnaResult {
+export function lagna(t: AstroTime, lat: number, lon: number, ay: Deg, eph: Ephemeris = astronomyEngineEphemeris): LagnaResult {
   const gast = eph.greenwichApparentSiderealTime(t);
   const ramc = norm360(gast + lon);
   const eps = eph.trueObliquity(t);

@@ -5,14 +5,7 @@ import { dignityOf } from "../data/tables/dignity";
 import { ayanamsa, ayanamsaRateDegPerDay } from "./ayanamsa";
 import { boundaryFlag } from "./boundary";
 import { vimshottari } from "./dasha";
-import {
-  astroTime,
-  astronomyEngineEphemeris,
-  type Ephemeris,
-  isCombust,
-  PLANET_IDS,
-  type PlanetId,
-} from "./ephemeris";
+import { astronomyEngineEphemeris, astroTime, type Ephemeris, isCombust, PLANET_IDS, type PlanetId } from "./ephemeris";
 import { EngineError } from "./errors";
 import { lagna as solveLagna, wholeSignHouse } from "./lagna";
 import { msToJd, norm360 } from "./math";
@@ -65,14 +58,7 @@ interface RawBody {
   speedTropical: number;
 }
 
-function grahaFrom(
-  id: GrahaId,
-  raw: RawBody,
-  ay: Deg,
-  ayRate: number,
-  lagnaSign: number,
-  sunTropical: Deg,
-): Graha {
+function grahaFrom(id: GrahaId, raw: RawBody, ay: Deg, ayRate: number, lagnaSign: number, sunTropical: Deg): Graha {
   const lonSidereal = norm360(raw.lonTropical - ay);
   const speed = raw.speedTropical - ayRate;
   const isNode = id === "RA" || id === "KE";

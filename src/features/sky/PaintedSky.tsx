@@ -3,9 +3,9 @@
 // band, grahas as brass discs, the Moon in its phase, the Lagna in sindoor, a rooftop parapet.
 // Always available; it is the dome's fallback and the poster's source, never a downgrade.
 import { memo, useId } from "react";
-import { SKY_R, SKY_VIEW } from "../../engine/sky/projection";
 import { GRAHA_ABBR_DEV, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
-import { ALT_RINGS, CARDINALS, moonLitPath, type PaintedScene, PARAPET } from "./scene";
+import { SKY_R, SKY_VIEW } from "../../engine/sky/projection";
+import { ALT_RINGS, CARDINALS, moonLitPath, PARAPET, type PaintedScene } from "./scene";
 
 interface PaintedSkyProps {
   scene: PaintedScene;

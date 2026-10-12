@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { loadFixture, loadTruth } from "../../test/palm-fixtures";
-import { boxBlur, type ImageLike } from "./image";
+import { boxBlur, type ImageLike, toGrey } from "./image";
 import { assessQuality, exposureOf, laplacianVariance, palmRoi, SHARPNESS_MIN, shutterEnabled } from "./quality";
-import { toGrey } from "./image";
 
 function checkerboard(w: number, h: number, cell: number): Float32Array {
   const a = new Float32Array(w * h);
@@ -60,7 +59,8 @@ describe("capture quality (§6.13)", () => {
 
   it("the shutter truth table: enabled only when hand, sharpness and exposure are all ok", () => {
     const rows: Array<[boolean, boolean, boolean, boolean]> = [];
-    for (const hand of [false, true]) for (const sharp of [false, true]) for (const exp of [false, true]) rows.push([hand, sharp, exp, hand && sharp && exp]);
+    for (const hand of [false, true])
+      for (const sharp of [false, true]) for (const exp of [false, true]) rows.push([hand, sharp, exp, hand && sharp && exp]);
     expect(rows).toHaveLength(8);
     for (const [hand, sharp, exp, want] of rows) expect(shutterEnabled(hand, sharp, exp)).toBe(want);
     expect(rows.filter((r) => r[3])).toHaveLength(1);

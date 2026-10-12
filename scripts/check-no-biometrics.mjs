@@ -10,13 +10,19 @@ for (const f of tracked) {
   const lower = f.toLowerCase();
   if (lower.startsWith("fixtures-private/")) errors.push(`${f}: fixtures-private/ must never be tracked`);
   if (/\.(jpe?g|heic|heif)$/.test(lower)) errors.push(`${f}: photographs are never committed`);
-  if (lower.endsWith(".png") && !lower.startsWith("e2e/visual/__screenshots__/") && !lower.startsWith("public/") && !lower.startsWith("android/")) {
+  if (
+    lower.endsWith(".png") &&
+    !lower.startsWith("e2e/visual/__screenshots__/") &&
+    !lower.startsWith("public/") &&
+    !lower.startsWith("android/")
+  ) {
     const size = statSync(f).size;
     if (size > 200 * 1024) errors.push(`${f}: PNG is ${(size / 1024).toFixed(0)} kB (> 200 kB)`);
   }
   if (/^(src|e2e|docs)\//.test(f) && /\.(png|webp|tiff?|jpe?g)$/.test(lower)) {
     const buf = readFileSync(f);
-    if (buf.includes(Buffer.from("Exif")) && (buf.includes(Buffer.from("GPS")) || buf.includes(Buffer.from("Make")))) errors.push(`${f}: carries EXIF Make/GPS`);
+    if (buf.includes(Buffer.from("Exif")) && (buf.includes(Buffer.from("GPS")) || buf.includes(Buffer.from("Make"))))
+      errors.push(`${f}: carries EXIF Make/GPS`);
   }
 }
 if (errors.length) {

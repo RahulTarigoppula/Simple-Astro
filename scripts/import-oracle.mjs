@@ -31,9 +31,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const csvPath = resolve(
-  process.argv[2] ?? "C:/Users/ttrah/AppData/Local/Temp/claude/oracle/all_nak_pad_boy_girl.csv",
-);
+const csvPath = resolve(process.argv[2] ?? "C:/Users/ttrah/AppData/Local/Temp/claude/oracle/all_nak_pad_boy_girl.csv");
 const outPath = resolve(here, "../src/engine/__fixtures__/ashtakoota-oracle.bin");
 
 export const CODES = {
@@ -49,7 +47,9 @@ function code(table, value, what, line) {
   return i;
 }
 
-const lines = readFileSync(csvPath, "utf8").split(/\r?\n/).filter((l) => l.trim() !== "");
+const lines = readFileSync(csvPath, "utf8")
+  .split(/\r?\n/)
+  .filter((l) => l.trim() !== "");
 if (lines.length !== 11664) throw new Error(`expected 11664 rows, found ${lines.length}`);
 
 const records = new Uint16Array(11664);

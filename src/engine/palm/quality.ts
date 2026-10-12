@@ -89,8 +89,7 @@ export function exposureOf(g: GreyImage, roi?: Roi): Exposure {
   const clippedHigh = hi / n;
   // Comfortable band for a palm: median 100..205 (auto-exposure puts a frame-filling palm near
   // 110–170 whatever the skin tone). Outside it, or with heavy clipping, say so.
-  const label: ExposureLabel =
-    median < 100 || clippedLow > 0.3 ? "low" : median > 205 || clippedHigh > 0.2 ? "high" : "ok";
+  const label: ExposureLabel = median < 100 || clippedLow > 0.3 ? "low" : median > 205 || clippedHigh > 0.2 ? "high" : "ok";
   const centre = 135;
   const spread = 95; // distance from the centre at which the score reaches 0
   const s = Math.max(0, 1 - Math.abs(median - centre) / spread) * (1 - Math.min(1, clippedLow + clippedHigh));
@@ -113,8 +112,7 @@ export function qualityOfGrey(g: GreyImage, roi?: Roi): Quality {
 }
 
 /** The shutter's rule, all three or nothing (the 8-row truth table is a test). */
-export const shutterEnabled = (handOk: boolean, sharpnessOk: boolean, exposureOk: boolean): boolean =>
-  handOk && sharpnessOk && exposureOk;
+export const shutterEnabled = (handOk: boolean, sharpnessOk: boolean, exposureOk: boolean): boolean => handOk && sharpnessOk && exposureOk;
 
 /** Gauge segments lit, 0..5, for the five-pip display. */
 export function sharpnessPips(v: number): number {

@@ -92,13 +92,7 @@ function check(m: MoonPlacement, label: string): void {
   }
 }
 
-const mk = (
-  id: KootaId,
-  score: number,
-  because: string,
-  dosha = false,
-  cancellation?: KootaResult["cancellation"],
-): KootaResult => {
+const mk = (id: KootaId, score: number, because: string, dosha = false, cancellation?: KootaResult["cancellation"]): KootaResult => {
   const m = META[id];
   const r: KootaResult = {
     id,
@@ -141,11 +135,7 @@ export function kootas(a: MoonPlacement, b: MoonPlacement, opts: AshtakootaOptio
   // 1 Varṇa
   const va = VARNA_BY_SIGN[a.sign] ?? "shudra";
   const vb = VARNA_BY_SIGN[b.sign] ?? "shudra";
-  const varna = mk(
-    "varna",
-    VARNA_RANK[va] >= VARNA_RANK[vb] ? 1 : 0,
-    `Varṇa: ${VARNA_LABEL[va]} and ${VARNA_LABEL[vb]}`,
-  );
+  const varna = mk("varna", VARNA_RANK[va] >= VARNA_RANK[vb] ? 1 : 0, `Varṇa: ${VARNA_LABEL[va]} and ${VARNA_LABEL[vb]}`);
 
   // 2 Vaśya
   const ca = vashyaClass(a.sign, a.deg ?? padaMidDeg(a.nak, a.pada));
@@ -171,7 +161,9 @@ export function kootas(a: MoonPlacement, b: MoonPlacement, opts: AshtakootaOptio
   const yoni = mk(
     "yoni",
     YONI_POINTS[rel],
-    rel === "same" ? `Yoni: both ${YONI_LABEL[ya]}` : `Yoni: ${YONI_LABEL[ya]} and ${YONI_LABEL[yb]} — ${rel === "sworn" ? "sworn rivals" : rel}`,
+    rel === "same"
+      ? `Yoni: both ${YONI_LABEL[ya]}`
+      : `Yoni: ${YONI_LABEL[ya]} and ${YONI_LABEL[yb]} — ${rel === "sworn" ? "sworn rivals" : rel}`,
   );
 
   // 5 Graha Maitrī — the Moon-sign lords, read both ways
@@ -217,7 +209,9 @@ export function kootas(a: MoonPlacement, b: MoonPlacement, opts: AshtakootaOptio
       "bhakoot",
       applied ? 7 : 0,
       `Bhakūṭa: ${signName(a.sign)} and ${signName(b.sign)} lie on the ${axis} axis${
-        canCancel ? `; ${la === lb ? `both ruled by ${gName(la)}` : `${gName(la)} and ${gName(lb)} are friends`}${applied ? ", cancellation applied" : ""}` : ""
+        canCancel
+          ? `; ${la === lb ? `both ruled by ${gName(la)}` : `${gName(la)} and ${gName(lb)} are friends`}${applied ? ", cancellation applied" : ""}`
+          : ""
       }`,
       !applied,
       cancellation,
@@ -281,13 +275,7 @@ export function moonOf(core: Pick<PatriCore, "grahas">): MoonPlacement {
 }
 
 /** Full Milan: the eight kootas plus both charts' Manglik status (with the "both charts" cancellation). */
-export function milan(
-  a: Profile,
-  b: Profile,
-  pa: PatriCore,
-  pb: PatriCore,
-  opts: AshtakootaOptions = {},
-): MilanResult {
+export function milan(a: Profile, b: Profile, pa: PatriCore, pb: PatriCore, opts: AshtakootaOptions = {}): MilanResult {
   const base = ashtakoota(a.id, b.id, moonOf(pa), moonOf(pb), pa.presetHash, opts);
   const ma: ManglikStatus = manglikStatus(pa);
   const mb: ManglikStatus = manglikStatus(pb);

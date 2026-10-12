@@ -5,7 +5,9 @@
   padding: var(--space-3) var(--paper-margin) 0;
 }
 .leaf-strip .lg {
-  font-variation-settings: "wdth" 87, "wght" 800;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 800;
 }
 .leaf-place {
   position: relative;

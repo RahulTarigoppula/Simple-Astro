@@ -41,15 +41,7 @@ export interface CvLike {
     borderValue?: object,
   ): void;
   GaussianBlur(src: CvMat, dst: CvMat, ksize: object, sigmaX: number, sigmaY?: number, borderType?: number): void;
-  warpPerspective(
-    src: CvMat,
-    dst: CvMat,
-    M: CvMat,
-    dsize: object,
-    flags?: number,
-    borderMode?: number,
-    borderValue?: object,
-  ): void;
+  warpPerspective(src: CvMat, dst: CvMat, M: CvMat, dsize: object, flags?: number, borderMode?: number, borderValue?: object): void;
   CV_8UC1: number;
   CV_8UC4: number;
   CV_32F: number;

@@ -88,13 +88,7 @@ export const rituOfMasa = (masaIndex: number): string => RITU_NAMES[Math.floor((
  * plain bisection would need ~19. If [t0, t1] does not bracket the target the window is extended
  * forward (doubling, up to 64×) before giving up and returning the far end.
  */
-export function solveCrossing(
-  angleFn: (ms: number) => Deg,
-  target: Deg,
-  t0: number,
-  t1: number,
-  tolMs = 250,
-): number {
+export function solveCrossing(angleFn: (ms: number) => Deg, target: Deg, t0: number, t1: number, tolMs = 250): number {
   const f = (t: number): number => signedDelta(target, angleFn(t));
   let a = t0;
   let fa = f(a);
@@ -279,4 +273,3 @@ export function computePanchang(atUtcMs: number, place: GeoPoint, preset: Engine
   if (day.polar) out.polar = day.polar;
   return out;
 }
-

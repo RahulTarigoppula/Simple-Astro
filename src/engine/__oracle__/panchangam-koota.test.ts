@@ -2,15 +2,10 @@
 // only here). It follows a different school for Varṇa, Vaśya, Yoni and Gaṇa, so only the kootas where
 // the classical rule is unambiguous are compared. Its Tārā is the classical one (3 when both counts
 // are kind), which is the independent evidence for not following PyJHora's inverted Tārā column.
-import {
-  calculateBhakoot,
-  calculateGrahaMaitri,
-  calculateNadi,
-  calculateTara,
-} from "@ishubhamx/panchangam-js/dist/matching/kootas";
+import { calculateBhakoot, calculateGrahaMaitri, calculateNadi, calculateTara } from "@ishubhamx/panchangam-js/dist/matching/kootas";
 import { describe, expect, it } from "vitest";
-import { signLord } from "../chart-helpers";
 import { kootas, type MoonPlacement, signOfPada } from "../ashtakoota";
+import { signLord } from "../chart-helpers";
 
 const firstPadaOf = (nak: number): MoonPlacement => ({ nak, pada: 1, sign: signOfPada(nak, 1) });
 /** The first pada of a sign: pada index sign × 9. */
@@ -21,8 +16,7 @@ const moonInSign = (sign: number): MoonPlacement => {
   return { nak, pada, sign: signOfPada(nak, pada) };
 };
 
-const score = (a: MoonPlacement, b: MoonPlacement, id: string): number =>
-  kootas(a, b).find((k) => k.id === id)?.score ?? Number.NaN;
+const score = (a: MoonPlacement, b: MoonPlacement, id: string): number => kootas(a, b).find((k) => k.id === id)?.score ?? Number.NaN;
 
 describe("Aṣṭakūṭa vs panchangam-js (classical kootas only)", () => {
   it("Tārā agrees on all 27 × 27 nakshatra pairs", () => {

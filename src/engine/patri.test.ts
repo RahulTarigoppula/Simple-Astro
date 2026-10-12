@@ -18,7 +18,7 @@ const PLANETS = ["SU", "MO", "MA", "ME", "JU", "VE", "SA"] as const;
 const pTrue = computePatri(REFERENCE_PROFILE, PRESET, NOW);
 const pMean = computePatri(REFERENCE_PROFILE, { ...PRESET, node: "mean" }, NOW);
 
-const deltaArcsec = (a: number, b: number): number => ((((a - b) % 360) + 540) % 360 - 180) * 3600;
+const deltaArcsec = (a: number, b: number): number => (((((a - b) % 360) + 540) % 360) - 180) * 3600;
 
 describe("REFERENCE_PROFILE", () => {
   it("is exactly what resolveBirthMoment produces for the written leaf", () => {
@@ -47,7 +47,13 @@ describe("§0.1a header numbers", () => {
     expect(pTrue.obliquity).toBeCloseToArcsec(E.obliquity, 5);
     expect(pTrue.lagna.lonSidereal).toBeCloseToArcsec(E.lagna.lonSidereal, 5);
     expect(pTrue.mc.lonSidereal).toBeCloseToArcsec(E.mc.lonSidereal, 5);
-    expect(pTrue.lagna).toMatchObject({ sign: E.lagna.sign, nakshatra: E.lagna.nakshatra, pada: E.lagna.pada, nakshatraLord: E.lagna.lord, boundary: null });
+    expect(pTrue.lagna).toMatchObject({
+      sign: E.lagna.sign,
+      nakshatra: E.lagna.nakshatra,
+      pada: E.lagna.pada,
+      nakshatraLord: E.lagna.lord,
+      boundary: null,
+    });
     expect(pTrue.mc.sign).toBe(E.mc.sign);
     for (const p of ["se-mean", "drik-mean"] as const) {
       expect(computePatri(REFERENCE_PROFILE, { ...PRESET, ayanamsa: p }, NOW).ayanamsa).toBeCloseToArcsec(E.ayanamsa[p], 0.2);
@@ -107,7 +113,14 @@ describe("grahas", () => {
     for (const id of ["RA", "KE"] as const) {
       const g = pMean.grahas[id];
       const e = E.nodes.mean[id];
-      expect([g.sign, g.nakshatra, g.pada, g.nakshatraLord, g.house, g.retrograde]).toEqual([e.sign, e.nakshatra, e.pada, e.lord, e.house, true]);
+      expect([g.sign, g.nakshatra, g.pada, g.nakshatraLord, g.house, g.retrograde]).toEqual([
+        e.sign,
+        e.nakshatra,
+        e.pada,
+        e.lord,
+        e.house,
+        true,
+      ]);
       expect(pMean.vargas[9]?.placements[id]).toBe(e.d9);
       expect(g.speed).toBeLessThan(0);
       expect(g.boundary).toBeNull();
@@ -119,7 +132,14 @@ describe("grahas", () => {
       const g = pTrue.grahas[id];
       const e = E.nodes.true[id];
       expect(g.lonSidereal).toBeCloseToArcsec(e.oracle, 20);
-      expect([g.sign, g.nakshatra, g.pada, g.nakshatraLord, g.house, g.retrograde]).toEqual([e.sign, e.nakshatra, e.pada, e.lord, e.house, true]);
+      expect([g.sign, g.nakshatra, g.pada, g.nakshatraLord, g.house, g.retrograde]).toEqual([
+        e.sign,
+        e.nakshatra,
+        e.pada,
+        e.lord,
+        e.house,
+        true,
+      ]);
       expect(pTrue.vargas[9]?.placements[id]).toBe(e.d9);
       expect(g.latEcliptic).toBe(0);
     }

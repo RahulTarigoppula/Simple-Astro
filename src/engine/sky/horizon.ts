@@ -84,12 +84,7 @@ function eclLonJ2000(v: V3): Deg {
   return norm360(atan2d(v[1] * cosd(EPS_J2000) + v[2] * sind(EPS_J2000), v[0]));
 }
 
-export function skySnapshot(
-  utcMs: number,
-  lat: number,
-  lon: number,
-  preset: EnginePreset | AyanamsaPreset,
-): SkySnapshot {
+export function skySnapshot(utcMs: number, lat: number, lon: number, preset: EnginePreset | AyanamsaPreset): SkySnapshot {
   const t = astroTime(utcMs);
   const rot = A.Rotation_EQJ_EQD(t).rot;
   const lstDeg = norm360(A.SiderealTime(t) * 15 + lon);
@@ -137,4 +132,3 @@ export function skySnapshot(
     lstDeg,
   };
 }
-

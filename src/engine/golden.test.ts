@@ -117,7 +117,10 @@ describe("golden-charts.json — fixture integrity", () => {
   it("has 50 charts, 10 per decade band, the reference chart first", () => {
     expect(CHARTS).toHaveLength(50);
     for (const band of ["1900-1929", "1930-1959", "1960-1989", "1990-2019", "2020-2030"]) {
-      expect(CHARTS.filter((c) => c.band === band), band).toHaveLength(10);
+      expect(
+        CHARTS.filter((c) => c.band === band),
+        band,
+      ).toHaveLength(10);
     }
     expect(CHARTS[0]!.input.utcIso).toBe("1994-03-14T01:55:00Z");
     expect(CHARTS.filter((c) => c.tags.includes("war-time-ist"))).toHaveLength(6);

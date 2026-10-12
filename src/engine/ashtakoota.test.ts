@@ -10,7 +10,7 @@
 import { describe, expect, it } from "vitest";
 import { BANNED_WORDS } from "../test/banned-words";
 import { synth } from "./__fixtures__/synthetic";
-import { ashtakoota, bandOf, KOOTA_ORDER, kootas, milan, type MoonPlacement, signOfPada } from "./ashtakoota";
+import { ashtakoota, bandOf, KOOTA_ORDER, kootas, type MoonPlacement, milan, signOfPada } from "./ashtakoota";
 import type { Profile } from "./types";
 
 const moon = (nak: number, pada: 1 | 2 | 3 | 4, deg?: number): MoonPlacement =>
@@ -27,9 +27,7 @@ describe("worked examples", () => {
     const bhakoot = r.kootas.find((k) => k.id === "bhakoot");
     expect(bhakoot?.because).toContain("3/11");
     expect(r.kootas.find((k) => k.id === "nadi")?.because).toContain("both Antya");
-    expect(r.kootas.find((k) => k.id === "tara")?.because).toBe(
-      "Tārā: 5th Pratyari one way (unkind), 6th Sādhaka the other (kind)",
-    );
+    expect(r.kootas.find((k) => k.id === "tara")?.because).toBe("Tārā: 5th Pratyari one way (unkind), 6th Sādhaka the other (kind)");
   });
 
   it("Chitrā 1 (Kanyā) × Rohiṇī 3 (Vṛṣabha): the §6.11 certain subtotal of 17, plus Vaśya ½ and Yoni 2", () => {

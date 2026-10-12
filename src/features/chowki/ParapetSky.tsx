@@ -64,10 +64,7 @@ function skyColors(alt: number): [string, string] {
   const span = hi[0] - lo[0] || 1;
   const t = Math.max(0, Math.min(1, (alt - lo[0]) / span));
   const p = (t * 100).toFixed(1);
-  return [
-    `color-mix(in oklch, var(${lo[1]}), var(${hi[1]}) ${p}%)`,
-    `color-mix(in oklch, var(${lo[2]}), var(${hi[2]}) ${p}%)`,
-  ];
+  return [`color-mix(in oklch, var(${lo[1]}), var(${hi[1]}) ${p}%)`, `color-mix(in oklch, var(${lo[2]}), var(${hi[2]}) ${p}%)`];
 }
 
 function parapetPath(vw: number): string {

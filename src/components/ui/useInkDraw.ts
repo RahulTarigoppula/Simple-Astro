@@ -59,12 +59,18 @@ export function useInkDraw(root: React.RefObject<Element | null>, deps: unknown[
         anims.push(
           reduced
             ? b.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, delay: 120, fill: "backwards", easing: EASE })
-            : b.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], {
-                duration: 420,
-                delay: d,
-                fill: "backwards",
-                easing: SPRING,
-              }),
+            : b.animate(
+                [
+                  { opacity: 0, transform: "translateY(6px)" },
+                  { opacity: 1, transform: "none" },
+                ],
+                {
+                  duration: 420,
+                  delay: d,
+                  fill: "backwards",
+                  easing: SPRING,
+                },
+              ),
         );
       });
     }

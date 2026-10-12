@@ -218,7 +218,15 @@ for (const [a, b] of [
   const ny = dx / n;
   FLEX.push({ pts: catmull([[m[0] - nx * 20, m[1] - ny * 20], m, [m[0] + nx * 20, m[1] + ny * 20]]), depth: 0.22, w: 1.3 });
 }
-FLEX.push({ pts: catmull([[176, 528], [256, 534], [340, 526]]), depth: 0.25, w: 1.5 });
+FLEX.push({
+  pts: catmull([
+    [176, 528],
+    [256, 534],
+    [340, 526],
+  ]),
+  depth: 0.25,
+  w: 1.5,
+});
 
 const MAJOR = Object.entries(GT).map(([id, ctrl]) => ({ id, pts: catmull(ctrl, 1), depth: DEPTH[id], w: 1.8 }));
 
@@ -293,9 +301,27 @@ const HENNA = [];
     HENNA.push({ pts: catmull([p0, p1, p2]), w: 2.0 });
   }
   // a vine sweeping across the upper palm, near the heart line's band
-  HENNA.push({ pts: catmull([[120, 210], [190, 196], [260, 204], [330, 196], [410, 214]]), w: 2.4 });
+  HENNA.push({
+    pts: catmull([
+      [120, 210],
+      [190, 196],
+      [260, 204],
+      [330, 196],
+      [410, 214],
+    ]),
+    w: 2.4,
+  });
   // a long curl down the ulnar side
-  HENNA.push({ pts: catmull([[420, 240], [396, 300], [404, 360], [380, 420], [330, 460]]), w: 2.4 });
+  HENNA.push({
+    pts: catmull([
+      [420, 240],
+      [396, 300],
+      [404, 360],
+      [380, 420],
+      [330, 460],
+    ]),
+    w: 2.4,
+  });
   // dotted chain toward the wrist
   for (let k = 0; k < 9; k++) {
     const p = [240 + k * 4, 420 + k * 9];

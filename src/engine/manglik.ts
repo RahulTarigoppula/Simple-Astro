@@ -4,8 +4,8 @@
 // read from one chart, one ("both charts") needs the partner and is applied by milan(), and one
 // ("past 28", by some schools) is recorded and NEVER applied automatically.
 import { isExalted, isOwnSign } from "../data/tables/rulership";
-import { CITE } from "./citations";
 import { aspects, houseFrom, KENDRA, ord, signName } from "./chart-helpers";
+import { CITE } from "./citations";
 import type { Citation, ManglikStatus, PatriCore, YogaEvidence } from "./types";
 
 export const MANGLIK_HOUSES: readonly number[] = [1, 2, 4, 7, 8, 12];

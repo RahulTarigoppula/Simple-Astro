@@ -18,13 +18,7 @@ export function observerOf(p: GeoPoint): A.Observer {
 
 /** One rise (+1) or set (−1) event of the Sun under a convention, searching `limitDays` forward
  *  (positive) or backward (negative) from `fromMs`. Null when none occurs in the window. */
-export function sunEvent(
-  obs: A.Observer,
-  direction: 1 | -1,
-  fromMs: number,
-  limitDays: number,
-  mode: SunriseMode,
-): number | null {
+export function sunEvent(obs: A.Observer, direction: 1 | -1, fromMs: number, limitDays: number, mode: SunriseMode): number | null {
   const t = astroTime(fromMs);
   const hit =
     mode === "upper-limb-refracted"

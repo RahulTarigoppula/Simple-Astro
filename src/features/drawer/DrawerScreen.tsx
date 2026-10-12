@@ -6,7 +6,7 @@ import { Sheet } from "../../components/ui/Sheet";
 import { TurmericBand } from "../../components/ui/TurmericBand";
 import attribution from "../../data/attribution.json";
 import { envelopeFileName, exportEnvelope, ImportError, importEnvelope } from "../../data/crypto";
-import { clearPatriCache, saveSettings, storageEstimate, type StorageEstimateInfo } from "../../data/repo";
+import { clearPatriCache, type StorageEstimateInfo, saveSettings, storageEstimate } from "../../data/repo";
 import { AYANAMSA_PRESETS, ayanamsa } from "../../engine/ayanamsa";
 import { formatDms } from "../../engine/math";
 import { jdTtFromUtcMs } from "../../engine/time";
@@ -32,7 +32,19 @@ interface Credit {
   use?: string;
 }
 
-function Toggle({ label, help, on, onChange, disabled }: { label: string; help?: string; on: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
+function Toggle({
+  label,
+  help,
+  on,
+  onChange,
+  disabled,
+}: {
+  label: string;
+  help?: string;
+  on: boolean;
+  onChange: (v: boolean) => void;
+  disabled?: boolean;
+}) {
   return (
     <div className="toggle-row">
       <span className="v">
@@ -120,7 +132,9 @@ function DialSegment({ jdTt, value, onChange }: { jdTt: number; value: AyanamsaP
           const t = i / 40;
           const xx = 10 + t * 400;
           const yy = 100 - Math.sin(t * Math.PI) * 45;
-          return <path key={xx} d={`M${xx} ${yy}v${i % 5 === 0 ? 9 : 5}`} stroke="var(--brass-shadow)" strokeWidth={i % 5 === 0 ? 1.4 : 0.8} />;
+          return (
+            <path key={xx} d={`M${xx} ${yy}v${i % 5 === 0 ? 9 : 5}`} stroke="var(--brass-shadow)" strokeWidth={i % 5 === 0 ? 1.4 : 0.8} />
+          );
         })}
         {vals.map(([p, a]) => {
           const xx = x(a);
@@ -128,8 +142,17 @@ function DialSegment({ jdTt, value, onChange }: { jdTt: number; value: AyanamsaP
           const yy = 100 - Math.sin(t * Math.PI) * 45;
           return (
             <g key={p}>
-              <path d={`M${xx} ${yy - 30}L${xx} ${yy + 12}`} stroke={p === value ? "var(--accent)" : "var(--brass-ink)"} strokeWidth={p === value ? 3 : 1.6} />
-              <text x={xx} y={yy - 36} textAnchor="middle" style={{ fontFamily: "var(--font-mono)", fontSize: 12, fill: "var(--ink-muted)" }}>
+              <path
+                d={`M${xx} ${yy - 30}L${xx} ${yy + 12}`}
+                stroke={p === value ? "var(--accent)" : "var(--brass-ink)"}
+                strokeWidth={p === value ? 3 : 1.6}
+              />
+              <text
+                x={xx}
+                y={yy - 36}
+                textAnchor="middle"
+                style={{ fontFamily: "var(--font-mono)", fontSize: 12, fill: "var(--ink-muted)" }}
+              >
                 {p === "se-true" ? "SE-true" : p === "se-mean" ? "SE-mean" : "Drik"}
               </text>
             </g>
@@ -235,7 +258,11 @@ export default function DrawerScreen() {
 
   const prepareOffline = async () => {
     const base = import.meta.env.BASE_URL;
-    const urls = [`${base}models/hand_landmarker.task`, `${base}mediapipe/vision_wasm_internal.wasm`, `${base}mediapipe/vision_wasm_internal.js`];
+    const urls = [
+      `${base}models/hand_landmarker.task`,
+      `${base}mediapipe/vision_wasm_internal.wasm`,
+      `${base}mediapipe/vision_wasm_internal.js`,
+    ];
     let bytes = 0;
     setWarm("warming…");
     try {
@@ -252,12 +279,20 @@ export default function DrawerScreen() {
     }
   };
 
-  const credits = [...((attribution as { bundled?: Credit[] }).bundled ?? []), ...((attribution as { services?: Credit[] }).services ?? [])];
+  const credits = [
+    ...((attribution as { bundled?: Credit[] }).bundled ?? []),
+    ...((attribution as { services?: Credit[] }).services ?? []),
+  ];
 
   return (
     <main className="screen drawer-screen" aria-label="The drawer">
       <div className="drawer-screen__dim">
-        <button type="button" className="linkish" style={{ color: "var(--surface)" }} onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/"))}>
+        <button
+          type="button"
+          className="linkish"
+          style={{ color: "var(--surface)" }}
+          onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/"))}
+        >
           ⇩ close the drawer
         </button>
       </div>
@@ -269,8 +304,8 @@ export default function DrawerScreen() {
           <TurmericBand title="Ayanāṃśa" meta={active ? `at ${active.name}'s birth` : "today"} plain level={2} />
           <DialSegment jdTt={jdTt} value={settings.preset.ayanamsa} onChange={(p) => setPreset({ ayanamsa: p })} />
           <p className="p p--muted">
-            Three Lahiri numbers exist and differ by up to 41″: Swiss Ephemeris with nutation, without it, and the value Drik Panchang prints. Every
-            chart engraves the one it used.
+            Three Lahiri numbers exist and differ by up to 41″: Swiss Ephemeris with nutation, without it, and the value Drik Panchang
+            prints. Every chart engraves the one it used.
           </p>
 
           <Radio
@@ -357,7 +392,12 @@ export default function DrawerScreen() {
           />
           <Toggle label="Sound" on={settings.sound} onChange={(v) => set({ sound: v })} />
           <Toggle label="Haptics" on={settings.haptics} onChange={(v) => set({ haptics: v })} />
-          <Toggle label="Calm desk" help="No flicker, no rustle, no inertia — whatever the OS says." on={settings.calmDesk} onChange={(v) => set({ calmDesk: v })} />
+          <Toggle
+            label="Calm desk"
+            help="No flicker, no rustle, no inertia — whatever the OS says."
+            on={settings.calmDesk}
+            onChange={(v) => set({ calmDesk: v })}
+          />
           <Toggle
             label="Bhakūṭa cancellation"
             help="Apply the classical cancellation when the Moon-sign lords are one or friends."
@@ -384,12 +424,15 @@ export default function DrawerScreen() {
           </div>
           {est ? (
             <p className="p p--muted">
-              The drawer holds {(est.usage / 1e6).toFixed(1)} MB of {(est.quota / 1e9).toFixed(1)} GB{est.persisted ? " (kept safe from eviction)" : ""}.
+              The drawer holds {(est.usage / 1e6).toFixed(1)} MB of {(est.quota / 1e9).toFixed(1)} GB
+              {est.persisted ? " (kept safe from eviction)" : ""}.
             </p>
           ) : null}
 
           <TurmericBand title="Wax envelope" meta="AES-GCM-256" plain level={2} />
-          <p className="p p--muted">Export is always encrypted with your passphrase (PBKDF2, 600 000 rounds). There is no unencrypted export.</p>
+          <p className="p p--muted">
+            Export is always encrypted with your passphrase (PBKDF2, 600 000 rounds). There is no unencrypted export.
+          </p>
           <div className="tools">
             <button type="button" className="linkish" onClick={() => setMode("export")}>
               Export the drawer ▸
@@ -415,7 +458,10 @@ export default function DrawerScreen() {
           <Colophon
             rows={[
               ["Version", `Chowki ${__APP_VERSION__} · engine astronomy-engine ${__ENGINE_BUILD__}`],
-              ["Presets", `${settings.preset.ayanamsa} · ${settings.preset.node} node · ${settings.preset.dashaYearDays} d · ${settings.preset.sunrise}`],
+              [
+                "Presets",
+                `${settings.preset.ayanamsa} · ${settings.preset.node} node · ${settings.preset.dashaYearDays} d · ${settings.preset.sunrise}`,
+              ],
               ["Network", settings.onlineLookupAllowed ? "place search online allowed (names only)" : "none — fully offline"],
             ]}
           >
@@ -435,7 +481,9 @@ export default function DrawerScreen() {
           setPass("");
           setPass2("");
           setFile(null);
-        }} label={mode === "export" ? "Export the drawer" : "Import an envelope"}>
+        }}
+        label={mode === "export" ? "Export the drawer" : "Import an envelope"}
+      >
         {mode === "export" ? (
           <form
             className="drawer-pass"
@@ -453,7 +501,11 @@ export default function DrawerScreen() {
               Once more
               <input type="password" autoComplete="new-password" value={pass2} onChange={(e) => setPass2(e.target.value)} />
             </label>
-            {pass2 && pass !== pass2 ? <p className="note-haldi" style={{ margin: 0 }}>The two passphrases differ.</p> : null}
+            {pass2 && pass !== pass2 ? (
+              <p className="note-haldi" style={{ margin: 0 }}>
+                The two passphrases differ.
+              </p>
+            ) : null}
             <button type="submit" className="stamp" disabled={busy || pass.length < 6 || pass !== pass2}>
               <span>{busy ? "sealing…" : "Seal and save"}</span>
             </button>
@@ -470,7 +522,12 @@ export default function DrawerScreen() {
             <p className="note-lac" style={{ margin: 0 }}>
               Importing replaces everything in this drawer with the envelope's contents.
             </p>
-            <input ref={fileInput} type="file" accept=".chowki,application/octet-stream" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+            <input
+              ref={fileInput}
+              type="file"
+              accept=".chowki,application/octet-stream"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
             <label className="help">
               Passphrase
               <input type="password" autoComplete="current-password" value={pass} onChange={(e) => setPass(e.target.value)} />

@@ -14,7 +14,7 @@ import * as A from "astronomy-engine";
 import { ayanamsa } from "../ayanamsa";
 import { astroTime, BODY, PLANET_IDS } from "../ephemeris";
 import { lagna as solveLagna } from "../lagna";
-import { D2R, R2D, norm360 } from "../math";
+import { D2R, norm360, R2D } from "../math";
 import { nakshatraIndexOf, signOf } from "../nakshatra";
 import { ketuOf, meanNode, trueNode } from "../nodes";
 import type { AyanamsaPreset, GrahaId, NodeMode, SignIdx } from "../types";

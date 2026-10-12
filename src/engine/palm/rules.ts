@@ -95,10 +95,7 @@ export const PALM_RULE_TABLE: readonly Rule[] = [
   ...(["earth", "air", "fire", "water"] as const).map(
     (el): Rule => ({
       id: `element-${el}` as PalmRuleId,
-      when: (c) =>
-        c.element === el
-          ? { widthOverLength: c.ratios.widthOverLength, fingerOverPalm: c.ratios.fingerOverPalm }
-          : null,
+      when: (c) => (c.element === el ? { widthOverLength: c.ratios.widthOverLength, fingerOverPalm: c.ratios.fingerOverPalm } : null),
     }),
   ),
   {
@@ -121,17 +118,13 @@ export const PALM_RULE_TABLE: readonly Rule[] = [
     id: "heart-long",
     line: "heart",
     when: (c) =>
-      withLine(c, "heart", (l) =>
-        lengthRatio(l) >= LONG_LINE_MIN ? { lengthRatio: lengthRatio(l), depth: l.metrics.depth } : null,
-      ),
+      withLine(c, "heart", (l) => (lengthRatio(l) >= LONG_LINE_MIN ? { lengthRatio: lengthRatio(l), depth: l.metrics.depth } : null)),
   },
   {
     id: "heart-short",
     line: "heart",
     when: (c) =>
-      withLine(c, "heart", (l) =>
-        lengthRatio(l) < LONG_LINE_MIN ? { lengthRatio: lengthRatio(l), depth: l.metrics.depth } : null,
-      ),
+      withLine(c, "heart", (l) => (lengthRatio(l) < LONG_LINE_MIN ? { lengthRatio: lengthRatio(l), depth: l.metrics.depth } : null)),
   },
   {
     id: "heart-curved",
@@ -153,17 +146,13 @@ export const PALM_RULE_TABLE: readonly Rule[] = [
     id: "head-long",
     line: "head",
     when: (c) =>
-      withLine(c, "head", (l) =>
-        lengthRatio(l) >= LONG_LINE_MIN ? { lengthRatio: lengthRatio(l), depth: l.metrics.depth } : null,
-      ),
+      withLine(c, "head", (l) => (lengthRatio(l) >= LONG_LINE_MIN ? { lengthRatio: lengthRatio(l), depth: l.metrics.depth } : null)),
   },
   {
     id: "head-short",
     line: "head",
     when: (c) =>
-      withLine(c, "head", (l) =>
-        lengthRatio(l) < LONG_LINE_MIN ? { lengthRatio: lengthRatio(l), depth: l.metrics.depth } : null,
-      ),
+      withLine(c, "head", (l) => (lengthRatio(l) < LONG_LINE_MIN ? { lengthRatio: lengthRatio(l), depth: l.metrics.depth } : null)),
   },
   {
     id: "head-sloping",
@@ -193,10 +182,7 @@ export const PALM_RULE_TABLE: readonly Rule[] = [
 ];
 
 /** Evaluate every rule; each hit's sentence prints its measurement (and the line's confidence). */
-export function palmHits(
-  parts: Pick<PalmReading, "element" | "ratios" | "lines">,
-  seed: string,
-): PalmHit[] {
+export function palmHits(parts: Pick<PalmReading, "element" | "ratios" | "lines">, seed: string): PalmHit[] {
   const ctx: Ctx = {
     ratios: parts.ratios,
     element: parts.element,
@@ -262,9 +248,7 @@ export function composeReading(a: ComposeArgs): PalmReading | null {
 /** Replace (or add) one line and recompute the hits — the stylus path. Pure, synchronous. */
 export function withLineReplaced(reading: PalmReading, line: PalmLine, computedAt: number): PalmReading {
   const order: PalmLineId[] = ["heart", "head", "life", "fate"];
-  const lines = [...reading.lines.filter((l) => l.id !== line.id), line].sort(
-    (x, y) => order.indexOf(x.id) - order.indexOf(y.id),
-  );
+  const lines = [...reading.lines.filter((l) => l.id !== line.id), line].sort((x, y) => order.indexOf(x.id) - order.indexOf(y.id));
   const hits = palmHits({ element: reading.element, ratios: reading.ratios, lines }, reading.captureId);
   return { ...reading, lines, hits, computedAt };
 }

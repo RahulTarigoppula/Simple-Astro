@@ -76,7 +76,8 @@ describe("Zhang–Suen thinning (§6.13 [6])", () => {
     const h = 512;
     const m = new Uint8Array(w * h);
     // thick bands and blobs — the worst a hysteresis mask could plausibly be
-    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if ((x * 7 + y * 3) % 97 < 30 || (x - 256) ** 2 + (y - 256) ** 2 < 40 ** 2) m[y * w + x] = 1;
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) if ((x * 7 + y * 3) % 97 < 30 || (x - 256) ** 2 + (y - 256) ** 2 < 40 ** 2) m[y * w + x] = 1;
     const { iterations } = zhangSuenStats(m, w, h);
     expect(iterations).toBeLessThanOrEqual(40);
     expect(iterations).toBeGreaterThan(1);

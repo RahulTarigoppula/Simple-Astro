@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadFixture, loadTruth } from "../../test/palm-fixtures";
-import { sqDistToPolyline, type Pt } from "./label";
+import { type Pt, sqDistToPolyline } from "./label";
 import { runPalmPipeline } from "./pipeline";
 import {
   applyH,

@@ -53,8 +53,7 @@ const bandFL = (v: number): string => (v >= LONG_FINGERS_MIN - EPS ? "long finge
 /** 2D:4D. Within ±3 % the two fingers read as even — no sentence is claimed for "even". */
 export const INDEX_LONG_MIN = 1.0;
 export const RING_LONG_MAX = 0.97;
-const bandIR = (v: number): string =>
-  v >= INDEX_LONG_MIN ? "index longer" : v < RING_LONG_MAX ? "ring longer" : "about even";
+const bandIR = (v: number): string => (v >= INDEX_LONG_MIN ? "index longer" : v < RING_LONG_MAX ? "ring longer" : "about even");
 /** Thumb spread against the palm axis. 35–45° is the unremarkable middle. */
 export const THUMB_FLEXIBLE_MIN = 45;
 export const THUMB_FIRM_MAX = 35;

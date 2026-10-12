@@ -528,11 +528,7 @@ export interface PalmSentence {
  * One palm sentence, measurement printed inside it. Without a seed the first variant is used (the
  * canonical wording); with a seed the variant is drawn deterministically from it.
  */
-export function palmSentence(
-  ruleId: PalmRuleId,
-  values: Readonly<Record<string, number>>,
-  seed?: string,
-): PalmSentence {
+export function palmSentence(ruleId: PalmRuleId, values: Readonly<Record<string, number>>, seed?: string): PalmSentence {
   const spec = PALM_RULES[ruleId];
   const printable: Record<string, string> = {};
   for (const key of spec.values) {

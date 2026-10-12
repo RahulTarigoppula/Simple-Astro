@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import fixture from "./__fixtures__/vargas.json";
 import { EngineError } from "./errors";
 import { GRAHA_IDS, type GrahaId, type VargaNumber } from "./types";
-import { VARGAS, navamsaClassical, vargaChart, vargaSign } from "./vargas";
+import { navamsaClassical, VARGAS, vargaChart, vargaSign } from "./vargas";
 
 type Row = Record<string, number | string>;
 
@@ -63,7 +63,17 @@ describe("invariants", () => {
   });
 
   it("vargaChart places every graha and the ascendant", () => {
-    const lons: Record<GrahaId, number> = { SU: 329.4811, MO: 349.1688, MA: 311.5233, ME: 302.4901, JU: 200.603, VE: 343.1253, SA: 311.5169, RA: 213.4956, KE: 33.4956 };
+    const lons: Record<GrahaId, number> = {
+      SU: 329.4811,
+      MO: 349.1688,
+      MA: 311.5233,
+      ME: 302.4901,
+      JU: 200.603,
+      VE: 343.1253,
+      SA: 311.5169,
+      RA: 213.4956,
+      KE: 33.4956,
+    };
     const grahas = Object.fromEntries(GRAHA_IDS.map((id) => [id, { lonSidereal: lons[id] }])) as Record<GrahaId, { lonSidereal: number }>;
     const d9 = vargaChart({ lagna: { lonSidereal: 345.657 }, grahas }, 9 as VargaNumber);
     expect(d9.ascendantSign).toBe(7); // Vṛścika

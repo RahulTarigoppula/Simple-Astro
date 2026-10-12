@@ -5,16 +5,7 @@ import { describe, expect, it } from "vitest";
 import { mulberry32 } from "../math";
 import { altAzXY, eunX, eunY, SKY_R, skyProjection } from "./projection";
 import { rooftopSky, siderealPointEun, starMatrix } from "./rooftop";
-import {
-  altAzOfRadec,
-  decodeStars,
-  horizonVectors,
-  mul3,
-  precessionMatrix,
-  projectStars,
-  type StarCatalog,
-  transformStars,
-} from "./stars";
+import { altAzOfRadec, decodeStars, horizonVectors, mul3, precessionMatrix, projectStars, type StarCatalog, transformStars } from "./stars";
 
 const BIN = readFileSync(fileURLToPath(new URL("../../data/bsc5.bin", import.meta.url)));
 const stars: StarCatalog = decodeStars(BIN);

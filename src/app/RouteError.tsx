@@ -5,7 +5,11 @@ import { EngineError } from "../engine/errors";
 export function RouteError() {
   const err = useRouteError();
   const reason =
-    err instanceof EngineError ? `${err.code.replace(/_/g, " ").toLowerCase()} — ${err.detail}` : err instanceof Error ? err.message : "the desk could not open this leaf";
+    err instanceof EngineError
+      ? `${err.code.replace(/_/g, " ").toLowerCase()} — ${err.detail}`
+      : err instanceof Error
+        ? err.message
+        : "the desk could not open this leaf";
   const offlineChunk = err instanceof Error && /dynamically imported module|Failed to fetch|Loading chunk/i.test(err.message);
   return (
     <main className="screen screen--scroll" aria-label="Error">

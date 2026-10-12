@@ -94,5 +94,4 @@ export function currentDasha(tree: readonly DashaNode[], atMs: number): CurrentD
 }
 
 /** Years in an interval under a daśā-year convention. */
-export const intervalYears = (n: DashaNode, yearDays: 365.25 | 360): number =>
-  (n.endMs - n.startMs) / (yearDays * MS_PER_DAY);
+export const intervalYears = (n: DashaNode, yearDays: 365.25 | 360): number => (n.endMs - n.startMs) / (yearDays * MS_PER_DAY);

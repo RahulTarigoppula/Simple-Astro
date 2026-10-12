@@ -50,7 +50,19 @@ function ManglikMarks({ m, onOpen }: { m: ManglikStatus; onOpen: () => void }) {
   );
 }
 
-function ScrollFace({ who, profile, moon, manglik, onManglik }: { who: string; profile: Profile; moon: MoonFacts | null; manglik: ManglikStatus | null; onManglik: () => void }) {
+function ScrollFace({
+  who,
+  profile,
+  moon,
+  manglik,
+  onManglik,
+}: {
+  who: string;
+  profile: Profile;
+  moon: MoonFacts | null;
+  manglik: ManglikStatus | null;
+  onManglik: () => void;
+}) {
   return (
     <div className="pair__scroll mscroll">
       <span className="mscroll__who">{who}</span>
@@ -91,7 +103,17 @@ function MauliKnot() {
 }
 
 /** The picker: the first leaf is laid down, the second is dragged (or tapped) in from the bundle. */
-function Picker({ first, profiles, onPick, onFirst }: { first: Profile | null; profiles: Profile[]; onPick: (p: Profile) => void; onFirst: (p: Profile) => void }) {
+function Picker({
+  first,
+  profiles,
+  onPick,
+  onFirst,
+}: {
+  first: Profile | null;
+  profiles: Profile[];
+  onPick: (p: Profile) => void;
+  onFirst: (p: Profile) => void;
+}) {
   const drop = useRef<HTMLDivElement>(null);
   const [over, setOver] = useState(false);
   const others = profiles.filter((p) => p.id !== first?.id);
@@ -265,9 +287,21 @@ function MilanScreen() {
                 if (Math.abs(info.offset.x) > 72) swap();
               }}
             >
-              <ScrollFace who="first leaf" profile={pa} moon={ma} manglik={r?.manglik.a ?? null} onManglik={() => setSheet({ kind: "manglik", side: "a" })} />
+              <ScrollFace
+                who="first leaf"
+                profile={pa}
+                moon={ma}
+                manglik={r?.manglik.a ?? null}
+                onManglik={() => setSheet({ kind: "manglik", side: "a" })}
+              />
               <MauliKnot />
-              <ScrollFace who="second leaf" profile={pb} moon={mb} manglik={r?.manglik.b ?? null} onManglik={() => setSheet({ kind: "manglik", side: "b" })} />
+              <ScrollFace
+                who="second leaf"
+                profile={pb}
+                moon={mb}
+                manglik={r?.manglik.b ?? null}
+                onManglik={() => setSheet({ kind: "manglik", side: "b" })}
+              />
             </motion.div>
             <p className="milan__swap">
               <button type="button" className="linkish" onClick={swap}>
@@ -281,7 +315,11 @@ function MilanScreen() {
                 The mala would not count: {err}
               </div>
             ) : r ? (
-              <Mala key={`${r.a}|${r.b}|${r.presetHash}|${settings.bhakootCancellation}`} result={r} onOpen={(k) => setSheet({ kind: "koota", k })} />
+              <Mala
+                key={`${r.a}|${r.b}|${r.presetHash}|${settings.bhakootCancellation}`}
+                result={r}
+                onOpen={(k) => setSheet({ kind: "koota", k })}
+              />
             ) : (
               <p className="p p--muted" role="status">
                 Casting both charts…
@@ -291,7 +329,10 @@ function MilanScreen() {
             {r?.porutham && r.porutham.length > 0 ? (
               <details className="porutham">
                 <summary>
-                  <span lang="ta">பொருத்தம்</span> · Ten Porutham <span className="porutham__meta">{r.porutham.filter((x) => x.pass).length} / {r.porutham.length}</span>
+                  <span lang="ta">பொருத்தம்</span> · Ten Porutham{" "}
+                  <span className="porutham__meta">
+                    {r.porutham.filter((x) => x.pass).length} / {r.porutham.length}
+                  </span>
                 </summary>
                 <ul className="porutham__list">
                   {r.porutham.map((x) => (
@@ -311,9 +352,17 @@ function MilanScreen() {
         <Colophon
           rows={[
             ["Method", "Aṣṭakūṭa from the two Moons' nakṣatra, pada and rāśi — eight kūṭas, 36 points"],
-            ["School", "North Indian practice after Muhūrta Cintāmaṇi ch. 6; Vaśya is the table that varies by school, and the reading follows the adopted one"],
+            [
+              "School",
+              "North Indian practice after Muhūrta Cintāmaṇi ch. 6; Vaśya is the table that varies by school, and the reading follows the adopted one",
+            ],
             ["Sides", "first leaf in the first column of every table, second leaf in the second"],
-            ["Bhakūṭa", settings.bhakootCancellation ? "the classical exception is applied (Drawer)" : "the classical exception is recorded, not applied (Drawer)"],
+            [
+              "Bhakūṭa",
+              settings.bhakootCancellation
+                ? "the classical exception is applied (Drawer)"
+                : "the classical exception is recorded, not applied (Drawer)",
+            ],
             ["Bands", "under 18 not recommended · 18–24½ acceptable · 25–32½ very good · 33–36 excellent"],
             ["Ayanāṃśa", AYANAMSA_LABEL[settings.preset.ayanamsa]],
           ]}
@@ -331,7 +380,11 @@ function MilanScreen() {
           <KootaSheet k={sheet.k} pa={pa} pb={pb} ma={ma} mb={mb} onClose={() => setSheet(null)} />
         ) : null}
         {sheet?.kind === "manglik" && r && pa && pb ? (
-          <ManglikSheet profile={sheet.side === "a" ? pa : pb} m={sheet.side === "a" ? r.manglik.a : r.manglik.b} onClose={() => setSheet(null)} />
+          <ManglikSheet
+            profile={sheet.side === "a" ? pa : pb}
+            m={sheet.side === "a" ? r.manglik.a : r.manglik.b}
+            onClose={() => setSheet(null)}
+          />
         ) : null}
       </Sheet>
     </Screen>
@@ -363,14 +416,31 @@ function MoonLine({ who, p, m }: { who: string; p: Profile; m: MoonFacts | null 
   );
 }
 
-function KootaSheet({ k, pa, pb, ma, mb, onClose }: { k: KootaResult; pa: Profile; pb: Profile; ma: MoonFacts | null; mb: MoonFacts | null; onClose: () => void }) {
+function KootaSheet({
+  k,
+  pa,
+  pb,
+  ma,
+  mb,
+  onClose,
+}: {
+  k: KootaResult;
+  pa: Profile;
+  pb: Profile;
+  ma: MoonFacts | null;
+  mb: MoonFacts | null;
+  onClose: () => void;
+}) {
   return (
     <div className="kootasheet">
       <h2 className="kootasheet__h">
         <span lang="sa" className="dev">
           {k.nameDev}
         </span>{" "}
-        · {k.name} <span className="kootasheet__score mono">{fmtPts(k.score)} / {k.max}</span>
+        · {k.name}{" "}
+        <span className="kootasheet__score mono">
+          {fmtPts(k.score)} / {k.max}
+        </span>
       </h2>
       <p className="p">{RULE_TEXT[k.id]}</p>
       <dl className="kootasheet__dl">
@@ -390,8 +460,8 @@ function KootaSheet({ k, pa, pb, ma, mb, onClose }: { k: KootaResult; pa: Profil
           <div className="row">
             <dt>Exception</dt>
             <dd>
-              {exceptionText(k.cancellation.rule)} — {k.cancellation.applied ? "applied (Drawer setting)" : "recorded, not applied"} · {k.cancellation.citation.text},{" "}
-              {k.cancellation.citation.ref}
+              {exceptionText(k.cancellation.rule)} — {k.cancellation.applied ? "applied (Drawer setting)" : "recorded, not applied"} ·{" "}
+              {k.cancellation.citation.text}, {k.cancellation.citation.ref}
             </dd>
           </div>
         ) : null}
@@ -438,4 +508,3 @@ function ManglikSheet({ profile, m, onClose }: { profile: Profile; m: ManglikSta
     </div>
   );
 }
-

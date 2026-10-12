@@ -2,21 +2,14 @@
 // always correct; the 3D dome (lazy chunk) crossfades over it once its first frame is drawn. No
 // WebGL, a lost context or reduced motion → the painted sky only, silently, with a one-line note.
 // The ScrubRing turns time ±12 h around the birth moment; every frame recomputes the real sky.
+
+import { DateTime } from "luxon";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { DateTime } from "luxon";
 import { useProfile, useSettings } from "../../app/hooks";
 import { DigitSet } from "../../components/ui/DigitSet";
 import { Screen } from "../../components/ui/Screen";
-import {
-  GRAHA_DEV,
-  GRAHA_NAMES,
-  NAKSHATRA_NAMES,
-  NAKSHATRA_SHORT,
-  SIGN_DEV,
-  SIGN_ENGRAVED,
-  SIGN_NAMES,
-} from "../../data/tables/names";
+import { GRAHA_DEV, GRAHA_NAMES, NAKSHATRA_NAMES, NAKSHATRA_SHORT, SIGN_DEV, SIGN_ENGRAVED, SIGN_NAMES } from "../../data/tables/names";
 import { formatDms } from "../../engine/math";
 import { type RooftopSky, rooftopSky } from "../../engine/sky/rooftop";
 import type { StarCatalog } from "../../engine/sky/stars";
@@ -27,8 +20,8 @@ import { reducedMotion } from "../../platform/native";
 import { play } from "../../platform/sound";
 import { PaintedSky } from "./PaintedSky";
 import { PosterAction } from "./PosterAction";
-import { buildScene, type PaintedScene } from "./scene";
 import { ScrubRing } from "./ScrubRing";
+import { buildScene, type PaintedScene } from "./scene";
 import { loadStars } from "./starField";
 import "./sky.css";
 
@@ -231,7 +224,13 @@ export default function SkyScreen() {
     const hm = `${String(birth.localH).padStart(2, "0")}:${String(birth.localMi).padStart(2, "0")}`;
     return {
       scene: buildScene(at, stars),
-      filename: `chowki-sky-${profile.name.normalize("NFKD").replace(/[^\w]+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "leaf"}.png`,
+      filename: `chowki-sky-${
+        profile.name
+          .normalize("NFKD")
+          .replace(/[^\w]+/g, "-")
+          .replace(/^-|-$/g, "")
+          .toLowerCase() || "leaf"
+      }.png`,
       text: {
         name: profile.name,
         birthLine: `${birth.localD} ${MONTHS_LONG[birth.localMo - 1] ?? ""} ${birth.localY} · ${hm} ${zone} · ${place}`,
@@ -306,7 +305,10 @@ export default function SkyScreen() {
         </div>
 
         <div className="sky-foot">
-          <p className="engraved sky-strip" aria-label={`${st.time} ${zone}, Lagna ${SIGN_NAMES[L.sign] ?? ""}, ${NAKSHATRA_NAMES[L.nakshatra] ?? ""}`}>
+          <p
+            className="engraved sky-strip"
+            aria-label={`${st.time} ${zone}, Lagna ${SIGN_NAMES[L.sign] ?? ""}, ${NAKSHATRA_NAMES[L.nakshatra] ?? ""}`}
+          >
             <DigitSet text={st.time} /> <span>{zone}</span>
             <span className="sep" aria-hidden="true">
               ·
@@ -339,8 +341,7 @@ export default function SkyScreen() {
 
         <table className="vh" id={tableId}>
           <caption>
-            The sky at {st.time} {zone} over {place}: geometric altitude and azimuth, sidereal longitude (Lahiri{" "}
-            {PRESET_SHORT[preset]}).
+            The sky at {st.time} {zone} over {place}: geometric altitude and azimuth, sidereal longitude (Lahiri {PRESET_SHORT[preset]}).
           </caption>
           <thead>
             <tr>

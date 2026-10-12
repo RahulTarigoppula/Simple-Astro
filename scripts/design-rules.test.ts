@@ -23,7 +23,7 @@ describe("design rules", () => {
       readFileSync(f, "utf8")
         .split("\n")
         .forEach((line, i) => {
-          const hex = new RegExp("(^|[^&\\w/])#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?(?:[0-9a-fA-F]{2})?\\b");
+          const hex = /(^|[^&\w/])#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?(?:[0-9a-fA-F]{2})?\b/;
           const isRoute = line.includes('"#/') || line.includes("'#/") || line.includes(`${String.fromCharCode(96)}#/`);
           if (hex.test(line) && !isRoute) hits.push(`${f}:${i + 1}: ${line.trim()}`);
         });
@@ -35,7 +35,8 @@ describe("design rules", () => {
     const hits: string[] = [];
     for (const f of files.filter((x) => x.endsWith(".css") || x.endsWith(".tsx"))) {
       const src = readFileSync(f, "utf8");
-      for (const re of [/backdrop-filter/, /filter:\s*blur\(/, /text-shadow\s*:/, /background-clip:\s*text/]) if (re.test(src)) hits.push(`${f}: ${re}`);
+      for (const re of [/backdrop-filter/, /filter:\s*blur\(/, /text-shadow\s*:/, /background-clip:\s*text/])
+        if (re.test(src)) hits.push(`${f}: ${re}`);
     }
     expect(hits).toEqual([]);
   });
