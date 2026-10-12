@@ -1,3 +1,4 @@
+import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useActiveProfile, useSettings } from "../../app/hooks";
@@ -6,6 +7,7 @@ import { Sheet } from "../../components/ui/Sheet";
 import { TurmericBand } from "../../components/ui/TurmericBand";
 import attribution from "../../data/attribution.json";
 import { envelopeFileName, exportEnvelope, ImportError, importEnvelope } from "../../data/crypto";
+import { db } from "../../data/db";
 import { clearPatriCache, type StorageEstimateInfo, saveSettings, storageEstimate } from "../../data/repo";
 import { AYANAMSA_PRESETS, ayanamsa } from "../../engine/ayanamsa";
 import { formatDms } from "../../engine/math";
@@ -439,6 +441,7 @@ export default function DrawerScreen() {
           <p className="p p--muted">
             Export is always encrypted with your passphrase (PBKDF2, 600 000 rounds). There is no unencrypted export.
           </p>
+          <BackupAge />
           <div className="tools">
             <button type="button" className="linkish" onClick={() => setMode("export")}>
               Export the drawer ▸
@@ -545,5 +548,27 @@ export default function DrawerScreen() {
         ) : null}
       </Sheet>
     </main>
+  );
+}
+
+/** When was the drawer last sealed in an envelope? Leaves live only on this device. */
+function BackupAge() {
+  const last = useLiveQuery(async () => (await db.meta.get("lastExportAt"))?.value ?? null, []);
+  const count = useLiveQuery(() => db.profiles.count(), []);
+  if (last === undefined || !count) return null;
+  const days = last ? Math.floor((Date.now() - last) / 86_400_000) : null;
+  const text =
+    days === null
+      ? `${count} leaf${count > 1 ? "s live" : " lives"} only on this device and ${count > 1 ? "have" : "has"} never been sealed in an envelope.`
+      : days === 0
+        ? "Last sealed in an envelope today."
+        : `Last sealed in an envelope ${days} day${days > 1 ? "s" : ""} ago.`;
+  return days === null || days > 30 ? (
+    <p className="note-haldi">
+      <span aria-hidden="true">⚑</span>
+      <span>{text} A phone can be lost; an envelope kept elsewhere cannot be read without your passphrase.</span>
+    </p>
+  ) : (
+    <p className="p p--muted">{text}</p>
   );
 }
