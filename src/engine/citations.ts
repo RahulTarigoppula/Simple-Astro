@@ -23,6 +23,8 @@ export const CITE = {
   // Guna Milan
   muhurtaChintamani6: c("Muhūrta Cintāmaṇi", "ch. 6"),
   milanCommentary: c("Later tradition", "Aṣṭakūṭa parihāra"),
+  porutham: c("Porutham tradition (Tamil jyotiṣa)", "Daśa porutham"),
+  ganaParihara: c("Later tradition", "Gaṇa parihāra"),
   // palm
   samudrikaHeart: c("Sāmudrika Śāstra", "Hṛdaya-rekhā"),
   samudrikaHead: c("Sāmudrika Śāstra", "Mastiṣka-rekhā"),
@@ -42,6 +44,12 @@ export const CITE = {
   sadeSati: c("Later tradition", "Sāḍe-sātī"),
   kantakaAshtama: c("Later tradition", "Kaṇṭaka and Aṣṭama Śani"),
   bphs46: c("BPHS", "ch. 46"),
+  // Muhūrta divisions and the month leaf
+  muhurtaChoghadiya: c("Muhūrta tradition", "Choghaḍiyā"),
+  muhurtaHora: c("Muhūrta tradition", "Horā"),
+  muhurtaKala: c("Muhūrta tradition", "Brahma-muhūrta and Godhūli"),
+  muhurtaTithiDay: c("Muhūrta tradition", "Udaya tithi"),
+  suryaSiddhanta14: c("Sūrya Siddhānta", "ch. 14"),
 } as const satisfies Record<string, Citation>;
 
 export type CiteKey = keyof typeof CITE;

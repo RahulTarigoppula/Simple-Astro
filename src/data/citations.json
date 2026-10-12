@@ -7,9 +7,11 @@
     "Sūrya Siddhānta": "Sūrya Siddhānta, the classical astronomical treatise; its chapter on conjunctions defines planetary contests.",
     "Muhūrta Cintāmaṇi": "Muhūrta Cintāmaṇi of Rāma Daivajña (1600), the standard muhūrta text; its sixth chapter sets out the Aṣṭakūṭa.",
     "Later tradition": "A convention found in later manuals and commentaries rather than in a verse of the classical texts.",
+    "Porutham tradition (Tamil jyotiṣa)": "The South Indian (Tamil) practice of marriage matching by ten agreements (daśa porutham), as set out in the common Tamil almanacs and jyotiṣa manuals.",
     "Sāmudrika Śāstra": "Sāmudrika Śāstra — the Indian tradition of reading the body's marks; its hasta (hand) section reads the lines and fingers.",
     "Cheiro, Language of the Hand": "Cheiro (William John Warner), Cheiro's Language of the Hand, 1894 — a public-domain classic of Western palmistry.",
-    "Gettings, The Book of the Hand": "Fred Gettings, The Book of the Hand, 1965 — source of the four-element hand typology (earth, air, fire, water)."
+    "Gettings, The Book of the Hand": "Fred Gettings, The Book of the Hand, 1965 — source of the four-element hand typology (earth, air, fire, water).",
+    "Muhūrta tradition": "The working rules of the muhūrta manuals and almanacs (Muhūrta Cintāmaṇi, Muhūrta Mārtaṇḍa and the printed pañcāṅgas) for dividing the day into choghaḍiyās, horās and named muhūrtas."
   },
   "entries": [
     {
@@ -101,6 +103,18 @@
       "ref": "Aṣṭakūṭa parihāra",
       "title": "Exceptions to Bhakūṭa and Nāḍī doṣa",
       "description": "Commentarial exceptions: Bhakūṭa eased when the sign lords are the same or mutual friends; Nāḍī eased for the same sign with different nakshatras, the same nakshatra with different padas, or friendly sign lords."
+    },
+    {
+      "text": "Porutham tradition (Tamil jyotiṣa)",
+      "ref": "Daśa porutham",
+      "title": "The ten poruthams",
+      "description": "Dina, Gaṇa, Mahendra, Strī-dīrgha, Yoni, Rāśi, Rāśyādhipati, Vaśya, Rajju and Vedha — each agreement either holds or does not; Rajju and Vedha are weighed heaviest."
+    },
+    {
+      "text": "Later tradition",
+      "ref": "Gaṇa parihāra",
+      "title": "Exception to Gaṇa doṣa",
+      "description": "Commentarial exception: Gaṇa doṣa eased when the two Moon-sign lords are one graha or mutual friends, or when Bhakūṭa is free of doṣa."
     },
     {
       "text": "Sāmudrika Śāstra",
@@ -197,6 +211,36 @@
       "ref": "ch. 46",
       "title": "Viṃśottarī daśā",
       "description": "The 120-year cycle of nine planetary periods, starting from the lord of the Moon's birth nakṣatra, each divided in proportion into antar- and pratyantardaśās."
+    },
+    {
+      "text": "Muhūrta tradition",
+      "ref": "Choghaḍiyā",
+      "title": "Choghaḍiyā",
+      "description": "Day and night each in eight equal parts named Amṛta, Śubha, Lābha (favourable), Cara (neutral), Udvega, Kāla, Roga (unfavourable); the day opens with the weekday lord's part, the night with the fifth weekday's."
+    },
+    {
+      "text": "Muhūrta tradition",
+      "ref": "Horā",
+      "title": "Horā",
+      "description": "Day and night each in twelve planetary hours; the first hour after sunrise belongs to the weekday lord and the rest follow the Chaldean order Sūrya, Śukra, Budha, Candra, Śani, Guru, Maṅgala."
+    },
+    {
+      "text": "Muhūrta tradition",
+      "ref": "Brahma-muhūrta and Godhūli",
+      "title": "Brahma-muhūrta and Godhūli",
+      "description": "Brahma-muhūrta is the second-to-last muhūrta of the night, 96 to 48 minutes before sunrise; Godhūli, the cow-dust hour, is the ghaṭī around sunset."
+    },
+    {
+      "text": "Muhūrta tradition",
+      "ref": "Udaya tithi",
+      "title": "The tithi at sunrise",
+      "description": "A civil day takes the tithi in force at its sunrise (udaya tithi); a tithi that begins and ends between two sunrises is kṣaya and is noted beside the day it falls in."
+    },
+    {
+      "text": "Sūrya Siddhānta",
+      "ref": "ch. 14",
+      "title": "Mānādhyāya — measures of time",
+      "description": "The measures of time, among them the saura māsa: the solar month begins at a saṅkrānti, when the Sun enters a sidereal sign."
     }
   ]
 }

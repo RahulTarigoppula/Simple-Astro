@@ -30,6 +30,8 @@ import { isNative, reducedMotion } from "../../platform/native";
 import { play, rustle } from "../../platform/sound";
 import { ChartFigure } from "./ChartFigure";
 import { DashaRibbon } from "./DashaRibbon";
+import { AshtakavargaSection } from "./extras/AshtakavargaSection";
+import { BhavaChalitTable } from "./extras/BhavaChalitTable";
 import { GrahaLedger } from "./GrahaLedger";
 import { KundliChart } from "./KundliChart";
 import "./patri.css";
@@ -616,6 +618,9 @@ function PatriBody({
           </p>
         </section>
       ))}
+
+      <AshtakavargaSection patri={patri} script={script} style={style} skipInk={skipInk} />
+      <BhavaChalitTable patri={patri} />
 
       <div className="patri-links">
         <Link className="linkish" to={`/patri/${profileId}/sky`}>

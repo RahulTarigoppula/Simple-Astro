@@ -1,0 +1,179 @@
+/* Aṣṭakavarga + Bhāva Chalit (src/features/patri/extras). Tokens only; kit.css classes reused. */
+
+/* SAV chart: numerals in place of graha chips, ink on paper. */
+.av-wrap {
+  max-width: 300px;
+}
+.chart .av-num {
+  fill: var(--ink);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 400;
+}
+.chart .av-num.is-strong {
+  font-variation-settings:
+    "wdth" 87,
+    "wght" 600;
+}
+.chart .av-chartdot {
+  fill: var(--brass);
+  stroke: var(--brass-lo);
+  stroke-width: 1;
+}
+
+/* Horizontal scroll container: the table scrolls, the page never does. */
+.av-scroll {
+  /* positioned, so the visually hidden (absolute) cell text is clipped here, not on the page */
+  position: relative;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  margin-top: var(--space-3);
+}
+.av-scroll:focus-visible {
+  outline-offset: -2px;
+}
+
+.av-matrix {
+  width: auto;
+  min-width: 100%;
+}
+.av-matrix th,
+.av-matrix td {
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: right;
+}
+.av-matrix thead th {
+  text-align: center;
+  white-space: nowrap;
+  text-transform: none;
+}
+.av-matrix thead th:first-child,
+.av-matrix tbody th,
+.av-matrix tfoot th {
+  text-align: left;
+  padding-left: var(--paper-margin);
+}
+.av-matrix tbody th,
+.av-matrix tfoot th {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+.av-matrix abbr {
+  text-decoration: none;
+  cursor: help;
+}
+.av-matrix thead th.is-lagna {
+  color: var(--ink);
+}
+.av-lg {
+  display: block;
+  color: var(--accent-text);
+  font-size: 9px;
+}
+.av-matrix td.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-variation-settings:
+    "wdth" 75,
+    "wght" 400;
+  white-space: nowrap;
+  min-width: 2.2em;
+}
+.av-matrix td.is-four {
+  font-variation-settings:
+    "wdth" 75,
+    "wght" 600;
+}
+.av-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 3px;
+  vertical-align: 0.15em;
+  border-radius: 50%;
+  background: var(--brass);
+  box-shadow: inset 0 0 0 1px var(--brass-lo);
+}
+.av-matrix td.av-total,
+.av-matrix tfoot td {
+  color: var(--ink-muted);
+}
+.av-matrix td.av-total {
+  border-left: 1px solid var(--border-strong);
+}
+.av-matrix tfoot td,
+.av-matrix tfoot th {
+  border-top: 1px solid var(--border-strong);
+  border-bottom: 0;
+}
+.av-legend {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+.av-legend .av-dot {
+  flex: none;
+  margin-left: 0;
+}
+.av-reading + .av-reading {
+  margin-top: var(--space-3);
+}
+
+/* Bhāva Chalit */
+.bc-table th,
+.bc-table td {
+  white-space: nowrap;
+}
+.bc-table tbody th {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink);
+  border-bottom: 1px solid var(--border);
+  padding-left: var(--paper-margin);
+}
+.bc-table th:last-child,
+.bc-table td:last-child {
+  text-align: left;
+}
+.bc-sign {
+  text-decoration: none;
+  color: var(--ink-muted);
+}
+.bc-deg .num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-variation-settings:
+    "wdth" 75,
+    "wght" 400;
+}
+.bc-shifts {
+  list-style: none;
+  margin: var(--space-3) var(--paper-margin) 0;
+  padding: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--ink);
+}
+.bc-shifts li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.bc-shifts li:last-child {
+  border-bottom: 0;
+}
+.bc-shifts strong {
+  font-weight: 600;
+}

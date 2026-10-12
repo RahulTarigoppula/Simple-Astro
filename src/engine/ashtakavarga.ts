@@ -28,8 +28,7 @@ export interface AvReading {
 }
 
 /** Bindus a contributor at `from` gives to `to` in graha g's BAV. */
-const gives = (g: AvGraha, c: AvContributor, from: number, to: number): boolean =>
-  BINDU_PLACES[g][c].includes(((to - from + 12) % 12) + 1);
+const gives = (g: AvGraha, c: AvContributor, from: number, to: number): boolean => BINDU_PLACES[g][c].includes(((to - from + 12) % 12) + 1);
 
 /** Pure core: positions of the eight contributors (signs) → BAV and SAV. */
 export function ashtakavargaFromSigns(pos: Record<AvContributor, number>): Omit<Ashtakavarga, "byHouse" | "lagnaSign"> {
