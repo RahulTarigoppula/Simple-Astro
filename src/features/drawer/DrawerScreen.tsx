@@ -407,6 +407,16 @@ export default function DrawerScreen() {
             on={settings.calmDesk}
             onChange={(v) => set({ calmDesk: v })}
           />
+          <Radio
+            label="Aṣṭakūṭa school"
+            help="The two differ in three places: Varṇa of earth and air signs (swapped), the Vaśya table, and Yoni Aśva × Mṛga (friendly or inimical)."
+            value={settings.ashtakootaSchool}
+            options={[
+              ["north-common", "North Indian (common)"],
+              ["pyjhora", "PyJHora · saravali"],
+            ]}
+            onChange={(v) => set({ ashtakootaSchool: v })}
+          />
           <Toggle
             label="Bhakūṭa cancellation"
             help="Apply the classical cancellation when the Moon-sign lords are one or friends."

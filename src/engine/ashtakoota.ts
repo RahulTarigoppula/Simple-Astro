@@ -4,8 +4,11 @@
 // Sides are positional: `a` is read in the vara (boy) column of the classical tables and `b` in the
 // kanyā (girl) column. Nothing here reads a profile's gender.
 //
-// Oracle status (see ashtakoota.oracle.test.ts): Varṇa, Vaśya table, Yoni, Graha Maitrī, Gaṇa and
-// Nāḍī agree with PyJHora's all_nak_pad_boy_girl.csv cell for cell. Three PyJHora defects are NOT
+// School: Varṇa, the Vaśya table and Yoni Aśva × Mṛga come in two schools (opts.school, default
+// "north-common"; see koota.ts). Everything else is shared.
+//
+// Oracle status (see ashtakoota.oracle.test.ts, run with school "pyjhora"): Varṇa, Vaśya table, Yoni,
+// Graha Maitrī, Gaṇa and Nāḍī agree with PyJHora's all_nak_pad_boy_girl.csv cell for cell. Three PyJHora defects are NOT
 // reproduced, each modelled exactly in the oracle test:
 //   1. Tārā — PyJHora awards 1.5 per direction whose tārā IS Vipat/Pratyari/Vadha (inverted), so its
 //      Tārā equals 3 − the classical score. Chowki awards points for the kind tārās.
@@ -41,7 +44,7 @@ import { gName, houseFrom, ord, signLord, signName } from "./chart-helpers";
 import { CITE } from "./citations";
 import { manglikStatus } from "./manglik";
 import { poruthams } from "./porutham";
-import type { KootaId, KootaResult, ManglikStatus, MilanResult, PatriCore, Profile, ProfileId, SignIdx } from "./types";
+import type { AshtakootaSchool, KootaId, KootaResult, ManglikStatus, MilanResult, PatriCore, Profile, ProfileId, SignIdx } from "./types";
 
 export interface MoonPlacement {
   nak: number; // 0..26, Aśvinī = 0
@@ -54,7 +57,11 @@ export interface MoonPlacement {
 export interface AshtakootaOptions {
   /** Apply the classical Bhakūṭa cancellation (sign lords identical or mutual friends). Default off. */
   bhakootCancellation?: boolean;
+  /** Which tables to use where the schools differ. Default "north-common" (as DEFAULT_SETTINGS). */
+  school?: AshtakootaSchool;
 }
+
+export const DEFAULT_ASHTAKOOTA_SCHOOL: AshtakootaSchool = "north-common";
 
 export type AshtakootaResult = Omit<MilanResult, "manglik">;
 
@@ -132,16 +139,17 @@ function mutualFriends(la: SevenId, lb: SevenId): boolean {
 export function kootas(a: MoonPlacement, b: MoonPlacement, opts: AshtakootaOptions = {}): KootaResult[] {
   check(a, "first Moon");
   check(b, "second Moon");
+  const school = opts.school ?? DEFAULT_ASHTAKOOTA_SCHOOL;
 
   // 1 Varṇa
-  const va = VARNA_BY_SIGN[a.sign] ?? "shudra";
-  const vb = VARNA_BY_SIGN[b.sign] ?? "shudra";
+  const va = VARNA_BY_SIGN[school][a.sign] ?? "shudra";
+  const vb = VARNA_BY_SIGN[school][b.sign] ?? "shudra";
   const varna = mk("varna", VARNA_RANK[va] >= VARNA_RANK[vb] ? 1 : 0, `Varṇa: ${VARNA_LABEL[va]} and ${VARNA_LABEL[vb]}`);
 
   // 2 Vaśya
   const ca = vashyaClass(a.sign, a.deg ?? padaMidDeg(a.nak, a.pada));
   const cb = vashyaClass(b.sign, b.deg ?? padaMidDeg(b.nak, b.pada));
-  const vashya = mk("vashya", VASHYA[ca][cb], `Vaśya: ${VASHYA_LABEL[ca]} and ${VASHYA_LABEL[cb]}`);
+  const vashya = mk("vashya", VASHYA[school][ca][cb], `Vaśya: ${VASHYA_LABEL[ca]} and ${VASHYA_LABEL[cb]}`);
 
   // 3 Tārā — counted both ways; tārās 3, 5 and 7 are unkind. 1.5 for each kind direction.
   const tAB = taraOf(a.nak, b.nak);
@@ -158,7 +166,7 @@ export function kootas(a: MoonPlacement, b: MoonPlacement, opts: AshtakootaOptio
   // 4 Yoni
   const ya = YONI_BY_NAK[a.nak] ?? "horse";
   const yb = YONI_BY_NAK[b.nak] ?? "horse";
-  const rel = yoniRelation(ya, yb);
+  const rel = yoniRelation(ya, yb, school);
   const yoni = mk(
     "yoni",
     YONI_POINTS[rel],
@@ -266,7 +274,15 @@ export function ashtakoota(
 ): AshtakootaResult {
   const ks = kootas(a, b, opts);
   const total = ks.reduce((s, k) => s + k.score, 0);
-  return { a: aId, b: bId, presetHash, kootas: ks, total, band: bandOf(total) };
+  return {
+    a: aId,
+    b: bId,
+    presetHash,
+    kootas: ks,
+    total,
+    band: bandOf(total),
+    ashtakootaSchool: opts.school ?? DEFAULT_ASHTAKOOTA_SCHOOL,
+  };
 }
 
 /** The Moon of a cast chart as an Aṣṭakūṭa input. */

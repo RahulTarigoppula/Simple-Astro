@@ -29,7 +29,7 @@ import { toast } from "../../state/ui";
 import { type ChartBody, KundliChart } from "../patri/KundliChart";
 import { Mala } from "./Mala";
 import { PoruthamThread } from "./PoruthamThread";
-import { becauseBody, doshaLine, exceptionLine, fmtPts, RULE_TEXT, summaryText, WEIGHS } from "./rules";
+import { becauseBody, doshaLine, exceptionLine, fmtPts, RULE_TEXT, SCHOOL_LABEL, SCHOOL_NOTE, summaryText, WEIGHS } from "./rules";
 import "./milan.css";
 
 const MANGLIK_NAME = new Map(MANGLIK_CANCELLATIONS.map((c) => [c.id, c.name]));
@@ -304,11 +304,14 @@ function MilanScreen() {
   const result = useMemo<{ r: MilanResult | null; err: string | null }>(() => {
     if (!pa || !pb || !patA || !patB) return { r: null, err: null };
     try {
-      return { r: milan(pa, pb, patA, patB, { bhakootCancellation: settings.bhakootCancellation }), err: null };
+      return {
+        r: milan(pa, pb, patA, patB, { bhakootCancellation: settings.bhakootCancellation, school: settings.ashtakootaSchool }),
+        err: null,
+      };
     } catch (e) {
       return { r: null, err: e instanceof Error ? e.message : String(e) };
     }
-  }, [pa, pb, patA, patB, settings.bhakootCancellation]);
+  }, [pa, pb, patA, patB, settings.bhakootCancellation, settings.ashtakootaSchool]);
   const r = result.r;
 
   const swap = () => {
@@ -432,7 +435,7 @@ function MilanScreen() {
               </div>
             ) : r ? (
               <Mala
-                key={`${r.a}|${r.b}|${r.presetHash}|${settings.bhakootCancellation}`}
+                key={`${r.a}|${r.b}|${r.presetHash}|${settings.bhakootCancellation}|${settings.ashtakootaSchool}`}
                 result={r}
                 onOpen={(k) => setSheet({ kind: "koota", k })}
               />
@@ -460,7 +463,7 @@ function MilanScreen() {
             ["Method", "Aṣṭakūṭa from the two Moons' nakṣatra, pada and rāśi — eight kūṭas, 36 points"],
             [
               "School",
-              "North Indian practice after Muhūrta Cintāmaṇi ch. 6; Vaśya is the table that varies by school, and the reading follows the adopted one",
+              `${SCHOOL_LABEL[settings.ashtakootaSchool]} (Drawer) — after Muhūrta Cintāmaṇi ch. 6; ${SCHOOL_NOTE[settings.ashtakootaSchool]}; Varṇa, Vaśya and one Yoni cell follow it`,
             ],
             ["Sides", "first leaf in the first column of every table, second leaf in the second"],
             [

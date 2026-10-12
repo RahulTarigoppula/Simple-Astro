@@ -16,6 +16,8 @@ Engine defaults unchanged (`ENGINE_EPOCH = 1`); no existing chart moves.
   Ekādaśī / Pūrṇimā / Amāvasyā / saṅkrānti marks, keyboard grid), Brahma-muhūrta and Godhūli.
 - **Guna Milan**: the **Daśa Porutham** thread (Rajju and Vedha weighed heaviest), both charts side by
   side on desktop, "what the tradition weighs" and exception notes per koota, and Copy summary.
+- **Aṣṭakūṭa school** in the Drawer: North Indian (common) — now the default — or PyJHora · saravali; they
+  differ in Varṇa of earth/air signs, the Vaśya table and Yoni Aśva × Mṛga, and Milan names the school.
 - **Birth time unknown**: a leaf can be cast for local noon; the patri says what still holds and whether
   the Moon changed nakṣatra that day.
 - **Print · save as PDF** for the patri (a clean manuscript stylesheet with the full daśā table).
@@ -24,7 +26,7 @@ Engine defaults unchanged (`ENGINE_EPOCH = 1`); no existing chart moves.
 ### Verified
 - Panchang against drikpanchang.com on 6 days × 3 cities under the Drik preset: every name matches; sunrise,
   sunset and all five end times within 2 minutes (Drik prints minutes). The upper-limb sunrise is Drik's.
-- Biome now runs locally and is clean; 654 unit tests and 22 end-to-end tests pass (incl. a no-sideways-
+- Biome now runs locally and is clean; 676 unit tests and 22 end-to-end tests pass (incl. a no-sideways-
   overflow check on every route at phone width).
 
 

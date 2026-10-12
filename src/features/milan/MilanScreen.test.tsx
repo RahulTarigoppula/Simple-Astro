@@ -201,7 +201,8 @@ describe("MilanScreen — porutham, compare and summary", () => {
     await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
     const text = writeText.mock.calls[0]?.[0] ?? "";
     expect(text).toContain(`${REFERENCE_PROFILE.name} and ${PRIYA.name}`);
-    expect(text).toContain(`${fmtPts(want.total)} / 36 — ${BAND_LABEL[want.band]}`);
+    expect(text).toContain(`${fmtPts(want.total)} / 36 — ${BAND_LABEL[want.band]} (North Indian (common) tables)`);
+    expect(screen.getByText(/^North Indian \(common\) \(Drawer\)/)).toBeInTheDocument();
     expect(text).toContain("Doṣas: Nāḍī");
     expect(text).toMatch(/Ten Porutham: \d+ \/ 10 tied/);
     expect(text).toContain(DISCLAIMER);

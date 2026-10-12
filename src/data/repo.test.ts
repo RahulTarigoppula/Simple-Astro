@@ -130,6 +130,7 @@ describe("settings", () => {
     const s = await getSettings();
     expect(s.theme).toBe("night");
     expect(s.bhakootCancellation).toBe(DEFAULT_SETTINGS.bhakootCancellation);
+    expect(s.ashtakootaSchool).toBe("north-common");
     expect(s.preset).toEqual(DEFAULT_PRESET);
     expect(mergeSettings(undefined)).toEqual(DEFAULT_SETTINGS);
   });
@@ -239,6 +240,17 @@ describe("milans + place cache + storage", () => {
     await saveMilan(m);
     expect(await getMilan("p-1", "p-2", m.presetHash)).toEqual(m);
     expect(await getMilan("p-2", "p-1", m.presetHash)).toBeUndefined();
+  });
+
+  it("getMilan with a school misses a row scored under another school (legacy rows count as pyjhora)", async () => {
+    const legacy = makeMilan("p-1", "p-2");
+    await saveMilan(legacy);
+    expect(await getMilan("p-1", "p-2", legacy.presetHash, "pyjhora")).toEqual(legacy);
+    expect(await getMilan("p-1", "p-2", legacy.presetHash, "north-common")).toBeUndefined();
+    const north = { ...legacy, ashtakootaSchool: "north-common" as const };
+    await saveMilan(north);
+    expect(await getMilan("p-1", "p-2", legacy.presetHash, "north-common")).toEqual(north);
+    expect(await getMilan("p-1", "p-2", legacy.presetHash, "pyjhora")).toBeUndefined();
   });
 
   it("place cache rows are keyed by the normalised query", async () => {

@@ -2,15 +2,15 @@
 // come from engine/ashtakoota.ts and are never computed here.
 import { NAKSHATRA_NAMES, SIGN_NAMES } from "../../data/tables/names";
 import { ganaParihara } from "../../engine/porutham";
-import type { KootaId, KootaResult, ManglikStatus, MilanResult } from "../../engine/types";
+import type { AshtakootaSchool, KootaId, KootaResult, ManglikStatus, MilanResult } from "../../engine/types";
 
 export const RULE_TEXT: Record<KootaId, string> = {
   varna:
-    "Each Moon sign belongs to one of four varṇas — Brāhmaṇa, Kṣatriya, Vaiśya, Śūdra. The single point is given when the first leaf's varṇa ranks at or above the second's.",
+    "Each Moon sign belongs to one of four varṇas — Brāhmaṇa, Kṣatriya, Vaiśya, Śūdra. The single point is given when the first leaf's varṇa ranks at or above the second's. Schools differ on the earth and air signs (Drawer: Aṣṭakūṭa school).",
   vashya:
-    "Each Moon sign falls in one of five classes — quadruped, human, water-born, wild, insect. A table of the two classes gives 0, ½, 1 or 2. This is the one table that varies from school to school.",
+    "Each Moon sign falls in one of five classes — quadruped, human, water-born, wild, insect. A table of the two classes gives 0, ½, 1 or 2. This table varies most from school to school (Drawer: Aṣṭakūṭa school).",
   tara: "Count the nakṣatras from one Moon to the other, both ways, and reduce by nines. The 3rd, 5th and 7th tārās (Vipat, Pratyari, Vadha) are unkind; each kind direction earns 1.5.",
-  yoni: "Each nakṣatra carries an animal yoni. The same animal earns 4, friendly 3, neutral 2, inimical 1, and the seven sworn pairs 0.",
+  yoni: "Each nakṣatra carries an animal yoni. The same animal earns 4, friendly 3, neutral 2, inimical 1, and the seven sworn pairs 0. Schools differ on Aśva × Mṛga (friendly or inimical).",
   maitri:
     "The lords of the two Moon signs are read for natural friendship, each way round: friend and friend 5, friend and neutral 4, neutral and neutral 3, friend and enemy 1, neutral and enemy ½, enemy and enemy 0.",
   gana: "Each nakṣatra is Deva, Manuṣya or Rākṣasa in temperament; a fixed table of the two gaṇas gives 0 to 6. A zero is counted as Gaṇa doṣa.",
@@ -39,6 +39,18 @@ export function becauseBody(k: KootaResult): string {
 export function doshaLine(k: KootaResult): string {
   return `Tradition says: ${becauseBody(k)} — counted as ${k.name} doṣa.`;
 }
+
+/** The Aṣṭakūṭa school, as named in the Drawer, the colophon and the copied summary. */
+export const SCHOOL_LABEL: Record<AshtakootaSchool, string> = {
+  "north-common": "North Indian (common)",
+  pyjhora: "PyJHora · saravali",
+};
+
+/** What the school decides, for the colophon. */
+export const SCHOOL_NOTE: Record<AshtakootaSchool, string> = {
+  "north-common": "the almanac tables most families compare against — earth signs Vaiśya, air Śūdra; Aśva × Mṛga friendly",
+  pyjhora: "the saravali.de tables used by PyJHora — earth signs Śūdra, air Vaiśya; Aśva × Mṛga inimical",
+};
 
 export const BAND_LABEL: Record<MilanResult["band"], string> = {
   "not-recommended": "not recommended",
@@ -114,7 +126,7 @@ export function summaryText({ result: r, first, second, manglikLabel, disclaimer
     `Guna Milan — ${first.name} and ${second.name}`,
     `First leaf: ${first.name} — ${moonText(first.moon)}; ${manglikLabel(r.manglik.a)}`,
     `Second leaf: ${second.name} — ${moonText(second.moon)}; ${manglikLabel(r.manglik.b)}`,
-    `Aṣṭakūṭa: ${fmtPts(r.total)} / 36 — ${BAND_LABEL[r.band]}`,
+    `Aṣṭakūṭa: ${fmtPts(r.total)} / 36 — ${BAND_LABEL[r.band]} (${SCHOOL_LABEL[r.ashtakootaSchool ?? "pyjhora"]} tables)`,
     ...r.kootas.map((k) => `  ${k.name}: ${fmtPts(k.score)} / ${k.max}${k.dosha ? " (doṣa)" : ""}`),
     `Doṣas: ${doshas.length ? doshas.map((k) => `${k.name} — ${becauseBody(k)}`).join("; ") : "none"}`,
   ];

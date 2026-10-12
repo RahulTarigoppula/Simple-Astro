@@ -26,7 +26,7 @@ machine (Windows 11, Node 22.17.0, Chrome via Playwright 1.5x). Phone rows wait 
 
 | Gate | Result |
 |---|---|
-| Vitest (all projects) | 654 / 654 pass — engine, 50 golden charts, Ashtakoota oracle, time zones, data layer, palm CV, sky, screens, design rules |
+| Vitest (all projects) | 676 / 676 pass — engine, 50 golden charts, Ashtakoota oracle, time zones, data layer, palm CV, sky, screens, design rules |
 | Playwright (desktop-chromium + pixel-7) | 22 / 22 pass (adds no-horizontal-overflow on 9 routes): smoke, golden numbers on screen, zero leakage, CSP, axe (no serious/critical on 8 routes), offline after one visit |
 | `check-licences.mjs` | 123 production packages, all OSI/OFL/CC0; no banned names |
 | `check-no-biometrics.mjs` | no photographs, no EXIF, synthetic PNGs only |

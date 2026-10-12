@@ -224,6 +224,13 @@ export interface ManglikStatus {
   citation: Citation;
 }
 
+/**
+ * Which published Aṣṭakūṭa tables to use where schools differ (Varṇa of earth/air signs, the Vaśya 5×5,
+ * Yoni Aśva × Mṛga). "north-common" = the North-Indian almanac tables most families compare against;
+ * "pyjhora" = the saravali.de tables used by PyJHora (validated pair-for-pair by the oracle test).
+ */
+export type AshtakootaSchool = "north-common" | "pyjhora";
+
 export interface MilanResult {
   a: ProfileId;
   b: ProfileId;
@@ -233,6 +240,8 @@ export interface MilanResult {
   band: "not-recommended" | "acceptable" | "very-good" | "excellent";
   manglik: { a: ManglikStatus; b: ManglikStatus };
   porutham?: Array<{ id: string; name: string; pass: boolean; note: string }>;
+  /** The Aṣṭakūṭa tables used; absent on rows saved before the setting existed (those were "pyjhora"). */
+  ashtakootaSchool?: AshtakootaSchool;
 }
 
 // ─── palmistry ───────────────────────────────────────────────────────────────
@@ -294,6 +303,7 @@ export interface Settings {
   onlineLookupAllowed: boolean; // default false — the "search online" stamp asks once
   handFraming: "dominant" | "classical"; // both framings are offered for the palm
   bhakootCancellation: boolean; // apply the classical Bhakūṭa cancellation in Milan
+  ashtakootaSchool: AshtakootaSchool; // which Aṣṭakūṭa tables Milan uses where schools differ
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -310,6 +320,7 @@ export const DEFAULT_SETTINGS: Settings = {
   onlineLookupAllowed: false,
   handFraming: "dominant",
   bhakootCancellation: false,
+  ashtakootaSchool: "north-common",
 };
 
 // ─── muhūrta divisions and the month leaf ────────────────────────────────────

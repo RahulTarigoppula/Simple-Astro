@@ -10,9 +10,10 @@
 //   • Bhakūṭa — identical except PyJHora's Karka × Kumbha cell (7 where every 6/8 axis is 0).
 // With those three documented PyJHora defects modelled, the TOTAL agrees on 11 664 / 11 664 pairs.
 // Any other disagreement fails, listing the first ten by nakshatra-pada name.
+// Every call here uses school "pyjhora" — the North-Indian common tables are tested in ashtakoota.test.ts.
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { VASHYA, type VashyaClass, vashyaClass } from "../data/tables/koota";
+import { VASHYA_PYJHORA as VASHYA, type VashyaClass, vashyaClass } from "../data/tables/koota";
 import { NAKSHATRA_NAMES } from "../data/tables/names";
 import { ashtakoota, kootas, type MoonPlacement, signOfPada } from "./ashtakoota";
 import type { KootaId } from "./types";
@@ -23,6 +24,8 @@ const CODES = {
   maitri: [0, 0.5, 1, 3, 4, 5],
   gana: [0, 1, 5, 6],
 } as const;
+
+const PYJHORA = { school: "pyjhora" } as const;
 
 type Row = Record<KootaId, number> & { total: number };
 
@@ -78,7 +81,7 @@ describe("Aṣṭakūṭa vs the PyJHora oracle (all_nak_pad_boy_girl.csv)", () 
         const b = moonOfPada(gi);
         const o = oracle[bi * 108 + gi];
         if (!o) throw new Error("oracle row missing");
-        const ks = kootas(a, b);
+        const ks = kootas(a, b, PYJHORA);
         const ours = Object.fromEntries(ks.map((k) => [k.id, k.score])) as Record<KootaId, number>;
         const total = ks.reduce((s, k) => s + k.score, 0);
         if (total === o.total) rawTotalAgree++;
@@ -123,7 +126,7 @@ describe("Aṣṭakūṭa vs the PyJHora oracle (all_nak_pad_boy_girl.csv)", () 
     const a: MoonPlacement = { nak: 26, pada: 1, sign: 11 };
     const b: MoonPlacement = { nak: 3, pada: 1, sign: 1 };
     const o = oracle[26 * 4 * 108 + 3 * 4];
-    const r = ashtakoota("a", "b", a, b, "x");
+    const r = ashtakoota("a", "b", a, b, "x", PYJHORA);
     expect(o?.total).toBe(19);
     expect(r.total).toBe(19);
     expect(r.band).toBe("acceptable");

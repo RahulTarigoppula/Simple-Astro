@@ -4,6 +4,7 @@
 
 import { computePatri } from "../engine/patri";
 import {
+  type AshtakootaSchool,
   DEFAULT_SETTINGS,
   type EnginePreset,
   type HandCapture,
@@ -300,8 +301,21 @@ export async function saveMilan(milan: MilanResult): Promise<MilanResult> {
   return milan;
 }
 
-export async function getMilan(a: ProfileId, b: ProfileId, presetHash: string): Promise<MilanResult | undefined> {
-  return db.milans.get([a, b, presetHash]);
+/**
+ * A saved Milan for the ordered pair under a preset. The row key stays [a+b+presetHash] (changing a
+ * Dexie primary key needs a schema bump); the Aṣṭakūṭa school is checked on read instead, so a row
+ * scored under another school is a miss. Rows saved before the setting existed count as "pyjhora".
+ * Omit `school` to read the row whatever its school.
+ */
+export async function getMilan(
+  a: ProfileId,
+  b: ProfileId,
+  presetHash: string,
+  school?: AshtakootaSchool,
+): Promise<MilanResult | undefined> {
+  const row = await db.milans.get([a, b, presetHash]);
+  if (!row || school === undefined) return row;
+  return (row.ashtakootaSchool ?? "pyjhora") === school ? row : undefined;
 }
 
 // ─── place cache ───────────────────────────────────────────────────────────────
