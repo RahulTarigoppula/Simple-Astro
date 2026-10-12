@@ -28,7 +28,7 @@ interface GrahaLedgerProps {
 export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false }: GrahaLedgerProps) {
   const L = patri.lagna;
   return (
-    <table className="ledger">
+    <table className="ledger ledger--grahas">
       <caption className="vh">Graha positions, sidereal, {patri.preset.ayanamsa}</caption>
       <thead>
         <tr>

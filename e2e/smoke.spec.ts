@@ -21,7 +21,7 @@ test("sealing casts the Patri with the golden numbers", async ({ page }) => {
   await sealReferenceLeaf(page);
   await expect(page.locator(".patri-head .engraved")).toContainText("2449425.5799");
   await expect(page.locator(".patri-head .engraved")).toContainText("MEENA");
-  const ledger = page.locator("table.ledger");
+  const ledger = page.locator("table.ledger--grahas");
   await expect(ledger.locator("tbody tr")).toHaveCount(10); // Lagna + nine grahas
   await expect(ledger).toContainText("15°39′25″"); // Lagna, Mīna
   await expect(ledger).toContainText(/19°10′0[89]″/); // Candra, Revatī 1 (SE: 19°10′08.6″)
