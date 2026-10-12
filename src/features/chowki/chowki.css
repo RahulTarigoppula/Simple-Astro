@@ -1,95 +1,379 @@
+/* Home — the astral dashboard */
 .chowki {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  padding: env(safe-area-inset-top, 0px) 0 var(--space-6);
 }
-.chowki .cloth {
+.chowki::-webkit-scrollbar {
+  width: 0;
+}
+
+.home-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5) 0;
+}
+.home-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.home-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--aurora);
+  box-shadow: var(--glow-violet);
   position: relative;
 }
-.chowki__drawer {
-  grid-column: 1 / -1;
-  justify-self: center;
+.home-mark::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: inset -4px -2px 0 0 var(--accent-2);
 }
-.chowki__rooftop {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 44px;
-  color: var(--surface);
-  font-size: var(--text-sm);
-  text-decoration: none;
-  opacity: 0.85;
-}
-.chowki__rooftop:hover {
-  opacity: 1;
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-}
-.flame {
-  transform: scale(calc(0.97 + var(--flame-k, 0.5) * 0.06), calc(1.02 - var(--flame-k, 0.5) * 0.04));
-  opacity: calc(0.9 + var(--flame-k, 0.5) * 0.1);
-}
-.chowki__note {
-  margin: 0 var(--space-5);
-  font-size: var(--text-sm);
-}
-.chowki__note .note-haldi {
-  margin: var(--space-2) 0 0;
-}
-@media (min-width: 900px) {
-  .chowki .cloth {
-    grid-template-columns: 1fr 2fr 1fr;
-    grid-template-rows: 1fr 1fr auto;
-    padding: var(--space-6);
-    gap: var(--space-5);
-    max-width: 1100px;
-    width: calc(100% - var(--space-8));
-    margin: var(--space-3) auto var(--space-6);
-  }
-  .chowki .deskobj--patri {
-    grid-column: 2;
-    grid-row: 1 / 3;
-  }
-  .chowki .greet {
-    padding: var(--space-6) var(--space-8) var(--space-2);
-  }
-  .chowki .greet h1 {
-    font-size: var(--text-3xl);
-  }
-  .chowki .sky {
-    height: 72px;
-  }
-}
-/* Morning terrace: the cloth turns pale, so the engraved labels lying on it switch to ink. */
-:root[data-theme="day"] .cloth .deskobj {
+.home-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
-:root[data-theme="day"] .cloth .deskobj .tip {
-  color: var(--surface);
+.home-name-dev {
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
 }
-@media (min-width: 900px) {
-  .chowki .deskobj svg {
-    width: 150px;
-    height: auto;
+.home-clock {
+  font-size: 11px;
+  color: var(--ink-muted);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--glass-edge);
+  background: rgba(255, 255, 255, 0.04);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 55vw;
+}
+
+.home-hero {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-5) 0;
+}
+.home-kicker {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--accent-text);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.home-title {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 8vw, 2.75rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.home-title [lang="hi"] {
+  font-family: var(--font-display);
+  line-height: 1.2;
+}
+.home-angas {
+  list-style: none;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.home-angas li {
+  display: grid;
+  gap: 1px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-edge);
+  min-width: 0;
+}
+.home-angas .k {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+.home-angas .v {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-angas .s {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.home-angas li.is-caution {
+  border-color: rgba(251, 191, 36, 0.3);
+  background: rgba(251, 191, 36, 0.06);
+}
+.home-angas li.is-caution .v {
+  color: var(--warning-text);
+}
+.home-cta {
+  margin-top: var(--space-4);
+  text-decoration: none;
+}
+
+.home-orbit {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--ink-muted);
+  border-radius: var(--radius-lg);
+}
+.home-orbit__cap {
+  font-size: 12px;
+  text-align: center;
+}
+.orbit {
+  width: min(100%, 340px);
+  height: auto;
+  overflow: visible;
+}
+.orbit__halo {
+  fill: none;
+  stroke: url(#orbit-ring);
+  stroke-width: 1;
+  stroke-dasharray: 2 6;
+  opacity: 0.55;
+}
+.orbit__spin {
+  transform-origin: 160px 160px;
+  animation: orbit-spin 180s linear infinite;
+}
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
   }
-  .chowki .deskobj--patri svg {
-    width: min(420px, 100%);
-  }
-  .chowki .chowki__drawer svg {
-    width: 170px;
-  }
-  .chowki .deskobj .lbl {
-    font-size: 11px;
-  }
+}
+.orbit__sign {
+  fill: rgba(255, 255, 255, 0.025);
+  stroke: rgba(180, 192, 255, 0.18);
+  stroke-width: 0.8;
+}
+.orbit__sign.is-rising {
+  fill: rgba(139, 92, 246, 0.2);
+  stroke: rgba(196, 181, 253, 0.6);
+}
+.orbit__sign.is-natal {
+  fill: rgba(103, 232, 249, 0.12);
+}
+.orbit__signlbl {
+  fill: var(--ink-muted);
+  font-size: 10px;
+  text-anchor: middle;
+  font-family: var(--font-body);
+}
+.orbit__ring {
+  fill: none;
+  stroke: rgba(180, 192, 255, 0.22);
+  stroke-width: 0.8;
+}
+.orbit__ring--inner {
+  stroke-dasharray: 1 4;
+}
+.orbit__tick {
+  stroke: rgba(180, 192, 255, 0.35);
+  stroke-width: 0.8;
+}
+.orbit__asc line {
+  stroke: var(--accent-2);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.7;
+}
+.orbit__asc circle {
+  fill: var(--accent-2);
+  filter: drop-shadow(0 0 6px rgba(245, 196, 107, 0.9));
+}
+.orbit__spoke {
+  stroke: rgba(196, 181, 253, 0.25);
+  stroke-width: 0.6;
+}
+.orbit__planet circle {
+  fill: rgba(17, 21, 52, 0.95);
+  stroke: var(--accent-text);
+  stroke-width: 1;
+  filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.7));
+}
+.orbit__planet text {
+  fill: var(--ink);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-anchor: middle;
+  font-family: var(--font-body);
+}
+.orbit__planet--SU circle {
+  stroke: var(--accent-2);
+  filter: drop-shadow(0 0 7px rgba(245, 196, 107, 0.9));
+}
+.orbit__planet--MO circle {
+  stroke: var(--moon);
+  filter: drop-shadow(0 0 7px rgba(224, 231, 255, 0.9));
+}
+.orbit__planet--RA circle,
+.orbit__planet--KE circle {
+  stroke: var(--ink-muted);
+  stroke-dasharray: 2 2;
+}
+.orbit__moonlit {
+  fill: var(--moon);
+  filter: drop-shadow(0 0 14px rgba(224, 231, 255, 0.7));
+}
+.orbit__moonshade {
+  fill: var(--space-1);
 }
 
 .chowki__strength {
-  flex: none;
-  margin: var(--space-2) var(--space-4) 0;
+  margin: var(--space-5) var(--space-5) 0;
+}
+
+.home-tiles {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: var(--space-5) var(--space-5) 0;
+}
+.tile {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  min-height: 64px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-edge);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)), rgba(17, 21, 52, 0.55);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+.tile:hover {
+  transform: translateY(-2px);
+  border-color: var(--glass-edge-strong);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+}
+.tile__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  color: var(--ink);
+}
+.tile--violet .tile__icon {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(99, 102, 241, 0.15));
+  box-shadow: inset 0 0 0 1px rgba(196, 181, 253, 0.35);
+}
+.tile--cyan .tile__icon {
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.35), rgba(37, 99, 235, 0.15));
+  box-shadow: inset 0 0 0 1px rgba(165, 243, 252, 0.35);
+}
+.tile--gold .tile__icon {
+  background: linear-gradient(135deg, rgba(245, 196, 107, 0.4), rgba(234, 88, 12, 0.12));
+  box-shadow: inset 0 0 0 1px rgba(253, 230, 138, 0.35);
+}
+.tile--rose .tile__icon {
+  background: linear-gradient(135deg, rgba(251, 113, 133, 0.38), rgba(139, 92, 246, 0.14));
+  box-shadow: inset 0 0 0 1px rgba(253, 164, 175, 0.35);
+}
+.tile__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.tile__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-base);
+  letter-spacing: -0.01em;
+}
+.tile__dev {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+}
+.tile__sub {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tile__go {
+  color: var(--ink-muted);
+}
+.home-foot {
+  margin: var(--space-6) var(--space-5) 0;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--ink-muted);
+}
+
+@media (min-width: 560px) {
+  .home-tiles {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 @media (min-width: 900px) {
-  .chowki__strength {
-    width: min(560px, calc(100% - var(--space-8)));
-    margin: var(--space-2) auto 0;
+  .chowki {
+    padding: var(--space-4) var(--space-6) var(--space-8);
+  }
+  .home-head,
+  .home-hero,
+  .home-tiles,
+  .chowki__strength,
+  .home-foot {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+  .home-hero {
+    grid-template-columns: 1.1fr 1fr;
+    align-items: center;
+    padding-top: var(--space-8);
+  }
+  .home-angas {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .home-tiles {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .orbit {
+    width: min(100%, 420px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbit__spin {
+    animation: none;
   }
 }

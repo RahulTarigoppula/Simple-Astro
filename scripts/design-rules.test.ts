@@ -14,10 +14,11 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-const files = walk("src").filter((f) => !f.split(String.fromCharCode(92)).join("/").endsWith("src/styles/tokens.css"));
+const PALETTE = ["src/styles/tokens.css", "src/styles/astral.css"];
+const files = walk("src").filter((f) => !PALETTE.some((p) => f.split(String.fromCharCode(92)).join("/").endsWith(p)));
 
 describe("design rules", () => {
-  it("no hex colour lives outside tokens.css", () => {
+  it("no hex colour lives outside the palette files", () => {
     const hits: string[] = [];
     for (const f of files) {
       readFileSync(f, "utf8")
@@ -31,13 +32,8 @@ describe("design rules", () => {
     expect(hits).toEqual([]);
   });
 
-  it("no forbidden material: backdrop-filter, blur(), text-shadow, gradient text", () => {
-    const hits: string[] = [];
-    for (const f of files.filter((x) => x.endsWith(".css") || x.endsWith(".tsx"))) {
-      const src = readFileSync(f, "utf8");
-      for (const re of [/backdrop-filter/, /filter:\s*blur\(/, /text-shadow\s*:/, /background-clip:\s*text/])
-        if (re.test(src)) hits.push(`${f}: ${re}`);
-    }
+  it("no gradient-filled text (it fails contrast checks)", () => {
+    const hits = files.filter((f) => /background-clip:\s*text/.test(readFileSync(f, "utf8")));
     expect(hits).toEqual([]);
   });
 

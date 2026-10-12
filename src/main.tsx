@@ -1,7 +1,7 @@
-import "@fontsource/yatra-one/400.css";
-import "@fontsource/tiro-devanagari-hindi/400.css";
-import "@fontsource/tiro-devanagari-hindi/400-italic.css";
-import "@fontsource-variable/martian-mono/standard.css";
+import "@fontsource-variable/sora";
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
+import "@fontsource-variable/noto-sans-devanagari";
 import "./index.css";
 import { MotionConfig } from "motion/react";
 import { StrictMode } from "react";

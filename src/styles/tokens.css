@@ -1,60 +1,90 @@
-/* §3.3 design tokens — pasted verbatim from IMPLEMENTATION-PROMPT. Do not edit the first block. */
+/* ==========================================================================
+   Chowki · Astral — design tokens.
+   Deep space, glass, starlight. Every colour in the app lives here; components use var(--…).
+   Token NAMES are kept from the first (manuscript) system so every screen re-themes through them:
+   "surface" is now a glass pane, "ink" is starlight text, "brass" is the gold of instruments,
+   "accent" is the nebula violet, "lac" is the doṣa rose.
+   ========================================================================== */
 :root {
   color-scheme: dark;
 
-  /* ── colour (Night desk, default) ── */
-  --bg: #1a110b;
-  --bg-elevated: #1d2748; /* teak desk (margins only); indigo cloth */
-  --surface: #f4ead3;
-  --surface-2: #ead9a9; /* handmade paper (dominant); turmeric band */
-  --ink: #1b1410;
-  --ink-muted: #5a483a;
-  --ink-faint: #9a8a72; /* faint = art only */
-  --accent: #b5301c;
-  --accent-text: #a8281a;
-  --accent-ink: #fff6e6; /* sindoor; on band; on fills */
-  --accent-2: #c9a24a; /* brass — never text on paper */
-  --success: #356234;
-  --warning: #c68a12;
-  --warning-text: #7a5407; /* tulsi; haldi fills only */
-  --danger: #7f160f;
-  --border: #c9b48a;
-  --border-strong: #8a7350; /* lac; turmeric hairlines */
-  --focus: #22408e;
-  --moon: #dce4f5;
-  --ledge: #241811;
+  /* ── space ── */
+  --bg: #04050d; /* the void behind everything */
+  --bg-elevated: #0a0e27; /* the deep indigo of panels' backdrop */
+  --space-0: #04050d;
+  --space-1: #070a1c;
+  --space-2: #0b1030;
+  --nebula-violet: #6d28d9;
+  --nebula-blue: #1d4ed8;
+  --nebula-cyan: #0891b2;
+  --nebula-rose: #be185d;
 
-  /* semantic aliases */
+  /* ── glass panes (the old "paper") ── */
+  --surface: rgba(17, 21, 52, 0.66);
+  --surface-2: rgba(42, 48, 104, 0.42);
+  --surface-solid: #11153a;
+  --glass-hi: rgba(255, 255, 255, 0.06);
+  --glass-edge: rgba(180, 192, 255, 0.16);
+  --glass-edge-strong: rgba(180, 192, 255, 0.3);
+
+  /* ── starlight text ── */
+  --ink: #eef0ff;
+  --ink-muted: #a7aed8;
+  --ink-faint: #5d6598; /* art only, never text */
+
+  /* ── accents ── */
+  --accent: #8b5cf6; /* nebula violet: primary actions, the Lagna mark, the thread */
+  --accent-text: #c4b5fd; /* violet for small text on glass */
+  --accent-ink: #ffffff; /* text on accent fills */
+  --accent-2: #f5c46b; /* stellar gold: instruments, earned beads, "now" */
+  --cyan: #67e8f9;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --warning-text: #fcd34d;
+  --danger: #fb7185;
+  --border: rgba(180, 192, 255, 0.14);
+  --border-strong: rgba(180, 192, 255, 0.3);
+  --focus: #67e8f9;
+  --moon: #e0e7ff;
+  --ledge: rgba(9, 11, 30, 0.72);
+
+  /* semantic aliases (kept from the first system) */
   --paper: var(--surface);
   --paper-band: var(--surface-2);
-  --tilak: var(--accent);
+  --tilak: var(--accent-2);
   --thread: var(--accent);
   --brass: var(--accent-2);
   --lac: var(--danger);
   --haldi: var(--warning);
   --tulsi: var(--success);
-  --engraved: color-mix(in oklch, var(--brass), black 55%);
-  --moon-k: 0; /* Moon illumination 0–1, set by the engine */
-  --moon-fill: color-mix(in oklch, var(--bg-elevated), var(--moon) calc(var(--moon-k) * 14%));
+  --engraved: #f8f5ff; /* text on instrument plates */
+  --moon-k: 0;
+  --moon-fill: color-mix(in oklch, var(--bg-elevated), var(--moon) calc(var(--moon-k) * 10%));
+
+  /* gradients */
+  --aurora: linear-gradient(120deg, #8b5cf6 0%, #6366f1 45%, #22d3ee 100%);
+  --aurora-soft: linear-gradient(120deg, rgba(139, 92, 246, 0.22), rgba(34, 211, 238, 0.14));
+  --gold-glow: radial-gradient(circle at 35% 30%, #fff3cf 0%, #f5c46b 45%, #b7791f 100%);
+  --rose-glow: radial-gradient(circle at 35% 30%, #ffd1dc 0%, #fb7185 50%, #9f1239 100%);
 
   /* ── typography ── */
-  --font-display: "Yatra One", "Noto Sans Devanagari", Georgia, serif;
-  --font-body: "Tiro Devanagari Hindi", "Noto Serif Devanagari", Georgia, serif;
-  --font-mono: "Martian Mono Variable", "Martian Mono", Consolas, "Courier New", monospace;
-  --mono-wdth: 87;
+  --font-display: "Sora Variable", "Sora", "Noto Sans Devanagari Variable", system-ui, sans-serif;
+  --font-body: "Inter Variable", "Inter", "Noto Sans Devanagari Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --mono-wdth: 100;
   --text-xs: 0.75rem;
   --text-sm: 0.8125rem;
-  --text-base: 1.0625rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.375rem;
+  --text-base: 1rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.3125rem;
   --text-2xl: 1.75rem;
-  --text-3xl: 2.125rem;
+  --text-3xl: 2.25rem;
   --text-4xl: 3rem;
-  --text-5xl: clamp(3rem, 16vw, 4.5rem);
+  --text-5xl: clamp(3rem, 16vw, 4.75rem);
   --leading-tight: 1.1;
-  --leading-body: 1.5;
+  --leading-body: 1.55;
   --leading-devanagari: 1.6;
-  --tracking-mono: 0.06em;
+  --tracking-mono: 0.08em;
 
   /* ── spacing ── */
   --space-1: 4px;
@@ -70,32 +100,33 @@
   --space-11: 80px;
   --space-12: 96px;
   --paper-margin: 20px;
-  --ledge-height: calc(64px + env(safe-area-inset-bottom, 0px));
+  --ledge-height: calc(76px + env(safe-area-inset-bottom, 0px));
 
   /* ── radius ── */
-  --radius-sm: 3px;
-  --radius-md: 6px;
-  --radius-lg: 14px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
   --radius-xl: 28px;
   --radius-full: 9999px;
 
-  /* ── elevation (one lamp, bottom-right) ── */
-  --lamp-x: 1;
-  --lamp-y: 1; /* bottom-right */
-  --flicker: 0px; /* ±0.6px jitter set by lamp-flicker */
-  --shadow-alpha: 0.45;
-  --shadow-1: calc(-2px * var(--lamp-x) + var(--flicker)) calc(-2px * var(--lamp-y) + var(--flicker)) 6px
-    rgba(20, 10, 4, var(--shadow-alpha));
-  --shadow-2: calc(-6px * var(--lamp-x) + var(--flicker)) calc(-5px * var(--lamp-y) + var(--flicker)) 18px
-    rgba(20, 10, 4, calc(var(--shadow-alpha) + 0.05));
-  --shadow-3: calc(-14px * var(--lamp-x) + var(--flicker)) calc(-12px * var(--lamp-y) + var(--flicker)) 36px
-    rgba(20, 10, 4, calc(var(--shadow-alpha) + 0.1));
-  --grain-opacity: 0.12;
-  --vignette-far: 0.18; /* darkness at the corner opposite the lamp */
+  /* ── depth: soft space shadows + light glows ── */
+  --lamp-x: 0;
+  --lamp-y: 1;
+  --flicker: 0px;
+  --shadow-alpha: 0.5;
+  --shadow-1: 0 4px 14px rgba(0, 0, 0, 0.35);
+  --shadow-2: 0 14px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--glass-edge);
+  --shadow-3: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--glass-edge-strong);
+  --glow-violet: 0 0 24px rgba(139, 92, 246, 0.45);
+  --glow-gold: 0 0 18px rgba(245, 196, 107, 0.55);
+  --glow-cyan: 0 0 18px rgba(103, 232, 249, 0.45);
+  --grain-opacity: 0;
+  --vignette-far: 0;
+  --blur-glass: 18px;
 
-  /* ── borders / strokes ── */
+  /* ── strokes ── */
   --hairline: 1px;
-  --stroke-chart: 1.25px;
+  --stroke-chart: 1.4px;
 
   /* ── motion ── */
   --dur-fast: 120ms;
@@ -107,84 +138,70 @@
   --ease-spring: linear(0, 0.36 10%, 0.78 21%, 1.02 34%, 1.06 42%, 1.01 58%, 0.99 74%, 1);
 }
 
-/* Morning terrace — auto by sun altitude, or diya snuffed */
+/* "Day" is a lighter twilight of the same sky — the app stays astral. */
 :root[data-theme="day"] {
-  color-scheme: light;
-  --bg: #6e4a2e;
-  --bg-elevated: #c9c1ae;
-  --ledge: #5e3f27;
-  --shadow-alpha: 0.22;
-  --grain-opacity: 0.1;
-  --vignette-far: 0.08;
-}
-
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="night"]) {
-    color-scheme: light;
-    --bg: #6e4a2e;
-    --bg-elevated: #c9c1ae;
-    --ledge: #5e3f27;
-    --shadow-alpha: 0.22;
-    --grain-opacity: 0.1;
-    --vignette-far: 0.08;
-  }
+  --bg: #0b1033;
+  --bg-elevated: #141a48;
+  --space-0: #0b1033;
+  --space-1: #121a4a;
+  --space-2: #1b2563;
+  --ledge: rgba(18, 24, 66, 0.72);
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --flicker: 0px;
     --dur-draw: 240ms;
     --ease-spring: var(--ease-out);
   }
 }
 
-/* ── Material stops (§3.2 "Materials") — every hex the art needs lives here, never in components ── */
+/* ── Instrument & art stops (old names kept so every SVG re-themes) ── */
 :root {
-  --brass-hi: #e2c56b;
-  --brass-mid: #c9a24a;
-  --brass-lo: #8f6f2e;
-  --brass-dark: #7e5f22;
-  --brass-shadow: #5c4413;
-  --brass-ink: #3a2a08;
-  --brass-label: #2a1d08;
-  --teak-light: #6e4a2e;
-  --leaf-face: #e4d19c;
-  --lac-hi: #a62a1b;
-  --lac-deep: #5a0e08;
-  --lac-dark: #4a0c08;
-  --lac-text: #f6d9ce;
-  --flame-core: #fff6e6;
-  --flame-mid: #e8a33c;
-  --flame-tip: #fff0c4;
-  --flame-glow: #ffc46b;
-  --sun-disc: #ffe0a8;
-  --parapet: #160d07;
-  --star: #f4ead3;
-  --print-ground: #26201a;
-  --palm-ground: #241a12;
-  --sky-night-0: #0b1024;
-  --sky-night-1: #141a32;
-  --sky-astro-1: #28264c;
-  --sky-civil-0: #2e2a4e;
-  --sky-civil-1: #7a4a50;
-  --sky-rise-0: #4a3050;
-  --sky-rise-1: #c9724a;
-  --sky-golden-0: #8a6b70;
-  --sky-golden-1: #e9a15a;
-  --sky-day-0: #5e86ac;
-  --sky-day-1: #c9c7b4;
-  --sky-noon-0: #4c7ba8;
-  --sky-noon-1: #bfd3e2;
-  --brass-cyl: linear-gradient(90deg, var(--brass-lo) 0%, var(--brass-hi) 18%, var(--brass-mid) 50%, var(--brass-dark) 100%);
-  --brass-cyl-v: linear-gradient(180deg, var(--brass-lo) 0%, var(--brass-hi) 18%, var(--brass-mid) 50%, var(--brass-dark) 100%);
-  --brass-plate: linear-gradient(180deg, var(--brass-hi) 0%, var(--brass-mid) 40%, var(--brass-lo) 100%);
-  --brass-edge: inset 0 1px 0 rgba(255, 246, 230, 0.55), inset 0 -1px 0 rgba(0, 0, 0, 0.45);
-  --grain-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23g)'/%3E%3C/svg%3E");
+  --brass-hi: #ffe7a8;
+  --brass-mid: #f5c46b;
+  --brass-lo: #b7791f;
+  --brass-dark: #7c4a0f;
+  --brass-shadow: #3b2a6b;
+  --brass-ink: #1b1440;
+  --brass-label: #ffffff;
+  --teak-light: #2b2f6b;
+  --leaf-face: #262c66;
+  --lac-hi: #fda4af;
+  --lac-deep: #9f1239;
+  --lac-dark: #4c0519;
+  --lac-text: #ffe4ea;
+  --flame-core: #ffffff;
+  --flame-mid: #c4b5fd;
+  --flame-tip: #e0f2fe;
+  --flame-glow: #a78bfa;
+  --sun-disc: #ffe7a8;
+  --parapet: #04050d;
+  --star: #f1f3ff;
+  --print-ground: #0a0d24;
+  --palm-ground: #0a0d24;
+  --sky-night-0: #04050d;
+  --sky-night-1: #0b1030;
+  --sky-astro-1: #1e1b4b;
+  --sky-civil-0: #1e1b4b;
+  --sky-civil-1: #4c1d95;
+  --sky-rise-0: #312e81;
+  --sky-rise-1: #c2410c;
+  --sky-golden-0: #4338ca;
+  --sky-golden-1: #f59e0b;
+  --sky-day-0: #1d4ed8;
+  --sky-day-1: #60a5fa;
+  --sky-noon-0: #1e40af;
+  --sky-noon-1: #7dd3fc;
+  /* instrument plates: dark glass with a gold rim instead of brass */
+  --brass-cyl: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(0, 0, 0, 0.25) 100%), #12163d;
+  --brass-cyl-v: linear-gradient(90deg, #8b5cf6, #6366f1 50%, #22d3ee);
+  --brass-plate: linear-gradient(120deg, rgba(139, 92, 246, 0.32), rgba(34, 211, 238, 0.18)), rgba(15, 18, 48, 0.8);
+  --brass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 0 1px rgba(180, 192, 255, 0.18);
+  --grain-url: none;
 }
 
-/* ── Rooftop sky (features/sky). Theme-independent on purpose: the rooftop is always the night
-      cloth — stars are paper dots on neel, whatever the desk's theme. ── */
+/* The rooftop sky is always the deepest night. */
 :root {
-  --sky-cloth: #1d2748; /* = night --bg-elevated, held constant for the rooftop */
-  --sky-cloth-deep: #121931; /* the disc of sky laid on the cloth */
+  --sky-cloth: #070a1c;
+  --sky-cloth-deep: #04050d;
 }

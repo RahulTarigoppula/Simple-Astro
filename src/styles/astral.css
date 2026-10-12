@@ -1,0 +1,676 @@
+/* ==========================================================================
+   Astral layer — the modern space skin over the component kit.
+   Loaded after kit.css; it restyles the same class names, so every screen follows.
+   ========================================================================== */
+
+html,
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-feature-settings: "cv11", "ss01";
+}
+body {
+  letter-spacing: -0.005em;
+}
+::selection {
+  background: rgba(139, 92, 246, 0.45);
+  color: var(--ink);
+}
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px rgba(103, 232, 249, 0.18);
+}
+.mono {
+  font-family: var(--font-mono);
+  font-variation-settings: normal;
+  font-weight: 500;
+}
+.display,
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+}
+
+/* ── The sky behind every screen ──────────────────────────────────────── */
+.desk {
+  background-color: var(--space-0);
+  background-image:
+    radial-gradient(1200px 700px at 85% -10%, rgba(109, 40, 217, 0.28), transparent 60%),
+    radial-gradient(900px 600px at -10% 30%, rgba(29, 78, 216, 0.22), transparent 60%),
+    radial-gradient(800px 600px at 60% 120%, rgba(8, 145, 178, 0.18), transparent 60%),
+    linear-gradient(180deg, var(--space-1), var(--space-0) 60%);
+}
+.desk::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.9), transparent 60%),
+    radial-gradient(1px 1px at 120px 80px, rgba(255, 255, 255, 0.7), transparent 60%),
+    radial-gradient(1.5px 1.5px at 200px 160px, rgba(199, 210, 254, 0.9), transparent 60%),
+    radial-gradient(1px 1px at 310px 40px, rgba(255, 255, 255, 0.6), transparent 60%),
+    radial-gradient(1px 1px at 60px 220px, rgba(165, 243, 252, 0.8), transparent 60%),
+    radial-gradient(2px 2px at 260px 260px, rgba(255, 255, 255, 0.95), transparent 60%),
+    radial-gradient(1px 1px at 360px 190px, rgba(221, 214, 254, 0.75), transparent 60%);
+  background-size: 400px 300px;
+  opacity: 0.75;
+  animation: star-drift 240s linear infinite;
+}
+.desk::after {
+  background:
+    radial-gradient(1px 1px at 50px 60px, rgba(255, 255, 255, 0.85), transparent 60%),
+    radial-gradient(1px 1px at 170px 140px, rgba(255, 255, 255, 0.6), transparent 60%),
+    radial-gradient(1.5px 1.5px at 90px 200px, rgba(196, 181, 253, 0.85), transparent 60%);
+  background-size: 260px 240px;
+  opacity: 0.5;
+  z-index: 0;
+  animation: twinkle 6s ease-in-out infinite alternate;
+}
+.desk > * {
+  position: relative;
+  z-index: 1;
+}
+@keyframes star-drift {
+  to {
+    transform: translate(200px, 150px);
+  }
+}
+@keyframes twinkle {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 0.65;
+  }
+}
+.screen,
+.screen--scroll,
+.patri,
+.leafscreen {
+  background: transparent;
+}
+
+/* ── Glass panes ──────────────────────────────────────────────────────── */
+.paper {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.01)), var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(140%);
+  backdrop-filter: blur(var(--blur-glass)) saturate(140%);
+}
+.paper::before {
+  display: none;
+}
+.paper--cut {
+  border-top: 1px solid var(--glass-edge);
+}
+.sheet-col {
+  margin-top: var(--space-4);
+  padding-bottom: var(--space-6);
+  overflow: hidden;
+}
+
+/* Section heads: a quiet title with an aurora bar */
+.band {
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+  padding: 14px var(--paper-margin) 10px;
+  margin-top: var(--space-6);
+}
+.band:first-child {
+  margin-top: 0;
+  padding-top: 18px;
+}
+.band::before {
+  top: 16px;
+  bottom: auto;
+  height: 18px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--aurora);
+  box-shadow: var(--glow-violet);
+}
+.band h1,
+.band h2,
+.band h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-lg);
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.band .dev,
+.band [lang="hi"] {
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--accent-text);
+}
+.band .meta {
+  font-family: var(--font-mono);
+  font-variation-settings: normal;
+  font-size: 10.5px;
+  color: var(--ink-muted);
+}
+.band--plain {
+  border-bottom-color: var(--border);
+}
+
+.row {
+  border-bottom-color: var(--border);
+}
+.row .end {
+  font-family: var(--font-mono);
+  font-variation-settings: normal;
+  color: var(--ink-muted);
+}
+.cite {
+  color: var(--cyan);
+}
+.flag {
+  color: var(--accent-2);
+}
+
+.note-haldi {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  border-left: 3px solid var(--warning);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+}
+.note-lac {
+  background: rgba(251, 113, 133, 0.08);
+  border: 1px solid rgba(251, 113, 133, 0.3);
+  border-left: 3px solid var(--danger);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+}
+
+/* Buttons */
+.stamp {
+  background: var(--aurora);
+  color: var(--accent-ink);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow:
+    0 10px 30px rgba(99, 102, 241, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.stamp:hover {
+  box-shadow:
+    0 12px 36px rgba(139, 92, 246, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.stamp:disabled {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-muted);
+  outline: 1px dashed var(--border-strong);
+  box-shadow: none;
+}
+.stamp .fill {
+  background: rgba(255, 255, 255, 0.28);
+}
+.linkish {
+  color: var(--accent-text);
+  background-image: var(--aurora);
+}
+.danger-text {
+  color: var(--danger);
+}
+
+/* Instrument plates (the old engraved brass) */
+.engraved {
+  background: var(--brass-plate);
+  border: 1px solid rgba(180, 192, 255, 0.22);
+  border-radius: var(--radius-sm);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.3);
+  color: var(--engraved);
+  font-family: var(--font-mono);
+  font-variation-settings: normal;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+.engraved b {
+  font-weight: 700;
+  color: var(--accent-2);
+}
+.engraved .sep {
+  color: var(--accent-text);
+  opacity: 0.7;
+}
+.setting > i {
+  color: var(--ink-faint);
+}
+
+/* ── Floating navigation (the Ledge) ──────────────────────────────────── */
+.ledge {
+  margin: 0 var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+  height: 68px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--radius-xl);
+  background: var(--ledge);
+  background-image: none;
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  backdrop-filter: blur(22px) saturate(160%);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+}
+.ledge a,
+.ledge button {
+  min-width: 56px;
+  min-height: 52px;
+  border-radius: var(--radius-lg);
+  color: var(--ink-muted);
+}
+.ledge .lbl {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  opacity: 1;
+}
+.ledge .obj {
+  filter: none;
+  color: currentColor;
+}
+.ledge a:hover,
+.ledge button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+}
+.ledge [aria-current="page"] {
+  transform: none;
+  color: var(--ink);
+  background: var(--aurora-soft);
+  box-shadow: inset 0 0 0 1px rgba(167, 139, 250, 0.35);
+}
+.ledge [aria-current="page"] .obj {
+  filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.8));
+}
+@media (min-width: 900px) {
+  .ledge {
+    margin: var(--space-4) 0 var(--space-4) var(--space-4);
+    width: 92px;
+    height: auto;
+    padding: var(--space-4) 0;
+  }
+  .ledge [aria-current="page"] {
+    transform: none;
+  }
+}
+
+/* ── Toasts & sheets ──────────────────────────────────────────────────── */
+.toast {
+  background: rgba(17, 21, 52, 0.88);
+  color: var(--ink);
+  border: 1px solid var(--glass-edge);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+dialog.sheet-dialog {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent), rgba(13, 16, 42, 0.92);
+  border: 1px solid var(--glass-edge);
+  border-bottom: 0;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+}
+dialog.sheet-dialog::backdrop {
+  background: rgba(2, 3, 10, 0.6);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.sheet-dialog__grip {
+  background: var(--border-strong);
+}
+
+/* ── Forms ────────────────────────────────────────────────────────────── */
+.field input,
+.drawer-pass input,
+.leaf-manual input {
+  color: var(--ink);
+}
+.field input:focus {
+  border-bottom-color: var(--cyan);
+}
+.seg button {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  color: var(--ink-muted);
+  background: rgba(255, 255, 255, 0.03);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+.seg button:hover {
+  color: var(--ink);
+}
+.seg button[aria-checked="true"],
+.seg button[aria-pressed="true"],
+.seg button[aria-selected="true"] {
+  background: var(--aurora);
+  border-color: transparent;
+  color: var(--accent-ink);
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
+}
+.switch {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+.switch::after {
+  background: var(--ink);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.switch[aria-checked="true"] {
+  background: var(--aurora);
+}
+
+/* Brass drums become glass dials */
+.drum {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, 0.3)),
+    rgba(18, 22, 56, 0.85);
+  border: 1px solid var(--glass-edge-strong);
+  border-radius: var(--radius-md);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 10px 28px rgba(0, 0, 0, 0.4);
+}
+.drum__cell {
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-variation-settings: normal;
+  font-weight: 600;
+}
+.drum__shade {
+  background: linear-gradient(180deg, rgba(7, 9, 26, 0.9), rgba(7, 9, 26, 0) 32%, rgba(7, 9, 26, 0) 68%, rgba(7, 9, 26, 0.9));
+}
+.drum__detent {
+  border-top: 1px solid rgba(167, 139, 250, 0.55);
+  border-bottom: 1px solid rgba(103, 232, 249, 0.4);
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.18);
+}
+.drum__lbl {
+  font-family: var(--font-body);
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+}
+.drum:focus-visible {
+  box-shadow: 0 0 0 2px var(--focus);
+}
+
+/* ── Charts: starlight lines ──────────────────────────────────────────── */
+.chart .stroke {
+  stroke: rgba(196, 205, 255, 0.78);
+  filter: drop-shadow(0 0 3px rgba(139, 92, 246, 0.55));
+}
+.chart .stroke--faint {
+  stroke: var(--ink-faint);
+  filter: none;
+}
+.chart .signnum {
+  fill: var(--accent-text);
+  font-family: var(--font-mono);
+  font-variation-settings: normal;
+}
+.chart .graha {
+  fill: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+.chart .graha.is-retro {
+  fill: var(--ink-muted);
+}
+.chart .graha.is-lit {
+  fill: var(--accent-2);
+  filter: drop-shadow(0 0 6px rgba(245, 196, 107, 0.9));
+}
+.chart .grahadeg {
+  fill: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-variation-settings: normal;
+}
+.chart .tilak {
+  fill: var(--accent-2);
+  filter: drop-shadow(0 0 6px rgba(245, 196, 107, 0.9));
+}
+.chart .lagna-tick {
+  stroke: var(--accent-2);
+}
+.chart .signname {
+  fill: var(--ink-muted);
+}
+.chart-wrap {
+  padding: 6px;
+  border-radius: var(--radius-md);
+  background: radial-gradient(circle at 50% 40%, rgba(99, 102, 241, 0.16), transparent 70%);
+}
+
+/* The loupe: a lens of light */
+.loupe__glass {
+  background: var(--space-2);
+}
+.loupe__rim {
+  background: conic-gradient(from 200deg, #8b5cf6, #22d3ee, #f5c46b, #8b5cf6);
+}
+.loupe.is-up {
+  box-shadow:
+    0 0 40px rgba(139, 92, 246, 0.45),
+    0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* The patri's rollers become two luminous horizons */
+.roller__body {
+  height: 3px;
+  background: var(--aurora);
+  box-shadow: 0 0 18px rgba(139, 92, 246, 0.7);
+  border-radius: 3px;
+}
+.roller--top .roller__body,
+.roller--bot .roller__body {
+  border-radius: 3px;
+}
+.roller__curl,
+.roller__cap {
+  display: none;
+}
+
+/* The seal: a violet orb */
+.seal {
+  background: radial-gradient(circle at 35% 30%, #e9d5ff 0%, #8b5cf6 45%, #3b0764 100%);
+  box-shadow:
+    0 0 30px rgba(139, 92, 246, 0.6),
+    inset -4px -6px 12px rgba(0, 0, 0, 0.35);
+  color: var(--accent-ink);
+}
+.seal::after {
+  border: 1px dashed rgba(196, 181, 253, 0.5);
+}
+.seal.is-cracked {
+  background: var(--rose-glow);
+}
+.seal__tab {
+  background: var(--warning);
+  color: var(--bg);
+  border-radius: var(--radius-sm);
+}
+
+/* Ledgers */
+.ledger th {
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-variation-settings: normal;
+  color: var(--ink-muted);
+  border-bottom-color: var(--border-strong);
+}
+.ledger td {
+  border-bottom-color: var(--border);
+}
+.ledger .num {
+  font-family: var(--font-mono);
+  font-variation-settings: normal;
+}
+.ledger tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.025);
+}
+.ledger tbody tr.is-lit {
+  background: rgba(245, 196, 107, 0.1);
+  box-shadow: inset 3px 0 0 var(--accent-2);
+}
+.ledger tbody tr[data-graha]:hover {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+/* Daśā ribbon */
+.ribbon button {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.ribbon button .l {
+  color: var(--ink);
+}
+.ribbon button .y {
+  font-family: var(--font-mono);
+  font-variation-settings: normal;
+}
+.ribbon button.is-now {
+  background: var(--aurora-soft);
+  border-color: rgba(167, 139, 250, 0.5);
+  box-shadow: var(--glow-violet);
+}
+.ribbon button.is-now::before {
+  background: var(--accent-2);
+  box-shadow: var(--glow-gold);
+  width: 8px;
+  height: 8px;
+  top: -4px;
+  border-radius: 50%;
+}
+.ribbon button[aria-expanded="true"] {
+  background: rgba(139, 92, 246, 0.16);
+}
+.fold-in {
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--radius-sm);
+}
+.fold-in li.is-now,
+.fold-in li.is-now .mono {
+  color: var(--accent-2);
+}
+
+/* Yogas & colophon */
+.yoga h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.yoga .src {
+  font-family: var(--font-mono);
+  font-variation-settings: normal;
+  color: var(--accent-text);
+}
+.colophon {
+  border-top-color: var(--border-strong);
+}
+.colophon .disclaimer {
+  color: var(--ink-muted);
+}
+
+/* Mala beads */
+.beads i {
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+.beads i.on {
+  background: var(--gold-glow);
+  box-shadow: 0 0 8px rgba(245, 196, 107, 0.6);
+}
+.beads i.half {
+  background: linear-gradient(90deg, var(--accent-2) 0 50%, rgba(255, 255, 255, 0.07) 50%);
+}
+.beads i.dosha {
+  background: var(--rose-glow);
+  box-shadow: 0 0 8px rgba(251, 113, 133, 0.6);
+}
+.stampband {
+  border-color: var(--accent-2);
+  color: var(--accent-2);
+  rotate: 0deg;
+  box-shadow: var(--glow-gold);
+}
+.score b {
+  font-family: var(--font-display);
+  font-weight: 700;
+  background: none;
+  color: var(--ink);
+}
+.mauli {
+  background: var(--aurora);
+  box-shadow: var(--glow-violet);
+}
+.pair__scroll {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-edge-strong);
+  border-radius: var(--radius-md);
+}
+
+/* Palm */
+.printframe {
+  background: var(--print-ground);
+  border-radius: var(--radius-md);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge-strong),
+    0 0 40px rgba(99, 102, 241, 0.18);
+}
+.print-lines .ln {
+  stroke: var(--cyan);
+  filter: drop-shadow(0 0 4px rgba(103, 232, 249, 0.8));
+}
+.print-lines .ln--faint {
+  stroke: rgba(103, 232, 249, 0.45);
+}
+.print-lines .ln--traced {
+  stroke: var(--accent-2);
+}
+.print-lines .halo {
+  stroke: rgba(4, 5, 13, 0.55);
+}
+.print-lines text {
+  fill: var(--ink);
+}
+.gauge i.on {
+  background: var(--cyan);
+}
+.confbar i {
+  background: var(--aurora);
+}
+.confbar.is-good i {
+  background: var(--success);
+}
+
+/* Parapet sky strip */
+.sky {
+  border-bottom: 0;
+  -webkit-mask-image: linear-gradient(180deg, black 60%, transparent);
+  mask-image: linear-gradient(180deg, black 60%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desk::before,
+  .desk::after {
+    animation: none;
+  }
+}

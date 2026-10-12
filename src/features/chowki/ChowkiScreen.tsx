@@ -1,24 +1,26 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router";
+// Home: the live sky wheel, today's pañcāṅga at a glance, the person's day, and the doors to
+// every instrument — an astral dashboard rather than a desk.
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router";
 import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { rememberOrigin } from "../../app/origin";
-import { useLamp } from "../../app/theme";
 import { Screen } from "../../components/ui/Screen";
-import { NAKSHATRA_NAMES, TITHI_DEV, VARA_NAMES } from "../../data/tables/names";
+import { NAKSHATRA_NAMES, SIGN_NAMES, TITHI_DEV, VARA_NAMES, YOGA_NAMES } from "../../data/tables/names";
 import { computePanchang } from "../../engine/panchang";
 import type { Panchang } from "../../engine/types";
-import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
-import { useUi } from "../../state/ui";
 import { DailyStrengthCard } from "../gochar";
-import { DialArt, DiyaArt, DrawerKnobArt, LeafBundleArt, LoupeArt, RolledPatriArt } from "./art";
-import { ParapetSky } from "./ParapetSky";
+import { IconArrow, IconChart, IconCircle, IconDrawer, IconMilan, IconPalm, IconPlus, IconSky, IconToday } from "./icons";
+import { ZodiacOrbit } from "./ZodiacOrbit";
 import "./chowki.css";
 
 const BENGALURU = { lat: 12.9716, lon: 77.5946, zone: "Asia/Kolkata" };
 
 function hhmm(ms: number, zone: string): string {
   return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: zone }).format(ms);
+}
+function hourIn(ms: number, zone: string): number {
+  return Number(new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hour12: false, timeZone: zone }).format(ms)) % 24;
 }
 
 function useNow(stepMs = 30_000): number {
@@ -30,68 +32,37 @@ function useNow(stepMs = 30_000): number {
   return now;
 }
 
-/** Long-press shows the engraved name label; tap opens the object. */
-function useLongLabel() {
-  const [on, setOn] = useState(false);
-  const timer = useRef(0);
-  const held = useRef(false);
-  const off = () => {
-    clearTimeout(timer.current);
-    setOn(false);
-  };
-  return {
-    labelled: on,
-    held,
-    bind: {
-      onPointerDown: () => {
-        held.current = false;
-        timer.current = window.setTimeout(() => {
-          held.current = true;
-          setOn(true);
-          haptics.selection();
-        }, 420);
-      },
-      onPointerUp: off,
-      onPointerLeave: off,
-      onPointerCancel: off,
-    },
-  };
-}
-
-interface ObjProps {
+interface TileProps {
   to: string;
-  name: string;
-  tip: string;
-  label: React.ReactNode;
-  className?: string;
-  children: React.ReactNode;
+  title: string;
+  dev: string;
+  sub: string;
+  icon: React.ReactNode;
+  tone?: "violet" | "cyan" | "gold" | "rose";
 }
 
-function DeskObject({ to, name, tip, label, className, children }: ObjProps) {
-  const { labelled, held, bind } = useLongLabel();
+function Tile({ to, title, dev, sub, icon, tone = "violet" }: TileProps) {
   return (
     <Link
       to={to}
-      className={`deskobj${className ? ` ${className}` : ""}${labelled ? " is-labelled" : ""}`}
-      aria-label={name}
+      className={`tile tile--${tone}`}
       onClick={(e) => {
-        if (held.current) {
-          // a long-press reads the label; it does not open the object
-          e.preventDefault();
-          held.current = false;
-          return;
-        }
         rememberOrigin(e.currentTarget);
-        play("tick", 0.6);
+        play("tick", 0.5);
       }}
-      {...bind}
     >
-      {children}
-      <span className="lbl" aria-hidden="true">
-        {label}
+      <span className="tile__icon">{icon}</span>
+      <span className="tile__text">
+        <span className="tile__title">
+          {title}{" "}
+          <span lang="hi" className="tile__dev">
+            {dev}
+          </span>
+        </span>
+        <span className="tile__sub">{sub}</span>
       </span>
-      <span className="tip" aria-hidden="true">
-        {tip}
+      <span className="tile__go" aria-hidden="true">
+        <IconArrow size={16} />
       </span>
     </Link>
   );
@@ -101,181 +72,171 @@ export default function ChowkiScreen() {
   const profiles = useProfiles();
   const active = useActiveProfile();
   const settings = useSettings();
-  const theme = useUi((s) => s.desk.resolvedTheme);
-  const { toggle } = useLamp();
-  const navigate = useNavigate();
   const now = useNow();
   const { patri: activePatri } = usePatri(active, settings.preset);
   const lat = active?.birth.place.lat ?? BENGALURU.lat;
   const lon = active?.birth.place.lon ?? BENGALURU.lon;
   const zone = active?.birth.zone ?? BENGALURU.zone;
+  const placeName = active?.birth.place.name ?? "Bengaluru";
 
-  const today = useMemo<{ p: Panchang | null; err: boolean }>(() => {
+  const p = useMemo<Panchang | null>(() => {
     try {
-      return { p: computePanchang(now, { lat, lon }, settings.preset), err: false };
+      return computePanchang(now, { lat, lon }, settings.preset);
     } catch {
-      return { p: null, err: true };
+      return null;
     }
   }, [now, lat, lon, settings.preset]);
 
-  const p = today.p;
-  const local = hhmm(now, zone);
-  const [hh = 0, mm = 0] = local.split(":").map(Number);
-  const dayArc = (ms: number) => (p ? ((ms - p.sunriseMs) / (p.nextSunriseMs - p.sunriseMs)) * 360 : 0);
-  const tithiNo = p ? (p.tithi.index - 1) % 15 : 0;
   const empty = profiles !== undefined && profiles.length === 0;
-
-  // Swipe up from the dial → the Rooftop.
-  const swipe = useRef<{ y: number; t: number } | null>(null);
-  const swiped = useRef(false);
+  const h = hourIn(now, zone);
+  const salutation = h < 5 ? "A quiet night" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+  const tithiNo = p ? (p.tithi.index - 1) % 15 : 0;
+  const second = profiles?.find((x) => x.id !== active?.id);
+  const strengthOk = active && activePatri && activePatri.profileId === active.id;
 
   return (
-    <Screen className="chowki" label="The Chowki — your desk">
-      <ParapetSky utcMs={now} lat={lat} lon={lon} />
-      <div className="greet">
-        <h1 className="dev" lang="hi">
-          {empty ? "Write your first leaf" : `नमस्ते${active ? `, ${active.name}` : ""}`}
-        </h1>
-        {p ? (
-          <p>
-            <span lang="hi" className="dev">
-              {p.tithi.index === 30 ? "अमावस्या" : `${p.tithi.paksha === "shukla" ? "शुक्ल" : "कृष्ण"} ${TITHI_DEV[tithiNo] ?? ""}`}
-            </span>{" "}
-            · {p.tithi.name}, <span lang="sa">{NAKSHATRA_NAMES[p.nakshatra.index]}</span> {p.nakshatra.pada} · {VARA_NAMES[p.vara.index]} ·{" "}
-            <span className="mono">
-              Rāhu Kāla {hhmm(p.rahuKaal[0], zone)}–{hhmm(p.rahuKaal[1], zone)}
-            </span>
-          </p>
-        ) : null}
-      </div>
+    <Screen className="chowki" label="Chowki — home">
+      <header className="home-head">
+        <div className="home-brand">
+          <span className="home-mark" aria-hidden="true" />
+          <span className="home-name">Chowki</span>
+          <span lang="hi" className="home-name-dev">
+            चौकी
+          </span>
+        </div>
+        <span className="home-clock mono" aria-label={`Local time at ${placeName}: ${hhmm(now, zone)}`}>
+          {hhmm(now, zone)} · {placeName}
+        </span>
+      </header>
 
-      {active && activePatri && activePatri.profileId === active.id ? (
+      <section className="home-hero" aria-labelledby="home-greet">
+        <div className="home-hero__text">
+          <p className="home-kicker">{salutation}</p>
+          <h1 id="home-greet" className="home-title">
+            {empty ? (
+              "Write your first leaf"
+            ) : (
+              <>
+                <span lang="hi">नमस्ते</span>
+                {active ? `, ${active.name}` : ""}
+              </>
+            )}
+          </h1>
+          {p ? (
+            <ul className="home-angas" aria-label="Today's pañcāṅga">
+              <li>
+                <span className="k">Tithi</span>
+                <span className="v">
+                  {p.tithi.index === 30 ? "अमावस्या" : `${p.tithi.paksha === "shukla" ? "शुक्ल" : "कृष्ण"} ${TITHI_DEV[tithiNo] ?? ""}`}
+                </span>
+                <span className="s">{p.tithi.name}</span>
+              </li>
+              <li>
+                <span className="k">Nakṣatra</span>
+                <span className="v">{NAKSHATRA_NAMES[p.nakshatra.index]}</span>
+                <span className="s">pada {p.nakshatra.pada}</span>
+              </li>
+              <li>
+                <span className="k">Yoga</span>
+                <span className="v">{YOGA_NAMES[p.yoga.index - 1] ?? p.yoga.name}</span>
+                <span className="s">{VARA_NAMES[p.vara.index]}</span>
+              </li>
+              <li className="is-caution">
+                <span className="k">Rāhu Kāla</span>
+                <span className="v mono">
+                  {hhmm(p.rahuKaal[0], zone)}–{hhmm(p.rahuKaal[1], zone)}
+                </span>
+                <span className="s">avoid beginnings</span>
+              </li>
+            </ul>
+          ) : (
+            <p className="note-haldi">The sky could not be reckoned for this place — check the leaf's date.</p>
+          )}
+          {empty ? (
+            <Link to="/leaf/new" className="stamp home-cta">
+              <span>Cast a birth chart</span>
+            </Link>
+          ) : null}
+        </div>
+        <Link
+          to={active ? `/patri/${active.id}/sky` : "/today"}
+          className="home-orbit"
+          aria-label="The sky right now — open the rooftop"
+          onClick={(e) => rememberOrigin(e.currentTarget)}
+        >
+          <ZodiacOrbit
+            nowMs={now}
+            preset={settings.preset}
+            lat={lat}
+            lon={lon}
+            natalMoonSign={strengthOk ? activePatri.grahas.MO.sign : undefined}
+          />
+          <span className="home-orbit__cap">
+            Sky now · Moon in {p ? NAKSHATRA_NAMES[p.nakshatra.index] : "—"}
+            {strengthOk ? ` · your Moon ${SIGN_NAMES[activePatri.grahas.MO.sign]}` : ""}
+          </span>
+        </Link>
+      </section>
+
+      {strengthOk && active ? (
         <div className="chowki__strength">
           <DailyStrengthCard patri={activePatri} nowMs={now} zone={active.birth.zone} />
         </div>
       ) : null}
-      <div className="cloth">
-        <DeskObject
-          to="/circle"
-          name={`Leaf bundle, ${profiles?.length ?? 0} leaves, opens the circle`}
-          tip="पत्ते · Circle"
-          label={`Leaves · ${profiles?.length ?? 0}`}
-        >
-          <LeafBundleArt count={profiles?.length ?? 0} />
-        </DeskObject>
 
-        <div
-          style={{ touchAction: "pan-x" }}
-          onClickCapture={(e) => {
-            if (swiped.current) {
-              e.preventDefault();
-              swiped.current = false;
-            }
-          }}
-          onPointerDown={(e) => {
-            swipe.current = { y: e.clientY, t: performance.now() };
-          }}
-          onPointerUp={(e) => {
-            const s = swipe.current;
-            swipe.current = null;
-            if (active && s && s.y - e.clientY > 60 && performance.now() - s.t < 600) {
-              e.preventDefault();
-              swiped.current = true;
-              navigate(`/patri/${active.id}/sky`);
-            }
-          }}
-        >
-          <DeskObject to="/today" name={`Brass panchang dial, ${local}, opens today's leaf`} tip="आज · Today" label={`Dial · ${local}`}>
-            <DialArt
-              hourAngle={(hh % 12) * 30 + mm * 0.5}
-              minuteAngle={mm * 6}
-              rahuFrom={p ? dayArc(p.rahuKaal[0]) : 0}
-              rahuTo={p ? dayArc(p.rahuKaal[1]) : 0}
-            />
-          </DeskObject>
-        </div>
-
-        {empty || !active ? (
-          <DeskObject
-            to="/leaf/new"
-            className="deskobj--patri"
-            name="A blank scroll with a stylus resting on it — write your first leaf"
-            tip="नया पत्ता · New leaf"
-            label="Write your first leaf"
-          >
-            <RolledPatriArt blank />
-          </DeskObject>
-        ) : (
-          <DeskObject
+      <nav className="home-tiles" aria-label="Instruments">
+        {active ? (
+          <Tile
             to={`/patri/${active.id}`}
-            className="deskobj--patri"
-            name={`Janam Patri of ${active.name}, opens the chart scroll`}
-            tip={`पत्री · ${active.birth.localD}/${active.birth.localMo}/${active.birth.localY}`}
-            label={
-              <>
-                <span className="dev" lang="hi">
-                  जन्म पत्री
-                </span>{" "}
-                · {active.name}
-              </>
-            }
-          >
-            <RolledPatriArt />
-          </DeskObject>
+            title="Janam Patri"
+            dev="जन्म पत्री"
+            sub={`${active.name}'s chart, daśā, yogas, transits`}
+            icon={<IconChart />}
+            tone="violet"
+          />
+        ) : (
+          <Tile to="/leaf/new" title="New leaf" dev="नया पत्ता" sub="Name, date, time and place of birth" icon={<IconPlus />} tone="violet" />
         )}
-
-        <DeskObject
+        <Tile to="/today" title="Today" dev="आज" sub="Pañcāṅga, Choghaḍiyā, Horā, month" icon={<IconToday />} tone="gold" />
+        <Tile
+          to="/circle"
+          title="Your circle"
+          dev="पत्ते"
+          sub={`${profiles?.length ?? 0} ${profiles?.length === 1 ? "leaf" : "leaves"} · add, edit, back up`}
+          icon={<IconCircle />}
+          tone="cyan"
+        />
+        <Tile
+          to={active && second ? `/milan/${active.id}/${second.id}` : "/milan"}
+          title="Guna Milan"
+          dev="गुण मिलान"
+          sub="Aṣṭakūṭa on 36 beads, Daśa Porutham"
+          icon={<IconMilan />}
+          tone="rose"
+        />
+        <Tile
           to={active ? `/hast/${active.id}` : "/leaf/new"}
-          name={active ? `Brass loupe, opens the palm reading for ${active.name}` : "Brass loupe — write a leaf first"}
-          tip="हस्त · Palm"
-          label="Loupe"
-        >
-          <LoupeArt />
-        </DeskObject>
+          title="Hast Rekha"
+          dev="हस्त रेखा"
+          sub="Palm lines, read on this device"
+          icon={<IconPalm />}
+          tone="gold"
+        />
+        <Tile
+          to={active ? `/patri/${active.id}/sky` : "/leaf/new"}
+          title="Birth sky"
+          dev="आकाश"
+          sub="The real sky at the moment of birth"
+          icon={<IconSky />}
+          tone="cyan"
+        />
+        {active ? (
+          <Tile to="/leaf/new" title="New leaf" dev="नया पत्ता" sub="Cast another chart" icon={<IconPlus />} tone="violet" />
+        ) : null}
+        <Tile to="/drawer" title="Settings" dev="दराज़" sub="Ayanāṃśa, node, schools, backup" icon={<IconDrawer />} tone="violet" />
+      </nav>
 
-        <button
-          type="button"
-          className="deskobj"
-          aria-pressed={theme === "night"}
-          aria-label={theme === "night" ? "Diya, lit — snuff it for the morning terrace" : "Diya, snuffed — light it for the night desk"}
-          onClick={() => {
-            toggle();
-            play(theme === "night" ? "breath" : "fwoomp");
-            haptics.impact("light");
-          }}
-        >
-          <DiyaArt lit={theme === "night"} />
-          <span className="lbl" aria-hidden="true">
-            Diya · {theme === "night" ? "lit" : "snuffed"}
-          </span>
-        </button>
-
-        <Link
-          to="/drawer"
-          className="deskobj chowki__drawer"
-          aria-label="The drawer — presets, export and the colophon"
-          onClick={() => haptics.impact("light")}
-        >
-          <DrawerKnobArt />
-          <span className="lbl" aria-hidden="true">
-            Drawer
-          </span>
-        </Link>
-      </div>
-      {active ? (
-        <div className="chowki__note" style={{ textAlign: "center", marginBottom: "var(--space-2)" }}>
-          <Link className="chowki__rooftop" to={`/patri/${active.id}/sky`} onClick={(e) => rememberOrigin(e.currentTarget)}>
-            <span aria-hidden="true">⇧</span> the birth sky from the rooftop
-          </Link>
-        </div>
-      ) : null}
-      {today.err ? (
-        <div className="chowki__note">
-          <p className="note-haldi" role="status">
-            The dial is stuck — check the date.
-          </p>
-        </div>
-      ) : null}
+      <p className="home-foot">Computed on this device · nothing leaves it · for reflection, not advice</p>
     </Screen>
   );
 }
