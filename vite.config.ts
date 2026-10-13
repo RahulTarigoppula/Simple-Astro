@@ -1,8 +1,9 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 const pkg = JSON.parse(readFileSync("./package.json", "utf8")) as {
@@ -12,6 +13,23 @@ const pkg = JSON.parse(readFileSync("./package.json", "utf8")) as {
 const isAndroid = process.env.VITE_PLATFORM === "android";
 const base = process.env.VITE_BASE_PATH ?? "/";
 const empty = fileURLToPath(new URL("./src/shims/empty.ts", import.meta.url));
+
+/** Keeps the CSP script hashes in step with the inline scripts actually shipped in index.html. */
+function cspInlineHashes(): Plugin {
+  return {
+    name: "csp-inline-hashes",
+    enforce: "post",
+    transformIndexHtml(html) {
+      const hashes = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map(
+        (m) =>
+          `'sha256-${createHash("sha256")
+            .update(m[1] ?? "")
+            .digest("base64")}'`,
+      );
+      return html.replace(/(script-src [^;]*?)(?: 'sha256-[^']+')+/, `$1 ${hashes.join(" ")}`);
+    },
+  };
+}
 
 export default defineConfig({
   base,
@@ -32,6 +50,7 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    cspInlineHashes(),
     // No service worker inside the Capacitor WebView: the APK ships every asset.
     ...(isAndroid
       ? []
