@@ -248,3 +248,24 @@
     padding-left: 6vw;
   }
 }
+
+/* The maker's own words: a signed quote, set apart from the narration */
+.journey__text--maker .journey__kicker {
+  color: var(--accent-text);
+}
+.journey__quote {
+  margin: 0;
+  padding-left: 16px;
+  border-left: 2px solid var(--accent-2);
+}
+.journey__quote .journey__line {
+  font-style: italic;
+  color: var(--ink);
+}
+.journey__sig {
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--accent-2);
+  animation: jr-rise 900ms var(--ease-out) both;
+}

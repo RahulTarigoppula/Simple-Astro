@@ -1,6 +1,6 @@
 // The words of the opening journey: from the edge of the observable universe to one child on a terrace
 // hearing an old story, to a grown-up question and its answer. Facts are as published (sources in the
-// comments); the last three beats are the maker's own story.
+// comments); the last three beats are the maker's own words, quoted, not rewritten.
 import type { SceneId } from "./scenes";
 
 export interface Beat {
@@ -10,6 +10,8 @@ export interface Beat {
   lines: string[];
   /** seconds this beat stays before moving on by itself */
   hold: number;
+  /** The maker's own words: shown as a signed quote, never paraphrased. */
+  voice?: "maker";
 }
 
 export const BEATS: Beat[] = [
@@ -59,7 +61,7 @@ export const BEATS: Beat[] = [
     // santalinus is endemic to the southern Eastern Ghats of Andhra Pradesh.
     lines: [
       "Neelakurinji turns the Western Ghats blue about once every twelve years — the time Jupiter takes to walk once around the sky.",
-      "Red sanders grows wild only in the hills of Andhra. Everything here is rarer than it looks.",
+      "Red sanders grows wild almost nowhere but the hills of Andhra Pradesh. Everything here is rarer than it looks.",
     ],
     hold: 12,
   },
@@ -72,34 +74,37 @@ export const BEATS: Beat[] = [
     ],
     hold: 10,
   },
+  // ── From here on, Rahul's own words (from his messages), only tidied for grammar. Nothing added. ──
   {
     id: "child",
-    kicker: "Every one of us",
-    title: "First, there was a story.",
+    kicker: "In Rahul's words",
+    title: "The greatest stories, from childhood.",
+    voice: "maker",
     lines: [
-      "A summer night on the terrace. A grandparent tells it again — Rāma's exile, Arjuna's doubt, Hanumān's leap across the sea.",
-      "In India, almost every childhood begins under these stories, and under these stars.",
+      "All of the people in India know one or the other of the greatest stories from childhood — like the Rāmāyaṇa and the Mahābhārata.",
     ],
-    hold: 13,
+    hold: 12,
   },
   {
     id: "question",
-    kicker: "Then, curiosity",
-    title: "Is any of it real?",
+    kicker: "In Rahul's words",
+    title: "Is astrology real?",
+    voice: "maker",
     lines: [
-      "The love and the belief were always there. Amish Tripathi's Shiva and Ram books turned them into questions — then countless books and audiobooks on the Mahābhārata and the Vedas.",
-      "And one question would not leave: do the planets really decide our lives?",
+      "My love and belief were already there. But my wanting to learn more and read things started with Amish Tripathi's Shiva and Ram series — they gave a new perspective.",
+      "So I started studying, and listening to countless books and audiobooks about the Mahābhārata and the Vedas. Then my curiosity asked this question: is astrology real? Are the doṣas' predictions true?",
     ],
-    hold: 14,
+    hold: 18,
   },
   {
     id: "vyom",
-    kicker: "What I found",
-    title: "Karma, not fate.",
+    kicker: "In Rahul's words",
+    title: "Karma is the only true thing.",
+    voice: "maker",
     lines: [
-      "The old science reads the sky like a weather forecast — what could happen, never what must. We can learn, foresee and grow. Our actions are the only thing truly ours.",
-      "I'm Rahul, an engineer who works with AI. I built Vyom — व्योम, the sky — to keep the facts, tell the stories, and leave the fear behind.",
+      "Then I understood: they act like predictions. We as humans have the capability to learn, predict and better ourselves — astrology is the same. The predictions are the kind of things that could happen. But karma, our own actions, is the only true thing. This is our own.",
+      "I'm a software engineer with a specialisation in AI. I developed Vyom to make things simpler, remove the superstition, and present facts and learnings of my own.",
     ],
-    hold: 18,
+    hold: 22,
   },
 ];

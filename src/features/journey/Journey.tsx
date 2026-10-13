@@ -148,21 +148,40 @@ export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () =
       </header>
 
       {beat ? (
-        <section key={beat.id} className={`journey__text journey__text--${beat.id}`} aria-live="polite">
+        <section
+          key={beat.id}
+          className={`journey__text journey__text--${beat.id}${beat.voice ? " journey__text--maker" : ""}`}
+          aria-live="polite"
+        >
           <p className="journey__kicker">{beat.kicker}</p>
           <h2 className="journey__title">{beat.title}</h2>
-          {beat.lines.map((l, i) => (
-            <p key={l.slice(0, 24)} className="journey__line" style={{ animationDelay: `${1.2 + i * 2.4}s` }}>
-              {l}
-            </p>
-          ))}
+          {beat.voice === "maker" ? (
+            <blockquote className="journey__quote">
+              {beat.lines.map((l, i) => (
+                <p key={l.slice(0, 24)} className="journey__line" style={{ animationDelay: `${1.2 + i * 2.4}s` }}>
+                  {l}
+                </p>
+              ))}
+              {last ? (
+                <footer className="journey__sig" style={{ animationDelay: `${1.2 + beat.lines.length * 2.4}s` }}>
+                  — Rahul, who made Vyom
+                </footer>
+              ) : null}
+            </blockquote>
+          ) : (
+            beat.lines.map((l, i) => (
+              <p key={l.slice(0, 24)} className="journey__line" style={{ animationDelay: `${1.2 + i * 2.4}s` }}>
+                {l}
+              </p>
+            ))
+          )}
           {last ? (
             <div className="journey__cta" style={{ animationDelay: `${1.6 + beat.lines.length * 2.4}s` }}>
               <button type="button" className="stamp" onClick={onDone}>
                 <span>Enter Vyom</span>
               </button>
               <button type="button" className="journey__ghost" onClick={onStory}>
-                Read the whole story
+                The history of the stars →
               </button>
             </div>
           ) : null}

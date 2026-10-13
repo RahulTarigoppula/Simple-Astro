@@ -493,7 +493,7 @@ function us(c: Ctx) {
   g.fill();
 }
 
-// ── 8. a terrace on a summer night: a grandparent, a child, a diya, the Moon ──
+// ── 8. the old stories: a diya on a terrace, names of the epics rising into the night ──
 function child(c: Ctx) {
   const { g, w, h, t } = c;
   const sky = g.createLinearGradient(0, 0, 0, h);
@@ -533,30 +533,6 @@ function child(c: Ctx) {
   g.beginPath();
   g.ellipse(dx, dy, 12, 5, 0, 0, Math.PI);
   g.fill();
-  // grandparent sitting (left), child lying with arms behind the head (right), lit from the diya
-  g.fillStyle = "#0b0a14";
-  const gx = dx - (tall ? 70 : 110);
-  g.beginPath();
-  g.arc(gx, dy - 58, 11, 0, TAU);
-  g.fill();
-  g.beginPath();
-  g.moveTo(gx - 22, dy + 8);
-  g.quadraticCurveTo(gx - 20, dy - 46, gx, dy - 47);
-  g.quadraticCurveTo(gx + 22, dy - 44, gx + 26, dy + 8);
-  g.fill();
-  const cx = dx + (tall ? 30 : 50);
-  g.beginPath();
-  g.arc(cx, dy + 4, 8, 0, TAU);
-  g.fill();
-  g.beginPath();
-  g.ellipse(cx + 40, dy + 8, 34, 7, 0, 0, TAU);
-  g.fill();
-  // rim light from the diya
-  g.strokeStyle = "rgba(251, 191, 36, 0.45)";
-  g.lineWidth = 1.5;
-  g.beginPath();
-  g.arc(gx, dy - 58, 11, -0.6, 1.2);
-  g.stroke();
   // the story rising: faint words of light drifting up toward the stars
   const words = ["Rāma", "Sītā", "Hanumān", "Arjuna", "Kṛṣṇa", "Draupadī"];
   g.font = "500 13px Inter Variable, Inter, system-ui, sans-serif";
@@ -564,7 +540,7 @@ function child(c: Ctx) {
     const k = (((t * 0.12 + i / words.length) % 1) + 1) % 1;
     g.globalAlpha = Math.sin(k * Math.PI) * 0.75;
     g.fillStyle = "#fde68a";
-    g.fillText(word, gx + 10 + Math.sin(i * 2.1 + t * 0.6) * 40, dy - 80 - k * (deck * 0.7));
+    g.fillText(word, dx - 30 + Math.sin(i * 2.1 + t * 0.6) * 70, dy - 40 - k * (deck * 0.75));
   });
   g.globalAlpha = 1;
 }
