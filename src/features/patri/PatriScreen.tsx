@@ -30,6 +30,7 @@ import { haptics } from "../../platform/haptics";
 import { isNative, reducedMotion } from "../../platform/native";
 import { play, rustle } from "../../platform/sound";
 import { CosmicProfile } from "../cosmic/CosmicProfile";
+import { MeetGrahas } from "../cosmic/MeetGrahas";
 import { GocharSection } from "../gochar";
 import { ChartFigure } from "./ChartFigure";
 import { DashaRibbon } from "./DashaRibbon";
@@ -541,6 +542,7 @@ function PatriBody({
         onRead={(g) => setLit(g)}
         onBoundary={(id) => setFoot({ kind: "boundary", id })}
       />
+      <MeetGrahas patri={patri} />
       {Object.values(patri.grahas).some((g) => g.boundary) || patri.lagna.boundary ? (
         <p className="note-haldi note--keep">
           <span aria-hidden="true">⚑</span>

@@ -94,6 +94,8 @@ interface Foot {
   note?: string;
   /** Glossary entry for the plain-English explanation. */
   explain?: string;
+  /** Where this item's myth lives in Explore. */
+  story?: string;
 }
 
 interface RowSpec {
@@ -199,12 +201,15 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
         </>
       ),
       end: endsLabel(clock, p.nakshatra.endMs, dayMs),
-      foot: ending(
-        `${nName}, pada ${p.nakshatra.pada}`,
-        nDev,
-        p.nakshatra.endMs,
-        "The Moon's sidereal mansion — 13°20′ each, four padas of 3°20′.",
-      ),
+      foot: {
+        ...ending(
+          `${nName}, pada ${p.nakshatra.pada}`,
+          nDev,
+          p.nakshatra.endMs,
+          "The Moon's sidereal mansion — 13°20′ each, four padas of 3°20′.",
+        ),
+        story: `/explore/nakshatra/${p.nakshatra.index}`,
+      },
     },
     {
       id: "yoga",
@@ -807,6 +812,11 @@ export default function TodayScreen() {
                   Tell me more
                 </button>
               </div>
+            ) : null}
+            {foot.story ? (
+              <Link to={foot.story} className="explain__story" onClick={() => setFoot(null)}>
+                ✦ Read the story of {foot.title.split(",")[0]} →
+              </Link>
             ) : null}
             <p className="footnote__close">
               <button type="button" className="linkish" onClick={() => setFoot(null)}>

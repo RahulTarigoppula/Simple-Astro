@@ -48,6 +48,23 @@ export function Term({ id, children, gloss = true }: { id: string; children?: Re
   );
 }
 
+/** Where each term's myth or deeper story lives. */
+const STORY_LINK: Record<string, [string, string]> = {
+  jyotisha: ["/story", "Read the story of the stars"],
+  graha: ["/explore", "Meet the nine grahas"],
+  "rahu-ketu": ["/explore/graha/RA", "The demon who swallowed the Sun"],
+  rashi: ["/explore", "Explore the twelve signs"],
+  nakshatra: ["/explore", "The 27 star-maidens"],
+  tithi: ["/story", "Why the Moon waxes and wanes"],
+  sidereal: ["/story", "How India met the Greeks"],
+  dasha: ["/explore/graha/KE", "The nine rulers of the life chapters"],
+  "sade-sati": ["/explore/graha/SA", "Śani, the slow judge"],
+  "hast-rekha": ["/story", "Sāmudrika Śāstra: the body as a map"],
+  "guna-milan": ["/explore/nakshatra/0", "The stars behind the score"],
+  panchang: ["/story", "The first clock was the sky"],
+  gochar: ["/forecast", "See your forecast"],
+};
+
 /** The one sheet, mounted by the Shell. */
 export function ExplainSheet() {
   const id = useUi((s) => s.explain);
@@ -76,6 +93,11 @@ export function ExplainSheet() {
               <h3>How Vyom works it out</h3>
               <p>{g.how}</p>
             </>
+          ) : null}
+          {g && STORY_LINK[g.id] ? (
+            <Link to={STORY_LINK[g.id]?.[0] ?? "/story"} className="explain__story" onClick={() => setExplain(null)}>
+              ✦ {STORY_LINK[g.id]?.[1]} →
+            </Link>
           ) : null}
           <div className="explain__foot">
             <Link to="/guide" className="linkish" onClick={() => setExplain(null)}>
