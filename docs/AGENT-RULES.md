@@ -1,4 +1,4 @@
-# Rules for anyone adding to Chowki
+# Rules for anyone adding to Vyom
 
 Repo: `C:\Work\Personal_Projects\02-jyoti-astrology-palmistry` (Windows; Bash = Git Bash; Node 22). Read
 `docs/UI-CONVENTIONS.md` (UI) and the relevant sections of `docs/IMPLEMENTATION-PROMPT.md` first.

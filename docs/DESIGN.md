@@ -1,6 +1,6 @@
 # Jyoti — DESIGN.md (design system, v1)
 
-**Project:** 02 · The Indian Astrology & Palmistry Companion (codename "Jyoti"; brand name **Chowki**) · **Date:** 2026-09-06
+**Project:** 02 · The Indian Astrology & Palmistry Companion (codename "Jyoti"; brand name **Vyom**) · **Date:** 2026-09-06
 **Binding docs:** `_shared/DECISIONS.md` (D1 stack, D5 licensing, D7 token contract, D8 row 02), `docs/RESEARCH.md` (engine, ayanamsa presets, palm pipeline, §7 visual enablers), `_shared/research/DESIGN-TOOLKIT.md` (fonts/libs).
 **Rule of the house:** `design/preview.html` is the visual contract (D9.3). If the app looks worse than this document, it is not done.
 
@@ -8,7 +8,7 @@
 
 ## 1. Identity
 
-**Name:** **Chowki** (चौकी — the low wooden desk a Jyotishi works at).
+**Name:** **Vyom** (व्योम — the low wooden desk a Jyotishi works at).
 
 **One-liner:** *A low teak desk on a night rooftop, lit by one brass diya, where your Janam Patri unrolls under your thumb in lamp-black ink, turmeric borders and a sindoor tilak — Indian manuscript physics, not a zodiac dashboard.*
 
@@ -22,7 +22,7 @@
 - **A fantasy-game parchment menu / Western tarot app** — no gold text, no gradient text, no purple nebula, no glyph fonts, no Western zodiac art, no ornate corner filigree. Brass appears only where a real brass object sits (rollers, dial, loupe, clip).
 - **A wood-textured skeuomorph from 2010** — teak is a *margin* (≤ 8 % of any screen), never a texture photo; paper owns 85–92 % of every screen so screenshots read as manuscript, not tavern. Materials are CSS gradients and one baked grain, never bitmaps.
 - **"Stars on navy + gold serif" horoscope apps (Co-Star, AstroSage)** — the sky exists only on the Rooftop screen, and it is astronomically true; the rest of the app is paper under a lamp.
-- **Napkin (project 03)** — Napkin owns uncoated grey-cream paper, a single vermilion signal, hairline catalogue figures and folio numerals. Chowki's paper is warmer and yellower, its rules are *turmeric bands* not hairlines, its accent is *sindoor applied as a dab* not a printed ink, and its objects have physics. If a Chowki screen could be mistaken for a Napkin plate, it has lost its desk.
+- **Napkin (project 03)** — Napkin owns uncoated grey-cream paper, a single vermilion signal, hairline catalogue figures and folio numerals. Vyom's paper is warmer and yellower, its rules are *turmeric bands* not hairlines, its accent is *sindoor applied as a dab* not a printed ink, and its objects have physics. If a Vyom screen could be mistaken for a Napkin plate, it has lost its desk.
 - **Inter-on-grey with a purple button.** If a screen would look fine that way, it has left the lens.
 
 ## 2. Moodboard & references
@@ -48,9 +48,9 @@
 |---|---|---|---|---|---|---|---|
 | 1 · Janma Patrika — The Two-Ink Almanac | 4 | 6 | 9 | 9 | 6 | **34** | Superb craft and the most legible of the three, but inside *this* portfolio it is Napkin's identity (warm paper, one vermilion ink, hairlines, folio numerals, Day/Night edition) with Devanagari added — and it leans on Fraunces, which is reserved elsewhere. Harvested for its ledger discipline. |
 | 2 · Jantar | 8 | 9 | 6 | 5 | 9 | **37** | The true-sky idea is the most *original* thing on the table and the horizon split is a real legibility contract. But an always-on R3F dome behind every screen is the heaviest thing a solo dev could sign up for on an Android WebView, and "warm-on-indigo" still thumbnails as a horoscope app. Harvested for its time scrub, tithi weather and instrument strips. |
-| 3 · **Chowki** | 9 | 9 | 7 | 6 | 9 | **40** | **Winner.** Deeply Indian without a single cliché, unmistakable in a cropped screenshot (rollers, tilak, 36-bead mala), and its premium feel comes from physics that is all DOM/CSS/Motion. Its weaknesses — object-only navigation and skeuomorphic weight — are fixed below with the Ledge and the "paper ≥ 85 %" rule. Already on the reserved Devanagari-modern typography. |
+| 3 · **Vyom** | 9 | 9 | 7 | 6 | 9 | **40** | **Winner.** Deeply Indian without a single cliché, unmistakable in a cropped screenshot (rollers, tilak, 36-bead mala), and its premium feel comes from physics that is all DOM/CSS/Motion. Its weaknesses — object-only navigation and skeuomorphic weight — are fixed below with the Ledge and the "paper ≥ 85 %" rule. Already on the reserved Devanagari-modern typography. |
 
-**Why Chowki won.** It is the only concept whose *every* signature element is specific to Indian astrology (patri, nadi leaves, mauli beads, diya, brass dial) and whose premium feel does not depend on WebGL. It is also the only concept that needs no font swap under the portfolio rule.
+**Why Vyom won.** It is the only concept whose *every* signature element is specific to Indian astrology (patri, nadi leaves, mauli beads, diya, brass dial) and whose premium feel does not depend on WebGL. It is also the only concept that needs no font swap under the portfolio rule.
 
 **What was grafted and how conflicts were resolved**
 1. **The Ledger** *(from Janma Patrika)* — the Graha table on the Patri is a true ruled ledger: tabular numerals, ′ and ″ in muted ink, margin citations (BPHS 36.13), and numerals that **set** digit-by-digit rather than fade in. Resolution: hairlines are turmeric-ruled (`--border`), not Napkin's grey.
@@ -59,7 +59,7 @@
 4. **Instrument ticks** *(from Jantar)* — in the Drawer, ayanamsa presets are shown as fine ticks on a magnified segment of the brass panchang dial so the 20–40″ differences are visible; automatic day/night by real sun altitude, with the diya as manual override.
 5. **The Ledge** *(own addition, replaces Jantar's gnomon bar)* — a 64 px teak ledge along the bottom edge holds miniature objects (scroll · leaves · dial · loupe · lamp) as a real five-destination bar inside any object. Fixes the "no tab bar" usability hole without adding chrome that is not part of the desk.
 
-Dropped: Jantar's 36-diya tally (conflicts with the mala; beads won), Janma Patrika's Fraunces and scroll-snap mastheads, Chowki's optional GSAP DrawSVG (Motion `pathLength` is sufficient and OSI).
+Dropped: Jantar's 36-diya tally (conflicts with the mala; beads won), Janma Patrika's Fraunces and scroll-snap mastheads, Vyom's optional GSAP DrawSVG (Motion `pathLength` is sufficient and OSI).
 
 ## 4. Colour system
 
@@ -268,9 +268,9 @@ Two text families + one mono (toolkit rule). All self-hosted and subset (`pyftsu
 
 ## 9. Screen-by-screen
 
-Global: phone-first 390–430 px portrait, one-handed. **The Ledge** (64 px + safe-area) sits along the bottom edge on every screen except Capture and Rooftop: five miniature objects — Scroll (Patri) · Leaves (Circle) · Dial (Today) · Loupe (Hast) · Lamp (theme) — each a ≥ 56 px target with an engraved label (`--text-xs`, `--surface` on `--ledge`); the active object sits 4 px higher with a warmer highlight. Predictive back and swipe-down on the top roller return to the Chowki. Desktop (≥ 900 px): the desk widens, paper stays a 480–560 px column, objects lie beside it; the Ledge becomes the left desk edge (vertical).
+Global: phone-first 390–430 px portrait, one-handed. **The Ledge** (64 px + safe-area) sits along the bottom edge on every screen except Capture and Rooftop: five miniature objects — Scroll (Patri) · Leaves (Circle) · Dial (Today) · Loupe (Hast) · Lamp (theme) — each a ≥ 56 px target with an engraved label (`--text-xs`, `--surface` on `--ledge`); the active object sits 4 px higher with a warmer highlight. Predictive back and swipe-down on the top roller return to the Vyom. Desktop (≥ 900 px): the desk widens, paper stays a 480–560 px column, objects lie beside it; the Ledge becomes the left desk edge (vertical).
 
-### 9.1 The Chowki (home) — `#/`
+### 9.1 The Vyom (home) — `#/`
 
 ```
 PHONE                                      DESKTOP (≥ 900px)
@@ -513,7 +513,7 @@ PHONE                                          DESKTOP
 - **Gestures:** drag down to close; from any screen, pull up from the Ledge's right end (or the Lamp long-press) opens it.
 
 ### 9.11 Offline / not-cached / 404 — `#/lost`
-A blank leaf on the desk: "This leaf is not in the bundle." with a single text link back to the Chowki. Everything else works offline by construction (PWA precache of fonts, engine, GeoNames, models, sounds; OpenCV.js and the sky chunk are precached on first visit to their screens, with a note if not yet cached).
+A blank leaf on the desk: "This leaf is not in the bundle." with a single text link back to the Vyom. Everything else works offline by construction (PWA precache of fonts, engine, GeoNames, models, sounds; OpenCV.js and the sky chunk are precached on first visit to their screens, with a note if not yet cached).
 
 ## 10. Component inventory
 
@@ -558,7 +558,7 @@ All primitives come from shadcn/ui on Base UI (Dialog → Drawer/FootnoteSheet, 
 
 ## 12. Sound & haptics
 
-Howler.js sprite (one `chowki.webm` + `chowki.mp3`, ≤ 300 kB total), master gain 0.5, master mute in the Drawer, audio unlocks on the first gesture, defaults **on** but respects system silent mode. Sources: freesound.org with the CC0 filter (search: "paper rustle", "brass tick", "wood bead", "wax seal", "pencil scratch", "match strike") and Kenney.nl (CC0 UI audio); the tanpura is *not* used (Chowki is a desk, not a temple).
+Howler.js sprite (one `chowki.webm` + `chowki.mp3`, ≤ 300 kB total), master gain 0.5, master mute in the Drawer, audio unlocks on the first gesture, defaults **on** but respects system silent mode. Sources: freesound.org with the CC0 filter (search: "paper rustle", "brass tick", "wood bead", "wax seal", "pencil scratch", "match strike") and Kenney.nl (CC0 UI audio); the tanpura is *not* used (Vyom is a desk, not a temple).
 
 | Event | Sound (CC0 sprite) | Haptic (`@capacitor/haptics`; `navigator.vibrate` fallback on Chrome Android) |
 |---|---|---|
@@ -588,7 +588,7 @@ Howler.js sprite (one `chowki.webm` + `chowki.mp3`, ≤ 300 kB total), master ga
 ## 14. Android-specific notes (Capacitor 8)
 
 - **Edge-to-edge:** `StatusBar.setOverlaysWebView(true)`, style `Dark` (light icons) on night desk and `Light` on morning terrace; status-bar area is teak (`--bg`), so the parapet strip starts below `env(safe-area-inset-top)`.
-- **Gesture navigation:** the Ledge sits above `env(safe-area-inset-bottom)` (64 px + inset); no horizontal gestures start within 24 px of the screen edges (system back zone) — the ribbon and varga pager add `touch-action: pan-y` edge guards; predictive back is enabled (`android:enableOnBackInvokedCallback="true"`) and mapped to "return to Chowki" with the `object-open` reverse.
+- **Gesture navigation:** the Ledge sits above `env(safe-area-inset-bottom)` (64 px + inset); no horizontal gestures start within 24 px of the screen edges (system back zone) — the ribbon and varga pager add `touch-action: pan-y` edge guards; predictive back is enabled (`android:enableOnBackInvokedCallback="true"`) and mapped to "return to Vyom" with the `object-open` reverse.
 - **Splash / icon / manifest:** `@capacitor/splash-screen` teak `#1A110B` with the diya mark centred, fading into the desk in 240 ms; adaptive icon = brass diya with a vermilion flame tip (fg) on teak `#1A110B` (bg) with a diya-silhouette monochrome layer; manifest `theme_color #1A110B`, `background_color #F4EAD3`, `display: standalone`, `orientation: portrait` (Rooftop allows landscape).
 - **Camera:** `@capacitor/camera` with `resultType: Uri`, `quality: 90`, `width: 1600`; `CAMERA` permission only; partial photo access on Android 14+ handled by the native picker.
 - **Haptics:** `VIBRATE` permission; all calls no-op on devices without a vibrator.
@@ -684,7 +684,7 @@ Tailwind v4 bridge (`src/index.css`): `@theme inline { --color-bg: var(--bg); --
 
 ## 16. Asset checklist
 
-- [ ] `design/preview.html` — Chowki home, Patri (D1 drawing + loupe), Writing the leaf (drums + sky strip), Guna mala; may hot-link Google Fonts (D1)
+- [ ] `design/preview.html` — Vyom home, Patri (D1 drawing + loupe), Writing the leaf (drums + sky strip), Guna mala; may hot-link Google Fonts (D1)
 - [ ] Fonts: `@fontsource/yatra-one`, `@fontsource/tiro-devanagari-hindi` (400, 400i), `@fontsource-variable/martian-mono`; subset with `pyftsubset` (Latin + Devanagari + `°′″℞`); fallback `size-adjust` metrics
 - [ ] `public/grain.svg` (baked feTurbulence tile, 256 px, < 6 kB) and `public/seal-edge.svg` (pre-displaced lac seal + tilak edges; no live filters)
 - [ ] Ink pictogram set: 27 nakshatra symbols + 9 graha marks (SVG, 24-unit grid), Devanagari and Latin abbreviation text styles

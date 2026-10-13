@@ -1,4 +1,4 @@
-# Chowki (Jyoti) — Architecture
+# Vyom (Jyoti) — Architecture
 
 Written 2026-09-08. Binding alongside `GOAL.md`, `docs/DESIGN.md` and `../_shared/DECISIONS.md` (this project is §D8 row 02). Every version below is the one verified in `docs/RESEARCH.md` on 2026-09-06; pin them in `package.json`.
 
@@ -8,7 +8,7 @@ The whole product is a pure function plus a face: `(birth date, time, place) →
 
 ## 1. Stack
 
-| Layer | Choice | Version (verified 2026-09-06) | Why for Chowki |
+| Layer | Choice | Version (verified 2026-09-06) | Why for Vyom |
 |---|---|---|---|
 | Build | Vite | 8.2.2 (MIT) | One static `dist/` serves GitHub Pages and the Capacitor APK; `base` parameterised per target |
 | UI | React 19 + TypeScript (strict) | react 19.2.8 (MIT) | D1; the whole desk is DOM/CSS/SVG, so React's reconciliation is the only runtime cost |
@@ -38,7 +38,7 @@ The whole product is a pure function plus a face: `(birth date, time, place) →
 
 **Deviations from DECISIONS.md, justified.**
 
-- **No `src/wit/`** and no LLM rung at all. D4's wit ladder exists for apps whose text is a joke; Chowki's text is a *citation*. Readings are deterministic sentences composed from rule hits (§5.15). A BYO-key paraphraser is a Someday item (GOAL §7) and would be labelled as a paraphrase of the rule hits, never as the reading.
+- **No `src/wit/`** and no LLM rung at all. D4's wit ladder exists for apps whose text is a joke; Vyom's text is a *citation*. Readings are deterministic sentences composed from rule hits (§5.15). A BYO-key paraphraser is a Someday item (GOAL §7) and would be labelled as a paraphrase of the rule hits, never as the reading.
 - **No `worker/`** — nothing needs a hidden key, so no Cloudflare Worker exists (D2's "when a secret exists" clause never fires).
 - **GSAP is not a dependency** even though D1 permits it; Motion's `pathLength` is the entire ink-draw requirement and staying OSI-clean is worth more than DrawSVG's convenience.
 - **Swiss Ephemeris stays out of `package.json`.** The `Ephemeris` interface (§5.3) has a second implementation sketched for the AGPL lane, but installing it requires relicensing the repo (D5.1), so it is a documented option, not a dependency.
@@ -50,7 +50,7 @@ The whole product is a pure function plus a face: `(birth date, time, place) →
 ```mermaid
 flowchart TB
   subgraph UI["React 19 UI — src/features/*"]
-    CH[Chowki home<br/>desk objects · parapet strip]
+    CH[Vyom home<br/>desk objects · parapet strip]
     LF[Leaf entry<br/>drums · place · seal]
     PT[Janam Patri<br/>rollers · kundli · ledger · dasha]
     TD[Today's leaf<br/>panchang dial]
@@ -1267,7 +1267,7 @@ VitePWA({
     ],
   },
   manifest: {
-    name: 'Chowki', short_name: 'Chowki', start_url: './#/', display: 'standalone',
+    name: 'Vyom', short_name: 'Vyom', start_url: './#/', display: 'standalone',
     orientation: 'portrait', theme_color: '#1A110B', background_color: '#F4EAD3',
     icons: [/* 192, 512, maskable */],
   },
@@ -1293,7 +1293,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.rahul.jyoti',
-  appName: 'Chowki',
+  appName: 'Vyom',
   webDir: 'dist',
   android: { adjustMarginsForEdgeToEdge: 'auto' },
   plugins: {
@@ -1314,7 +1314,7 @@ export default config;
 | `@capacitor/haptics` | drum detents, tilak, beads, seal, burn | `selectionChanged` for detents, `impact` for seal/tilak/burn (DESIGN §12); every call no-ops on a device with no vibrator |
 | `@capacitor/preferences` | theme + `calmDesk` before first paint | Read synchronously-ish in the boot script so the desk never flashes the wrong wood |
 | `@capacitor/status-bar` + `/splash-screen` | edge-to-edge, teak splash with the diya | Style `Dark` on the night desk, `Light` on the morning terrace, switched by the same effect that sets `data-theme` |
-| `@capacitor/app` | predictive back → "return to Chowki" | `App.addListener('backButton')` maps to the reverse `object-open` transition |
+| `@capacitor/app` | predictive back → "return to Vyom" | `App.addListener('backButton')` maps to the reverse `object-open` transition |
 
 **Manifest additions** (`android/app/src/main/AndroidManifest.xml`):
 
@@ -1408,7 +1408,7 @@ frame-ancestors 'none'; base-uri 'none'
 
 ## 10. Security and privacy
 
-Chowki holds other people's birth times and photographs of their hands. Both are personal data; the hands are biometrics. The design is therefore "nothing leaves, and the owner can prove it".
+Vyom holds other people's birth times and photographs of their hands. Both are personal data; the hands are biometrics. The design is therefore "nothing leaves, and the owner can prove it".
 
 1. **No accounts, no sync, no server, no key.** There is no backend to breach. GOAL success criterion 6 is a Playwright test that records the network log through a full session — leaf → cast → palm → milan → export — and **fails if any request appears** other than an explicitly tapped place search.
 2. **Palm photographs never leave the device.** They are Dexie Blobs, processed in a worker, rendered from `blob:` URLs (or `_capacitor_file_` inside the APK), and destroyed by **Burn** — a 600 ms hold that deletes the profile, its patris, palms, readings, milans and blobs in one transaction. There is no trash, no tombstone, no undo after the char completes.

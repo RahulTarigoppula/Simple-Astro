@@ -167,8 +167,8 @@ export default function CircleScreen() {
         <div className="paper paper--cut sheet-col circle__col">
           <h1 className="circle__empty-h display">Write your first leaf</h1>
           <p className="circle__empty-p">
-            Nobody saved yet. A "leaf" is one person's birth details — date, time and place. Everything in Vyom is worked out from it, on this
-            device.
+            Nobody saved yet. A "leaf" is one person's birth details — date, time and place. Everything in Vyom is worked out from it, on
+            this device.
           </p>
           <BlankLeaf first />
         </div>

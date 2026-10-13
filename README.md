@@ -1,12 +1,13 @@
-# Chowki
+# Vyom
 
-*Your Janam Patri under a live sky — explained in plain English.*
+*Vyom (व्योम) — Sanskrit for "the sky". Indian astrology under a live sky, explained in plain English, with the myths behind every star.*
 
-**Codename:** Jyoti (project 02 of 8) · **Repo:** [Simple-Astro](https://github.com/RahulTarigoppula/Simple-Astro) · **App / brand:** Chowki (चौकी) · **Live:** https://rahultarigoppula.github.io/Simple-Astro/
-**Status: v0.3.0 (2026-10-13), live at https://rahultarigoppula.github.io/Simple-Astro/** — install it from the browser menu ("Install app") and it works offline. The Android APK is built by CI from a `v*` tag once the signing secrets exist (see [docs/HANDOFF.md](docs/HANDOFF.md)). What changed is in [CHANGELOG.md](CHANGELOG.md); what was measured is in [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
+**Codename:** Jyoti (project 02 of 8) · **Repo:** [Simple-Astro](https://github.com/RahulTarigoppula/Simple-Astro) · **App / brand:** Vyom (व्योम) · **Live:** https://rahultarigoppula.github.io/Simple-Astro/
+**Status: v0.4.0 (2026-10-13), live at https://rahultarigoppula.github.io/Simple-Astro/** — install it from the browser menu ("Install app") and it works offline. The Android APK is built by CI from a `v*` tag once the signing secrets exist (see [docs/HANDOFF.md](docs/HANDOFF.md)). What changed is in [CHANGELOG.md](CHANGELOG.md); what was measured is in [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
 
 ## Summary
 
+- **0.4.0:** renamed to **Vyom**; **Forecasts** for the day, week, month, quarter and year (gochara from the Moon, Tārā/Candra-bala, daśā); **Explore**, the myths and meanings of the 9 grahas, 12 rāśis and 27 nakṣatras, numerology and the Chinese zodiac; a **cosmic profile** per person; **Coming up in the sky** with Moon phases, Ekādaśī, eclipses (visible here or not), sign changes and retrogrades; Navagraha medallions.
 - **Astral design (0.3.0):** deep-space glass UI, a live sidereal zodiac wheel on Home, and plain-English help everywhere — an ⓘ beside every term, a Guide with the full glossary, and **Roots**, 16 story cards on the gods, sages, Greeks and astronomers behind Jyotiṣa, palmistry and numerology.
 - A private, offline Jyotisha desk: write a "leaf" (name, birth date, time, place) and it casts a full Janam Patri — nine grahas in sidereal longitude, Lagna, Rāśi (D1) and Navāṁśa (D9) drawn in ink, nakshatra/pada, the Vimshottari dasha tree, birth panchang, and yogas cited to BPHS chapter and verse.
 - Every number shows its work: ayanamsa preset (SE-true / SE-mean / Drik-compatible), resolved IANA zone and historical UTC offset, Julian Day, and a vermilion asterisk whenever a body sits within 2′ of a sign, pada or tithi boundary.
@@ -21,7 +22,7 @@
 | [docs/IMPLEMENTATION-PROMPT.md](docs/IMPLEMENTATION-PROMPT.md) | **Start here** — the self-contained build prompt; where it disagrees with any other doc, it wins |
 | [GOAL.md](GOAL.md) | Goal statement, vibe, success criteria, non-goals, MVP ✅ / v1 🚀 / Someday 🔮 split |
 | [docs/RESEARCH.md](docs/RESEARCH.md) | Verified library/API/ephemeris research with the adversarial verification log |
-| [docs/DESIGN.md](docs/DESIGN.md) | "Chowki" design system: tokens, type, motion, signature interactions, every screen |
+| [docs/DESIGN.md](docs/DESIGN.md) | "Vyom" design system: tokens, type, motion, signature interactions, every screen |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Stack, data model, the engine and palm algorithms with worked examples, offline/Android, budgets |
 | [docs/PLAN.md](docs/PLAN.md) | Phased build plan with checkboxes, definitions of done, the Weekend MVP path |
 | [docs/TESTING.md](docs/TESTING.md) | Test map, golden-chart matrix, day-1 verification list, manual Android checklist |
@@ -61,7 +62,7 @@ Useful one-off scripts (all outside-the-repo downloads are cached in `%TEMP%`):
 
 ## Attribution
 
-Chowki's own code is MIT. The classical tables (nakshatra lords, yoni animals, gana, nadi, varna, koota matrices, varga rules, yoga definitions) are **facts re-typed from Brihat Parashara Hora Shastra and Muhurta Chintamani**, not code copied from any implementation; PyJHora (AGPL-3.0) and Drik Panchang are consulted as validation oracles only and are never dependencies.
+Vyom's own code is MIT. The classical tables (nakshatra lords, yoni animals, gana, nadi, varna, koota matrices, varga rules, yoga definitions) are **facts re-typed from Brihat Parashara Hora Shastra and Muhurta Chintamani**, not code copied from any implementation; PyJHora (AGPL-3.0) and Drik Panchang are consulted as validation oracles only and are never dependencies.
 
 | Asset / library | Licence | Notes |
 |---|---|---|
@@ -98,4 +99,4 @@ No other network request exists. No analytics, no telemetry, no accounts, no cra
 
 ## Disclaimer
 
-Based on classical Jyotisha / Samudrika Shastra texts. For reflection and fun — not medical, legal or financial advice. Chowki makes no predictions about health, death, fertility, wealth or legal outcomes, and sells nothing.
+Based on classical Jyotisha / Samudrika Shastra texts. For reflection and fun — not medical, legal or financial advice. Vyom makes no predictions about health, death, fertility, wealth or legal outcomes, and sells nothing.

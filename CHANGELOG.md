@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.4.0 — 2026-10-13
+
+Chart engine unchanged; no chart moves. Saved people and settings carry over (storage keys are unchanged).
+
+### Renamed: Vyom
+- The app is now **Vyom (व्योम)**, Sanskrit for "the sky". The old name, Chowki, meant a low wooden stool.
+
+### New
+- **Forecasts** (#/forecast): day, week, month, quarter and year. Each planet's house from the natal Moon is checked against the classical favourable houses (Phaladīpikā ch. 26); days add Tārā-bala and Candra-bala; long periods weigh Jupiter, Saturn and the nodes. Shows *working for you* / *go gently with*, a day-by-day or month-by-month chart with the best day, the running daśā chapters, the Sāḍe Sātī phase, the period's sky events and the numerology personal year.
+- **Coming up in the sky**: full and new moons, Ekādaśī, lunar and solar eclipses with visibility from the place, saṅkrāntis, sign changes and retrograde stations, all solved from the ephemeris.
+- **Explore** (#/explore): the nine grahas (myth, meaning, day, colour, gem, vehicle, mantra, the real astronomy, where it is now), the twelve rāśis (element, quality, ruler, body, nakṣatras inside, who is there now), the 27 nakṣatras (deity, symbol, stars, myth, gaṇa, yoni), numerology (root, destiny, Chaldean name number, personal year, number friendship) and the Chinese zodiac (the Great Race; the year from the real Chinese New Year new moon).
+- **Cosmic profile** on Home and the chart: rising sign, Moon sign, birth star with its deity, Sun sign (Indian and Western), Chinese zodiac and numbers; each card opens its story.
+- **Today for you** on Home: the day's tone, the Moon's house and star, the life chapter, and a door to the full forecast.
+- Navagraha medallions, a slow mandala behind the live wheel, and story links in every explanation.
+
+### Changed
+- Navigation: Home · Chart · Forecast · Today · Explore · People (Settings is the gear on Home).
+- People open untied by default with plain labels; cards are solid so the delete tray never shows through.
+- The forecast month calendar lines up with weekdays; the profile reflows in narrow columns.
+
 ## 0.3.0 — 2026-10-13
 
 Engine unchanged; no chart moves.
