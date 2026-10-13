@@ -10,9 +10,11 @@ import { Screen } from "../../components/ui/Screen";
 import { GRAHA_LORE, RASHI_LORE } from "../../data/lore";
 import type { SkyEvent } from "../../engine/events";
 import { type Forecast, forecast, HOUSE_AREA, ord, type Period, periodBounds } from "../../engine/forecast";
+import { dayGuide, personalReading } from "../../engine/personal";
 import { personalYear } from "../../engine/profile";
 import type { GrahaId } from "../../engine/types";
 import "../cosmic/cosmic.css";
+import { AreasCard, ContactsCard, DayGuideCard, DayNotes, StrengthCard } from "./PersonalSections";
 import "./forecast.css";
 
 const PERIODS: Array<{ id: Period; label: string }> = [
@@ -187,6 +189,18 @@ export default function ForecastScreen() {
     }
   }, [patri, profile, period, atMs, zone, settings.preset, lat, lon]);
 
+  const personal = useMemo(() => {
+    if (!patri || !profile || patri.profileId !== profile.id || !f) return null;
+    try {
+      const mid = period === "day" ? f.startMs + 43_200_000 : (f.startMs + f.endMs) / 2;
+      const r = personalReading(patri, mid, settings.preset);
+      const g = period === "day" ? dayGuide(patri, mid, { lat, lon }, settings.preset, r.areas) : null;
+      return { r, g };
+    } catch {
+      return null;
+    }
+  }, [patri, profile, f, period, settings.preset, lat, lon]);
+
   if (profiles !== undefined && !profile) {
     return (
       <Screen className="forecast" label="Forecast">
@@ -272,7 +286,10 @@ export default function ForecastScreen() {
               <p className="fc-tone">
                 {TONE_WORD[f.tone]} <span>· {TONE_HINT[f.tone]}</span>
               </p>
-              <p className="fc-headline">{f.headline}</p>
+              <p className="fc-headline">
+                {profile ? <strong>{profile.name}, </strong> : null}
+                {f.headline[0]?.toLowerCase() + f.headline.slice(1)}
+              </p>
               <div className="fc-meter" role="img" aria-label={`Support score ${Math.round(((f.score + 1) / 2) * 100)} out of 100`}>
                 <span style={{ width: `${Math.round(((f.score + 1) / 2) * 100)}%` }} />
               </div>
@@ -303,7 +320,17 @@ export default function ForecastScreen() {
             </section>
           ) : null}
 
+          {personal?.g && profile ? <DayGuideCard g={personal.g} zone={zone} name={profile.name} /> : null}
+
+          {personal && profile ? <AreasCard r={personal.r} name={profile.name} /> : null}
+
           <Steps f={f} zone={zone} />
+
+          {period === "week" ? <DayNotes steps={f.steps} zone={zone} /> : null}
+
+          {personal ? <ContactsCard r={personal.r} /> : null}
+
+          {personal && period !== "day" ? <StrengthCard r={personal.r} /> : null}
 
           <div className="fc-two">
             <section className="cosmic-card fc-list fc-list--good">
