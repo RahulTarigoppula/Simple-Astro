@@ -246,7 +246,7 @@ export default function HastScreen() {
         <TurmericBand
           dev="हस्त रेखा"
           title={`${hand === "right" ? "Right" : "Left"} hand`}
-          meta={capture ? (reading ? `${lines.length} lines` : "landmarks only") : "no print"}
+          meta={capture ? (reading ? `${lines.length} lines` : "hand found") : "no photo yet"}
           level={1}
           explain="hast-rekha"
         />
@@ -345,7 +345,7 @@ export default function HastScreen() {
                   <b>Lay your hand here</b>
                   <span style={{ fontSize: "var(--text-sm)" }}>Fill the frame · palm flat · even light</span>
                   <Link className="stamp" to={`/hast/${id ?? ""}/capture?hand=${hand}`} style={{ marginTop: 8, textDecoration: "none" }}>
-                    <span>◉ &nbsp;open the camera</span>
+                    <span>◉ &nbsp;Open the camera</span>
                   </Link>
                 </div>
               )}
@@ -488,8 +488,7 @@ export default function HastScreen() {
               <p className="p">This print has landmarks but no reading yet — retake it to read the lines.</p>
             ) : (
               <p className="p p--muted">
-                The palm is photographed, rectified and read on this device. The photo is kept only on this device and can be deleted with
-                one hold.
+                Your palm is photographed and read on this device. The photo is kept only on this device and can be deleted with one hold.
               </p>
             )}
 

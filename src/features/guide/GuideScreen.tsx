@@ -77,7 +77,7 @@ export default function GuideScreen() {
       </header>
 
       <Link to="/story" className="guide-story">
-        <span className="guide-story__k">New · Roots</span>
+        <span className="guide-story__k">Roots</span>
         <span className="guide-story__t">The story of the stars</span>
         <span className="guide-story__s">Gods, ṛṣis, Greeks and astronomers — play the story →</span>
       </Link>

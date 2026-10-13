@@ -2,7 +2,7 @@
 // device. The brass dial and the Moon sit on the indigo cloth; the ledger is ruled paper.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
-import { useActiveProfile, usePatri, useSettings } from "../../app/hooks";
+import { useActiveProfile, useSettings } from "../../app/hooks";
 import { useNowMs } from "../../app/useNow";
 import { useWide } from "../../app/useWide";
 import { Colophon } from "../../components/ui/Colophon";
@@ -21,7 +21,6 @@ import { type EnginePreset, type Panchang, PRESET_HASH, type Profile, type Sunri
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
 import { useUi } from "../../state/ui";
-import { DailyStrengthCard } from "../gochar";
 import { BrassDial } from "./BrassDial";
 import { ayanaDev, ayanaLatin, karanaDev, masaDev, rituDev, tithiDev, yogaDev } from "./dev";
 import { MonthGrid, type Ymd } from "./MonthGrid";
@@ -516,7 +515,6 @@ function Tabs({ tabs, tab, onTab }: { tabs: ReadonlyArray<{ id: Tab; label: stri
 export default function TodayScreen() {
   const active = useActiveProfile();
   const settings = useSettings();
-  const { patri: activePatri } = usePatri(active, settings.preset);
   // The settings row is re-merged on every read; hold the preset by value so memos stay put.
   const presetRef = useRef(settings.preset);
   if (PRESET_HASH(presetRef.current) !== PRESET_HASH(settings.preset)) presetRef.current = settings.preset;
@@ -694,11 +692,6 @@ export default function TodayScreen() {
             explain="panchang"
             meta={p ? clock.dateShort(p.sunriseMs) : undefined}
           />
-          {active && activePatri && activePatri.profileId === active.id ? (
-            <div className="today__mine">
-              <DailyStrengthCard patri={activePatri} nowMs={tickMs} zone={active.birth.zone} />
-            </div>
-          ) : null}
           {place ? (
             <div className="today__where">
               <div className="engraved">

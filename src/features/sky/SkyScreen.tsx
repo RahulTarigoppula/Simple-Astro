@@ -255,7 +255,7 @@ export default function SkyScreen() {
         <div className="rooftop rooftop--missing">
           <p>This person is not saved on this device.</p>
           <button type="button" className="sky-btn" onClick={() => navigate("/")}>
-            ⇩ home
+            ← Back
           </button>
         </div>
       </Screen>
@@ -333,7 +333,7 @@ export default function SkyScreen() {
             <div className="sky-actions">
               <PosterAction make={makePoster} />
               <button type="button" className="sky-btn sky-btn--desk" onClick={back}>
-                ⇩ home
+                ← Back
               </button>
             </div>
           </div>

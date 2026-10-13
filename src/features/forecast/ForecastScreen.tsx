@@ -284,7 +284,7 @@ export default function ForecastScreen() {
             </div>
             <div className="fc-hero__text">
               <p className="fc-tone">
-                {TONE_WORD[f.tone]} <span>· {TONE_HINT[f.tone]}</span>
+                {TONE_WORD[f.tone]} <span>{TONE_HINT[f.tone]}</span>
               </p>
               <p className="fc-headline">
                 {profile ? <strong>{profile.name}, </strong> : null}

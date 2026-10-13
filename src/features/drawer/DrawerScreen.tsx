@@ -332,43 +332,6 @@ export default function DrawerScreen() {
             .
           </p>
 
-          <TurmericBand title="Ayanāṃśa" explain="ayanamsha" meta={active ? `at ${active.name}'s birth` : "today"} plain level={2} />
-          <DialSegment jdTt={jdTt} value={settings.preset.ayanamsa} onChange={(p) => setPreset({ ayanamsa: p })} />
-          <p className="p p--muted">
-            Three Lahiri numbers exist and differ by up to 41″: Swiss Ephemeris with nutation, without it, and the value Drik Panchang
-            prints. Every chart engraves the one it used.
-          </p>
-
-          <Radio
-            label="Rāhu / Ketu"
-            help="True (osculating) or mean node — up to 1.7° apart."
-            value={settings.preset.node}
-            options={[
-              ["true", "true"],
-              ["mean", "mean"],
-            ]}
-            onChange={(v) => setPreset({ node: v })}
-          />
-          <Radio
-            label="Daśā year"
-            value={settings.preset.dashaYearDays}
-            options={[
-              [365.25, "365.25 d"],
-              [360, "360 d"],
-            ]}
-            onChange={(v) => setPreset({ dashaYearDays: v })}
-          />
-          <Radio
-            label="Sunrise"
-            help="Governs vāra and every end time."
-            value={settings.preset.sunrise}
-            options={[
-              ["upper-limb-refracted", "upper limb + refraction"],
-              ["disc-centre", "disc centre"],
-            ]}
-            onChange={(v) => setPreset({ sunrise: v })}
-          />
-
           <TurmericBand title="Display" plain level={2} />
           <JourneyToggle />
           <p className="p drawer-replay">
@@ -465,6 +428,49 @@ export default function DrawerScreen() {
             onChange={() => undefined}
           />
 
+          <TurmericBand
+            title="Accuracy · ayanāṃśa"
+            explain="ayanamsha"
+            meta={active ? `at ${active.name}'s birth` : "today"}
+            plain
+            level={2}
+          />
+          <DialSegment jdTt={jdTt} value={settings.preset.ayanamsa} onChange={(p) => setPreset({ ayanamsa: p })} />
+          <p className="p p--muted">
+            Three Lahiri numbers exist and differ by up to 41″: Swiss Ephemeris with nutation, without it, and the value Drik Panchang
+            prints. Every chart engraves the one it used.
+          </p>
+
+          <Radio
+            label="Rāhu / Ketu"
+            help="True (osculating) or mean node — up to 1.7° apart."
+            value={settings.preset.node}
+            options={[
+              ["true", "true"],
+              ["mean", "mean"],
+            ]}
+            onChange={(v) => setPreset({ node: v })}
+          />
+          <Radio
+            label="Daśā year"
+            value={settings.preset.dashaYearDays}
+            options={[
+              [365.25, "365.25 d"],
+              [360, "360 d"],
+            ]}
+            onChange={(v) => setPreset({ dashaYearDays: v })}
+          />
+          <Radio
+            label="Sunrise"
+            help="Governs vāra and every end time."
+            value={settings.preset.sunrise}
+            options={[
+              ["upper-limb-refracted", "upper limb + refraction"],
+              ["disc-centre", "disc centre"],
+            ]}
+            onChange={(v) => setPreset({ sunrise: v })}
+          />
+
           <TurmericBand title="Offline & storage" plain level={2} />
           <div className="toggle-row">
             <span className="v">
@@ -496,7 +502,7 @@ export default function DrawerScreen() {
             </button>
           </div>
 
-          <TurmericBand title="Colophon" plain level={2} />
+          <TurmericBand title="About Vyom" plain level={2} />
           <ul className="credits">
             {credits.map((c) => (
               <li key={c.name}>

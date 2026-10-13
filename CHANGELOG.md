@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.3 — 2026-10-14
+
+Review pass on the rest of the app.
+- Chart: the birth chart comes first; the profile moves below it; the leftover scroll "rollers" (glowing bars at the top and bottom) are gone.
+- Today: inauspicious times in warm text instead of yellow marker strokes; the jargon-heavy Tārā · Candra · Daśā card is removed (Home and Forecast cover it in plain English).
+- Settings: Display first; the technical ayanāṃśa section follows as "Accuracy"; "Colophon" is now "About Vyom".
+- Plainer copy: Back instead of "⇩ home", "no photo yet", "Open the camera", no stray dot in the forecast hint, no "New" badge in the Guide.
+
 ## 0.6.2 — 2026-10-14
 
 - The intro, re-cut as one continuous story: the universe narrows to the pale blue dot, life and the people who looked up, then Rahul's own words — one thought per frame, large, quoted and signed. No act labels, no extra trivia; scenes carry over between frames instead of restarting, and the dawn breaks as he says "then I understood".

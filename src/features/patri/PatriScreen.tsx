@@ -322,7 +322,6 @@ export default function PatriScreen() {
 
             {patri && profile && patri.profileId === profile.id ? (
               <div className="patri-cosmic">
-                <CosmicProfile profile={profile} patri={patri} />
                 <Link to={`/forecast/${profile.id}`} className="patri-forecast">
                   <span className="patri-forecast__k">Forecast</span>
                   <span className="patri-forecast__t">What the sky holds for {profile.name}</span>
@@ -358,6 +357,12 @@ export default function PatriScreen() {
                 </svg>
               </div>
             )}
+
+            {patri && profile && patri.profileId === profile.id ? (
+              <div className="patri-cosmic">
+                <CosmicProfile profile={profile} patri={patri} />
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

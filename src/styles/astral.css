@@ -958,3 +958,19 @@ body,
 .colophon__how dl {
   margin-top: 10px;
 }
+
+/* Review fixes */
+.roller {
+  display: none;
+}
+/* Today: inauspicious times in warm text instead of yellow marker strokes */
+.haldi-band,
+.haldi-band--thin {
+  background: none;
+  padding: 0;
+  color: var(--warning-text);
+}
+/* the forecast hint reads as a line, not a fragment */
+.fc-tone span::before {
+  content: none;
+}
