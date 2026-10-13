@@ -17,8 +17,8 @@ test("zero leakage across a full session", async ({ page, baseURL }) => {
   await place.pressSequentially("Madurai", { delay: 60 });
   await page.waitForTimeout(800);
   await place.fill("");
-  await page.getByRole("button", { name: /house example/i }).click();
-  await hold(page, /hold to seal the leaf/i);
+  await page.getByRole("button", { name: /fill in an example/i }).click();
+  await hold(page, /hold to save/i);
   await page.waitForURL(/#\/patri\//);
   const id = page.url().split("#/patri/")[1] ?? "";
   await page.getByRole("tab", { name: "D2" }).click();

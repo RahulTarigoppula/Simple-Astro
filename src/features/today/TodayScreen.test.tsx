@@ -169,8 +169,8 @@ describe("TodayScreen", { timeout: 60_000 }, () => {
     expect(Number((document.activeElement as HTMLElement).dataset.day)).toBe(nd + 7 <= 28 ? nd + 7 : nd - 7);
     next.focus();
     fireEvent.click(next);
-    await waitFor(() => expect(screen.getByRole("button", { name: "Read this day's full leaf" })).toBeInTheDocument(), { timeout: 20_000 });
-    fireEvent.click(screen.getByRole("button", { name: "Read this day's full leaf" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Read this day in full" })).toBeInTheDocument(), { timeout: 20_000 });
+    fireEvent.click(screen.getByRole("button", { name: "Read this day in full" }));
     expect(await screen.findByRole("button", { name: /^Tithi/ })).toBeInTheDocument();
   });
 

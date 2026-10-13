@@ -14,8 +14,8 @@ for (const [tag, viewport] of [
 ]) {
   const page = await browser.newPage({ viewport, reducedMotion: "reduce" });
   await page.goto(`${base}#/leaf/new`);
-  await page.getByRole("button", { name: /house example/i }).click();
-  const seal = page.getByRole("button", { name: /hold to seal the leaf/i });
+  await page.getByRole("button", { name: /fill in an example/i }).click();
+  const seal = page.getByRole("button", { name: /hold to save/i });
   await seal.scrollIntoViewIfNeeded();
   const box = await seal.boundingBox();
   if (!box) throw new Error("no seal");

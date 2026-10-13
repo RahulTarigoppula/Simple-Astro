@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.6.0 — 2026-10-14
+
+### The Journey
+- Vyom now opens with a **two-minute cinematic journey**, drawn live on canvas: the observable universe (93 billion light-years), the Milky Way and "you are here", the Solar System, the pale blue dot, a forest of three trillion trees, Neelakurinji blooming once in twelve years under Jupiter's arc, star-stuff looking up at the Seven Sages — then **a summer night on a terrace**, a grandparent telling the Rāmāyaṇa by a diya, **the question** ("is any of it real?"), and the answer: **karma, not fate**. It plays once per visit, can be skipped, replayed from Home or Roots, and turned off in Settings. No music; respects reduced motion.
+
+### The maker's story
+- The Prologue now tells it in full: childhood with the Rāmāyaṇa and Mahābhārata; Amish Tripathi's Shiva and Ram books; countless books and audiobooks on the Mahābhārata and the Vedas; the question "are the doṣas true?"; and the answer — predictions are possibilities, karma is ours. Every forecast ends with the same note.
+
+### Forecasts, personal
+- **Your guide for today**: good for / go easy on, best hours (benefic horās outside Rāhu Kāla), the day's colour.
+- **Life, area by area**: career, money, love, health, mind, home and luck, each read from planets in your own houses (classical gochara table) and their aṣṭakavarga strength, with the reason.
+- **Touching your birth chart**: transiting planets within orb of your natal planets and rising degree.
+- **How well each planet travels for you**: aṣṭakavarga bindus for every transit (BPHS ch. 66).
+- Day-by-day notes for the week.
+
+### A calmer, plainer app
+- Home rebuilt around one hierarchy: greeting and a sentence about tonight's Moon, the live wheel, today for you, three doors, what's coming up in the sky, the story invitation, then everything else.
+- People is a clear list of cards (forecast, compare, ⋯) — no more bundle and thread.
+- Plain words everywhere: person instead of leaf, save instead of seal, delete instead of burn, encrypted backup instead of wax envelope, Settings instead of drawer.
+- Roots is one experience: Start the story, chapter rings and a table of contents.
+- Custom line icons replace emoji in forecasts.
+
 ## 0.5.0 — 2026-10-13
 
 ### Explore, reimagined

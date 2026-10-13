@@ -175,10 +175,10 @@ export default function PatriScreen() {
 
   if (profile === null) {
     return (
-      <Screen scroll label="Lost leaf">
+      <Screen scroll label="Person not found">
         <div className="paper sheet-col" style={{ marginTop: "var(--space-9)" }}>
-          <TurmericBand dev="खोया पत्ता" title="Lost leaf" level={1} />
-          <p className="p">This leaf is not in the bundle.</p>
+          <TurmericBand title="Person not found" level={1} />
+          <p className="p">This person is not saved on this device.</p>
           <p className="p">
             <Link className="linkish" to="/">
               Back home
@@ -233,7 +233,7 @@ export default function PatriScreen() {
               type="button"
               ref={sealBtn}
               className={`seal${error ? " is-cracked" : ""}`}
-              aria-label={stale ? "Lac seal — presets changed: hold to recompute" : "Lac seal — hold to recompute this chart"}
+              aria-label={stale ? "Presets changed — hold to recompute this chart" : "Hold to recompute this chart"}
               onFocus={() => setPull(96)}
               onBlur={releasePull}
               {...sealHold}
@@ -308,14 +308,14 @@ export default function PatriScreen() {
               {error ? (
                 <p className="note-lac" role="alert" style={{ margin: "var(--space-3) 0 0" }}>
                   <span aria-hidden="true">⚑</span>
-                  <span>The seal cracked: {error.message}. The last cast stays on the desk.</span>
+                  <span>Something went wrong: {error.message}. The last chart stays on screen.</span>
                 </p>
               ) : null}
               {profile?.timeUnknown && patri ? <TimeUnknownNote profile={profile} patri={patri} /> : null}
               {stale ? (
                 <p className="note-haldi" style={{ margin: "var(--space-3) 0 0" }}>
                   <span aria-hidden="true">⚑</span>
-                  <span>The presets changed in the drawer. Pull down and hold the lac seal to recompute.</span>
+                  <span>The presets changed in Settings. Pull down and hold the recompute button to update this chart.</span>
                 </p>
               ) : null}
             </header>
@@ -388,7 +388,7 @@ export default function PatriScreen() {
           </button>
           {foot?.kind === "yoga" ? null : (
             <button type="button" className="linkish" onClick={() => navigate("/drawer")}>
-              Presets in the drawer
+              Presets in Settings
             </button>
           )}
         </div>
@@ -658,10 +658,10 @@ function PatriBody({
           Palm — Hast Rekha
         </Link>
         <Link className="linkish" to="/circle">
-          Guna Milan with another leaf
+          Guna Milan with another person
         </Link>
         <Link className="linkish" to={`/leaf/${profileId}/edit`}>
-          Edit this leaf
+          Edit birth details
         </Link>
         {isNative() ? null : (
           <button

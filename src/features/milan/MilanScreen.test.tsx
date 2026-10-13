@@ -120,7 +120,7 @@ describe("MilanScreen", () => {
     await upsertProfile(REFERENCE_PROFILE);
     await upsertProfile(PRIYA);
     const { router } = renderAt(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`);
-    fireEvent.click(await screen.findByRole("button", { name: /Swap first and second leaf/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /Swap first and second person/ }));
     await waitFor(() => expect(router.state.location.pathname).toBe(`/milan/${PRIYA.id}/${REFERENCE_PROFILE.id}`));
     const swapped = engineResult(PRIYA, REFERENCE_PROFILE);
     const first = swapped.kootas[0];
@@ -133,15 +133,15 @@ describe("MilanScreen", () => {
   it("with one leaf, the second scroll is a dotted outline asking for another", async () => {
     await upsertProfile(REFERENCE_PROFILE);
     renderAt("/milan");
-    expect(await screen.findByText("drag a leaf from the bundle")).toBeInTheDocument();
-    expect(screen.getByText(/Only one leaf is in the bundle/)).toBeInTheDocument();
+    expect(await screen.findByText("drag a person here")).toBeInTheDocument();
+    expect(screen.getByText(/Only one person is saved/)).toBeInTheDocument();
   });
 
   it("picks the second leaf from the bundle", async () => {
     await upsertProfile(REFERENCE_PROFILE);
     await upsertProfile(PRIYA);
     const { router } = renderAt("/milan");
-    fireEvent.click(await screen.findByRole("button", { name: /Lay .*'s leaf beside/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /^Compare .* with/ }));
     await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/milan\/[^/]+\/[^/]+$/));
   });
 });
@@ -202,7 +202,7 @@ describe("MilanScreen — porutham, compare and summary", () => {
     const text = writeText.mock.calls[0]?.[0] ?? "";
     expect(text).toContain(`${REFERENCE_PROFILE.name} and ${PRIYA.name}`);
     expect(text).toContain(`${fmtPts(want.total)} / 36 — ${BAND_LABEL[want.band]} (North Indian (common) tables)`);
-    expect(screen.getByText(/^North Indian \(common\) \(Drawer\)/)).toBeInTheDocument();
+    expect(screen.getByText(/^North Indian \(common\) \(Settings\)/)).toBeInTheDocument();
     expect(text).toContain("Doṣas: Nāḍī");
     expect(text).toMatch(/Ten Porutham: \d+ \/ 10 tied/);
     expect(text).toContain(DISCLAIMER);

@@ -292,7 +292,7 @@ export function MonthGrid({ place, preset, clock, ym, onMonth, today, selected, 
           </p>
           {onOpenLeaf ? (
             <button type="button" className="linkish month__open" onClick={onOpenLeaf}>
-              Read this day's full leaf
+              Read this day in full
             </button>
           ) : null}
         </div>

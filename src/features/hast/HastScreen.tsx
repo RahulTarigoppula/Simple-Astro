@@ -198,7 +198,7 @@ export default function HastScreen() {
       void deletePalmCapture(capture.id).then(() => {
         haptics.impact("heavy");
         play("crackle");
-        toast("Print burned. The photo and its landmarks are gone from this device.", "danger");
+        toast("Palm photo deleted. The photo and its landmarks are gone from this device.", "danger");
         if (burnEdge.current) burnEdge.current.style.opacity = "0";
       });
     },
@@ -212,10 +212,10 @@ export default function HastScreen() {
 
   if (profile === null) {
     return (
-      <Screen scroll label="Lost leaf">
+      <Screen scroll label="Person not found">
         <div className="paper sheet-col" style={{ marginTop: "var(--space-9)" }}>
-          <TurmericBand dev="खोया पत्ता" title="Lost leaf" level={1} />
-          <p className="p">This leaf is not in the bundle.</p>
+          <TurmericBand title="Person not found" level={1} />
+          <p className="p">This person is not saved on this device.</p>
           <p className="p">
             <Link className="linkish" to="/">
               Back home
@@ -488,15 +488,15 @@ export default function HastScreen() {
               <p className="p">This print has landmarks but no reading yet — retake it to read the lines.</p>
             ) : (
               <p className="p p--muted">
-                The palm is photographed, rectified and read on this device. The photo is kept only in this drawer and burns away in one
-                hold.
+                The palm is photographed, rectified and read on this device. The photo is kept only on this device and can be deleted with
+                one hold.
               </p>
             )}
 
             {capture ? (
               <div className="tools" style={{ paddingBottom: "var(--space-4)" }}>
-                <button type="button" className="tool danger-text" aria-label="Burn this print — hold" {...burn}>
-                  Burn this print (hold)
+                <button type="button" className="tool danger-text" aria-label="Delete this palm photo — hold" {...burn}>
+                  Delete this palm photo (hold)
                 </button>
               </div>
             ) : null}

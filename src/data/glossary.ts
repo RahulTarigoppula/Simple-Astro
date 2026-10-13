@@ -43,12 +43,12 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     id: "leaf",
-    term: "Leaf",
-    dev: "पत्ता",
+    term: "Person",
+    dev: "व्यक्ति",
     plain: "a saved person",
     short: "One person's birth details — name, date, time and place of birth.",
-    long: "Old astrologers wrote each horoscope on a palm leaf; Vyom keeps the name. A leaf stores only what is needed to rebuild the chart: name, birth date and time, birth place and its time zone. Everything else is recalculated whenever you open it.",
-    how: "Leaves are stored in your browser's private database on this device only. Nothing is uploaded.",
+    long: "Each person you add stores only what is needed to rebuild their chart: name, birth date and time, birth place and its time zone. Everything else is recalculated whenever you open it.",
+    how: "People are stored in your browser's private database on this device only. Nothing is uploaded.",
     group: "basics",
   },
   {
@@ -56,8 +56,8 @@ export const GLOSSARY: GlossaryEntry[] = [
     term: "Circle",
     dev: "पोथी",
     plain: "your saved people",
-    short: "The list of everyone you have saved a leaf for.",
-    long: 'Your circle holds every leaf you\'ve written — yourself, family, friends. Pick one to make it the active person; Home, the chart and the palm reading follow whoever is active. You can edit, back up, or permanently delete ("burn") a leaf from here.',
+    short: "The list of everyone you have saved.",
+    long: "Your circle holds everyone you've added — yourself, family, friends. Pick one to make them the active person; Home, the chart and the palm reading follow whoever is active. You can edit, back up, or permanently delete a person from here.",
     group: "basics",
   },
   {
@@ -467,7 +467,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     plain: "palm reading",
     short: "Reading character from the lines and shape of the hand (Sāmudrika Śāstra).",
     long: "Palmistry is folklore, not science — the lines are mostly shaped by how the hand folds. Vyom treats it as a fun, reflective reading: it photographs your palm, finds the main lines on your device, and describes them using the classical texts' language about temperament, never about fate or health.",
-    how: "Google's MediaPipe hand model finds 21 points on your hand; image processing then traces the creases. The photo never leaves your device and can be burned (deleted) in one hold.",
+    how: "Google's MediaPipe hand model finds 21 points on your hand; image processing then traces the creases. The photo never leaves your device and can be deleted in one hold.",
     group: "palm",
   },
   {

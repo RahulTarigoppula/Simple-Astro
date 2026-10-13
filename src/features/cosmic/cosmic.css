@@ -463,3 +463,18 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (min-width: 900px) {
+  .tfy {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    column-gap: 28px;
+    align-items: center;
+  }
+  .tfy__facts {
+    margin-top: 0;
+  }
+  .tfy__nav {
+    grid-column: 1;
+  }
+}

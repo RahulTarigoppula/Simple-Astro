@@ -9,7 +9,7 @@ export function RouteError() {
       ? `${err.code.replace(/_/g, " ").toLowerCase()} — ${err.detail}`
       : err instanceof Error
         ? err.message
-        : "the desk could not open this leaf";
+        : "Vyom could not open this page";
   const offlineChunk = err instanceof Error && /dynamically imported module|Failed to fetch|Loading chunk/i.test(err.message);
   return (
     <main className="screen screen--scroll" aria-label="Error">
@@ -17,9 +17,9 @@ export function RouteError() {
         <div className="band">
           <h1>
             <span lang="hi" className="dev">
-              मुहर टूटी
+              कुछ गड़बड़
             </span>{" "}
-            · The seal cracked
+            · Something went wrong
           </h1>
         </div>
         <div style={{ display: "grid", placeItems: "center", padding: "var(--space-6) 0 0" }}>
@@ -31,7 +31,7 @@ export function RouteError() {
         </div>
         <p className="p" role="alert">
           {offlineChunk
-            ? "The loupe is still in the drawer — open this screen once with a connection, or use Drawer → Prepare for offline."
+            ? "This screen has not been downloaded yet — open it once with a connection, or use Settings → Prepare for offline."
             : `Reason: ${reason}.`}
         </p>
         <p className="p">

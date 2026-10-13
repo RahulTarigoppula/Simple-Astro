@@ -6,16 +6,16 @@ import type { AshtakootaSchool, KootaId, KootaResult, ManglikStatus, MilanResult
 
 export const RULE_TEXT: Record<KootaId, string> = {
   varna:
-    "Each Moon sign belongs to one of four varṇas — Brāhmaṇa, Kṣatriya, Vaiśya, Śūdra. The single point is given when the first leaf's varṇa ranks at or above the second's. Schools differ on the earth and air signs (Drawer: Aṣṭakūṭa school).",
+    "Each Moon sign belongs to one of four varṇas — Brāhmaṇa, Kṣatriya, Vaiśya, Śūdra. The single point is given when the first person's varṇa ranks at or above the second's. Schools differ on the earth and air signs (Settings: Aṣṭakūṭa school).",
   vashya:
-    "Each Moon sign falls in one of five classes — quadruped, human, water-born, wild, insect. A table of the two classes gives 0, ½, 1 or 2. This table varies most from school to school (Drawer: Aṣṭakūṭa school).",
+    "Each Moon sign falls in one of five classes — quadruped, human, water-born, wild, insect. A table of the two classes gives 0, ½, 1 or 2. This table varies most from school to school (Settings: Aṣṭakūṭa school).",
   tara: "Count the nakṣatras from one Moon to the other, both ways, and reduce by nines. The 3rd, 5th and 7th tārās (Vipat, Pratyari, Vadha) are unkind; each kind direction earns 1.5.",
   yoni: "Each nakṣatra carries an animal yoni. The same animal earns 4, friendly 3, neutral 2, inimical 1, and the seven sworn pairs 0. Schools differ on Aśva × Mṛga (friendly or inimical).",
   maitri:
     "The lords of the two Moon signs are read for natural friendship, each way round: friend and friend 5, friend and neutral 4, neutral and neutral 3, friend and enemy 1, neutral and enemy ½, enemy and enemy 0.",
   gana: "Each nakṣatra is Deva, Manuṣya or Rākṣasa in temperament; a fixed table of the two gaṇas gives 0 to 6. A zero is counted as Gaṇa doṣa.",
   bhakoot:
-    "The distance between the two Moon signs, counted both ways. The 2/12, 5/9 and 6/8 axes are Bhakūṭa doṣa and earn 0; every other axis earns 7. The classical exception — the two sign lords identical or mutual friends — is applied only when the Drawer setting asks for it.",
+    "The distance between the two Moon signs, counted both ways. The 2/12, 5/9 and 6/8 axes are Bhakūṭa doṣa and earn 0; every other axis earns 7. The classical exception — the two sign lords identical or mutual friends — is applied only when you turn it on in Settings.",
   nadi: "The nakṣatras run through three nāḍīs in turn — Ādi, Madhya, Antya. Different nāḍīs earn 8; the same nāḍī is Nāḍī doṣa and earns 0. Its classical exceptions are recorded here and never applied on their own.",
 };
 
@@ -101,7 +101,7 @@ export function exceptionLine(k: KootaResult, ks: readonly KootaResult[]): Excep
   if (k.cancellation) {
     const c = k.cancellation;
     return {
-      text: `The classical exception holds for this pair — ${exceptionText(c.rule)}. ${c.applied ? "Applied (Drawer setting)." : "Recorded, not applied."}`,
+      text: `The classical exception holds for this pair — ${exceptionText(c.rule)}. ${c.applied ? "Applied (Settings)." : "Recorded, not applied."}`,
       source: `${c.citation.text}, ${c.citation.ref}`,
     };
   }
@@ -124,8 +124,8 @@ export function summaryText({ result: r, first, second, manglikLabel, disclaimer
   const doshas = r.kootas.filter((k) => k.dosha);
   const lines = [
     `Guna Milan — ${first.name} and ${second.name}`,
-    `First leaf: ${first.name} — ${moonText(first.moon)}; ${manglikLabel(r.manglik.a)}`,
-    `Second leaf: ${second.name} — ${moonText(second.moon)}; ${manglikLabel(r.manglik.b)}`,
+    `First person: ${first.name} — ${moonText(first.moon)}; ${manglikLabel(r.manglik.a)}`,
+    `Second person: ${second.name} — ${moonText(second.moon)}; ${manglikLabel(r.manglik.b)}`,
     `Aṣṭakūṭa: ${fmtPts(r.total)} / 36 — ${BAND_LABEL[r.band]} (${SCHOOL_LABEL[r.ashtakootaSchool ?? "pyjhora"]} tables)`,
     ...r.kootas.map((k) => `  ${k.name}: ${fmtPts(k.score)} / ${k.max}${k.dosha ? " (doṣa)" : ""}`),
     `Doṣas: ${doshas.length ? doshas.map((k) => `${k.name} — ${becauseBody(k)}`).join("; ") : "none"}`,

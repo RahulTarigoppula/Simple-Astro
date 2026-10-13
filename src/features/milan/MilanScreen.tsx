@@ -201,34 +201,34 @@ function Picker({
       <div className="pair">
         {first ? (
           <div className="pair__scroll mscroll">
-            <span className="mscroll__who">first leaf</span>
+            <span className="mscroll__who">first person</span>
             <b>{first.name}</b>
           </div>
         ) : (
-          <div className="pair__scroll pair__scroll--empty mscroll">no leaf yet</div>
+          <div className="pair__scroll pair__scroll--empty mscroll">no one yet</div>
         )}
         <MauliKnot />
         <div ref={drop} className={`pair__scroll pair__scroll--empty mscroll mscroll--drop${over ? " is-over" : ""}`}>
-          drag a leaf from the bundle
+          drag a person here
         </div>
       </div>
       {profiles.length === 0 ? (
         <p className="p">
-          The bundle is empty.{" "}
+          No one saved yet.{" "}
           <Link className="linkish" to="/leaf/new">
-            Write the first leaf
+            Add the first person
           </Link>
         </p>
       ) : others.length === 0 ? (
         <p className="p">
-          Only one leaf is in the bundle — a Milan needs two.{" "}
+          Only one person is saved — a Milan needs two.{" "}
           <Link className="linkish" to="/leaf/new">
-            Write a second leaf
+            Add a second person
           </Link>
         </p>
       ) : (
         <>
-          <p className="p p--muted">Drag a leaf onto the dotted scroll, or tap it.</p>
+          <p className="p p--muted">Drag a person onto the dotted scroll, or tap them.</p>
           <ul className="milan-pick">
             {others.map((p) => (
               <li key={p.id}>
@@ -249,7 +249,7 @@ function Picker({
                     if ("clientX" in pe && inDrop(pe.clientX, pe.clientY)) onPick(p);
                   }}
                   onClick={() => onPick(p)}
-                  aria-label={`Lay ${p.name}'s leaf beside ${first?.name ?? "the first"} — the second leaf`}
+                  aria-label={`Compare ${p.name} with ${first?.name ?? "the first person"} — the second person`}
                 >
                   <span className="leaf__hole" aria-hidden="true" />
                   {p.name}
@@ -259,7 +259,7 @@ function Picker({
           </ul>
           {profiles.length > 2 ? (
             <details className="milan-first">
-              <summary>Change the first leaf</summary>
+              <summary>Change the first person</summary>
               <ul className="milan-pick">
                 {profiles.map((p) => (
                   <li key={p.id}>
@@ -357,7 +357,7 @@ function MilanScreen() {
 
         {loading ? null : picking ? (
           <>
-            {a && !pa ? <div className="note-haldi">That leaf is not in the bundle any more. Choose two leaves.</div> : null}
+            {a && !pa ? <div className="note-haldi">That person is no longer saved. Choose two people.</div> : null}
             <Picker
               first={first}
               profiles={profiles ?? []}
@@ -387,7 +387,7 @@ function MilanScreen() {
               }}
             >
               <ScrollFace
-                who="first leaf"
+                who="first person"
                 profile={pa}
                 moon={ma}
                 manglik={r?.manglik.a ?? null}
@@ -395,7 +395,7 @@ function MilanScreen() {
               />
               <MauliKnot />
               <ScrollFace
-                who="second leaf"
+                who="second person"
                 profile={pb}
                 moon={mb}
                 manglik={r?.manglik.b ?? null}
@@ -404,7 +404,7 @@ function MilanScreen() {
             </motion.div>
             <p className="milan__swap">
               <button type="button" className="linkish" onClick={swap}>
-                ⇄ Swap first and second leaf
+                ⇄ Swap first and second person
               </button>
               <span className="milan__swaphelp">The classical tables read the two sides differently.</span>
             </p>
@@ -412,7 +412,7 @@ function MilanScreen() {
             {wide && patA && patB ? (
               <div className="milan-charts">
                 <LeafChart
-                  who="first leaf"
+                  who="first person"
                   profile={pa}
                   patri={patA}
                   manglik={r?.manglik.a ?? null}
@@ -420,7 +420,7 @@ function MilanScreen() {
                   script={settings.chartScript}
                 />
                 <LeafChart
-                  who="second leaf"
+                  who="second person"
                   profile={pb}
                   patri={patB}
                   manglik={r?.manglik.b ?? null}
@@ -464,14 +464,14 @@ function MilanScreen() {
             ["Method", "Aṣṭakūṭa from the two Moons' nakṣatra, pada and rāśi — eight kūṭas, 36 points"],
             [
               "School",
-              `${SCHOOL_LABEL[settings.ashtakootaSchool]} (Drawer) — after Muhūrta Cintāmaṇi ch. 6; ${SCHOOL_NOTE[settings.ashtakootaSchool]}; Varṇa, Vaśya and one Yoni cell follow it`,
+              `${SCHOOL_LABEL[settings.ashtakootaSchool]} (Settings) — after Muhūrta Cintāmaṇi ch. 6; ${SCHOOL_NOTE[settings.ashtakootaSchool]}; Varṇa, Vaśya and one Yoni cell follow it`,
             ],
-            ["Sides", "first leaf in the first column of every table, second leaf in the second"],
+            ["Sides", "first person in the first column of every table, second person in the second"],
             [
               "Bhakūṭa",
               settings.bhakootCancellation
-                ? "the classical exception is applied (Drawer)"
-                : "the classical exception is recorded, not applied (Drawer)",
+                ? "the classical exception is applied (Settings)"
+                : "the classical exception is recorded, not applied (Settings)",
             ],
             ["Bands", "under 18 not recommended · 18–24½ acceptable · 25–32½ very good · 33–36 excellent"],
             ["Ayanāṃśa", AYANAMSA_LABEL[settings.preset.ayanamsa]],
@@ -581,8 +581,8 @@ function KootaSheet({
         {glossary(KOOTA_PLAIN[k.id])?.short} {glossary(KOOTA_PLAIN[k.id])?.long}
       </p>
       <dl className="kootasheet__dl">
-        <MoonLine who="First leaf" p={pa} m={ma} />
-        <MoonLine who="Second leaf" p={pb} m={mb} />
+        <MoonLine who="First person" p={pa} m={ma} />
+        <MoonLine who="Second person" p={pb} m={mb} />
         <div className="row">
           <dt>Because</dt>
           <dd>{becauseBody(k)}</dd>
@@ -642,8 +642,8 @@ function PoruthamSheet({
       </h2>
       <p className="p">{p.rule}</p>
       <dl className="kootasheet__dl">
-        <MoonLine who="First leaf" p={pa} m={ma} />
-        <MoonLine who="Second leaf" p={pb} m={mb} />
+        <MoonLine who="First person" p={pa} m={ma} />
+        <MoonLine who="Second person" p={pb} m={mb} />
         <div className="row">
           <dt>Because</dt>
           <dd>{p.because}</dd>
@@ -662,7 +662,7 @@ function PoruthamSheet({
         </div>
       </dl>
       {p.pass ? null : <p className="note-lac">Tradition says this knot stays open: {p.because}</p>}
-      <p className="p p--muted">Counted from the second leaf (the kanyā column) to the first, as the tables are read.</p>
+      <p className="p p--muted">Counted from the second person (the kanyā column) to the first, as the tables are read.</p>
       <p className="kootasheet__close">
         <button type="button" className="linkish" onClick={onClose}>
           Close

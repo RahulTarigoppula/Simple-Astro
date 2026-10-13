@@ -14,7 +14,7 @@ const STEPS: Array<{ title: string; body: string; to: string; cta: string }> = [
     title: "Save a person",
     body: "Enter a name, birth date, birth time and birth place. If you don't know the time, switch on \"Birth time unknown\" — you'll still get most of it.",
     to: "/leaf/new",
-    cta: "New leaf",
+    cta: "Add a person",
   },
   {
     title: "Read the birth chart",
@@ -36,7 +36,7 @@ const STEPS: Array<{ title: string; body: string; to: string; cta: string }> = [
   },
   {
     title: "Explore the myths",
-    body: "Every planet, sign and star has a story — the Moon's 27 wives, the demon behind eclipses, the boy who became the Pole Star. Explore them, or read the 16-card history of astrology.",
+    body: "Every planet, sign and star has a story — the Moon's 27 wives, the demon behind eclipses, the boy who became the Pole Star. Explore them, or play the story of astrology from the beginning.",
     to: "/explore",
     cta: "Explore",
   },
@@ -83,7 +83,7 @@ export default function GuideScreen() {
         <span className="maker__text">
           <span className="maker__k">A note from the maker</span>
           <span className="maker__t">
-            Why a software engineer who works on AI built an astrology app — to keep the facts, drop the fear.
+            From the Ramayana at bedtime to the question 'is astrology real?' — and why the answer is karma, not fate.
           </span>
           <span className="maker__s">Read the prologue in Roots →</span>
         </span>
@@ -92,7 +92,7 @@ export default function GuideScreen() {
       <Link to="/story" className="guide-story">
         <span className="guide-story__k">New · Roots</span>
         <span className="guide-story__t">The story of the stars</span>
-        <span className="guide-story__s">Gods, ṛṣis, Greeks and astronomers — 16 short cards →</span>
+        <span className="guide-story__s">Gods, ṛṣis, Greeks and astronomers — play the story →</span>
       </Link>
 
       <section className="guide-card guide-honest" aria-labelledby="g-real">

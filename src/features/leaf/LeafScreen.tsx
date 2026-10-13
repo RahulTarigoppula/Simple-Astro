@@ -181,7 +181,7 @@ export default function LeafScreen() {
   const seal = async () => {
     if (!resolved.m) {
       play("dull");
-      toast(resolved.err ? resolved.err.detail : "This leaf cannot be sealed yet.", "danger");
+      toast(resolved.err ? resolved.err.detail : "These birth details cannot be saved yet.", "danger");
       return;
     }
     const now = Date.now();
@@ -200,10 +200,10 @@ export default function LeafScreen() {
       await saveSettings({ activeProfileId: profile.id });
       play("thunk");
       haptics.impact("medium");
-      toast(`Leaf sealed — ${name}. The patri was written for it.`);
+      toast(`Saved — ${name}. Their birth chart is ready.`);
       navigate(`/patri/${profile.id}`);
     } catch (e) {
-      toast(`The seal cracked — ${e instanceof Error ? e.message : String(e)}`, "danger");
+      toast(`Could not save — ${e instanceof Error ? e.message : String(e)}`, "danger");
     }
   };
 
@@ -242,14 +242,14 @@ export default function LeafScreen() {
   const offSign = draft.manualOffsetMin < 0 ? -1 : 1;
   const offAbs = Math.abs(draft.manualOffsetMin);
   const strip = resolved.m;
-  const title = id ? "Edit leaf" : "New leaf";
+  const title = id ? "Edit person" : "Add a person";
 
   if (id && editing === null) {
     return (
-      <Screen scroll label="Lost leaf">
+      <Screen scroll label="Person not found">
         <div className="paper sheet-col" style={{ marginTop: "var(--space-9)" }}>
-          <TurmericBand dev="खोया पत्ता" title="Lost leaf" level={1} />
-          <p className="p">This leaf is not in the bundle.</p>
+          <TurmericBand title="Person not found" level={1} />
+          <p className="p">This person is not saved on this device.</p>
           <p className="p">
             <Link className="linkish" to="/">
               Back home
@@ -264,7 +264,7 @@ export default function LeafScreen() {
     <Screen className="leafscreen" label={title}>
       <ParapetSky utcMs={skyMs} lat={draft.place.lat} lon={draft.place.lon} />
       <div className="paper sheet-col leaf-sheet">
-        <TurmericBand dev={id ? "पत्ता" : "नया पत्ता"} title={title} meta={id ? "editing" : "unsaved"} level={1} />
+        <TurmericBand dev={id ? "व्यक्ति" : "नया व्यक्ति"} title={title} meta={id ? "editing" : "unsaved"} level={1} />
 
         <div className="field">
           <label htmlFor="leaf-name">Name</label>
@@ -272,7 +272,7 @@ export default function LeafScreen() {
             id="leaf-name"
             type="text"
             value={draft.name}
-            placeholder="Whose leaf is this?"
+            placeholder="Who is this?"
             spellCheck={false}
             autoComplete="off"
             onChange={(e) => set("name", e.target.value)}
@@ -341,7 +341,7 @@ export default function LeafScreen() {
         {draft.timeUnknown ? (
           <p className="note-haldi" role="status">
             <span aria-hidden="true">⚑</span>
-            <span>Clock time unknown — the hour and minute drums are set aside and the leaf is cast for 12:00 local.</span>
+            <span>Clock time unknown — the hour and minute drums are set aside and the chart is cast for 12:00 local.</span>
           </p>
         ) : null}
         <p className="vh" aria-live="polite">
@@ -354,7 +354,7 @@ export default function LeafScreen() {
             id="leaf-place"
             type="search"
             value={query}
-            placeholder="search the gazetteer…"
+            placeholder="Search a town or city…"
             spellCheck={false}
             autoComplete="off"
             aria-describedby="leaf-place-chosen"
@@ -371,7 +371,7 @@ export default function LeafScreen() {
           </span>
         </div>
         {results.length ? (
-          <ul className="results" aria-label="Places in the bundle">
+          <ul className="results" aria-label="Places found">
             {results.map((p) => (
               <li key={`${p.geonameId ?? ""}-${p.lat}-${p.lon}`}>
                 <button type="button" onClick={() => choosePlace(p)}>
@@ -386,7 +386,7 @@ export default function LeafScreen() {
         {query.trim().length >= 2 && results.length === 0 ? (
           <div className="leaf-online">
             <span style={{ fontSize: "var(--text-sm)", color: "var(--ink-muted)" }}>
-              {gazReady ? "Not in the bundle." : "Opening the gazetteer…"}
+              {gazReady ? "Not in the built-in list." : "Loading places…"}
             </span>
             <button type="button" className="online-stamp" disabled={online === "busy"} onClick={() => void goOnline()}>
               {online === "busy" ? "asking the wire…" : "search online ⌑"}
@@ -548,8 +548,8 @@ export default function LeafScreen() {
         <div className="sealbtn-wrap">
           <HoldStamp
             className="sealbtn"
-            label={<>◉ &nbsp;hold to seal the leaf</>}
-            ariaLabel="Hold to seal the leaf"
+            label={<>◉ &nbsp;hold to save</>}
+            ariaLabel="Hold to save"
             disabled={!resolved.m}
             onFire={() => void seal()}
           />
@@ -566,7 +566,7 @@ export default function LeafScreen() {
                   play("tick");
                 }}
               >
-                Fill with the house example (Rahul, 14 Mar 1994)
+                Fill in an example (Rahul, 14 Mar 1994)
               </button>
             </div>
           ) : null}

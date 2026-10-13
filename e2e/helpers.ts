@@ -15,9 +15,9 @@ export async function hold(page: Page, name: RegExp | string, ms = 800): Promise
 /** Write and seal the house example leaf (Rahul · 14 Mar 1994 · 07:25 · Bengaluru); returns its id. */
 export async function sealReferenceLeaf(page: Page): Promise<string> {
   await page.goto("#/leaf/new");
-  await page.getByRole("button", { name: /house example/i }).click();
+  await page.getByRole("button", { name: /fill in an example/i }).click();
   await page.locator(".leaf-strip").getByText(/MEENA/).waitFor();
-  await hold(page, /hold to seal the leaf/i);
+  await hold(page, /hold to save/i);
   await page.waitForURL(/#\/patri\//);
   return page.url().split("#/patri/")[1] ?? "";
 }

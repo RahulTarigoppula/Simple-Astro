@@ -309,7 +309,7 @@ export default function CaptureScreen() {
           {model === "loading"
             ? "Opening the hand model…"
             : model === "failed"
-              ? "The hand model could not open — use Prepare for offline in the drawer, or try again online."
+              ? "The hand model could not open — use Prepare for offline in Settings, or try again online."
               : camera === "live"
                 ? gate.ok
                   ? sharpOk && expOk

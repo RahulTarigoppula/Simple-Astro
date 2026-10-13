@@ -3,13 +3,13 @@ import { sealReferenceLeaf } from "./helpers";
 
 test("empty desk invites the first leaf", async ({ page }) => {
   await page.goto("./");
-  await expect(page.getByRole("heading", { name: /write your first leaf/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /add your first person/i })).toBeVisible();
   await expect(page.getByRole("navigation", { name: "Main navigation" })).toBeVisible();
 });
 
 test("writing the reference leaf engraves the contract with reality", async ({ page }) => {
   await page.goto("#/leaf/new");
-  await page.getByRole("button", { name: /house example/i }).click();
+  await page.getByRole("button", { name: /fill in an example/i }).click();
   const strip = page.locator(".leaf-strip");
   await expect(strip).toContainText("ASIA/KOLKATA");
   await expect(strip).toContainText("+05:30");
@@ -34,7 +34,7 @@ test("sealing casts the Patri with the golden numbers", async ({ page }) => {
 
 test("brass drums are spinbuttons and refuse 31 February", async ({ page }) => {
   await page.goto("#/leaf/new");
-  await page.getByRole("button", { name: /house example/i }).click();
+  await page.getByRole("button", { name: /fill in an example/i }).click();
   const month = page.getByRole("spinbutton", { name: "Month" });
   const day = page.getByRole("spinbutton", { name: "Day" });
   await month.focus();
@@ -49,8 +49,8 @@ test("brass drums are spinbuttons and refuse 31 February", async ({ page }) => {
 
 test("a short press on the seal saves nothing", async ({ page }) => {
   await page.goto("#/leaf/new");
-  await page.getByRole("button", { name: /house example/i }).click();
-  const btn = page.getByRole("button", { name: /hold to seal the leaf/i });
+  await page.getByRole("button", { name: /fill in an example/i }).click();
+  const btn = page.getByRole("button", { name: /hold to save/i });
   await btn.scrollIntoViewIfNeeded();
   const box = await btn.boundingBox();
   if (!box) throw new Error("no seal");
@@ -64,7 +64,7 @@ test("a short press on the seal saves nothing", async ({ page }) => {
 
 test("a nonsense route lands on the lost leaf", async ({ page }) => {
   await page.goto("#/nonsense");
-  await expect(page.getByText("This leaf is not in the bundle.")).toBeVisible();
+  await expect(page.getByText("There is nothing at this address.")).toBeVisible();
 });
 
 test("after one visit the desk opens and computes in airplane mode", async ({ page, context }) => {

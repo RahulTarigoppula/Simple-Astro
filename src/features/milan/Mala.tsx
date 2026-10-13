@@ -268,7 +268,7 @@ export function Mala({ result, onOpen }: MalaProps) {
                   ) : null}
                 </p>
               ) : k.cancellation?.applied ? (
-                <p className="knote">The doṣa is set aside: {exceptionText(k.cancellation.rule)} (Drawer setting).</p>
+                <p className="knote">The doṣa is set aside: {exceptionText(k.cancellation.rule)} (Settings).</p>
               ) : null}
             </li>
           );

@@ -256,7 +256,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
         [p.sunriseMs, p.sunsetMs],
         p.polar
           ? `The Sun neither rises nor sets here today (${p.polar}); the day is local apparent noon ± 6 hours.`
-          : "Daylight at the leaf's place, under the sunrise convention below.",
+          : "Daylight at this place, under the sunrise convention below.",
       ),
     },
     {
@@ -494,7 +494,7 @@ function Tabs({ tabs, tab, onTab }: { tabs: ReadonlyArray<{ id: Tab; label: stri
     ref.current?.querySelector<HTMLButtonElement>(`#tab-${next.id}`)?.focus();
   };
   return (
-    <div ref={ref} className="seg today-tabs" role="tablist" aria-label="Leaf sections" onKeyDown={onKey}>
+    <div ref={ref} className="seg today-tabs" role="tablist" aria-label="Day sections" onKeyDown={onKey}>
       {tabs.map((t) => (
         <button
           key={t.id}
@@ -652,7 +652,7 @@ export default function TodayScreen() {
   };
 
   return (
-    <Screen className="today" scroll label="Today's leaf — the pañcāṅga">
+    <Screen className="today" scroll label="Today — the pañcāṅga">
       <div className="today__desk" style={style}>
         <div className="today__side">
           <div className="today__cloth">
@@ -713,9 +713,9 @@ export default function TodayScreen() {
                   <>At {place.whose}'s birthplace — a pañcāṅga belongs to a place. </>
                 ) : (
                   <>
-                    No leaf in the bundle yet, so the dial reads Bengaluru.{" "}
+                    No one saved yet, so the dial reads Bengaluru.{" "}
                     <Link className="linkish" to="/leaf/new">
-                      Write a leaf
+                      Add a person
                     </Link>
                   </>
                 )}
@@ -728,7 +728,7 @@ export default function TodayScreen() {
             <InkLine />
           ) : !p || !periods ? (
             <div className="note-haldi" role="status">
-              The dial is stuck — check the date and the leaf's place.
+              The dial is stuck — check the date and the birthplace.
             </div>
           ) : (
             <>
@@ -762,7 +762,7 @@ export default function TodayScreen() {
           <Colophon
             rows={[
               ["Place", place ? `${place.name} · ${place.lat.toFixed(4)}°, ${place.lon.toFixed(4)}°` : "—"],
-              ["Zone", place ? `${clock.zone} (the leaf's, not this device's)` : "—"],
+              ["Zone", place ? `${clock.zone} (the birthplace's, not this device's)` : "—"],
               ["Sunrise", SUNRISE_LABEL[preset.sunrise]],
               ["Ayanāṃśa", AYANAMSA_LABEL[preset.ayanamsa]],
               ["Engine", `astronomy-engine ${ASTRONOMY_ENGINE_VERSION} · computed on this device, offline`],

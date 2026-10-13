@@ -224,12 +224,12 @@ export default function SkyScreen() {
     const hm = `${String(birth.localH).padStart(2, "0")}:${String(birth.localMi).padStart(2, "0")}`;
     return {
       scene: buildScene(at, stars),
-      filename: `chowki-sky-${
+      filename: `vyom-sky-${
         profile.name
           .normalize("NFKD")
           .replace(/[^\w]+/g, "-")
           .replace(/^-|-$/g, "")
-          .toLowerCase() || "leaf"
+          .toLowerCase() || "person"
       }.png`,
       text: {
         name: profile.name,
@@ -253,9 +253,9 @@ export default function SkyScreen() {
     return (
       <Screen label="Rooftop sky" className="sky-screen">
         <div className="rooftop rooftop--missing">
-          <p>This leaf is not in the bundle.</p>
+          <p>This person is not saved on this device.</p>
           <button type="button" className="sky-btn" onClick={() => navigate("/")}>
-            ⇩ desk
+            ⇩ home
           </button>
         </div>
       </Screen>
@@ -333,7 +333,7 @@ export default function SkyScreen() {
             <div className="sky-actions">
               <PosterAction make={makePoster} />
               <button type="button" className="sky-btn sky-btn--desk" onClick={back}>
-                ⇩ desk
+                ⇩ home
               </button>
             </div>
           </div>
