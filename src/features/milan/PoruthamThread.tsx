@@ -29,12 +29,12 @@ export function PoruthamThread({ list, onOpen }: { list: PoruthamResult[]; onOpe
     <section className="porutham" aria-labelledby="porutham-h">
       <h2 id="porutham-h" className="porutham__h">
         <span lang="ta">பொருத்தம்</span>
-        <span>Ten Porutham</span>
+        <span>Porutham</span>
         <span className="porutham__meta">
-          {tied} / {list.length} tied
+          {tied} of {list.length} agree
         </span>
       </h2>
-      <p className="porutham__sub">The South Indian reading — each agreement holds or does not; there are no points.</p>
+      <p className="porutham__sub">The South Indian way: ten checks, each simply agrees or doesn't.</p>
       <ol className="pthread">
         {list.map((p) => (
           <li key={p.id} className={p.pass ? "is-tied" : "is-open"}>
@@ -43,7 +43,7 @@ export function PoruthamThread({ list, onOpen }: { list: PoruthamResult[]; onOpe
               className="pthread__row"
               aria-haspopup="dialog"
               onClick={() => onOpen(p)}
-              aria-label={`${p.name}: ${p.pass ? "tied — the porutham holds" : "open — the porutham does not hold"}${p.weighty ? ", one of the two weighed heaviest" : ""}`}
+              aria-label={`${p.name}: ${p.pass ? "agrees" : "does not agree"}${p.weighty ? ", one of the two matters most" : ""}`}
             >
               <Knot tied={p.pass} />
               <span className="pthread__name">
@@ -53,8 +53,8 @@ export function PoruthamThread({ list, onOpen }: { list: PoruthamResult[]; onOpe
                 </span>
               </span>
               <span className="pthread__state">
-                {p.pass ? "tied" : "open"}
-                {p.weighty ? <span className="pthread__weighty">weighed heaviest</span> : null}
+                {p.pass ? "agrees" : "doesn't"}
+                {p.weighty ? <span className="pthread__weighty">matters most</span> : null}
               </span>
             </button>
           </li>

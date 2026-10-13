@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0 — 2026-10-14
+
+Simpler everywhere.
+- **Settings** is one plain page with a visible ✕: Look & feel (theme, chart style, sound, intro), Your data (backup and restore). Everything technical folds under Advanced; credits fold under About.
+- **Compatibility**: a one-line verdict in plain English with the flagged factors and a karma note; Mars doṣa instead of "Manglik / bhaṅga noted"; the South Indian Porutham check folds away and says "agrees / doesn't".
+- **Palm**: titled "Palm reading", with one line on what you'll get.
+
 ## 0.6.3 — 2026-10-14
 
 Review pass on the rest of the app.

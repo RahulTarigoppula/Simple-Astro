@@ -245,7 +245,7 @@ export default function HastScreen() {
       <div className="paper sheet-col">
         <TurmericBand
           dev="हस्त रेखा"
-          title={`${hand === "right" ? "Right" : "Left"} hand`}
+          title={`Palm reading · ${hand} hand`}
           meta={capture ? (reading ? `${lines.length} lines` : "hand found") : "no photo yet"}
           level={1}
           explain="hast-rekha"
@@ -488,7 +488,9 @@ export default function HastScreen() {
               <p className="p">This print has landmarks but no reading yet — retake it to read the lines.</p>
             ) : (
               <p className="p p--muted">
-                Your palm is photographed and read on this device. The photo is kept only on this device and can be deleted with one hold.
+                Take one photo and Vyom traces your heart, head and life lines and explains what tradition says about each — for fun and
+                reflection. Your palm is photographed and read on this device. The photo is kept only on this device and can be deleted with
+                one hold.
               </p>
             )}
 

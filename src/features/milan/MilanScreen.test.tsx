@@ -162,10 +162,10 @@ describe("MilanScreen — porutham, compare and summary", () => {
     await screen.findByRole("img", { name: /^Nāḍī:/ }, { timeout: 5000 });
     fireEvent.pointerDown(document.body);
     for (const p of want) {
-      const name = new RegExp(`^${p.name}: ${p.pass ? "tied" : "open"}`);
+      const name = new RegExp(`^${p.name}: ${p.pass ? "agrees" : "does not agree"}`);
       expect(screen.getByRole("button", { name })).toBeInTheDocument();
     }
-    expect(screen.getByText(`${want.filter((p) => p.pass).length} / 10 tied`)).toBeInTheDocument();
+    expect(screen.getAllByText(`${want.filter((p) => p.pass).length} of 10 agree`).length).toBeGreaterThan(0);
     const rajju = want.find((p) => p.id === "rajju");
     if (!rajju) throw new Error("no rajju");
     fireEvent.click(screen.getByRole("button", { name: /^Rajju:/ }));

@@ -33,6 +33,12 @@ import { PoruthamThread } from "./PoruthamThread";
 import { becauseBody, doshaLine, exceptionLine, fmtPts, RULE_TEXT, SCHOOL_LABEL, SCHOOL_NOTE, summaryText, WEIGHS } from "./rules";
 import "./milan.css";
 
+const VERDICT: Record<string, string> = {
+  "not-recommended": "tradition does not recommend this match",
+  acceptable: "an acceptable match by tradition",
+  "very-good": "a very good match by tradition",
+  excellent: "an excellent match by tradition",
+};
 const MANGLIK_NAME = new Map(MANGLIK_CANCELLATIONS.map((c) => [c.id, c.name]));
 
 interface MoonFacts {
@@ -115,11 +121,11 @@ function ManglikMarks({ m, onOpen }: { m: ManglikStatus; onOpen: () => void }) {
             ))}
           </span>
           <span className="vh">Manglik from {m.from.map((f) => MANGLIK_REF_LABEL[f]).join(", ")}</span>
-          <span aria-hidden="true">Manglik</span>
-          {cancelled ? <span className="mk__muted">bhaṅga noted</span> : null}
+          <span aria-hidden="true">Mars doṣa</span>
+          {cancelled ? <span className="mk__muted">cancelled</span> : null}
         </>
       ) : (
-        <span className="mk__muted">no Manglik mark</span>
+        <span className="mk__muted">no Mars doṣa</span>
       )}
     </button>
   );
@@ -406,7 +412,6 @@ function MilanScreen() {
               <button type="button" className="linkish" onClick={swap}>
                 ⇄ Swap first and second person
               </button>
-              <span className="milan__swaphelp">The classical tables read the two sides differently.</span>
             </p>
 
             {wide && patA && patB ? (
@@ -446,14 +451,37 @@ function MilanScreen() {
               </p>
             )}
 
-            {poruthamList.length > 0 ? <PoruthamThread list={poruthamList} onOpen={(p) => setSheet({ kind: "porutham", p })} /> : null}
+            {r ? (
+              <div className="milan-verdict">
+                <p className="milan-verdict__t">
+                  {pa.name} and {pb.name}: <strong>{r.total} of 36</strong> — {VERDICT[r.band]}.
+                  {r.kootas.some((k) => k.dosha)
+                    ? ` Tradition flags ${r.kootas
+                        .filter((k) => k.dosha)
+                        .map((k) => k.name)
+                        .join(" and ")}; tap a row to see why.`
+                    : " No factor is flagged."}
+                </p>
+                <p className="milan-verdict__k">
+                  A score is tradition's arithmetic on two Moons — not a verdict on two people. Karma, your own actions, decides the rest.
+                </p>
+              </div>
+            ) : null}
+
+            {poruthamList.length > 0 ? (
+              <details className="milan-more">
+                <summary>
+                  South Indian check · Porutham <span>{poruthamList.filter((p) => p.pass).length} of 10 agree</span>
+                </summary>
+                <PoruthamThread list={poruthamList} onOpen={(p) => setSheet({ kind: "porutham", p })} />
+              </details>
+            ) : null}
 
             {r ? (
               <p className="milan__share">
                 <button type="button" className="linkish" onClick={() => void copySummary()}>
                   Copy summary
                 </button>
-                <span className="milan__swaphelp">Plain text to the clipboard — names, score, doṣas, poruthams.</span>
               </p>
             ) : null}
           </>

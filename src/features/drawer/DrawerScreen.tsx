@@ -2,7 +2,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useActiveProfile, useSettings } from "../../app/hooks";
-import { Colophon } from "../../components/ui/Colophon";
+import { InfoDot } from "../../components/ui/Explain";
 import { Sheet } from "../../components/ui/Sheet";
 import { TurmericBand } from "../../components/ui/TurmericBand";
 import attribution from "../../data/attribution.json";
@@ -309,141 +309,76 @@ export default function DrawerScreen() {
   ];
 
   return (
-    <main className="screen drawer-screen" aria-label="Settings">
-      <div className="drawer-screen__dim">
-        <button
-          type="button"
-          className="linkish"
-          style={{ color: "var(--surface)" }}
-          onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/"))}
-        >
-          ⇩ close settings
-        </button>
-      </div>
-      <div className="drawer-box">
-        <span className="drawer-knob" aria-hidden="true" />
-        <div className="paper">
-          <TurmericBand dev="सेटिंग्स" title="Settings" meta={`Vyom ${__APP_VERSION__}`} level={1} />
-          <p className="p drawer-guide">
-            The defaults are right for almost everyone. Unsure what a word means?{" "}
-            <Link to="/guide" className="linkish">
-              Read the plain-English guide
-            </Link>
-            .
-          </p>
+    <main className="screen settings-screen" aria-label="Settings">
+      <div className="settings">
+        <header className="settings-head">
+          <h1>Settings</h1>
+          <button
+            type="button"
+            className="settings-close"
+            aria-label="Close settings"
+            onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/"))}
+          >
+            ✕
+          </button>
+        </header>
+        <p className="settings-lede">The defaults are right for almost everyone.</p>
 
-          <TurmericBand title="Display" plain level={2} />
-          <JourneyToggle />
-          <p className="p drawer-replay">
-            <Link to="/journey" className="linkish">
-              ▶ Play the intro now
-            </Link>
-          </p>
-          <Radio
-            label="Chart"
-            value={settings.chartStyle}
-            options={[
-              ["north", "North ◇"],
-              ["south", "South ▦"],
-            ]}
-            onChange={(v) => set({ chartStyle: v })}
-          />
-          <Radio
-            label="Chart script"
-            value={settings.chartScript}
-            options={[
-              ["devanagari", "देव"],
-              ["latin", "Lat"],
-            ]}
-            onChange={(v) => set({ chartScript: v })}
-          />
+        <section className="settings-card" aria-labelledby="set-look">
+          <h2 id="set-look">Look &amp; feel</h2>
           <Radio
             label="Theme"
-            help="Auto follows the real Sun at the active birthplace."
             value={settings.theme}
             options={[
-              ["auto", "auto (sun)"],
-              ["night", "night"],
-              ["day", "day"],
+              ["auto", "Auto"],
+              ["night", "Night"],
+              ["day", "Day"],
             ]}
             onChange={(v) => set({ theme: v })}
           />
           <Radio
-            label="Language"
-            help="Hindi, Tamil and Telugu are on the way."
-            value={settings.language}
+            label="Chart style"
+            help="How birth charts are drawn."
+            value={settings.chartStyle}
             options={[
-              ["en", "EN"],
-              ["hi", "HI", true],
-              ["ta", "TA", true],
-              ["te", "TE", true],
+              ["north", "North Indian"],
+              ["south", "South Indian"],
             ]}
-            onChange={(v) => set({ language: v })}
-          />
-          <Radio
-            label="Palm framing"
-            help="Dominant / non-dominant, or the classical right / left."
-            value={settings.handFraming}
-            options={[
-              ["dominant", "dominant"],
-              ["classical", "classical"],
-            ]}
-            onChange={(v) => set({ handFraming: v })}
-          />
-          <Toggle
-            label="Devanagari digits"
-            help="Ledger degrees as ०–९; engraved brass stays Latin."
-            on={settings.devanagariDigits}
-            onChange={(v) => set({ devanagariDigits: v })}
+            onChange={(v) => set({ chartStyle: v })}
           />
           <Toggle label="Sound" on={settings.sound} onChange={(v) => set({ sound: v })} />
-          <Toggle label="Haptics" on={settings.haptics} onChange={(v) => set({ haptics: v })} />
-          <Toggle
-            label="Calm mode"
-            help="No flicker, no rustle, no inertia — whatever the OS says."
-            on={settings.calmDesk}
-            onChange={(v) => set({ calmDesk: v })}
-          />
-          <Radio
-            label="Aṣṭakūṭa school"
-            help="The two differ in three places: Varṇa of earth and air signs (swapped), the Vaśya table, and Yoni Aśva × Mṛga (friendly or inimical)."
-            value={settings.ashtakootaSchool}
-            options={[
-              ["north-common", "North Indian (common)"],
-              ["pyjhora", "PyJHora · saravali"],
-            ]}
-            onChange={(v) => set({ ashtakootaSchool: v })}
-          />
-          <Toggle
-            label="Bhakūṭa cancellation"
-            help="Apply the classical cancellation when the Moon-sign lords are one or friends."
-            on={settings.bhakootCancellation}
-            onChange={(v) => set({ bhakootCancellation: v })}
-          />
-          <Toggle
-            label="Precision mode (AGPL lane)"
-            help="Disabled. Swiss Ephemeris is AGPL-3.0: enabling it would relicense the whole app, add a source link and bump the major version. The MIT engine agrees with it to ~20″."
-            on={false}
-            disabled
-            onChange={() => undefined}
-          />
-
-          <TurmericBand
-            title="Accuracy · ayanāṃśa"
-            explain="ayanamsha"
-            meta={active ? `at ${active.name}'s birth` : "today"}
-            plain
-            level={2}
-          />
-          <DialSegment jdTt={jdTt} value={settings.preset.ayanamsa} onChange={(p) => setPreset({ ayanamsa: p })} />
-          <p className="p p--muted">
-            Three Lahiri numbers exist and differ by up to 41″: Swiss Ephemeris with nutation, without it, and the value Drik Panchang
-            prints. Every chart engraves the one it used.
+          <JourneyToggle />
+          <p className="settings-link">
+            <Link to="/journey">▶ Play the intro now</Link>
           </p>
+        </section>
 
+        <section className="settings-card" aria-labelledby="set-data">
+          <h2 id="set-data">Your data</h2>
+          <p className="settings-note">Everything stays on this device. A backup is encrypted with a passphrase only you know.</p>
+          <BackupAge zone={active?.birth.zone ?? null} />
+          <div className="settings-actions">
+            <button type="button" className="settings-btn" onClick={() => setMode("export")}>
+              Create a backup
+            </button>
+            <button type="button" className="settings-btn settings-btn--ghost" onClick={() => setMode("import")}>
+              Restore a backup
+            </button>
+          </div>
+        </section>
+
+        <details className="settings-card settings-more">
+          <summary>
+            <span>Advanced</span>
+            <span className="settings-more__hint">for people who know Jyotiṣa</span>
+          </summary>
+          <h3>
+            Ayanāṃśa <InfoDot id="ayanamsha" />
+          </h3>
+          <DialSegment jdTt={jdTt} value={settings.preset.ayanamsa} onChange={(p) => setPreset({ ayanamsa: p })} />
           <Radio
             label="Rāhu / Ketu"
-            help="True (osculating) or mean node — up to 1.7° apart."
+            help="True or mean node — up to 1.7° apart."
             value={settings.preset.node}
             options={[
               ["true", "true"],
@@ -462,78 +397,75 @@ export default function DrawerScreen() {
           />
           <Radio
             label="Sunrise"
-            help="Governs vāra and every end time."
             value={settings.preset.sunrise}
             options={[
-              ["upper-limb-refracted", "upper limb + refraction"],
+              ["upper-limb-refracted", "upper limb"],
               ["disc-centre", "disc centre"],
             ]}
             onChange={(v) => setPreset({ sunrise: v })}
           />
-
-          <TurmericBand title="Offline & storage" plain level={2} />
+          <Radio
+            label="Guna Milan tables"
+            value={settings.ashtakootaSchool}
+            options={[
+              ["north-common", "North Indian"],
+              ["pyjhora", "PyJHora"],
+            ]}
+            onChange={(v) => set({ ashtakootaSchool: v })}
+          />
+          <Toggle label="Bhakūṭa cancellation" on={settings.bhakootCancellation} onChange={(v) => set({ bhakootCancellation: v })} />
+          <Radio
+            label="Chart script"
+            value={settings.chartScript}
+            options={[
+              ["devanagari", "देव"],
+              ["latin", "Latin"],
+            ]}
+            onChange={(v) => set({ chartScript: v })}
+          />
+          <Toggle label="Devanagari digits" on={settings.devanagariDigits} onChange={(v) => set({ devanagariDigits: v })} />
+          <Radio
+            label="Palm framing"
+            value={settings.handFraming}
+            options={[
+              ["dominant", "dominant"],
+              ["classical", "classical"],
+            ]}
+            onChange={(v) => set({ handFraming: v })}
+          />
+          <Toggle label="Haptics" on={settings.haptics} onChange={(v) => set({ haptics: v })} />
+          <Toggle label="Calm mode" help="Less motion and no sounds." on={settings.calmDesk} onChange={(v) => set({ calmDesk: v })} />
           <div className="toggle-row">
             <span className="v">
               Prepare for offline
-              <span className="help">{warm || "Warms the hand model, the palm wasm and the sky so they open in airplane mode."}</span>
+              <span className="help">{warm || "Downloads the palm and sky models so they work without internet."}</span>
             </span>
             <button type="button" className="linkish" onClick={() => void prepareOffline()}>
-              prepare ▸
+              Download
             </button>
           </div>
-          {est ? (
-            <p className="p p--muted">
-              Vyom is using {(est.usage / 1e6).toFixed(1)} MB of {(est.quota / 1e9).toFixed(1)} GB
-              {est.persisted ? " (kept safe from eviction)" : ""}.
-            </p>
-          ) : null}
+          {est ? <p className="settings-note">Using {(est.usage / 1e6).toFixed(1)} MB on this device.</p> : null}
+        </details>
 
-          <TurmericBand title="Encrypted backup" meta="AES-GCM-256" plain level={2} />
-          <p className="p p--muted">
-            Export is always encrypted with your passphrase (PBKDF2, 600 000 rounds). There is no unencrypted export.
+        <details className="settings-card settings-more">
+          <summary>
+            <span>About Vyom</span>
+            <span className="settings-more__hint">version {__APP_VERSION__} · credits</span>
+          </summary>
+          <p className="settings-note">
+            Planet positions by astronomy-engine {__ENGINE_BUILD__}, computed on this device. For reflection, not advice.{" "}
+            <Link to="/guide">Read the guide</Link>.
           </p>
-          <BackupAge zone={active?.birth.zone ?? null} />
-          <div className="tools">
-            <button type="button" className="linkish" onClick={() => setMode("export")}>
-              Create an encrypted backup ▸
-            </button>
-            <button type="button" className="linkish" onClick={() => setMode("import")}>
-              Restore from a backup ▸
-            </button>
-          </div>
-
-          <TurmericBand title="About Vyom" plain level={2} />
           <ul className="credits">
             {credits.map((c) => (
               <li key={c.name}>
-                <b style={{ fontWeight: 400 }}>{c.name}</b>
+                <b style={{ fontWeight: 500 }}>{c.name}</b>
                 {c.author ? ` — ${c.author}` : ""} <span className="lic">{c.licence}</span>
-                {c.use ? <span style={{ color: "var(--ink-muted)" }}> · {c.use}</span> : null}
               </li>
             ))}
-            <li>
-              Sounds — synthesised on the device, original <span className="lic">CC0</span>
-            </li>
           </ul>
-          <Colophon
-            rows={[
-              ["Version", `Vyom ${__APP_VERSION__} · engine astronomy-engine ${__ENGINE_BUILD__}`],
-              [
-                "Presets",
-                `${settings.preset.ayanamsa} · ${settings.preset.node} node · ${settings.preset.dashaYearDays} d · ${settings.preset.sunrise}`,
-              ],
-              ["Network", settings.onlineLookupAllowed ? "place search online allowed (names only)" : "none — fully offline"],
-            ]}
-          >
-            <p style={{ margin: "var(--space-3) 0 0" }}>
-              <Link className="linkish" to="/">
-                Back home
-              </Link>
-            </p>
-          </Colophon>
-        </div>
+        </details>
       </div>
-
       <Sheet
         open={mode !== "none"}
         onClose={() => {
