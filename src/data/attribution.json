@@ -12,7 +12,7 @@
       "author": "Don Cross",
       "licence": "MIT",
       "url": "https://github.com/cosinekitty/astronomy",
-      "use": "Tropical apparent longitudes, sidereal time, rise/set, Moon-phase search — the whole ephemeris lane"
+      "use": "Tropical apparent longitudes, sidereal time, rise/set, Moon-phase search: the whole ephemeris lane"
     },
     {
       "id": "luxon",
@@ -78,7 +78,7 @@
       "author": "OpenCV team; packaged by TechStark",
       "licence": "Apache-2.0",
       "url": "https://github.com/TechStark/opencv-js",
-      "use": "CLAHE, black-hat, Hessian, warpPerspective — lazy-loaded on the Hast screen only"
+      "use": "CLAHE, black-hat, Hessian, warpPerspective, lazy-loaded on the Hast screen only"
     },
     {
       "id": "font-sora",
@@ -138,7 +138,7 @@
       "name": "Desk sounds",
       "licence": "CC0-1.0",
       "url": "",
-      "use": "Synthesised on the device with Web Audio — original, no samples shipped",
+      "use": "Synthesised on the device with Web Audio. Original, no samples shipped",
       "author": "Chowki"
     },
     {
@@ -166,7 +166,7 @@
       "id": "panchangam-js",
       "name": "@ishubhamx/panchangam-js",
       "licence": "MIT",
-      "use": "Node-side panchang/dasha cross-check oracle — devDependency only, never in the browser bundle"
+      "use": "Node-side panchang/dasha cross-check oracle, devDependency only, never in the browser bundle"
     }
   ],
   "services": [

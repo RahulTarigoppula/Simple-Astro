@@ -16,12 +16,12 @@ export default function StoryScreen() {
   const minutes = Math.round((slides.length * 30) / 60);
 
   return (
-    <Screen className="story" label="Roots — the story of the stars">
+    <Screen className="story" label="Roots: the story of the stars">
       <header className="story-hero">
         <p className="story-kicker">Roots · कथा</p>
         <h1>The story of the stars</h1>
         <p className="story-lede">
-          Four thousand years of people looking up — gods and ṛṣis, Greeks and astronomers, palm-readers and number-mystics.
+          Four thousand years of people looking up: gods and ṛṣis, Greeks and astronomers, palm-readers and number-mystics.
         </p>
         <div className="story-hero__actions">
           <button type="button" className="stamp story-play" onClick={() => setPlay(0)}>
@@ -63,7 +63,7 @@ export default function StoryScreen() {
       </section>
 
       {play !== null ? (
-        <StoryPlayer title="Roots — the story of the stars" slides={slides} start={play} onClose={() => setPlay(null)} />
+        <StoryPlayer title="Roots: the story of the stars" slides={slides} start={play} onClose={() => setPlay(null)} />
       ) : null}
     </Screen>
   );

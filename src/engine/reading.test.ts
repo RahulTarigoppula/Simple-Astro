@@ -125,7 +125,7 @@ describe("palmSentence()", () => {
   it("low confidence changes the wording, not the claim", () => {
     const s = palmSentence("life-wide", { arcRatio: 0.42, confidence: 0.4 });
     expect(s.text).toBe(
-      "Tradition says a life line sweeping wide into the palm (arc 0.42 of palm width) is read as an outgoing, energetic temperament — the life line is faint in this print; trace it to confirm.",
+      "Tradition says a life line sweeping wide into the palm (arc 0.42 of palm width) is read as an outgoing, energetic temperament. The life line is faint in this print, so trace it to confirm.",
     );
     const sure = palmSentence("life-wide", { arcRatio: 0.42, confidence: 0.9 });
     expect(sure.text.endsWith("energetic temperament.")).toBe(true);

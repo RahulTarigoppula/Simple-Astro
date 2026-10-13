@@ -41,6 +41,6 @@ describe("TimeUnknownNote", () => {
     render(<TimeUnknownNote profile={leaf} patri={patri} />);
     const note = screen.getByRole("note");
     expect(note).toHaveClass("note-haldi", "note--keep");
-    expect(note).toHaveTextContent(/Birth time unknown — cast for local noon/);
+    expect(note).toHaveTextContent(/Birth time unknown, so the chart is cast for local noon/);
   });
 });

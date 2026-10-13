@@ -36,7 +36,7 @@ export const BEATS: Beat[] = [
     id: "rare",
     scene: "rare",
     title: "Some flowers wait twelve years.",
-    line: "Neelakurinji, in the Western Ghats — about as long as Jupiter takes to circle the sky.",
+    line: "Neelakurinji, in the Western Ghats. About as long as Jupiter takes to circle the sky.",
     hold: 8,
   },
   { id: "us", scene: "us", title: "And we looked up.", line: "We named the lights, and told stories about them.", hold: 7 },
@@ -46,14 +46,14 @@ export const BEATS: Beat[] = [
     id: "stories",
     scene: "child",
     quote:
-      "All of the people in India know one or the other of the greatest stories from childhood — like the Rāmāyaṇa and the Mahābhārata.",
+      "All of the people in India know one or the other of the greatest stories from childhood, like the Rāmāyaṇa and the Mahābhārata.",
     hold: 9,
   },
   {
     id: "perspective",
     scene: "child",
     quote:
-      "My love and belief were already there. But my wanting to learn more and read things started with Amish Tripathi's Shiva and Ram series — they gave a new perspective.",
+      "My love and belief were already there. But my wanting to learn more and read things started with Amish Tripathi's Shiva and Ram series. They gave a new perspective.",
     hold: 10,
   },
   {
@@ -72,7 +72,7 @@ export const BEATS: Beat[] = [
     id: "understood",
     scene: "dawn",
     quote:
-      "Then I understood — they act like predictions. We as humans have the capability to learn, predict and better ourselves. Astrology is the same.",
+      "Then I understood. They act like predictions. We as humans have the capability to learn, predict and better ourselves. Astrology is the same.",
     hold: 10,
   },
   {

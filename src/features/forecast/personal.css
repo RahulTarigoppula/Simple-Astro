@@ -315,3 +315,15 @@
   line-height: 1.6;
   color: var(--ink);
 }
+
+/* Review: lighter chips, calmer hero */
+.fc-chip,
+.fc-chip.mono,
+.fc-chip .mono {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+.fc-guide__hours {
+  gap: 8px;
+}

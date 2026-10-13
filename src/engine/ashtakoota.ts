@@ -172,7 +172,7 @@ export function kootas(a: MoonPlacement, b: MoonPlacement, opts: AshtakootaOptio
     YONI_POINTS[rel],
     rel === "same"
       ? `Yoni: both ${YONI_LABEL[ya]}`
-      : `Yoni: ${YONI_LABEL[ya]} and ${YONI_LABEL[yb]} — ${rel === "sworn" ? "sworn rivals" : rel}`,
+      : `Yoni: ${YONI_LABEL[ya]} and ${YONI_LABEL[yb]}, ${rel === "sworn" ? "sworn rivals" : rel}`,
   );
 
   // 5 Graha Maitrī — the Moon-sign lords, read both ways
@@ -226,7 +226,7 @@ export function kootas(a: MoonPlacement, b: MoonPlacement, opts: AshtakootaOptio
       cancellation,
     );
   } else {
-    bhakoot = mk("bhakoot", 7, `Bhakūṭa: ${signName(a.sign)} and ${signName(b.sign)} lie on the ${axis} axis — no doṣa`);
+    bhakoot = mk("bhakoot", 7, `Bhakūṭa: ${signName(a.sign)} and ${signName(b.sign)} lie on the ${axis} axis, so no doṣa`);
   }
 
   // 8 Nāḍī

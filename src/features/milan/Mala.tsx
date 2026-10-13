@@ -215,7 +215,7 @@ export function Mala({ result, onOpen }: MalaProps) {
           )}
         </div>
         <p className="vh" aria-live="polite">
-          {phase === "done" ? `${fmtPts(result.total)} of 36 points — ${band}.` : ""}
+          {phase === "done" ? `${fmtPts(result.total)} of 36 points: ${band}.` : ""}
         </p>
       </div>
 
@@ -261,10 +261,10 @@ export function Mala({ result, onOpen }: MalaProps) {
                   {doshaLine(k)}
                   <span className="knote__src">
                     {" "}
-                    — {k.citation.text}, {k.citation.ref}
+                    ({k.citation.text}, {k.citation.ref})
                   </span>
                   {k.cancellation && !k.cancellation.applied ? (
-                    <span className="knote__exc"> An exception is recorded — {exceptionText(k.cancellation.rule)} — and not applied.</span>
+                    <span className="knote__exc"> An exception is recorded ({exceptionText(k.cancellation.rule)}) but not applied.</span>
                   ) : null}
                 </p>
               ) : k.cancellation?.applied ? (

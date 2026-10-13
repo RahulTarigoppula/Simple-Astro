@@ -25,7 +25,7 @@ const PERIODS: Array<{ id: Period; label: string }> = [
   { id: "year", label: "Year" },
 ];
 const DAY = 86_400_000;
-const TONE_WORD = { bright: "Bright", steady: "Steady", mixed: "Mixed", testing: "Testing" } as const;
+const TONE_WORD = { bright: "Bright", steady: "Steady", mixed: "Mixed", testing: "Quiet" } as const;
 const TONE_HINT = {
   bright: "Most of the sky favours you",
   steady: "More help than hindrance",
@@ -69,9 +69,9 @@ function eventText(e: SkyEvent): string {
     case "ekadashi":
       return `${e.shukla ? "Śukla" : "Kṛṣṇa"} Ekādaśī begins`;
     case "lunar-eclipse":
-      return `${e.eclipse} lunar eclipse${e.visibleHere ? " — visible here" : " (not visible here)"}`;
+      return `${e.eclipse} lunar eclipse${e.visibleHere ? " (visible here)" : " (not visible here)"}`;
     case "solar-eclipse":
-      return `${e.eclipse} solar eclipse${e.visibleHere ? " — visible here" : " (not visible here)"}`;
+      return `${e.eclipse} solar eclipse${e.visibleHere ? " (visible here)" : " (not visible here)"}`;
     case "sankranti":
       return `Sun enters ${sign?.name} (${sign?.western})`;
     case "ingress":
@@ -307,13 +307,13 @@ export default function ForecastScreen() {
               <div className="fc-moon__row">
                 <GrahaGlyph id="MO" size={44} />
                 <p>
-                  The Moon is in your <strong>{ord(f.steps[0].moonHouse)} house</strong> from your Moon sign — the area of{" "}
+                  The Moon is in your <strong>{ord(f.steps[0].moonHouse)} house</strong> from your Moon sign, the area of{" "}
                   {HOUSE_AREA[f.steps[0].moonHouse]}. Today's star is <strong>{f.steps[0].tara}</strong> for you (
                   {f.steps[0].taraTone === "kind"
                     ? "a kind one"
                     : f.steps[0].taraTone === "unkind"
                       ? "one tradition calls unkind"
-                      : "your own birth star — mixed"}
+                      : "your own birth star, so mixed"}
                   ) <InfoDot id="tara-bala" />.
                 </p>
               </div>
@@ -349,7 +349,7 @@ export default function ForecastScreen() {
                   ))}
                 </ul>
               ) : (
-                <p className="p p--muted">No planet in a favourable house for this period — a time to rest and plan.</p>
+                <p className="p p--muted">No planet in a favourable house for this period. A time to rest and plan.</p>
               )}
             </section>
             <section className="cosmic-card fc-list fc-list--care">
@@ -368,7 +368,7 @@ export default function ForecastScreen() {
                   ))}
                 </ul>
               ) : (
-                <p className="p p--muted">Nothing strained — every listed planet is in a supportive house.</p>
+                <p className="p p--muted">Nothing strained. Every listed planet is in a supportive house.</p>
               )}
             </section>
           </div>
@@ -378,14 +378,14 @@ export default function ForecastScreen() {
               <GrahaGlyph id="SA" size={44} />
               <div>
                 <h2>
-                  {f.sadeSati === "kantaka" ? "Kaṇṭaka Śani" : f.sadeSati === "ashtama" ? "Aṣṭama Śani" : `Sāḍe Sātī — ${f.sadeSati} phase`}{" "}
+                  {f.sadeSati === "kantaka" ? "Kaṇṭaka Śani" : f.sadeSati === "ashtama" ? "Aṣṭama Śani" : `Sāḍe Sātī, ${f.sadeSati} phase`}{" "}
                   <InfoDot id="sade-sati" />
                 </h2>
                 <p>
                   {f.sadeSati === "kantaka"
-                    ? "Saturn is in a 'thorn' house (4th, 7th or 10th) from your Moon — tradition reads extra effort at home, in partnerships or at work."
+                    ? "Saturn is in a 'thorn' house (4th, 7th or 10th) from your Moon. Tradition reads extra effort at home, in partnerships or at work."
                     : f.sadeSati === "ashtama"
-                      ? "Saturn is in the 8th from your Moon — a stretch tradition associates with slow, deep change."
+                      ? "Saturn is in the 8th from your Moon, a stretch tradition associates with slow, deep change."
                       : "Saturn is passing over your Moon sign's neighbourhood: a 7½-year season of responsibility and maturing. Everyone meets it about every 30 years."}
                 </p>
               </div>
@@ -444,7 +444,7 @@ export default function ForecastScreen() {
                 {py}
               </span>
               <p>
-                <strong>Personal year {py}</strong> in numerology —{" "}
+                <strong>Personal year {py}</strong> in numerology:{" "}
                 {lore(({ 1: "SU", 2: "MO", 3: "JU", 4: "RA", 5: "ME", 6: "VE", 7: "KE", 8: "SA", 9: "MA" } as const)[py as 1])?.english}'s
                 year, read as a time for{" "}
                 {lore(({ 1: "SU", 2: "MO", 3: "JU", 4: "RA", 5: "ME", 6: "VE", 7: "KE", 8: "SA", 9: "MA" } as const)[py as 1])?.signifies}.{" "}
@@ -458,15 +458,15 @@ export default function ForecastScreen() {
           <aside className="fc-karma">
             <span className="fc-karma__k">कर्म · Karma, not fate</span>
             <p>
-              A forecast shows what <em>could</em> happen — like the weather. What does happen is shaped by your karma: your own choices and
+              A forecast shows what <em>could</em> happen, like the weather. What does happen is shaped by your karma: your own choices and
               actions. Use this to reflect and plan, never to fear.
             </p>
           </aside>
 
           <p className="fc-foot">
             How this is read: each planet's house is counted from the natal Moon sign and checked against the classical table of favourable
-            houses (Phaladīpikā ch. 26); days add the Moon's Tārā-bala and Candra-bala. It is a traditional reading for reflection — not a
-            prediction of events and not advice.
+            houses (Phaladīpikā ch. 26); days add the Moon's Tārā-bala and Candra-bala. It is a traditional reading for reflection. It is
+            not a prediction of events and not advice.
           </p>
         </>
       ) : (

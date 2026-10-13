@@ -36,7 +36,7 @@ function SavChart({
   const svgRef = useRef<SVGSVGElement>(null);
   const titleId = useId();
   const tableId = useId();
-  const title = "Sarvāṣṭakavarga — bindus per house";
+  const title = "Sarvāṣṭakavarga: bindus per house";
 
   const marks = useMemo(() => {
     const out: React.ReactNode[] = [];
@@ -175,7 +175,7 @@ export function AshtakavargaSection({ patri, script, style, skipInk = false }: A
         </div>
       </div>
       <p className="figcap">
-        Sarvāṣṭakavarga — the bindus of all seven grahas in each house ({sum(av.sav)} in all). A dot marks {SAV_STRONG} or more; the tilak
+        Sarvāṣṭakavarga: the bindus of all seven grahas in each house ({sum(av.sav)} in all). A dot marks {SAV_STRONG} or more; the tilak
         marks the Lagna in {SIGN_NAMES[lagnaSign]}.
       </p>
 
@@ -241,7 +241,7 @@ export function AshtakavargaSection({ patri, script, style, skipInk = false }: A
         </table>
       </div>
       <p className="p p--muted av-legend">
-        <span className="av-dot" aria-hidden="true" /> {TRANSIT_SMOOTH} or more bindus — a sign tradition reads as smoother for that graha's
+        <span className="av-dot" aria-hidden="true" /> {TRANSIT_SMOOTH} or more bindus: a sign tradition reads as smoother for that graha's
         transit.
       </p>
 

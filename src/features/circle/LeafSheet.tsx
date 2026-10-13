@@ -81,7 +81,7 @@ export function LeafSheet(props: LeafSheetProps) {
             <BurnHold
               className="leafsheet__row leafsheet__burn"
               label="Hold to delete"
-              ariaLabel={`Delete ${name} — hold to delete them and their palm photos from this device`}
+              ariaLabel={`Delete ${name}, hold to delete them and their palm photos from this device`}
               onProgress={props.onBurnProgress}
               onBurn={props.onBurn}
             />
@@ -95,7 +95,7 @@ export function LeafSheet(props: LeafSheetProps) {
             First person: <b>{name}</b>. Choose the second person to compare.
           </p>
           {others.length === 0 ? (
-            <p className="p">There is no one else saved yet — add another person first.</p>
+            <p className="p">There is no one else saved yet. Add another person first.</p>
           ) : (
             <ul className="leafsheet__list">
               {others.map((o) => {
@@ -146,7 +146,7 @@ function ExportForm({ onDone, onBack }: { onDone: () => void; onBack: () => void
       const blob = await exportEnvelope(pass);
       await saveFile(blob, envelopeFileName(), "Vyom encrypted backup");
       play("thunk");
-      toast("Encrypted backup saved (AES-GCM). Keep the passphrase — it cannot be recovered.");
+      toast("Encrypted backup saved (AES-GCM). Keep the passphrase safe. It cannot be recovered.");
       onDone();
     } catch (e) {
       setErr(`Could not create the backup: ${e instanceof Error ? e.message : String(e)}`);
@@ -166,8 +166,8 @@ function ExportForm({ onDone, onBack }: { onDone: () => void; onBack: () => void
       }}
     >
       <p className="p p--muted">
-        The backup holds everything — every person, chart and palm photo — encrypted with your passphrase (AES-GCM, PBKDF2 600 000 rounds).
-        Nothing is sent anywhere; the file is handed to you.
+        The backup holds every person, chart and palm photo, encrypted with your passphrase (AES-GCM, PBKDF2 600 000 rounds). Nothing is
+        sent anywhere; the file is handed to you.
       </p>
       <div className="field">
         <label htmlFor="env-pass">Passphrase</label>

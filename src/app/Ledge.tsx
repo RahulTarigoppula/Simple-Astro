@@ -39,9 +39,9 @@ export function Ledge() {
   );
   return (
     <nav className="ledge" aria-label="Main navigation">
-      {item("/", "Home", "Home — the sky now", <IconHome />, true)}
+      {item("/", "Home", "Home: the sky now", <IconHome />, true)}
       {item(patriTo, "Chart", active ? `Birth chart of ${active.name}` : "Add a person", <IconChart />)}
-      {item(forecastTo, "Forecast", "Forecast — day to year", <IconForecast />)}
+      {item(forecastTo, "Forecast", "Forecast, day to year", <IconForecast />)}
       {item("/today", "Today", "Today's almanac", <IconToday />)}
       {item("/explore", "Explore", "Explore gods, signs and stars", <IconSky />)}
       {item("/circle", "People", "Your saved people", <IconCircle />)}

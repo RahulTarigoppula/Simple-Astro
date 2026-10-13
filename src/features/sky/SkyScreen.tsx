@@ -46,9 +46,9 @@ const PRESET_SHORT: Record<AyanamsaPreset, string> = { "se-true": "SE-true", "se
 
 type Fallback = "reduced" | "nogl" | "lost" | null;
 const FALLBACK_NOTE: Record<Exclude<Fallback, null>, string> = {
-  reduced: "Painted sky — reduced motion is on, so the 3D dome stays folded.",
-  nogl: "Painted sky — this device offers no WebGL for the 3D dome.",
-  lost: "Painted sky — the 3D dome lost its graphics context.",
+  reduced: "Painted sky. Reduced motion is on, so the 3D dome stays folded.",
+  nogl: "Painted sky. This device offers no WebGL for the 3D dome.",
+  lost: "Painted sky. The 3D dome lost its graphics context.",
 };
 
 function hasWebGL(): boolean {

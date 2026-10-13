@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.1 (2026-10-14)
+
+- Every user-facing sentence rewritten without em-dashes and without stock phrases: short, plain sentences across screens, the glossary, the myths, Roots, forecasts and rules.
+- Rahul's quotes: punctuation only (no word changed).
+- Explore: chips to start the wheel at your birth star, Moon sign and rising sign; a Surprise me button; off-topic cards removed; no orphan fact box.
+- Forecast: the low tone reads Quiet instead of Testing; hour chips in the body font.
+
 ## 0.7.0 — 2026-10-14
 
 Simpler everywhere.

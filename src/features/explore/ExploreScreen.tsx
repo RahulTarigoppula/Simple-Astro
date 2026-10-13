@@ -12,6 +12,7 @@ import { EXALTATION, naturalRelation, OWN_SIGNS } from "../../data/tables/dignit
 import { GANA_BY_NAK, GANA_LABEL, YONI_BY_NAK, YONI_LABEL } from "../../data/tables/koota";
 import { NAK_LORDS, NAKSHATRA_DEV, NAKSHATRA_NAMES } from "../../data/tables/names";
 import { transitsAt } from "../../engine/gochar";
+import { mulberry32 } from "../../engine/math";
 import { birthNumbers, CHINESE_ANIMALS, chineseZodiac, NUMBER_GRAHA, nameNumber, personalYear } from "../../engine/profile";
 import { GRAHA_IDS, type GrahaId } from "../../engine/types";
 import "../cosmic/cosmic.css";
@@ -102,7 +103,7 @@ function GrahaDetail({ id }: { id: GrahaId }) {
               </span>,
             ],
             ["Rules", own.length ? own.map((s) => RASHI_LORE[s]?.name).join(", ") : "no sign (a shadow graha)"],
-            ["Exalted in", ex ? `${RASHI_LORE[ex[0]]?.name} (${RASHI_LORE[ex[0]]?.western})` : "—"],
+            ["Exalted in", ex ? `${RASHI_LORE[ex[0]]?.name} (${RASHI_LORE[ex[0]]?.western})` : "–"],
           ]}
         />
       </section>
@@ -183,10 +184,10 @@ function RashiDetail({ i }: { i: number }) {
         <Facts
           rows={[
             ["Element", r.element],
-            ["Quality", `${r.quality} — ${r.quality === "Movable" ? "starts things" : r.quality === "Fixed" ? "holds steady" : "adapts"}`],
+            ["Quality", `${r.quality}: ${r.quality === "Movable" ? "starts things" : r.quality === "Fixed" ? "holds steady" : "adapts"}`],
             ["Ruled by", <Link key="r" to={`/explore/graha/${r.ruler}`}>{`${lore(r.ruler)?.name} (${lore(r.ruler)?.english})`}</Link>],
             ["Body (Kāla-puruṣa)", r.body],
-            ["Western sign", `${r.western} — about 24° ahead of this sidereal sign`],
+            ["Western sign", `${r.western}, about 24° ahead of this sidereal sign`],
           ]}
         />
       </section>
@@ -208,7 +209,7 @@ function RashiDetail({ i }: { i: number }) {
         {active && patri ? (
           <p>
             <strong>In {active.name}'s chart:</strong> {mineHere.length ? mineHere.map((g) => lore(g)?.english).join(", ") : "empty"}
-            {patri.lagna.sign === i ? " — and it is the rising sign" : ""}.
+            {patri.lagna.sign === i ? ", and it is the rising sign" : ""}.
           </p>
         ) : null}
       </section>
@@ -284,15 +285,15 @@ function NakshatraDetail({ i }: { i: number }) {
 
 // ── numbers ───────────────────────────────────────────────────────────────
 const NUMBER_MEANING: Record<number, string> = {
-  1: "a leader — independent, proud, original",
-  2: "a feeler — gentle, imaginative, diplomatic",
-  3: "a teacher — wise, generous, expansive",
-  4: "a rebel — unconventional, inventive, restless",
-  5: "a communicator — quick, witty, adaptable",
-  6: "a lover — warm, artistic, home-making",
-  7: "a seeker — inward, intuitive, spiritual",
-  8: "a builder — patient, serious, enduring",
-  9: "a warrior — brave, energetic, direct",
+  1: "a leader: independent, proud, original",
+  2: "a feeler: gentle, imaginative, diplomatic",
+  3: "a teacher: wise, generous, expansive",
+  4: "a rebel: unconventional, inventive, restless",
+  5: "a communicator: quick, witty, adaptable",
+  6: "a lover: warm, artistic, home-making",
+  7: "a seeker: inward, intuitive, spiritual",
+  8: "a builder: patient, serious, enduring",
+  9: "a warrior: brave, energetic, direct",
 };
 
 function Numbers() {
@@ -316,7 +317,7 @@ function Numbers() {
                 {lore(g)?.english} ({lore(g)?.name})
               </Link>
             ) : null}{" "}
-            — {NUMBER_MEANING[v] ?? ""}
+            is {NUMBER_MEANING[v] ?? ""}
           </p>
           <p className="ex-num__how">{how}</p>
         </div>
@@ -337,7 +338,7 @@ function Numbers() {
         <div>
           <p className="ex-kicker">Aṅka Jyotiṣa · Numerology</p>
           <h1>Your numbers</h1>
-          <p className="ex-sub">Each digit 1–9 belongs to a graha. Just for fun — no scientific basis.</p>
+          <p className="ex-sub">Each digit 1–9 belongs to a graha. Just for fun. There is no scientific basis.</p>
         </div>
       </header>
       {profiles && profiles.length > 1 ? (
@@ -391,7 +392,7 @@ function Numbers() {
               {p.name}'s {n.root} ({lore(NUMBER_GRAHA[n.root as 1])?.english}) and {q.name}'s {nq.root} (
               {lore(NUMBER_GRAHA[nq.root as 1])?.english}):{" "}
               {rel === "self"
-                ? "the same number — like-minded"
+                ? "the same number, so like-minded"
                 : rel === "friend"
                   ? "friends"
                   : rel === "neutral"
@@ -435,7 +436,7 @@ function Chinese() {
         <p>
           The Jade Emperor called all the animals to a race across a great river; the order they arrived would name the years. The clever
           Rat rode on the Ox's back and leapt ashore first. The Ox came second, then the Tiger, the Rabbit hopping across stones, the Dragon
-          (who stopped to bring rain), the Horse — startled at the bank by the Snake hidden on its hoof — the Goat, Monkey and Rooster
+          (who stopped to bring rain), the Horse (startled at the bank by the Snake hidden on its hoof), the Goat, Monkey and Rooster
           sharing a raft, the Dog who stopped to bathe, and last the Pig, who had stopped to eat and nap.
         </p>
       </section>
@@ -447,7 +448,7 @@ function Chinese() {
               const c = chineseZodiac(p.birth.utcMs);
               return (
                 <li key={p.id}>
-                  <strong>{p.name}</strong> — {c.element} {c.animal} ({c.yin ? "yin" : "yang"}), lunar year {c.year}
+                  <strong>{p.name}</strong>: {c.element} {c.animal} ({c.yin ? "yin" : "yang"}), lunar year {c.year}
                 </li>
               );
             })}
@@ -456,7 +457,7 @@ function Chinese() {
           <p className="p--muted">No one saved yet.</p>
         )}
         <p className="p--muted ex-note">
-          The year starts at Chinese New Year (a new moon between 21 January and 20 February), not on 1 January — so early-year birthdays
+          The year starts at Chinese New Year (a new moon between 21 January and 20 February), not on 1 January, so early-year birthdays
           often belong to the previous animal.
         </p>
       </section>
@@ -481,6 +482,14 @@ function Hub() {
   const patri = p && active && p.profileId === active.id ? p : null;
   const [sel, setSel] = useState<WheelSel>(() => ({ kind: "nak", i: sky.MO.nakshatra }));
   const [playing, setPlaying] = useState(false);
+  const surprise = () => {
+    // Seeded from the clock (Math.random is never used in Vyom).
+    const r = mulberry32(Date.now() % 2147483647)();
+    const k = Math.floor(r * 48);
+    if (k < 9) setSel({ kind: "graha", id: GRAHA_IDS[k] ?? "SU" });
+    else if (k < 21) setSel({ kind: "rashi", i: k - 9 });
+    else setSel({ kind: "nak", i: k - 21 });
+  };
   const panel = panelFor(sel, sky, patri, active?.name ?? null);
   const kinds = [
     ["graha", "9 Planets"],
@@ -509,6 +518,24 @@ function Hub() {
           </button>
         ))}
       </div>
+
+      {patri && active ? (
+        <div className="ex-you" role="group" aria-label={`Start with ${active.name}'s sky`}>
+          <button type="button" onClick={() => setSel({ kind: "nak", i: patri.grahas.MO.nakshatra })}>
+            ★ {NAKSHATRA_NAMES[patri.grahas.MO.nakshatra]} <span>birth star</span>
+          </button>
+          <button type="button" onClick={() => setSel({ kind: "rashi", i: patri.grahas.MO.sign })}>
+            ☾ {RASHI_LORE[patri.grahas.MO.sign]?.name} <span>Moon sign</span>
+          </button>
+          <button type="button" onClick={() => setSel({ kind: "rashi", i: patri.lagna.sign })}>
+            ↑ {RASHI_LORE[patri.lagna.sign]?.name} <span>rising sign</span>
+          </button>
+        </div>
+      ) : null}
+
+      <button type="button" className="ex-surprise" onClick={surprise}>
+        ✦ Surprise me
+      </button>
 
       <div className="ex-stage">
         <SkyWheel
@@ -580,16 +607,6 @@ function Hub() {
           <span className="ex-learn__k">Shēngxiào</span>
           <span className="ex-learn__t">Chinese zodiac</span>
           <span className="ex-learn__s">The Great Race and your animal</span>
-        </Link>
-        <Link to="/guide" className="ex-learn__card ex-learn__card--cyan">
-          <span className="ex-learn__k">Guide · 50+ words</span>
-          <span className="ex-learn__t">Plain English</span>
-          <span className="ex-learn__s">What every term means</span>
-        </Link>
-        <Link to="/forecast" className="ex-learn__card ex-learn__card--gold">
-          <span className="ex-learn__k">Bhaviṣya</span>
-          <span className="ex-learn__t">Your forecast</span>
-          <span className="ex-learn__s">Day to year, read from the sky</span>
         </Link>
       </nav>
 

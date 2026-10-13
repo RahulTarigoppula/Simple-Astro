@@ -135,14 +135,14 @@ export default function ChowkiScreen() {
   const nakLore = p ? NAKSHATRA_LORE[p.nakshatra.index] : undefined;
   const skyLine = p
     ? p.tithi.index === 15
-      ? `Full Moon tonight, in ${NAKSHATRA_NAMES[p.nakshatra.index]} — “${nakLore?.meaning}”.`
+      ? `Full Moon tonight, in ${NAKSHATRA_NAMES[p.nakshatra.index]}, “${nakLore?.meaning}”.`
       : p.tithi.index === 30
-        ? `New Moon — the sky is dark, and the Moon rests beside the Sun.`
-        : `The Moon walks through ${NAKSHATRA_NAMES[p.nakshatra.index]} — “${nakLore?.meaning}” — on the ${ORD[dayOf] ?? dayOf} day of the ${waxing ? "waxing" : "waning"} Moon.`
+        ? `New Moon. The sky is dark, and the Moon rests beside the Sun.`
+        : `The Moon walks through ${NAKSHATRA_NAMES[p.nakshatra.index]} (“${nakLore?.meaning}”) on the ${ORD[dayOf] ?? dayOf} day of the ${waxing ? "waxing" : "waning"} Moon.`
     : "";
 
   return (
-    <Screen className="chowki" label="Vyom — home">
+    <Screen className="chowki" label="Vyom home">
       <header className="home-head">
         <div className="home-brand">
           <span className="home-mark" aria-hidden="true" />
@@ -208,7 +208,7 @@ export default function ChowkiScreen() {
         <Link
           to={active ? `/patri/${active.id}/sky` : "/explore"}
           className="home-orbit"
-          aria-label="The sky right now — open it"
+          aria-label="Open the sky right now"
           onClick={(e) => rememberOrigin(e.currentTarget)}
         >
           <ZodiacOrbit
@@ -245,7 +245,7 @@ export default function ChowkiScreen() {
           <Link to="/story" className="home-big home-big--gold">
             <IconStory size={26} />
             <span className="home-big__t">Roots</span>
-            <span className="home-big__s">Gods, sages and stars — the story</span>
+            <span className="home-big__s">Gods, sages and stars: the story</span>
           </Link>
         ) : (
           <Link to="/forecast" className="home-big home-big--gold">

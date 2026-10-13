@@ -122,7 +122,7 @@ export function savReadings(byHouse: readonly number[]): AvReading[] {
       id: "sav-strong",
       houses: strong,
       citation: CITE.sav28,
-      text: `Tradition says houses holding ${SAV_STRONG} or more bindus are where a chart finds steadier support — here ${houseList(strong)}.`,
+      text: `Tradition says houses holding ${SAV_STRONG} or more bindus are where a chart finds steadier support. Here: ${houseList(strong)}.`,
     });
   }
   if (effort.length > 0) {
@@ -130,7 +130,7 @@ export function savReadings(byHouse: readonly number[]): AvReading[] {
       id: "sav-effort",
       houses: effort,
       citation: CITE.sav28,
-      text: `Tradition says houses below ${SAV_EFFORT} bindus ask for more patient effort — here ${houseList(effort)}.`,
+      text: `Tradition says houses below ${SAV_EFFORT} bindus ask for more patient effort. Here: ${houseList(effort)}.`,
     });
   } else {
     out.push({
@@ -178,7 +178,7 @@ export function ashtakavargaReadings(av: Ashtakavarga): AvReading[] {
     out.push({
       id: "transit",
       citation: CITE.phaladipika24,
-      text: `Tradition says ${GRAHA_NAMES.SA}'s slow transits pass more smoothly through signs where its own Aṣṭakavarga holds ${TRANSIT_SMOOTH} or more bindus — here ${list}.`,
+      text: `Tradition says ${GRAHA_NAMES.SA}'s slow transits pass more smoothly through signs where its own Aṣṭakavarga holds ${TRANSIT_SMOOTH} or more bindus. Here: ${list}.`,
     });
   }
   return out;

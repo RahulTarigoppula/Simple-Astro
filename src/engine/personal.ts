@@ -142,7 +142,7 @@ const NATAL_MEANS: Record<GrahaId | "LAGNA", string> = {
 const TRANSIT_DOES: Record<GrahaId, string> = {
   SU: "shines a light on",
   MO: "stirs",
-  MA: "energises — and can overheat —",
+  MA: "energises (and can overheat)",
   ME: "sharpens",
   JU: "expands and blesses",
   VE: "sweetens",
@@ -165,10 +165,10 @@ export function personalReading(patri: Patri, atMs: number, preset: EnginePreset
     const b = binduFor(av, g, tr[g].sign);
     const text =
       b >= 5
-        ? `${Name(g)} moves through a sign where your chart gives it ${b} of 8 points — a strong passage.`
+        ? `${Name(g)} moves through a sign where your chart gives it ${b} of 8 points, a strong passage.`
         : b === 4
-          ? `${Name(g)} has ${b} of 8 points in its current sign — an average passage.`
-          : `${Name(g)} has only ${b} of 8 points in its current sign — its gifts arrive with effort.`;
+          ? `${Name(g)} has ${b} of 8 points in its current sign, an average passage.`
+          : `${Name(g)} has only ${b} of 8 points in its current sign, so its gifts arrive with effort.`;
     return { graha: g, sign: tr[g].sign, bindus: b, text };
   });
 
@@ -187,7 +187,7 @@ export function personalReading(patri: Patri, atMs: number, preset: EnginePreset
           transit: t,
           natal: n,
           orb: o,
-          text: `${Name(t)} is crossing your birth ${n === "LAGNA" ? "rising degree" : NAME[n].replace("the ", "")} (within ${o.toFixed(1)}°) — it ${TRANSIT_DOES[t]} your ${NATAL_MEANS[n]}.`,
+          text: `${Name(t)} is crossing your birth ${n === "LAGNA" ? "rising degree" : NAME[n].replace("the ", "")} (within ${o.toFixed(1)}°). It ${TRANSIT_DOES[t]} your ${NATAL_MEANS[n]}.`,
         });
       }
     }

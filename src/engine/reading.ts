@@ -541,7 +541,7 @@ export function palmSentence(ruleId: PalmRuleId, values: Readonly<Record<string,
   let text = fill(list[idx] ?? list[0] ?? "", printable);
   const confidence = values.confidence;
   if (spec.line && confidence !== undefined && confidence < LOW_CONFIDENCE) {
-    text = `${text.slice(0, -1)} — the ${spec.line} line is faint in this print; trace it to confirm.`;
+    text = `${text} The ${spec.line} line is faint in this print, so trace it to confirm.`;
   }
   const measured = spec.values.map((k) => `${k} ${printable[k] ?? ""}`).join(" · ");
   return { ruleId, text, citation: spec.citation, measured };

@@ -200,10 +200,10 @@ export default function LeafScreen() {
       await saveSettings({ activeProfileId: profile.id });
       play("thunk");
       haptics.impact("medium");
-      toast(`Saved — ${name}. Their birth chart is ready.`);
+      toast(`Saved ${name}. Their birth chart is ready.`);
       navigate(`/patri/${profile.id}`);
     } catch (e) {
-      toast(`Could not save — ${e instanceof Error ? e.message : String(e)}`, "danger");
+      toast(`Could not save: ${e instanceof Error ? e.message : String(e)}`, "danger");
     }
   };
 
@@ -226,7 +226,7 @@ export default function LeafScreen() {
     } catch (e) {
       setOnline("failed");
       setManual(true);
-      toast(e instanceof NetError ? "The wire is quiet — type the coordinates." : "Not found; you can type the coordinates.", "warn");
+      toast(e instanceof NetError ? "No connection. Type the coordinates instead." : "Not found; you can type the coordinates.", "warn");
     }
   };
 
@@ -341,7 +341,7 @@ export default function LeafScreen() {
         {draft.timeUnknown ? (
           <p className="note-haldi" role="status">
             <span aria-hidden="true">⚑</span>
-            <span>Clock time unknown — the hour and minute drums are set aside and the chart is cast for 12:00 local.</span>
+            <span>Clock time unknown. The hour and minute drums are set aside and the chart is cast for 12:00 local.</span>
           </p>
         ) : null}
         <p className="vh" aria-live="polite">
@@ -424,13 +424,13 @@ export default function LeafScreen() {
                 <span>
                   LAGNA {lg != null ? `${SIGN_MARK[lg]} ` : ""}
                   <b className="lg">
-                    <DigitSet text={lg != null ? (SIGN_ENGRAVED[lg] ?? "") : "—"} />
+                    <DigitSet text={lg != null ? (SIGN_ENGRAVED[lg] ?? "") : "–"} />
                   </b>
                 </span>
               </>
             ) : (
               <span>
-                {resolved.err?.code === "TIME_AMBIGUOUS" || resolved.err?.code === "TIME_INVALID" ? "THE CLOCK NEEDS THE OFFSET DRUM" : "—"}
+                {resolved.err?.code === "TIME_AMBIGUOUS" || resolved.err?.code === "TIME_INVALID" ? "THE CLOCK NEEDS THE OFFSET DRUM" : "–"}
               </span>
             )}
           </div>
@@ -445,7 +445,7 @@ export default function LeafScreen() {
         {resolved.err?.code === "TIME_AMBIGUOUS" ? (
           <p className="note-haldi" role="status">
             <span aria-hidden="true">⚑</span>
-            <span>This clock time happened twice here — set the offset drum to say which.</span>
+            <span>This clock time happened twice here. Set the offset drum to say which.</span>
           </p>
         ) : null}
         {draft.override !== "none" ? (

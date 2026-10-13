@@ -112,7 +112,7 @@ export function lineFor(id: GrahaId, house: number): ForecastLine {
   const favourable = GOCHAR_FAVOURABLE[id].includes(house);
   const area = HOUSE_AREA[house] ?? "";
   const text = favourable
-    ? `${NAME[id]} in the ${ord(house)} from your Moon supports ${area} — ${GRAHA_THEME[id]} work in your favour.`
+    ? `${NAME[id]} in the ${ord(house)} from your Moon supports ${area}, and ${GRAHA_THEME[id]} work in your favour.`
     : `${NAME[id]} in the ${ord(house)} from your Moon asks for care with ${area}; ${GRAHA_THEME[id]} may feel strained.`;
   return { graha: id, house, favourable, text };
 }
@@ -207,15 +207,15 @@ function toneOf(score: number): Forecast["tone"] {
 
 const HEADLINE: Record<Period, Record<Forecast["tone"], string>> = {
   day: {
-    bright: "A supported day — good for starting things and meeting people.",
-    steady: "A steady day — ordinary progress, nothing to force.",
-    mixed: "A mixed day — keep plans simple and stay patient.",
-    testing: "A quiet day by tradition — finish old work rather than begin new.",
+    bright: "A supported day. Good for starting things and meeting people.",
+    steady: "A steady day: ordinary progress, nothing to force.",
+    mixed: "A mixed day. Keep plans simple and stay patient.",
+    testing: "A quiet day by tradition. Finish old work rather than begin new.",
   },
   week: {
     bright: "A bright week: most of the sky is on your side.",
     steady: "A steady week with a few easy openings.",
-    mixed: "A mixed week: pick your moments — see the good days below.",
+    mixed: "A mixed week: pick your moments. The good days are below.",
     testing: "A testing week by tradition: rest, plan and avoid big gambles.",
   },
   month: {
@@ -233,7 +233,7 @@ const HEADLINE: Record<Period, Record<Forecast["tone"], string>> = {
   year: {
     bright: "A year of expansion by the classical reckoning.",
     steady: "A year of steady building.",
-    mixed: "A year of give and take — both growth and lessons.",
+    mixed: "A year of give and take, with both growth and lessons.",
     testing: "A year of hard-won lessons; tradition promises they last.",
   },
 };

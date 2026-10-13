@@ -40,7 +40,7 @@ export function panelFor(sel: WheelSel, sky: Record<GrahaId, TransitGraha>, patr
       kicker: `Graha · ${g?.title ?? ""}`,
       title: g?.name ?? "",
       dev: g?.dev,
-      tagline: `${g?.english} — ${g?.signifies}`,
+      tagline: `${g?.english}: ${g?.signifies}`,
       art: (
         <div className="panel-glyph">
           <span className="panel-glyph__orbit" />
@@ -53,8 +53,8 @@ export function panelFor(sel: WheelSel, sky: Record<GrahaId, TransitGraha>, patr
         ["Colour", g?.colour ?? ""],
         ["Gem", g?.gem ?? ""],
         ["Rides", g?.vehicle ?? ""],
-        ["Rules", own.length ? own.map((s) => RASHI_LORE[s]?.name).join(", ") : "no sign — a shadow graha"],
-        ["Exalted in", ex ? `${RASHI_LORE[ex[0]]?.name}` : "—"],
+        ["Rules", own.length ? own.map((s) => RASHI_LORE[s]?.name).join(", ") : "no sign (a shadow graha)"],
+        ["Exalted in", ex ? `${RASHI_LORE[ex[0]]?.name}` : "–"],
         ["Mantra", g?.mantra ?? ""],
       ],
       now: `Now in ${RASHI_LORE[now.sign]?.name} (${RASHI_LORE[now.sign]?.western}), ${NAKSHATRA_NAMES[now.nakshatra]}${now.retrograde && sel.id !== "RA" && sel.id !== "KE" ? ", retrograde" : ""}.`,
@@ -75,7 +75,7 @@ export function panelFor(sel: WheelSel, sky: Record<GrahaId, TransitGraha>, patr
       kicker: `Rāśi ${sel.i + 1} of 12 · ${r?.element} · ${r?.quality}`,
       title: r?.name ?? "",
       dev: r?.dev,
-      tagline: `${r?.western} · ${r?.symbol} — ${r?.nature}`,
+      tagline: `${r?.western} · ${r?.symbol}: ${r?.nature}`,
       art: <StarPatch from={sel.i * 30} span={30} lat={24} label={`The real stars of ${r?.name}`} />,
       story: `${r?.name}, ${r?.symbol}, is ${r?.element === "Air" || r?.element === "Earth" ? "an" : "a"} ${r?.element.toLowerCase()} sign ruled by ${lore(r?.ruler ?? "SU")?.english} (${lore(r?.ruler ?? "SU")?.name}). In the body of the cosmic person, Kāla-puruṣa, it is the ${r?.body}. Its nakṣatras are ${naks.map((k) => NAKSHATRA_NAMES[k]).join(", ")}.`,
       facts: [
@@ -88,7 +88,7 @@ export function panelFor(sel: WheelSel, sky: Record<GrahaId, TransitGraha>, patr
       now: here.length ? `Here now: ${here.map((g) => lore(g)?.english).join(", ")}.` : "No graha is in this sign right now.",
       mine:
         patri && name
-          ? `In ${name}'s chart: ${mineHere.length ? mineHere.map((g) => lore(g)?.english).join(", ") : "empty"}${patri.lagna.sign === sel.i ? " — the rising sign" : ""}${patri.grahas.MO.sign === sel.i ? " — the Moon sign" : ""}.`
+          ? `In ${name}'s chart: ${mineHere.length ? mineHere.map((g) => lore(g)?.english).join(", ") : "empty"}${patri.lagna.sign === sel.i ? ". This is the rising sign" : ""}${patri.grahas.MO.sign === sel.i ? ". This is the Moon sign" : ""}.`
           : undefined,
       to: `/explore/rashi/${sel.i}`,
       tone: "sky",

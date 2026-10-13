@@ -54,7 +54,7 @@ export function Shell() {
       <div className="desk__top" aria-hidden="true" />
       {swUpdate ? (
         <button type="button" className="sw-tab paper" onClick={() => swUpdate()}>
-          A newer version of Vyom is ready — reload
+          A newer version of Vyom is ready. Reload
         </button>
       ) : null}
       <div className="screens">

@@ -88,7 +88,7 @@ export function DashaRibbon({ tree, nowMs, zone, yearDays }: DashaRibbonProps) {
                       }}
                     >
                       <span className="n">
-                        {GRAHA_NAMES[md.lord]} — {GRAHA_NAMES[a.lord]}
+                        {GRAHA_NAMES[md.lord]} / {GRAHA_NAMES[a.lord]}
                         {on ? " · now" : ""}
                       </span>
                       <span className="mono">

@@ -207,8 +207,8 @@ export function palmHits(parts: Pick<PalmReading, "element" | "ratios" | "lines"
 export function framingNote(hand: Hand, dominant: Hand, framing: Framing): string {
   const isDominant = hand === dominant;
   const dom = isDominant
-    ? "the dominant hand — read for what has been made of one's nature"
-    : "the non-dominant hand — read for the nature one began with";
+    ? "the dominant hand, read for what has been made of one's nature"
+    : "the non-dominant hand, read for the nature one began with";
   const classical =
     hand === "right" ? "classically, the right hand is read for the present" : "classically, the left hand is read for what was given";
   const H = hand === "right" ? "Right" : "Left";

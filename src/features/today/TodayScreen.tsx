@@ -173,7 +173,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
         </>
       ),
       end: endsLabel(clock, p.tithi.endMs, dayMs),
-      foot: ending(p.tithi.name, tDev, p.tithi.endMs, `Tithi ${p.tithi.index} of 30 — each is 12° of the Moon pulling away from the Sun.`),
+      foot: ending(p.tithi.name, tDev, p.tithi.endMs, `Tithi ${p.tithi.index} of 30. Each is 12° of the Moon pulling away from the Sun.`),
     },
     {
       id: "vara",
@@ -205,7 +205,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
           `${nName}, pada ${p.nakshatra.pada}`,
           nDev,
           p.nakshatra.endMs,
-          "The Moon's sidereal mansion — 13°20′ each, four padas of 3°20′.",
+          "The Moon's sidereal mansion: 13°20′ each, four padas of 3°20′.",
         ),
         story: `/explore/nakshatra/${p.nakshatra.index}`,
       },
@@ -219,12 +219,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
         </>
       ),
       end: endsLabel(clock, p.yoga.endMs, dayMs),
-      foot: ending(
-        p.yoga.name,
-        yDev,
-        p.yoga.endMs,
-        `Yoga ${p.yoga.index} of 27 — the sum of the sidereal Sun and Moon in steps of 13°20′.`,
-      ),
+      foot: ending(p.yoga.name, yDev, p.yoga.endMs, `Yoga ${p.yoga.index} of 27: the sum of the sidereal Sun and Moon in steps of 13°20′.`),
     },
     {
       id: "karana",
@@ -235,7 +230,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
         </>
       ),
       end: endsLabel(clock, p.karana.endMs, dayMs),
-      foot: ending(p.karana.name, kDev, p.karana.endMs, `Karaṇa ${p.karana.index} of 60 — half a tithi, 6° of elongation.`),
+      foot: ending(p.karana.name, kDev, p.karana.endMs, `Karaṇa ${p.karana.index} of 60: half a tithi, 6° of elongation.`),
     },
   ];
 
@@ -263,7 +258,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
       k: "Moonrise · set",
       v: (
         <span className="mono today-num">
-          {p.moonriseMs !== null ? clock.hm(p.moonriseMs) : "—"} – {p.moonsetMs !== null ? clock.hm(p.moonsetMs) : "—"}
+          {p.moonriseMs !== null ? clock.hm(p.moonriseMs) : "–"} – {p.moonsetMs !== null ? clock.hm(p.moonsetMs) : "–"}
         </span>
       ),
       foot: {
@@ -329,7 +324,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
         "Brahma-muhūrta",
         "ब्राह्म मुहूर्त",
         brahmaMuhurta(p.sunriseMs),
-        `The second-to-last muhūrta of the night before this sunrise: 96 to 48 minutes before it. — ${MUHURTA_KALA_CITATION.text}.`,
+        `The second-to-last muhūrta of the night before this sunrise: 96 to 48 minutes before it. Source: ${MUHURTA_KALA_CITATION.text}.`,
       ),
     },
     {
@@ -340,7 +335,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
         "Godhūli",
         "गोधूलि",
         godhuli(p.sunsetMs),
-        `The hour of cow-dust: one ghaṭī (24 minutes) centred on sunset. — ${MUHURTA_KALA_CITATION.text}.`,
+        `The hour of cow-dust: one ghaṭī (24 minutes) centred on sunset. Source: ${MUHURTA_KALA_CITATION.text}.`,
       ),
     },
   ];
@@ -366,8 +361,8 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
         title: "Māsa",
         dev: "मास",
         lines: [
-          ["Amānta", `${p.masaAmanta} — months end at Amāvasyā (the south and west)`],
-          ["Pūrṇimānta", `${p.masaPurnimanta} — months end at Pūrṇimā (the north)`],
+          ["Amānta", `${p.masaAmanta}: months end at Amāvasyā (the south and west)`],
+          ["Pūrṇimānta", `${p.masaPurnimanta}: months end at Pūrṇimā (the north)`],
           ["Ayanāṃśa", AYANAMSA_LABEL[preset.ayanamsa]],
         ],
         note: "Named by the sidereal Sun's sign at the governing new moon. Both conventions are printed because the circle spans both.",
@@ -385,8 +380,8 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
         title: `${p.ritu} · ${ayanaLatin(p.ayana)}`,
         dev: `${rituDev(p.ritu)} · ${ayanaDev(p.ayana)}`,
         lines: [
-          ["Ṛtu", `${p.ritu} — the season, two lunar months each`],
-          ["Ayana", `${ayanaLatin(p.ayana)} — by the sidereal Sun (Makara to Karka is Uttarāyaṇa)`],
+          ["Ṛtu", `${p.ritu}: the season, two lunar months each`],
+          ["Ayana", `${ayanaLatin(p.ayana)}, by the sidereal Sun (Makara to Karka is Uttarāyaṇa)`],
         ],
       },
     },
@@ -650,7 +645,7 @@ export default function TodayScreen() {
   };
 
   return (
-    <Screen className="today" scroll label="Today — the pañcāṅga">
+    <Screen className="today" scroll label="Today: the pañcāṅga">
       <div className="today__desk" style={style}>
         <div className="today__side">
           <div className="today__cloth">
@@ -703,7 +698,7 @@ export default function TodayScreen() {
               </div>
               <p className="p p--muted today__whose">
                 {place.whose ? (
-                  <>At {place.whose}'s birthplace — a pañcāṅga belongs to a place. </>
+                  <>At {place.whose}'s birthplace. A pañcāṅga belongs to a place. </>
                 ) : (
                   <>
                     No one saved yet, so the dial reads Bengaluru.{" "}
@@ -721,7 +716,7 @@ export default function TodayScreen() {
             <InkLine />
           ) : !p || !periods ? (
             <div className="note-haldi" role="status">
-              The dial is stuck — check the date and the birthplace.
+              The dial is stuck. Check the date and the birthplace.
             </div>
           ) : (
             <>
@@ -754,8 +749,8 @@ export default function TodayScreen() {
 
           <Colophon
             rows={[
-              ["Place", place ? `${place.name} · ${place.lat.toFixed(4)}°, ${place.lon.toFixed(4)}°` : "—"],
-              ["Zone", place ? `${clock.zone} (the birthplace's, not this device's)` : "—"],
+              ["Place", place ? `${place.name} · ${place.lat.toFixed(4)}°, ${place.lon.toFixed(4)}°` : "–"],
+              ["Zone", place ? `${clock.zone} (the birthplace's, not this device's)` : "–"],
               ["Sunrise", SUNRISE_LABEL[preset.sunrise]],
               ["Ayanāṃśa", AYANAMSA_LABEL[preset.ayanamsa]],
               ["Engine", `astronomy-engine ${ASTRONOMY_ENGINE_VERSION} · computed on this device, offline`],
@@ -764,7 +759,7 @@ export default function TodayScreen() {
         </article>
       </div>
 
-      <Sheet open={foot !== null} onClose={() => setFoot(null)} label={foot ? `Footnote — ${foot.title}` : "Footnote"}>
+      <Sheet open={foot !== null} onClose={() => setFoot(null)} label={foot ? `Footnote: ${foot.title}` : "Footnote"}>
         {foot ? (
           <div className="footnote">
             <h2 className="footnote__h">

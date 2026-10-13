@@ -1,5 +1,5 @@
 export const DISCLAIMER =
-  "Based on classical Jyotisha / Samudrika Shastra texts. For reflection and fun — not medical, legal or financial advice.";
+  "Based on classical Jyotisha / Samudrika Shastra texts. For reflection and fun. Not medical, legal or financial advice.";
 
 interface ColophonProps {
   rows: Array<[string, React.ReactNode]>;

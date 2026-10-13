@@ -54,7 +54,7 @@ export default function CircleScreen() {
     try {
       await burnProfile(p.id);
       haptics.impact("heavy");
-      toast("Deleted — the person and their palm photos are gone from this device.", "danger");
+      toast("Deleted. The person and their palm photos are gone from this device.", "danger");
     } catch (e) {
       toast(`Could not delete: ${e instanceof Error ? e.message : String(e)}`, "danger");
     }
@@ -70,13 +70,13 @@ export default function CircleScreen() {
 
   if (list.length === 0) {
     return (
-      <Screen className="people-screen" label="People — empty">
+      <Screen className="people-screen" label="People (empty)">
         <div className="people">
           <header className="people-head">
             <p className="people-kicker">People · लोग</p>
             <h1>Add your first person</h1>
             <p className="people-lede">
-              Vyom works from one person's birth details — date, time and place. Everything else is calculated from them, on this device.
+              Vyom works from one person's birth details: date, time and place. Everything else is calculated from them, on this device.
             </p>
           </header>
           <Link to="/leaf/new" className="stamp people-add" aria-label="Add your first person">
@@ -105,7 +105,7 @@ export default function CircleScreen() {
                 <button
                   type="button"
                   className="person__main"
-                  aria-label={`${p.name} — Moon in ${m?.nakName ?? "unknown"}, ${m?.signName ?? ""}. Open birth chart`}
+                  aria-label={`${p.name}, Moon in ${m?.nakName ?? "unknown"}, ${m?.signName ?? ""}. Open birth chart`}
                   onClick={(e) => open(p, e.currentTarget)}
                 >
                   <span className="person__orb" aria-hidden="true">

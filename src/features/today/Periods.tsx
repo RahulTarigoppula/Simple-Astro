@@ -66,7 +66,7 @@ function Cite({ c, children }: { c: Citation; children: React.ReactNode }) {
     <p className="p p--muted today-cite">
       {children}{" "}
       <cite>
-        — {c.text}, {c.ref}.
+        ({c.text}, {c.ref})
       </cite>
     </p>
   );

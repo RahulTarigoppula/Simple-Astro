@@ -88,7 +88,7 @@ describe("MilanScreen", () => {
     // Tap anywhere to finish the count.
     fireEvent.pointerDown(document.body);
     expect(await screen.findByText(BAND_LABEL[want.band])).toBeInTheDocument();
-    expect(screen.getByText(`${fmtPts(want.total)} of 36 points — ${BAND_LABEL[want.band]}.`)).toBeInTheDocument();
+    expect(screen.getByText(`${fmtPts(want.total)} of 36 points: ${BAND_LABEL[want.band]}.`)).toBeInTheDocument();
 
     // The lac rows are the engine's doṣa rows, labelled as such — colour is never the only signal.
     const doshaRows = want.kootas.filter((k) => k.dosha);
@@ -201,7 +201,7 @@ describe("MilanScreen — porutham, compare and summary", () => {
     await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
     const text = writeText.mock.calls[0]?.[0] ?? "";
     expect(text).toContain(`${REFERENCE_PROFILE.name} and ${PRIYA.name}`);
-    expect(text).toContain(`${fmtPts(want.total)} / 36 — ${BAND_LABEL[want.band]} (North Indian (common) tables)`);
+    expect(text).toContain(`${fmtPts(want.total)} / 36: ${BAND_LABEL[want.band]} (North Indian (common) tables)`);
     expect(screen.getByText(/^North Indian \(common\) \(Settings\)/)).toBeInTheDocument();
     expect(text).toContain("Doṣas: Nāḍī");
     expect(text).toMatch(/Ten Porutham: \d+ \/ 10 tied/);

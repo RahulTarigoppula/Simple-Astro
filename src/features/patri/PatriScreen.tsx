@@ -233,7 +233,7 @@ export default function PatriScreen() {
               type="button"
               ref={sealBtn}
               className={`seal${error ? " is-cracked" : ""}`}
-              aria-label={stale ? "Presets changed — hold to recompute this chart" : "Hold to recompute this chart"}
+              aria-label={stale ? "Presets changed. Hold to recompute this chart" : "Hold to recompute this chart"}
               onFocus={() => setPull(96)}
               onBlur={releasePull}
               {...sealHold}
@@ -460,7 +460,7 @@ function PatriBody({
           "Tithi",
           pc.tithi.name,
           `no. ${pc.tithi.index}`,
-          `Tithi — ${pc.tithi.name}`,
+          `Tithi: ${pc.tithi.name}`,
           pc.tithi.endMs,
           `Moon − Sun elongation ${pc.elongation.toFixed(4)}° at birth; each tithi is 12°.`,
         )}
@@ -468,7 +468,7 @@ function PatriBody({
           "Vāra",
           pc.vara.name,
           `sunrise ${hhmmss(pc.sunriseMs, zone)}`,
-          `Vāra — ${pc.vara.name}`,
+          `Vāra: ${pc.vara.name}`,
           null,
           "The weekday of the governing sunrise, not of the calendar date.",
         )}
@@ -481,7 +481,7 @@ function PatriBody({
             </span>
           </>,
           `pada ${pc.nakshatra.pada}`,
-          `Nakṣatra — ${NAKSHATRA_NAMES[pc.nakshatra.index]}`,
+          `Nakṣatra: ${NAKSHATRA_NAMES[pc.nakshatra.index]}`,
           pc.nakshatra.endMs,
           "The Moon's sidereal mansion; each is 13°20′, each pada 3°20′.",
         )}
@@ -489,7 +489,7 @@ function PatriBody({
           "Yoga",
           pc.yoga.name,
           `no. ${pc.yoga.index}`,
-          `Yoga — ${pc.yoga.name}`,
+          `Yoga: ${pc.yoga.name}`,
           pc.yoga.endMs,
           "Sun + Moon sidereal longitudes, in 13°20′ steps.",
         )}
@@ -497,7 +497,7 @@ function PatriBody({
           "Karaṇa",
           pc.karana.name,
           `half-tithi ${pc.karana.index}`,
-          `Karaṇa — ${pc.karana.name}`,
+          `Karaṇa: ${pc.karana.name}`,
           pc.karana.endMs,
           "Half a tithi: 6° of elongation.",
         )}
@@ -518,7 +518,7 @@ function PatriBody({
 
       <TurmericBand
         dev="राशि चक्र"
-        title="Fig. 1 — D1 birth chart"
+        title="Fig. 1: D1 birth chart"
         explain="patri"
         meta={style === "north" ? "whole sign · north" : "whole sign · south"}
       />
@@ -535,7 +535,7 @@ function PatriBody({
         />
       </div>
       <p className="figcap">
-        Fig. 1 — Rāśi (D1), {presetLabel(p)}, whole-sign houses, {p.node} node. Ayanāṃśa at birth {formatDms(patri.ayanamsa)}. The tilak
+        Fig. 1. Rāśi (D1), {presetLabel(p)}, whole-sign houses, {p.node} node. Ayanāṃśa at birth {formatDms(patri.ayanamsa)}. The tilak
         marks the Lagna in {SIGN_NAMES[patri.lagna.sign]} {formatDms(patri.lagna.degInSign)}.
       </p>
 
@@ -551,13 +551,11 @@ function PatriBody({
       {Object.values(patri.grahas).some((g) => g.boundary) || patri.lagna.boundary ? (
         <p className="note-haldi note--keep">
           <span aria-hidden="true">⚑</span>
-          <span>
-            An asterisk marks a body within 2′ of a sign, nakṣatra or pada edge — tap it to see what the other presets would read.
-          </span>
+          <span>An asterisk marks a body within 2′ of a sign, nakṣatra or pada edge. Tap it to see what the other presets would read.</span>
         </p>
       ) : null}
 
-      <TurmericBand dev="वर्ग" title={`Fig. 2 — D${varga}`} explain="varga" meta={VARGA_NAMES[varga]} plain level={3} />
+      <TurmericBand dev="वर्ग" title={`Fig. 2: D${varga}`} explain="varga" meta={VARGA_NAMES[varga]} plain level={3} />
       <div className="varga-pager" role="tablist" aria-label="Divisional charts">
         {PAGER.map((v) => (
           <button
@@ -596,7 +594,7 @@ function PatriBody({
             </div>
           </div>
           <p className="figcap">
-            Fig. 2 — {VARGA_NAMES[varga]} (D{varga}), {presetLabel(p)}. The Lagna falls in {SIGN_NAMES[vchart.ascendantSign]}.
+            Fig. 2. {VARGA_NAMES[varga]} (D{varga}), {presetLabel(p)}. The Lagna falls in {SIGN_NAMES[vchart.ascendantSign]}.
           </p>
         </>
       ) : null}
@@ -660,7 +658,7 @@ function PatriBody({
           The birth sky from the rooftop ⇧
         </Link>
         <Link className="linkish" to={`/hast/${profileId}`}>
-          Palm — Hast Rekha
+          Palm (Hast Rekha)
         </Link>
         <Link className="linkish" to="/circle">
           Guna Milan with another person
@@ -674,7 +672,7 @@ function PatriBody({
             className="linkish"
             onClick={() => {
               const before = document.title;
-              document.title = `Janam Patri — ${name}`;
+              document.title = `Janam Patri: ${name}`;
               window.addEventListener("afterprint", () => (document.title = before), { once: true });
               window.print();
             }}
@@ -708,7 +706,7 @@ function FootBody({ foot, patri, zone, onShow }: { foot: NonNullable<Foot>; patr
     const name = isL ? "Lagna" : GRAHA_ENGLISH[foot.id as GrahaId];
     return (
       <div className="sheet-body">
-        <TurmericBand title={`${name} — near a boundary`} level={2} />
+        <TurmericBand title={`${name}: near a boundary`} level={2} />
         <p className="p">{note ? `${name} stands ${note.text}.` : `${name} is not within reach of another preset's edge.`}</p>
         <ul className="foot-list">
           <li>
@@ -737,7 +735,7 @@ function FootBody({ foot, patri, zone, onShow }: { foot: NonNullable<Foot>; patr
             <li key={e.note}>
               {e.grahaId ? (
                 <button type="button" className="linkish" onClick={() => e.grahaId && onShow(e.grahaId)}>
-                  {e.note} — show me
+                  {e.note}. Show me
                 </button>
               ) : (
                 e.note

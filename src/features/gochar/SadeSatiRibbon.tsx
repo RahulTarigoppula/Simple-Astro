@@ -155,7 +155,7 @@ export function SadeSatiRibbon({ result, birthMs, nowMs, zone }: SadeSatiRibbonP
                 aria-controls="gochar-spell-panel"
                 tabIndex={i === sel ? 0 : -1}
                 className={inside ? "is-now" : undefined}
-                aria-label={`${SPELL_LABEL[s.kind]}, ${fmtDate(s.startMs, zone)} to ${fmtDate(s.endMs, zone)}${inside ? ", running now" : paused ? ", paused — Śani stepped back" : ""}`}
+                aria-label={`${SPELL_LABEL[s.kind]}, ${fmtDate(s.startMs, zone)} to ${fmtDate(s.endMs, zone)}${inside ? ", running now" : paused ? ", paused while Śani stepped back" : ""}`}
                 onClick={() => pick(i)}
                 onKeyDown={(e) => onKey(e, i)}
               >

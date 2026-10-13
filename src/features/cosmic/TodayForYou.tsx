@@ -45,7 +45,7 @@ export function TodayForYou({ profile, patri, nowMs, preset }: { profile: Profil
           <li>
             <GrahaGlyph id="MO" size={30} />
             <span>
-              Moon in your <strong>{ord(d.moonHouse)}</strong> — {HOUSE_AREA[d.moonHouse]} <InfoDot id="chandra-bala" />
+              Moon in your <strong>{ord(d.moonHouse)}</strong>: {HOUSE_AREA[d.moonHouse]} <InfoDot id="chandra-bala" />
             </span>
           </li>
           <li>

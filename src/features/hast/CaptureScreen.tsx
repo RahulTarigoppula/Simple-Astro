@@ -146,7 +146,7 @@ export default function CaptureScreen() {
       try {
         const d = await detectHand(canvas);
         if (!d.ok) {
-          toast(d.reason === "no-hand" ? "No hand in this picture." : `No hand found — ${d.reason}.`, "warn");
+          toast(d.reason === "no-hand" ? "No hand in this picture." : `No hand found: ${d.reason}.`, "warn");
           return;
         }
         const g = gateHand(d.landmarks, d.handedness, d.score);
@@ -273,9 +273,9 @@ export default function CaptureScreen() {
             <b style={{ color: "var(--surface)" }}>{camera === "starting" ? "Opening the camera…" : "Gallery only"}</b>
             <span style={{ fontSize: "var(--text-sm)" }}>
               {camera === "denied"
-                ? "The camera was not allowed. Pick a photo of your palm instead — it never leaves this device."
+                ? "The camera was not allowed. Pick a photo of your palm instead. It never leaves this device."
                 : camera === "none"
-                  ? "No camera here. Pick a photo of your palm instead — it never leaves this device."
+                  ? "No camera here. Pick a photo of your palm instead. It never leaves this device."
                   : ""}
             </span>
           </div>
@@ -296,24 +296,24 @@ export default function CaptureScreen() {
             label="sharpness"
             pips={quality ? sharpnessPips(quality.sharpness.value) : 0}
             low={!sharpOk}
-            value={quality ? quality.sharpness.value.toFixed(0) : "—"}
+            value={quality ? quality.sharpness.value.toFixed(0) : "–"}
           />
           <Gauge
             label="exposure"
             pips={quality ? exposurePips(quality.exposure.score) : 0}
             low={!expOk}
-            value={quality ? quality.exposure.label : "—"}
+            value={quality ? quality.exposure.label : "–"}
           />
         </div>
         <p className="p p--muted" style={{ marginTop: 6 }} aria-live="polite">
           {model === "loading"
             ? "Opening the hand model…"
             : model === "failed"
-              ? "The hand model could not open — use Prepare for offline in Settings, or try again online."
+              ? "The hand model could not open. Use Prepare for offline in Settings, or try again online."
               : camera === "live"
                 ? gate.ok
                   ? sharpOk && expOk
-                    ? "Hold still — the shutter is ready."
+                    ? "Hold still. The shutter is ready."
                     : !sharpOk
                       ? "Hold still, or move to the window: the print is soft."
                       : "Move to even light: the palm is too dark or too bright."

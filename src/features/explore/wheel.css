@@ -402,3 +402,53 @@
     transition: none;
   }
 }
+
+/* Review: no orphan fact box */
+.ex-panel__facts div:last-child:nth-child(odd) {
+  grid-column: span 2;
+}
+.ex-you {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--space-3);
+}
+.ex-you button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(245, 196, 107, 0.4);
+  background: rgba(245, 196, 107, 0.08);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: none;
+}
+.ex-you button span {
+  color: var(--ink-muted);
+}
+.ex-you button:hover {
+  border-color: var(--accent-2);
+}
+
+.ex-surprise {
+  justify-self: start;
+  margin-top: var(--space-3);
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(196, 181, 253, 0.45);
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0.2), rgba(34, 211, 238, 0.14));
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: none;
+}
+.ex-surprise:hover {
+  border-color: var(--accent-text);
+}

@@ -99,7 +99,7 @@ export function BhavaChalitTable({ patri }: BhavaChalitTableProps) {
               <span lang="hi" className="dev" aria-hidden="true">
                 {GRAHA_ABBR_DEV[s.id]}
               </span>{" "}
-              {GRAHA_NAMES[s.id]} — whole-sign house {s.house}, <strong>shifts to bhāva {s.bhava}</strong>
+              {GRAHA_NAMES[s.id]}: whole-sign house {s.house}, <strong>shifts to bhāva {s.bhava}</strong>
             </li>
           ))}
         </ul>

@@ -12,19 +12,19 @@ const GROUPS = Object.keys(GROUP_TITLES) as GlossaryGroup[];
 const STEPS: Array<{ title: string; body: string; to: string; cta: string }> = [
   {
     title: "Save a person",
-    body: "Enter a name, birth date, birth time and birth place. If you don't know the time, switch on \"Birth time unknown\" — you'll still get most of it.",
+    body: "Enter a name, birth date, birth time and birth place. If you don't know the time, switch on \"Birth time unknown\". You'll still get most of it.",
     to: "/leaf/new",
     cta: "Add a person",
   },
   {
     title: "Read the birth chart",
-    body: "See where the Sun, Moon and planets were at that moment, the life-chapter timeline (daśā), and classical patterns (yogas) — each with a plain explanation.",
+    body: "See where the Sun, Moon and planets were at that moment, the life-chapter timeline (daśā), and classical patterns (yogas), each with a plain explanation.",
     to: "/circle",
     cta: "Your circle",
   },
   {
     title: "See your forecast",
-    body: "A plain-English outlook for the day, week, month, quarter and year — which planets are working for you and which ask for patience — plus your life chapter (daśā).",
+    body: "A plain-English outlook for the day, week, month, quarter and year. It shows which planets are working for you and which ask for patience, plus your life chapter (daśā).",
     to: "/forecast",
     cta: "Forecast",
   },
@@ -36,13 +36,13 @@ const STEPS: Array<{ title: string; body: string; to: string; cta: string }> = [
   },
   {
     title: "Explore the myths",
-    body: "Every planet, sign and star has a story — the Moon's 27 wives, the demon behind eclipses, the boy who became the Pole Star. Explore them, or play the story of astrology from the beginning.",
+    body: "Every planet, sign and star has a story: the Moon's 27 wives, the demon behind eclipses, the boy who became the Pole Star. Explore them, or play the story of astrology from the beginning.",
     to: "/explore",
     cta: "Explore",
   },
   {
     title: "Compare two people, or read a palm",
-    body: "Guna Milan gives the traditional 36-point match score. The palm reader photographs your hand and describes its lines — on your device only.",
+    body: "Guna Milan gives the traditional 36-point match score. The palm reader photographs your hand and describes its lines, on your device only.",
     to: "/milan",
     cta: "Guna Milan",
   },
@@ -66,20 +66,20 @@ export default function GuideScreen() {
   );
 
   return (
-    <Screen className="guide" scroll label="Guide — Vyom in plain English">
+    <Screen className="guide" scroll label="Guide: Vyom in plain English">
       <header className="guide-hero">
         <p className="guide-kicker">Guide</p>
         <h1>Vyom in plain English</h1>
         <p className="guide-lede">
-          Vyom is an Indian astrology (Jyotiṣa) app. It works out exactly where the Sun, Moon and planets are — or were when someone was
-          born — and shows what the old tradition says about it. You don't need to know anything, or believe anything, to use it.
+          Vyom is an Indian astrology (Jyotiṣa) app. It works out exactly where the Sun, Moon and planets are (or were, when someone was
+          born) and shows what the old tradition says about it. You don't need to know anything, or believe anything, to use it.
         </p>
       </header>
 
       <Link to="/story" className="guide-story">
         <span className="guide-story__k">Roots</span>
         <span className="guide-story__t">The story of the stars</span>
-        <span className="guide-story__s">Gods, ṛṣis, Greeks and astronomers — play the story →</span>
+        <span className="guide-story__s">Gods, ṛṣis, Greeks and astronomers. Play the story →</span>
       </Link>
 
       <section className="guide-card guide-honest" aria-labelledby="g-real">
@@ -95,7 +95,7 @@ export default function GuideScreen() {
           <div>
             <h3>Tradition, not science</h3>
             <p>
-              What those positions are said to mean — personality, good and bad times, compatibility, palm lines. There's no scientific
+              What those positions are said to mean: personality, good and bad times, compatibility, palm lines. There's no scientific
               evidence for them. Vyom shows them as a cultural reference and for reflection, never as advice or fate.
             </p>
           </div>
@@ -138,7 +138,7 @@ export default function GuideScreen() {
           <h2 id="g-words">Every word, explained</h2>
           <label className="guide-search">
             <span className="vh">Search the glossary</span>
-            <input type="search" placeholder="Search — e.g. tithi, rising sign, Saturn" value={q} onChange={(e) => setQ(e.target.value)} />
+            <input type="search" placeholder="Search, e.g. tithi, rising sign, Saturn" value={q} onChange={(e) => setQ(e.target.value)} />
           </label>
         </div>
         {hits.length === 0 ? <p className="guide-none">Nothing matches “{q}”.</p> : null}
@@ -179,7 +179,7 @@ export default function GuideScreen() {
         })}
       </section>
 
-      <p className="guide-foot">For reflection and cultural interest — not medical, legal, financial or relationship advice.</p>
+      <p className="guide-foot">For reflection and cultural interest. Not medical, legal, financial or relationship advice.</p>
     </Screen>
   );
 }

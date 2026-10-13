@@ -120,7 +120,7 @@ function JourneyToggle() {
   return (
     <Radio
       label="Opening journey"
-      help="The intro — from the universe to why Vyom exists — plays when Vyom opens."
+      help="The intro (from the universe to why Vyom exists) plays when Vyom opens."
       value={on ? "on" : "off"}
       options={[
         ["on", "Play"],
@@ -244,7 +244,7 @@ export default function DrawerScreen() {
       const blob = await exportEnvelope(pass);
       await saveFile(blob, envelopeFileName(), "Vyom encrypted backup");
       play("thunk");
-      toast("Encrypted backup saved (AES-GCM). Keep the passphrase — it cannot be recovered.");
+      toast("Encrypted backup saved (AES-GCM). Keep the passphrase safe. It cannot be recovered.");
       setMode("none");
     } catch (e) {
       toast(`Could not create the backup: ${e instanceof Error ? e.message : String(e)}`, "danger");
@@ -262,7 +262,7 @@ export default function DrawerScreen() {
       const r = await importEnvelope(file, pass);
       clearPatriCache();
       play("snap");
-      toast(`Backup restored — ${r.counts.profiles} ${r.counts.profiles === 1 ? "person" : "people"} restored.`);
+      toast(`Backup restored: ${r.counts.profiles} ${r.counts.profiles === 1 ? "person" : "people"} restored.`);
       setMode("none");
     } catch (e) {
       const code = e instanceof ImportError ? e.code : "";
@@ -270,7 +270,7 @@ export default function DrawerScreen() {
         code === "BAD_PASSPHRASE"
           ? "That passphrase does not match this backup."
           : code === "NEWER_FORMAT"
-            ? "This backup was made by a newer Vyom — update the app first."
+            ? "This backup was made by a newer Vyom. Update the app first."
             : "This file is not a Vyom backup.",
         "danger",
       );
@@ -297,9 +297,9 @@ export default function DrawerScreen() {
       }
       // The lazy screens themselves: importing them puts their chunks in the runtime cache.
       await Promise.allSettled(Object.values(HEAVY_SCREENS).map((load) => load()));
-      setWarm(`Ready offline — ${(bytes / 1e6).toFixed(1)} MB of models cached.`);
+      setWarm(`Ready offline: ${(bytes / 1e6).toFixed(1)} MB of models cached.`);
     } catch {
-      setWarm("The wire is quiet — try again with a connection.");
+      setWarm("No connection. Try again when you are online.");
     }
   };
 
@@ -378,7 +378,7 @@ export default function DrawerScreen() {
           <DialSegment jdTt={jdTt} value={settings.preset.ayanamsa} onChange={(p) => setPreset({ ayanamsa: p })} />
           <Radio
             label="Rāhu / Ketu"
-            help="True or mean node — up to 1.7° apart."
+            help="True or mean node. They are up to 1.7° apart."
             value={settings.preset.node}
             options={[
               ["true", "true"],
@@ -460,7 +460,7 @@ export default function DrawerScreen() {
             {credits.map((c) => (
               <li key={c.name}>
                 <b style={{ fontWeight: 500 }}>{c.name}</b>
-                {c.author ? ` — ${c.author}` : ""} <span className="lic">{c.licence}</span>
+                {c.author ? `, ${c.author}` : ""} <span className="lic">{c.licence}</span>
               </li>
             ))}
           </ul>

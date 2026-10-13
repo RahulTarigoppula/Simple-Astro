@@ -122,7 +122,7 @@ describe("Śani stepped back by retrogression", () => {
     render(<GocharSection patri={patri} nowMs={at} zone="Asia/Kolkata" />);
     const tabs = await screen.findAllByRole("tab", {}, { timeout: 5000 });
     const labels = tabs.map((t) => t.getAttribute("aria-label") ?? "");
-    expect(labels.some((l) => /paused — Śani stepped back/.test(l))).toBe(true);
+    expect(labels.some((l) => /paused while Śani stepped back/.test(l))).toBe(true);
     expect(labels.some((l) => /running now/.test(l))).toBe(false);
   });
 });

@@ -29,7 +29,7 @@ export function StoryRings() {
         })}
       </ul>
       {start !== null ? (
-        <StoryPlayer title="Roots — the story of the stars" slides={slides} start={start} onClose={() => setStart(null)} />
+        <StoryPlayer title="Roots: the story of the stars" slides={slides} start={start} onClose={() => setStart(null)} />
       ) : null}
     </>
   );

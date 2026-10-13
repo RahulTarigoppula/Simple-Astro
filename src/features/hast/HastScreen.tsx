@@ -171,7 +171,7 @@ export default function HastScreen() {
     await saveReading(next);
     play("snap", 0.6);
     haptics.selection();
-    toast(`Traced the ${NAME[id0].toLowerCase()} line — the reading was recomputed from your geometry.`);
+    toast(`Traced the ${NAME[id0].toLowerCase()} line. The reading was recomputed from your geometry.`);
   };
 
   const nudge = async (dx: number, dy: number) => {
@@ -241,7 +241,7 @@ export default function HastScreen() {
   );
 
   return (
-    <Screen scroll label={`Hast Rekha — ${profile?.name ?? ""}`}>
+    <Screen scroll label={`Hast Rekha: ${profile?.name ?? ""}`}>
       <div className="paper sheet-col">
         <TurmericBand
           dev="हस्त रेखा"
@@ -359,7 +359,7 @@ export default function HastScreen() {
                   aria-pressed={tracing}
                   onClick={() => {
                     setTracing((t) => !t);
-                    toast(tracing ? "Stylus down." : "Stylus in hand — drag along a line; the faint one is traced first.");
+                    toast(tracing ? "Stylus down." : "Stylus in hand. Drag along a line; the faint one is traced first.");
                   }}
                 >
                   ✎ Trace lines
@@ -460,7 +460,7 @@ export default function HastScreen() {
                     <span aria-hidden="true">⚑</span>
                     <span>
                       {weak.length
-                        ? `The ${weak.map((l) => NAME[l.id].toLowerCase()).join(" and ")} line${weak.length > 1 ? "s read" : " reads"} below 0.6 — the app will not read what it cannot see.`
+                        ? `The ${weak.map((l) => NAME[l.id].toLowerCase()).join(" and ")} line${weak.length > 1 ? "s read" : " reads"} below 0.6, and the app will not read what it cannot see.`
                         : `The ${missing.map((m) => m.toLowerCase()).join(", ")} line${missing.length > 1 ? "s were" : " was"} not found in this print.`}{" "}
                       Trace to confirm: the reading is recomputed from your stroke.
                     </span>
@@ -485,10 +485,10 @@ export default function HastScreen() {
                 </div>
               </>
             ) : capture ? (
-              <p className="p">This print has landmarks but no reading yet — retake it to read the lines.</p>
+              <p className="p">This print has landmarks but no reading yet. Retake it to read the lines.</p>
             ) : (
               <p className="p p--muted">
-                Take one photo and Vyom traces your heart, head and life lines and explains what tradition says about each — for fun and
+                Take one photo and Vyom traces your heart, head and life lines and explains what tradition says about each, for fun and
                 reflection. Your palm is photographed and read on this device. The photo is kept only on this device and can be deleted with
                 one hold.
               </p>
@@ -496,7 +496,7 @@ export default function HastScreen() {
 
             {capture ? (
               <div className="tools" style={{ paddingBottom: "var(--space-4)" }}>
-                <button type="button" className="tool danger-text" aria-label="Delete this palm photo — hold" {...burn}>
+                <button type="button" className="tool danger-text" aria-label="Delete this palm photo (hold)" {...burn}>
                   Delete this palm photo (hold)
                 </button>
               </div>

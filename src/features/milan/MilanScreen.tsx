@@ -51,7 +51,7 @@ const moonOfPatri = (p: Patri): MoonFacts => ({ nak: p.grahas.MO.nakshatra, pada
 /** "Manglik (from Lagna, Candra) — bhaṅga noted" / "no Manglik mark". */
 export function manglikLabel(m: ManglikStatus): string {
   if (!m.present) return "no Manglik mark";
-  return `Manglik (from ${m.from.map((f) => MANGLIK_REF_LABEL[f]).join(", ")})${m.cancellations.length > 0 ? " — bhaṅga noted" : ""}`;
+  return `Manglik (from ${m.from.map((f) => MANGLIK_REF_LABEL[f]).join(", ")})${m.cancellations.length > 0 ? ", bhaṅga noted" : ""}`;
 }
 
 const bodiesOfPatri = (p: Patri): ChartBody[] =>
@@ -103,7 +103,7 @@ function LeafChart({
           </span>{" "}
           {NAKSHATRA_NAMES[m.nak]} pada {m.pada} · {SIGN_NAMES[m.sign]}
         </span>
-        <span className={`milan-chart__mk${manglik?.present ? " is-present" : ""}`}>{manglik ? manglikLabel(manglik) : "—"}</span>
+        <span className={`milan-chart__mk${manglik?.present ? " is-present" : ""}`}>{manglik ? manglikLabel(manglik) : "–"}</span>
       </figcaption>
     </figure>
   );
@@ -227,7 +227,7 @@ function Picker({
         </p>
       ) : others.length === 0 ? (
         <p className="p">
-          Only one person is saved — a Milan needs two.{" "}
+          Only one person is saved. A Milan needs two.{" "}
           <Link className="linkish" to="/leaf/new">
             Add a second person
           </Link>
@@ -255,7 +255,7 @@ function Picker({
                     if ("clientX" in pe && inDrop(pe.clientX, pe.clientY)) onPick(p);
                   }}
                   onClick={() => onPick(p)}
-                  aria-label={`Compare ${p.name} with ${first?.name ?? "the first person"} — the second person`}
+                  aria-label={`Compare ${p.name} with ${first?.name ?? "the first person"} as the second person`}
                 >
                   <span className="leaf__hole" aria-hidden="true" />
                   {p.name}
@@ -350,14 +350,14 @@ function MilanScreen() {
       if (!navigator.clipboard) throw new Error("no clipboard");
       await navigator.clipboard.writeText(text);
       haptics.selection();
-      toast("Summary copied — plain text, with the disclaimer.");
+      toast("Summary copied as plain text, with the disclaimer.");
     } catch {
       toast("This browser would not let Vyom copy. Nothing was sent anywhere.", "warn");
     }
   };
 
   return (
-    <Screen className="milan" scroll label="Guna Milan — the 36-bead mala">
+    <Screen className="milan" scroll label="Guna Milan: the 36-bead mala">
       <article className="paper paper--cut sheet-col milan__sheet" aria-labelledby="milan-h">
         <TurmericBand id="milan-h" level={1} dev="गुण मिलान" title="Milan · compatibility" meta="aṣṭakūṭa" explain="guna-milan" />
 
@@ -454,7 +454,7 @@ function MilanScreen() {
             {r ? (
               <div className="milan-verdict">
                 <p className="milan-verdict__t">
-                  {pa.name} and {pb.name}: <strong>{r.total} of 36</strong> — {VERDICT[r.band]}.
+                  {pa.name} and {pb.name}: <strong>{r.total} of 36</strong>: {VERDICT[r.band]}.
                   {r.kootas.some((k) => k.dosha)
                     ? ` Tradition flags ${r.kootas
                         .filter((k) => k.dosha)
@@ -463,7 +463,8 @@ function MilanScreen() {
                     : " No factor is flagged."}
                 </p>
                 <p className="milan-verdict__k">
-                  A score is tradition's arithmetic on two Moons — not a verdict on two people. Karma, your own actions, decides the rest.
+                  A score is tradition's arithmetic on two Moons. It is not a verdict on two people. Karma, your own actions, decides the
+                  rest.
                 </p>
               </div>
             ) : null}
@@ -489,10 +490,10 @@ function MilanScreen() {
 
         <Colophon
           rows={[
-            ["Method", "Aṣṭakūṭa from the two Moons' nakṣatra, pada and rāśi — eight kūṭas, 36 points"],
+            ["Method", "Aṣṭakūṭa from the two Moons' nakṣatra, pada and rāśi: eight kūṭas, 36 points"],
             [
               "School",
-              `${SCHOOL_LABEL[settings.ashtakootaSchool]} (Settings) — after Muhūrta Cintāmaṇi ch. 6; ${SCHOOL_NOTE[settings.ashtakootaSchool]}; Varṇa, Vaśya and one Yoni cell follow it`,
+              `${SCHOOL_LABEL[settings.ashtakootaSchool]} (Settings), after Muhūrta Cintāmaṇi ch. 6; ${SCHOOL_NOTE[settings.ashtakootaSchool]}; Varṇa, Vaśya and one Yoni cell follow it`,
             ],
             ["Sides", "first person in the first column of every table, second person in the second"],
             [
@@ -514,10 +515,10 @@ function MilanScreen() {
         onClose={() => setSheet(null)}
         label={
           sheet?.kind === "koota"
-            ? `${sheet.k.name} — the rule`
+            ? `${sheet.k.name}: the rule`
             : sheet?.kind === "porutham"
-              ? `${sheet.p.name} porutham — the rule`
-              : "Manglik — Kuja doṣa"
+              ? `${sheet.p.name} porutham: the rule`
+              : "Manglik (Kuja doṣa)"
         }
       >
         {sheet?.kind === "koota" && pa && pb ? (
@@ -556,7 +557,7 @@ function MoonLine({ who, p, m }: { who: string; p: Profile; m: MoonFacts | null 
             {SIGN_NAMES[m.sign]}
           </>
         ) : (
-          "—"
+          "–"
         )}
       </dd>
     </div>
@@ -707,7 +708,7 @@ function ManglikSheet({ profile, m, onClose }: { profile: Profile; m: ManglikSta
         <span lang="sa" className="dev">
           कुज दोष
         </span>{" "}
-        · Manglik — {profile.name}
+        · Manglik: {profile.name}
       </h2>
       <p className="p">
         {m.present

@@ -61,7 +61,7 @@ const META: Record<PoruthamId, { name: string; nameDev: string; rule: string; we
     name: "Gaṇa",
     nameDev: "गण",
     rule: "Each nakṣatra is Deva, Manuṣya or Rākṣasa in temperament. The same gaṇa, or Deva with Manuṣya, ties the knot; a Rākṣasa nakṣatra beside a Deva or Manuṣya one leaves it open.",
-    weighs: "temperament — how the two natures meet",
+    weighs: "temperament: how the two natures meet",
   },
   mahendra: {
     name: "Mahendra",
@@ -78,7 +78,7 @@ const META: Record<PoruthamId, { name: string; nameDev: string; rule: string; we
   yoni: {
     name: "Yoni",
     nameDev: "योनि",
-    rule: "Each nakṣatra carries an animal yoni. The knot stays open only for the seven sworn pairs — horse and buffalo, elephant and lion, sheep and monkey, serpent and mongoose, dog and deer, cat and rat, cow and tiger.",
+    rule: "Each nakṣatra carries an animal yoni. The knot stays open only for the seven sworn pairs: horse and buffalo, elephant and lion, sheep and monkey, serpent and mongoose, dog and deer, cat and rat, cow and tiger.",
     weighs: "instinctive nature and closeness",
   },
   rashi: {
@@ -96,20 +96,20 @@ const META: Record<PoruthamId, { name: string; nameDev: string; rule: string; we
   vashya: {
     name: "Vaśya",
     nameDev: "वश्य",
-    rule: "Each sign holds certain signs under its sway: Meṣa — Siṃha, Vṛścika; Vṛṣabha — Karka, Tulā; Mithuna — Kanyā; Karka — Vṛścika, Dhanu; Siṃha — Tulā; Kanyā — Mithuna, Mīna; Tulā — Kanyā, Makara; Vṛścika — Karka; Dhanu — Mīna; Makara — Meṣa, Kumbha; Kumbha — Meṣa; Mīna — Makara. The knot is tied when either Moon sign holds the other.",
+    rule: "Each sign holds certain signs under its sway. Meṣa: Siṃha, Vṛścika. Vṛṣabha: Karka, Tulā. Mithuna: Kanyā. Karka: Vṛścika, Dhanu. Siṃha: Tulā. Kanyā: Mithuna, Mīna. Tulā: Kanyā, Makara. Vṛścika: Karka. Dhanu: Mīna. Makara: Meṣa, Kumbha. Kumbha: Meṣa. Mīna: Makara. The knot is tied when either Moon sign holds the other.",
     weighs: "mutual regard and attraction",
   },
   rajju: {
     name: "Rajju",
     nameDev: "रज्जु",
-    rule: "The nakṣatras fall on five cords of the body — Pāda (feet), Kaṭi (waist), Nābhi (navel), Kaṇṭha (neck), Śiras (head) — rising and falling through each run of nine. Two nakṣatras on the same cord leave the knot open.",
+    rule: "The nakṣatras fall on five cords of the body (Pāda the feet, Kaṭi the waist, Nābhi the navel, Kaṇṭha the neck, Śiras the head), rising and falling through each run of nine. Two nakṣatras on the same cord leave the knot open.",
     weighs: "the endurance of the bond",
   },
   vedha: {
     name: "Vedha",
     nameDev: "वेध",
     rule: "Certain nakṣatras pierce one another: Aśvinī–Jyeṣṭhā, Bharaṇī–Anurādhā, Kṛttikā–Viśākhā, Rohiṇī–Svātī, Ārdrā–Śravaṇa, Punarvasu–Uttara Āṣāḍhā, Puṣya–Pūrva Āṣāḍhā, Āśleṣā–Mūla, Maghā–Revatī, Pūrva Phalgunī–Uttara Bhādrapadā, Uttara Phalgunī–Pūrva Bhādrapadā, Hasta–Śatabhiṣā, and Mṛgaśīrṣa, Citrā and Dhaniṣṭhā with each other. Such a pair leaves the knot open.",
-    weighs: "mutual obstruction — friction the pair would carry",
+    weighs: "mutual obstruction: friction the pair would carry",
   },
 };
 
@@ -227,7 +227,7 @@ export function poruthams(a: MoonPlacement, b: MoonPlacement): PoruthamResult[] 
     ganaPass,
     ga === gb
       ? `${to} and ${from} are both ${GANA_LABEL[ga]}.`
-      : `${to} is ${GANA_LABEL[ga]} and ${from} is ${GANA_LABEL[gb]}${ganaPass ? "" : " — a Rākṣasa nakṣatra beside another gaṇa"}.`,
+      : `${to} is ${GANA_LABEL[ga]} and ${from} is ${GANA_LABEL[gb]}${ganaPass ? "" : ", a Rākṣasa nakṣatra beside another gaṇa"}.`,
   );
 
   // 3 Mahendra
@@ -247,7 +247,7 @@ export function poruthams(a: MoonPlacement, b: MoonPlacement): PoruthamResult[] 
     !sworn,
     ya === yb
       ? `${to} and ${from} share the ${YONI_LABEL[ya]} yoni.`
-      : `${to} is ${YONI_LABEL[ya]} and ${from} is ${YONI_LABEL[yb]}${sworn ? " — a sworn pair" : ", not a sworn pair"}.`,
+      : `${to} is ${YONI_LABEL[ya]} and ${from} is ${YONI_LABEL[yb]}${sworn ? ", a sworn pair" : ", not a sworn pair"}.`,
   );
 
   // 6 Rāśi
@@ -298,7 +298,7 @@ export function poruthams(a: MoonPlacement, b: MoonPlacement): PoruthamResult[] 
     ra !== rb,
     ra === rb
       ? `${to} and ${from} lie on the same cord, ${RAJJU_LABEL[ra]}.`
-      : `${to} lies on ${RAJJU_LABEL[ra]} and ${from} on ${RAJJU_LABEL[rb]} — different cords.`,
+      : `${to} lies on ${RAJJU_LABEL[ra]} and ${from} on ${RAJJU_LABEL[rb]}: different cords.`,
   );
 
   // 10 Vedha

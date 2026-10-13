@@ -23,7 +23,7 @@ export function PosterAction({ make }: PosterActionProps) {
         setBusy(true);
         renderPoster(job.scene, job.text)
           .then((canvas) => savePoster(canvas, job.filename))
-          .then(() => toast("Poster drawn — 1080 × 1920 PNG"))
+          .then(() => toast("Poster drawn: 1080 × 1920 PNG"))
           .catch(() => toast("The poster could not be drawn on this device", "warn"))
           .finally(() => setBusy(false));
       }}

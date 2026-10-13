@@ -27,7 +27,7 @@ function describe(e: SkyEvent): { icon: React.ReactNode; title: string; note: st
       return {
         icon: <span className="ev-moon ev-moon--full" />,
         title: "Pūrṇimā · Full Moon",
-        note: "The Moon is opposite the Sun — a festival day in many traditions.",
+        note: "The Moon is opposite the Sun. A festival day in many traditions.",
         tone: "moon",
         explain: "tithi",
       };
@@ -53,7 +53,7 @@ function describe(e: SkyEvent): { icon: React.ReactNode; title: string; note: st
         title: `${cap(e.eclipse)} lunar eclipse`,
         note: e.visibleHere
           ? "Visible from here (weather permitting). In myth, Rāhu swallows the Moon."
-          : "Not visible from this place — the Moon is below the horizon.",
+          : "Not visible from this place. The Moon is below the horizon.",
         tone: e.visibleHere ? "eclipse" : "muted",
         explain: "rahu-ketu",
       };
@@ -62,7 +62,7 @@ function describe(e: SkyEvent): { icon: React.ReactNode; title: string; note: st
         icon: <GrahaGlyph id="RA" size={34} />,
         title: `${cap(e.eclipse)} solar eclipse`,
         note: e.visibleHere
-          ? "Visible from here — never look at the Sun without eclipse glasses."
+          ? "Visible from here. Never look at the Sun without eclipse glasses."
           : "Not visible from this place; seen elsewhere on Earth.",
         tone: e.visibleHere ? "eclipse" : "muted",
         explain: "rahu-ketu",

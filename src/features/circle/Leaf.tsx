@@ -85,7 +85,7 @@ export function Leaf(props: LeafProps) {
               props.onTray(false);
               props.onTool(t);
             }}
-            aria-label={`${label} — ${name}`}
+            aria-label={`${label}: ${name}`}
           >
             {label}
           </button>
@@ -97,7 +97,7 @@ export function Leaf(props: LeafProps) {
               Delete<small>hold</small>
             </>
           }
-          ariaLabel={`Delete ${name} — hold to delete them and their palm photos`}
+          ariaLabel={`Delete ${name}, hold to delete them and their palm photos`}
           onProgress={(k) => charTo(char.current, k)}
           onBurn={props.onBurn}
         />
@@ -128,7 +128,7 @@ export function Leaf(props: LeafProps) {
         <button
           type="button"
           className="leaf__face"
-          aria-label={`${name} — ${moonText}; born ${birthLine(profile)}. Opens the Janam Patri${active ? " (the active person)" : ""}`}
+          aria-label={`${name}, ${moonText}; born ${birthLine(profile)}. Opens the Janam Patri${active ? " (the active person)" : ""}`}
           onClick={(e) => {
             if (dragged.current) return;
             if (trayOpen) {

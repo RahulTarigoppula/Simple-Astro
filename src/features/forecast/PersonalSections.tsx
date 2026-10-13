@@ -133,7 +133,7 @@ export function DayGuideCard({ g, zone, name }: { g: DayGuide; zone: string; nam
     <section className="cosmic-card fc-guide" aria-labelledby="fc-guide-h">
       <header className="cosmic-card__head">
         <h2 id="fc-guide-h">
-          {name}'s guide for today <span className="gloss">by tradition — use what helps, ignore what doesn't</span>
+          {name}'s guide for today <span className="gloss">by tradition. Use what helps, ignore what doesn't.</span>
         </h2>
       </header>
       <div className="fc-guide__grid">
@@ -205,7 +205,7 @@ export function DayNotes({ steps, zone }: { steps: DayRating[]; zone: string }) 
                 <span>{fmt(s.ms + 43_200_000, zone, { day: "numeric", month: "short" })}</span>
               </span>
               <span className="fc-note__t">
-                <span className="fc-note__w">{WORD[t]}</span> · Moon in your {ord(s.moonHouse)} — {HOUSE_AREA[s.moonHouse]}; {s.tara} star (
+                <span className="fc-note__w">{WORD[t]}</span> · Moon in your {ord(s.moonHouse)}: {HOUSE_AREA[s.moonHouse]}; {s.tara} star (
                 {s.taraTone === "kind" ? "kind" : s.taraTone === "unkind" ? "unkind" : "your own"})
               </span>
             </li>

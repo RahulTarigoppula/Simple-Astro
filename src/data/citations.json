@@ -1,16 +1,16 @@
 {
   "$comment": "Every Citation used by a rule resolves to one entry here (src/engine/citations.test.ts). Chapter numbers follow the common English translations (BPHS: R. Santhanam; Phaladīpikā: V. Subrahmanya Sastri; Sārāvalī: R. Santhanam); a verse is given only where it is well established. 'Later tradition' marks conventions that are widely used but have no verse in the classical texts.",
   "works": {
-    "BPHS": "Bṛhat Parāśara Horā Śāstra — the foundational Parāśarī text on natal astrology.",
+    "BPHS": "Bṛhat Parāśara Horā Śāstra, the foundational Parāśarī text on natal astrology.",
     "Phaladīpikā": "Phaladīpikā of Mantreśvara (c. 14th century), a compact manual of natal rules and yogas.",
     "Sārāvalī": "Sārāvalī of Kalyāṇavarmā (c. 9th–10th century), notable for its chapters on planetary combinations.",
     "Sūrya Siddhānta": "Sūrya Siddhānta, the classical astronomical treatise; its chapter on conjunctions defines planetary contests.",
     "Muhūrta Cintāmaṇi": "Muhūrta Cintāmaṇi of Rāma Daivajña (1600), the standard muhūrta text; its sixth chapter sets out the Aṣṭakūṭa.",
     "Later tradition": "A convention found in later manuals and commentaries rather than in a verse of the classical texts.",
     "Porutham tradition (Tamil jyotiṣa)": "The South Indian (Tamil) practice of marriage matching by ten agreements (daśa porutham), as set out in the common Tamil almanacs and jyotiṣa manuals.",
-    "Sāmudrika Śāstra": "Sāmudrika Śāstra — the Indian tradition of reading the body's marks; its hasta (hand) section reads the lines and fingers.",
-    "Cheiro, Language of the Hand": "Cheiro (William John Warner), Cheiro's Language of the Hand, 1894 — a public-domain classic of Western palmistry.",
-    "Gettings, The Book of the Hand": "Fred Gettings, The Book of the Hand, 1965 — source of the four-element hand typology (earth, air, fire, water).",
+    "Sāmudrika Śāstra": "Sāmudrika Śāstra, the Indian tradition of reading the body's marks; its hasta (hand) section reads the lines and fingers.",
+    "Cheiro, Language of the Hand": "Cheiro (William John Warner), Cheiro's Language of the Hand, 1894. A public-domain classic of Western palmistry.",
+    "Gettings, The Book of the Hand": "Fred Gettings, The Book of the Hand, 1965. Source of the four-element hand typology (earth, air, fire, water).",
     "Muhūrta tradition": "The working rules of the muhūrta manuals and almanacs (Muhūrta Cintāmaṇi, Muhūrta Mārtaṇḍa and the printed pañcāṅgas) for dividing the day into choghaḍiyās, horās and named muhūrtas."
   },
   "entries": [
@@ -96,7 +96,7 @@
       "text": "Muhūrta Cintāmaṇi",
       "ref": "ch. 6",
       "title": "Aṣṭakūṭa",
-      "description": "The eight kootas of Guna Milan — Varṇa, Vaśya, Tārā, Yoni, Graha Maitrī, Gaṇa, Bhakūṭa, Nāḍī — worth 1 to 8 points, 36 in all."
+      "description": "The eight kootas of Guna Milan (Varṇa, Vaśya, Tārā, Yoni, Graha Maitrī, Gaṇa, Bhakūṭa, Nāḍī), worth 1 to 8 points, 36 in all."
     },
     {
       "text": "Later tradition",
@@ -108,7 +108,7 @@
       "text": "Porutham tradition (Tamil jyotiṣa)",
       "ref": "Daśa porutham",
       "title": "The ten poruthams",
-      "description": "Dina, Gaṇa, Mahendra, Strī-dīrgha, Yoni, Rāśi, Rāśyādhipati, Vaśya, Rajju and Vedha — each agreement either holds or does not; Rajju and Vedha are weighed heaviest."
+      "description": "Dina, Gaṇa, Mahendra, Strī-dīrgha, Yoni, Rāśi, Rāśyādhipati, Vaśya, Rajju and Vedha. Each agreement either holds or does not; Rajju and Vedha are weighed heaviest."
     },
     {
       "text": "Later tradition",
@@ -239,7 +239,7 @@
     {
       "text": "Sūrya Siddhānta",
       "ref": "ch. 14",
-      "title": "Mānādhyāya — measures of time",
+      "title": "Mānādhyāya: measures of time",
       "description": "The measures of time, among them the saura māsa: the solar month begins at a saṅkrānti, when the Sun enters a sidereal sign."
     }
   ]

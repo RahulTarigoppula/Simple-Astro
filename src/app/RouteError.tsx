@@ -6,7 +6,7 @@ export function RouteError() {
   const err = useRouteError();
   const reason =
     err instanceof EngineError
-      ? `${err.code.replace(/_/g, " ").toLowerCase()} — ${err.detail}`
+      ? `${err.code.replace(/_/g, " ").toLowerCase()}: ${err.detail}`
       : err instanceof Error
         ? err.message
         : "Vyom could not open this page";
@@ -31,7 +31,7 @@ export function RouteError() {
         </div>
         <p className="p" role="alert">
           {offlineChunk
-            ? "This screen has not been downloaded yet — open it once with a connection, or use Settings → Prepare for offline."
+            ? "This screen has not been downloaded yet. Open it once with a connection, or use Settings → Prepare for offline."
             : `Reason: ${reason}.`}
         </p>
         <p className="p">

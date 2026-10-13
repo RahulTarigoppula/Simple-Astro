@@ -62,7 +62,7 @@ export function TimeUnknownNote({ profile, patri }: { profile: Profile; patri: P
     <p className="note-haldi note--keep" role="note" style={{ margin: "var(--space-3) 0 0" }}>
       <span aria-hidden="true">⚑</span>
       <span>
-        Birth time unknown — cast for local noon. The Lagna, houses, Navāṃśa and daśā dates are not reliable.{" "}
+        Birth time unknown, so the chart is cast for local noon. The Lagna, houses, Navāṃśa and daśā dates are not reliable.{" "}
         {moonDaySentence(dawn, dusk, patri.grahas.MO)}
       </span>
     </p>

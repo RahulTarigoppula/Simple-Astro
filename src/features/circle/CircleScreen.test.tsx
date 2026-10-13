@@ -69,7 +69,7 @@ describe("CircleScreen", () => {
     const { router } = renderCircle();
     const people = await screen.findByRole("list", { name: "People" });
     expect(within(people).getAllByRole("listitem")).toHaveLength(2);
-    const rahul = await screen.findByRole("button", { name: /^Rahul — Moon in Revatī/ });
+    const rahul = await screen.findByRole("button", { name: /^Rahul, Moon in Revatī/ });
     expect(screen.getByText("रेवती")).toHaveAttribute("lang", "hi");
     fireEvent.click(rahul);
     await waitFor(() => expect(router.state.location.pathname).toBe(`/patri/${REFERENCE_PROFILE.id}`));
@@ -93,7 +93,7 @@ describe("CircleScreen", () => {
     renderCircle();
     fireEvent.click(await screen.findByRole("button", { name: "Actions for Priya" }));
     const dlg = await screen.findByRole("dialog");
-    const burn = within(dlg).getByRole("button", { name: /Delete Priya —/ });
+    const burn = within(dlg).getByRole("button", { name: /Delete Priya, hold/ });
     act(() => {
       fireEvent.keyDown(burn, { key: " " });
     });
@@ -106,7 +106,7 @@ describe("CircleScreen", () => {
     renderCircle();
     fireEvent.click(await screen.findByRole("button", { name: "Actions for Priya" }));
     const dlg = await screen.findByRole("dialog");
-    const burn = within(dlg).getByRole("button", { name: /Delete Priya —/ });
+    const burn = within(dlg).getByRole("button", { name: /Delete Priya, hold/ });
     fireEvent.keyDown(burn, { key: " " });
     fireEvent.keyUp(burn, { key: " " });
     await new Promise((r) => setTimeout(r, 800));

@@ -253,7 +253,7 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
       </div>
       <div className="chart-tools">
         <button type="button" className="linkish" onClick={flip}>
-          {style === "north" ? "Turn the paper — South grid ⇄" : "Turn the paper — North diamond ⇄"}
+          {style === "north" ? "Turn the paper: South grid ⇄" : "Turn the paper: North diamond ⇄"}
         </button>
       </div>
       <div className="readout" aria-live="polite">
@@ -276,7 +276,7 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
               ) : null}
             </>
           ) : (
-            <span className="loupe-hint">Touch a graha — the loupe rises</span>
+            <span className="loupe-hint">Touch a graha to raise the loupe</span>
           )}
         </div>
       </div>

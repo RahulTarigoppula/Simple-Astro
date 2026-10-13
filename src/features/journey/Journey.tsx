@@ -124,7 +124,7 @@ export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () =
       className="journey"
       role="dialog"
       aria-modal="true"
-      aria-label="The journey — from the universe to Vyom"
+      aria-label="The journey from the universe to Vyom"
       onTouchStart={(e) => {
         touch.current = e.touches[0]?.clientX ?? null;
       }}
@@ -169,7 +169,7 @@ export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () =
             <blockquote className="journey__quote">
               {beat.id === BEATS.find((b) => b.quote)?.id ? <p className="journey__kicker">In Rahul's words</p> : null}
               <p className="journey__say">{beat.quote}</p>
-              {beat.sign ? <footer className="journey__sig">— Rahul, who made Vyom</footer> : null}
+              {beat.sign ? <footer className="journey__sig">Rahul, who made Vyom</footer> : null}
             </blockquote>
           ) : (
             <>

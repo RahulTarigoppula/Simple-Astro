@@ -107,7 +107,7 @@ export async function extractLines(
   });
   if (msg.ok) {
     if (import.meta.env.DEV && msg.mats.created !== msg.mats.deleted) {
-      console.warn(`palm worker: cv.Mat leak — ${msg.mats.created} created, ${msg.mats.deleted} deleted`);
+      console.warn(`palm worker: cv.Mat leak: ${msg.mats.created} created, ${msg.mats.deleted} deleted`);
     }
     return {
       rectified: new ImageData(new Uint8ClampedArray(msg.rectified), 512, 512),

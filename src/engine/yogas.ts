@@ -385,13 +385,13 @@ export const manglik: YogaRule = {
       return {
         grahaId: "MA" as const,
         house: h,
-        note: `Maṅgala in the ${ord(h)} from ${ref === "lagna" ? "the Lagna" : MANGLIK_REF_LABEL[ref]}${counted ? " — counted" : " — not a Manglik house"}`,
+        note: `Maṅgala in the ${ord(h)} from ${ref === "lagna" ? "the Lagna" : MANGLIK_REF_LABEL[ref]}${counted ? ", counted" : ", not a Manglik house"}`,
       };
     });
     for (const c of MANGLIK_CANCELLATIONS) {
       const scope =
         c.scope === "chart" ? "checked in this chart" : c.scope === "pair" ? "checked in Guna Milan" : "recorded only, never applied";
-      because.push({ note: `standard cancellation — ${c.description} (${scope})` });
+      because.push({ note: `standard cancellation: ${c.description} (${scope})` });
     }
     return {
       strength: lead.ref === "lagna" ? "full" : "partial",
@@ -458,7 +458,7 @@ export const grahaYuddha: YogaRule = {
         grahaId: w.winner ?? w.b,
         note:
           w.winner === null
-            ? "equal latitudes — no clear victor"
+            ? "equal latitudes, so no clear victor"
             : `${gName(w.winner)} lies further north (${p.g[w.winner].latEcliptic.toFixed(2)}° latitude) and is the victor`,
       });
     }

@@ -206,7 +206,7 @@ describe("schools", () => {
       expect(score(a, b, "yoni", NORTH)).toBe(3);
       expect(score(a, b, "yoni", PYJHORA)).toBe(1);
     }
-    expect(kootas(moon(0, 1), moon(16, 1), NORTH)[3]?.because).toBe("Yoni: Aśva (horse) and Mṛga (deer) — friendly");
+    expect(kootas(moon(0, 1), moon(16, 1), NORTH)[3]?.because).toBe("Yoni: Aśva (horse) and Mṛga (deer), friendly");
     // Negative: Aśva × Mahiṣa (Hasta) stays sworn (0) in both schools.
     expect(score(moon(0, 1), moon(12, 1), "yoni", NORTH)).toBe(0);
     expect(score(moon(0, 1), moon(12, 1), "yoni", PYJHORA)).toBe(0);
