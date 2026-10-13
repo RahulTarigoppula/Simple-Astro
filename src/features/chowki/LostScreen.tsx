@@ -3,17 +3,17 @@ import { Screen } from "../../components/ui/Screen";
 
 export default function LostScreen() {
   return (
-    <Screen scroll label="Lost leaf">
+    <Screen scroll label="Page not found">
       <div className="paper sheet-col" style={{ marginTop: "var(--space-9)" }}>
         <div className="band">
           <h1>
             <span lang="hi" className="dev">
-              खोया पत्ता
+              खो गया
             </span>{" "}
-            · Lost leaf
+            · Page not found
           </h1>
         </div>
-        <p className="p">This leaf is not in the bundle.</p>
+        <p className="p">There is nothing at this address.</p>
         <p className="p">
           <Link className="linkish" to="/">
             Back home

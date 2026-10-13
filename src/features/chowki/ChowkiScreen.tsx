@@ -6,11 +6,11 @@ import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/
 import { rememberOrigin } from "../../app/origin";
 import { InfoDot } from "../../components/ui/Explain";
 import { Screen } from "../../components/ui/Screen";
-import { NAKSHATRA_NAMES, SIGN_NAMES, TITHI_DEV, VARA_NAMES, YOGA_NAMES } from "../../data/tables/names";
+import { NAKSHATRA_LORE } from "../../data/lore";
+import { NAKSHATRA_NAMES } from "../../data/tables/names";
 import { computePanchang } from "../../engine/panchang";
 import type { Panchang } from "../../engine/types";
 import { play } from "../../platform/sound";
-import { CosmicProfile } from "../cosmic/CosmicProfile";
 import { SkyEvents } from "../cosmic/SkyEvents";
 import { TodayForYou } from "../cosmic/TodayForYou";
 import {
@@ -21,7 +21,6 @@ import {
   IconForecast,
   IconGuide,
   IconMilan,
-  IconMoon,
   IconNumbers,
   IconPalm,
   IconPlus,
@@ -30,8 +29,27 @@ import {
   IconToday,
 } from "./icons";
 import { ZodiacOrbit } from "./ZodiacOrbit";
-import "../story/roots.css";
 import "./chowki.css";
+import "./home.css";
+
+const ORD = [
+  "",
+  "first",
+  "second",
+  "third",
+  "fourth",
+  "fifth",
+  "sixth",
+  "seventh",
+  "eighth",
+  "ninth",
+  "tenth",
+  "eleventh",
+  "twelfth",
+  "thirteenth",
+  "fourteenth",
+  "fifteenth",
+];
 
 const BENGALURU = { lat: 12.9716, lon: 77.5946, zone: "Asia/Kolkata" };
 
@@ -109,9 +127,19 @@ export default function ChowkiScreen() {
   const empty = profiles !== undefined && profiles.length === 0;
   const h = hourIn(now, zone);
   const salutation = h < 5 ? "A quiet night" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
-  const tithiNo = p ? (p.tithi.index - 1) % 15 : 0;
   const second = profiles?.find((x) => x.id !== active?.id);
   const strengthOk = active && activePatri && activePatri.profileId === active.id;
+
+  const waxing = p ? p.tithi.paksha === "shukla" : true;
+  const dayOf = p ? ((p.tithi.index - 1) % 15) + 1 : 1;
+  const nakLore = p ? NAKSHATRA_LORE[p.nakshatra.index] : undefined;
+  const skyLine = p
+    ? p.tithi.index === 15
+      ? `Full Moon tonight, in ${NAKSHATRA_NAMES[p.nakshatra.index]} — “${nakLore?.meaning}”.`
+      : p.tithi.index === 30
+        ? `New Moon — the sky is dark, and the Moon rests beside the Sun.`
+        : `The Moon walks through ${NAKSHATRA_NAMES[p.nakshatra.index]} — “${nakLore?.meaning}” — on the ${ORD[dayOf] ?? dayOf} day of the ${waxing ? "waxing" : "waning"} Moon.`
+    : "";
 
   return (
     <Screen className="chowki" label="Vyom — home">
@@ -139,7 +167,7 @@ export default function ChowkiScreen() {
           <p className="home-kicker">{salutation}</p>
           <h1 id="home-greet" className="home-title">
             {empty ? (
-              "Write your first leaf"
+              "Add your first person"
             ) : (
               <>
                 <span lang="hi">नमस्ते</span>
@@ -147,58 +175,43 @@ export default function ChowkiScreen() {
               </>
             )}
           </h1>
+          {skyLine ? <p className="home-line">{skyLine}</p> : null}
           {p ? (
-            <ul className="home-angas" aria-label="Today's pañcāṅga — the Hindu almanac">
+            <ul className="home-chips" aria-label="Today's almanac">
               <li>
-                <span className="k">
-                  Tithi <InfoDot id="tithi" />
-                </span>
-                <span className="g">lunar day</span>
-                <span className="v">
-                  {p.tithi.index === 30 ? "अमावस्या" : `${p.tithi.paksha === "shukla" ? "शुक्ल" : "कृष्ण"} ${TITHI_DEV[tithiNo] ?? ""}`}
-                </span>
-                <span className="s">{p.tithi.name}</span>
+                <span className="k">Lunar day</span>
+                <span className="v">{p.tithi.name}</span>
+                <InfoDot id="tithi" />
               </li>
               <li>
-                <span className="k">
-                  Nakṣatra <InfoDot id="nakshatra" />
-                </span>
-                <span className="g">Moon's star</span>
+                <span className="k">Moon's star</span>
                 <span className="v">{NAKSHATRA_NAMES[p.nakshatra.index]}</span>
-                <span className="s">pada {p.nakshatra.pada}</span>
-              </li>
-              <li>
-                <span className="k">
-                  Yoga <InfoDot id="yoga-panchang" />
-                </span>
-                <span className="g">Sun + Moon</span>
-                <span className="v">{YOGA_NAMES[p.yoga.index - 1] ?? p.yoga.name}</span>
-                <span className="s">{VARA_NAMES[p.vara.index]}</span>
+                <InfoDot id="nakshatra" />
               </li>
               <li className="is-caution">
-                <span className="k">
-                  Rāhu Kāla <InfoDot id="rahu-kala" />
-                </span>
-                <span className="g">avoid new starts</span>
+                <span className="k">Rāhu Kāla</span>
                 <span className="v mono">
                   {hhmm(p.rahuKaal[0], zone)}–{hhmm(p.rahuKaal[1], zone)}
                 </span>
-                <span className="s">by tradition</span>
+                <InfoDot id="rahu-kala" />
               </li>
             </ul>
-          ) : (
-            <p className="note-haldi">The sky could not be reckoned for this place — check the leaf's date.</p>
-          )}
+          ) : null}
           {empty ? (
-            <Link to="/leaf/new" className="stamp home-cta">
-              <span>Cast a birth chart</span>
-            </Link>
+            <div className="home-cta-row">
+              <Link to="/leaf/new" className="stamp home-cta">
+                <span>Add a person</span>
+              </Link>
+              <Link to="/journey" className="home-cta-ghost">
+                ▶ Watch the journey
+              </Link>
+            </div>
           ) : null}
         </div>
         <Link
-          to={active ? `/patri/${active.id}/sky` : "/today"}
+          to={active ? `/patri/${active.id}/sky` : "/explore"}
           className="home-orbit"
-          aria-label="The sky right now — open the rooftop"
+          aria-label="The sky right now — open it"
           onClick={(e) => rememberOrigin(e.currentTarget)}
         >
           <ZodiacOrbit
@@ -210,7 +223,7 @@ export default function ChowkiScreen() {
           />
           <span className="home-legend" aria-hidden="true">
             <span>
-              <i className="lg lg--asc" /> rising sign here
+              <i className="lg lg--asc" /> rising here
             </span>
             {strengthOk ? (
               <span>
@@ -218,12 +231,8 @@ export default function ChowkiScreen() {
               </span>
             ) : null}
             <span>
-              <i className="lg lg--planet" /> planet now
+              <i className="lg lg--planet" /> planets now
             </span>
-          </span>
-          <span className="home-orbit__cap">
-            The sky right now · Moon in {p ? NAKSHATRA_NAMES[p.nakshatra.index] : "—"}
-            {strengthOk ? ` · your Moon sign ${SIGN_NAMES[activePatri.grahas.MO.sign]}` : ""} · tap to explore
           </span>
         </Link>
       </section>
@@ -231,38 +240,69 @@ export default function ChowkiScreen() {
       {strengthOk && active ? (
         <div className="home-stack">
           <TodayForYou profile={active} patri={activePatri} nowMs={now} preset={settings.preset} />
-          <CosmicProfile profile={active} patri={activePatri} compact />
         </div>
       ) : null}
 
+      <nav className="home-primary" aria-label="Start here">
+        {strengthOk ? (
+          <Link to="/story" className="home-big home-big--gold">
+            <IconStory size={26} />
+            <span className="home-big__t">Roots</span>
+            <span className="home-big__s">Gods, sages and stars — the story</span>
+          </Link>
+        ) : (
+          <Link to="/forecast" className="home-big home-big--gold">
+            <IconForecast size={26} />
+            <span className="home-big__t">Your forecast</span>
+            <span className="home-big__s">Day to year, read from the sky</span>
+          </Link>
+        )}
+        {active ? (
+          <Link to={`/patri/${active.id}`} className="home-big home-big--violet">
+            <IconChart size={26} />
+            <span className="home-big__t">Birth chart</span>
+            <span className="home-big__s">{active.name}'s sky at birth</span>
+          </Link>
+        ) : (
+          <Link to="/leaf/new" className="home-big home-big--violet">
+            <IconPlus size={26} />
+            <span className="home-big__t">Add a person</span>
+            <span className="home-big__s">Birth date, time and place</span>
+          </Link>
+        )}
+        <Link to="/explore" className="home-big home-big--cyan">
+          <IconSky size={26} />
+          <span className="home-big__t">Explore the sky</span>
+          <span className="home-big__s">Planets, signs, stars and their myths</span>
+        </Link>
+      </nav>
+
       <div className="home-stack">
-        <SkyEvents nowMs={now} place={{ lat, lon, name: placeName }} zone={zone} preset={settings.preset} days={40} limit={6} />
+        <SkyEvents nowMs={now} place={{ lat, lon, name: placeName }} zone={zone} preset={settings.preset} days={40} limit={4} />
       </div>
 
-      <h2 className="home-sec">Everything in Vyom</h2>
-      <nav className="home-tiles" aria-label="Features">
-        {active ? (
-          <Tile
-            to={`/patri/${active.id}`}
-            title="Birth chart"
-            dev="जन्म पत्री"
-            sub={`${active.name}'s Janam Patri`}
-            icon={<IconChart />}
-            tone="violet"
-          />
-        ) : (
-          <Tile to="/leaf/new" title="Add a person" dev="नया पत्ता" sub="Birth date, time and place" icon={<IconPlus />} tone="violet" />
-        )}
-        <Tile
-          to={active ? `/forecast/${active.id}` : "/forecast"}
-          title="Forecast"
-          dev="भविष्य"
-          sub="Day, week, month, year"
-          icon={<IconForecast />}
-          tone="gold"
-        />
+      <section className="home-origin" aria-labelledby="home-origin-h">
+        <div className="home-origin__art" aria-hidden="true">
+          <span />
+        </div>
+        <div className="home-origin__text">
+          <p className="home-origin__k">The story behind Vyom</p>
+          <h2 id="home-origin-h">From the edge of the universe to a bedtime Rāmāyaṇa.</h2>
+          <p>Ninety-three billion light-years, one pale blue dot, and one question asked by a curious engineer: is astrology real?</p>
+          <div className="home-origin__actions">
+            <Link to="/journey" className="stamp">
+              <span>▶ Watch the journey</span>
+            </Link>
+            <Link to="/story" className="linkish">
+              Read Roots →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <h2 className="home-sec">More in Vyom</h2>
+      <nav className="home-tiles" aria-label="More">
         <Tile to="/today" title="Today's almanac" dev="पंचांग" sub="Good and bad times" icon={<IconToday />} tone="gold" />
-        <Tile to="/explore" title="Explore" dev="अन्वेषण" sub="Gods, signs and stars" icon={<IconSky />} tone="cyan" />
         <Tile
           to={active && second ? `/milan/${active.id}/${second.id}` : "/milan"}
           title="Compatibility"
@@ -279,39 +319,12 @@ export default function ChowkiScreen() {
           icon={<IconPalm />}
           tone="rose"
         />
-        <Tile to="/story" title="The story" dev="कथा" sub="Where it all began" icon={<IconStory />} tone="gold" />
         <Tile to="/explore/numbers" title="Numerology" dev="अंक" sub="Your numbers" icon={<IconNumbers />} tone="violet" />
-        <Tile
-          to={active ? `/patri/${active.id}/sky` : "/leaf/new"}
-          title="Birth sky"
-          dev="आकाश"
-          sub="Planetarium view"
-          icon={<IconMoon />}
-          tone="cyan"
-        />
-        <Tile to="/circle" title="Your people" dev="पत्ते" sub={`${profiles?.length ?? 0} saved`} icon={<IconCircle />} tone="cyan" />
+        <Tile to="/circle" title="People" dev="लोग" sub={`${profiles?.length ?? 0} saved`} icon={<IconCircle />} tone="cyan" />
         <Tile to="/guide" title="Guide" dev="मार्गदर्शिका" sub="Every word explained" icon={<IconGuide />} tone="violet" />
-        <Tile to="/drawer" title="Settings" dev="दराज़" sub="Accuracy, backup" icon={<IconDrawer />} tone="violet" />
       </nav>
-      <Link to="/story" className="maker maker--link home-maker">
-        <span className="maker__av" aria-hidden="true">
-          R
-        </span>
-        <span className="maker__text">
-          <span className="maker__k">Why Vyom exists</span>
-          <span className="maker__t">"I believed God exists — that was the extent of it. Then I started reading…"</span>
-          <span className="maker__s">A note from the maker · play the story →</span>
-        </span>
-      </Link>
 
-      <p className="home-foot">
-        New to all this?{" "}
-        <Link to="/guide" className="linkish">
-          Read the 2-minute guide
-        </Link>
-        .
-      </p>
-      <p className="home-foot">Computed on this device · nothing leaves it · for reflection, not advice</p>
+      <p className="home-foot">Computed on this device · nothing leaves it · karma, not fate</p>
     </Screen>
   );
 }

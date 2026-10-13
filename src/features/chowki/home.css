@@ -1,0 +1,240 @@
+/* Home v3: calm hierarchy — greeting and the live sky, your day, three doors, what's coming, the story */
+.home-line {
+  margin: 10px 0 0;
+  max-width: 38ch;
+  font-size: var(--text-lg);
+  line-height: 1.5;
+  color: var(--ink-muted);
+  text-wrap: pretty;
+}
+.home-chips {
+  list-style: none;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.home-chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 6px 0 14px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--glass-edge);
+  background: rgba(255, 255, 255, 0.04);
+}
+.home-chips .k {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.home-chips .v {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.home-chips li.is-caution {
+  border-color: rgba(251, 191, 36, 0.35);
+}
+.home-chips li.is-caution .v {
+  color: var(--warning-text);
+}
+.home-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: var(--space-5);
+}
+.home-cta-row .home-cta {
+  margin: 0;
+}
+.home-cta-ghost {
+  color: var(--accent-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* three big doors */
+.home-primary {
+  display: grid;
+  gap: 10px;
+  padding: var(--space-5) var(--space-5) 0;
+}
+.home-big {
+  --c: var(--accent);
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 14px;
+  align-items: center;
+  padding: 18px;
+  border-radius: var(--radius-xl);
+  border: 1px solid color-mix(in oklch, var(--c) 40%, transparent);
+  background:
+    radial-gradient(360px 160px at 100% 0%, color-mix(in oklch, var(--c) 22%, transparent), transparent 70%), rgba(14, 17, 46, 0.72);
+  color: var(--ink);
+  text-decoration: none;
+  overflow: hidden;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+.home-big:hover,
+.home-big:focus-visible {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklch, var(--c) 70%, transparent);
+}
+.home-big > svg {
+  grid-row: 1 / 3;
+  width: 48px;
+  height: 48px;
+  padding: 11px;
+  border-radius: 16px;
+  color: color-mix(in oklch, var(--c) 60%, white);
+  background: color-mix(in oklch, var(--c) 18%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--c) 45%, transparent);
+}
+.home-big--gold {
+  --c: var(--accent-2);
+}
+.home-big--cyan {
+  --c: var(--cyan);
+}
+.home-big__t {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.home-big__s {
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+/* the story invitation */
+.home-origin {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  margin: var(--space-6) var(--space-5) 0;
+  padding: 22px;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(245, 196, 107, 0.3);
+  background:
+    radial-gradient(600px 260px at 0% 100%, rgba(245, 196, 107, 0.14), transparent 70%),
+    radial-gradient(500px 240px at 100% 0%, rgba(139, 92, 246, 0.2), transparent 70%), rgba(10, 12, 34, 0.85);
+  overflow: hidden;
+}
+.home-origin__art {
+  position: relative;
+  height: 120px;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(1px 1px at 20% 30%, white, transparent), radial-gradient(1px 1px at 70% 20%, white, transparent),
+    radial-gradient(1.4px 1.4px at 40% 70%, white, transparent), radial-gradient(1px 1px at 85% 60%, white, transparent),
+    radial-gradient(1.2px 1.2px at 10% 80%, white, transparent),
+    radial-gradient(ellipse 60% 40% at 50% 55%, rgba(196, 181, 253, 0.35), transparent 70%), rgba(3, 4, 11, 0.6);
+  overflow: hidden;
+}
+.home-origin__art span {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: 34px;
+  height: 34px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--el-air), var(--nebula-blue) 70%);
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.7);
+  animation: home-dot 6s ease-in-out infinite;
+}
+@keyframes home-dot {
+  50% {
+    transform: scale(1.12);
+    box-shadow: 0 0 40px rgba(56, 189, 248, 0.9);
+  }
+}
+.home-origin__k {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-2);
+}
+.home-origin h2 {
+  margin: 4px 0 8px;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 5.5vw, 1.9rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.home-origin p {
+  margin: 0;
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+.home-origin__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: 14px;
+}
+.home-origin__actions .stamp {
+  text-decoration: none;
+}
+
+@media (min-width: 700px) {
+  .home-primary {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .home-big {
+    grid-template-columns: 1fr;
+    row-gap: 6px;
+  }
+  .home-big > svg {
+    grid-row: auto;
+    margin-bottom: 8px;
+  }
+  .home-origin {
+    grid-template-columns: 220px 1fr;
+    align-items: center;
+  }
+  .home-origin__art {
+    height: 100%;
+    min-height: 160px;
+  }
+}
+@media (min-width: 900px) {
+  .home-primary,
+  .home-origin {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+  .home-origin {
+    width: calc(100% - 2 * var(--space-5));
+  }
+  .home-tiles {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-origin__art span {
+    animation: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .home-origin {
+    max-width: calc(1100px - 2 * var(--space-5));
+    width: calc(100% - 2 * var(--space-5));
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
