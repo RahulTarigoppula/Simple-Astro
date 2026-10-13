@@ -312,3 +312,8 @@
   width: 100%;
   height: 100%;
 }
+
+.sky-help {
+  padding: 0 var(--space-5) var(--space-3);
+  font-size: 12px;
+}

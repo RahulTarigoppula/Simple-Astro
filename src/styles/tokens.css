@@ -11,9 +11,9 @@
   /* ── space ── */
   --bg: #04050d; /* the void behind everything */
   --bg-elevated: #0a0e27; /* the deep indigo of panels' backdrop */
-  --space-0: #04050d;
-  --space-1: #070a1c;
-  --space-2: #0b1030;
+  --void-0: #04050d;
+  --void-1: #070a1c;
+  --void-2: #0b1030;
   --nebula-violet: #6d28d9;
   --nebula-blue: #1d4ed8;
   --nebula-cyan: #0891b2;
@@ -142,9 +142,9 @@
 :root[data-theme="day"] {
   --bg: #0b1033;
   --bg-elevated: #141a48;
-  --space-0: #0b1033;
-  --space-1: #121a4a;
-  --space-2: #1b2563;
+  --void-0: #0b1033;
+  --void-1: #121a4a;
+  --void-2: #1b2563;
   --ledge: rgba(18, 24, 66, 0.72);
 }
 
