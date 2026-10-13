@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.3.0 — 2026-10-13
+
+Engine unchanged; no chart moves.
+
+### New look
+- **Astral redesign**: deep-space background with a slow starfield, glass panels, aurora accents, Sora / Inter / JetBrains Mono / Noto Sans Devanagari. Instruments (Today's dial, the sky's time ring, the ayanāṃśa ruler) are redrawn in cool "moonsteel".
+- **Home** is a dashboard: today's almanac at a glance, a **live zodiac wheel** (planets where they are right now, the rising sign here, your Moon sign), and tiles for every feature.
+- Navigation is a floating bar on phones and a side rail on desktop.
+
+### Plain English
+- An **ⓘ** beside every traditional term opens a simple explanation, an in-depth one, and how Chowki calculates it.
+- **Guide** (#/guide): what's real astronomy and what's tradition, how to use the app, privacy, and a searchable glossary of 50+ terms.
+- **Roots** (#/story): 16 story cards — the Navagraha, the Moon's 27 wives, Rāhu's eclipse, Dhruva, the Saptarṣi, Vedāṅga Jyotiṣa, Parāśara, the Yavanajātaka, Āryabhaṭa, Varāhamihira and zero, Jantar Mantar, palmistry, numerology, and the 1955 calendar reform — ending with the person's **root and destiny numbers**.
+- English names beside Sanskrit everywhere: planets and signs in the chart table, simple labels on every Today row and Guna Milan factor, English labels on the zodiac wheel.
+
+### Fixes
+- The CSP hash for the theme bootstrap is now computed at build time.
+- Tests no longer depend on the time of day or a fast CI runner.
+
 ## 0.2.0 — 2026-10-12
 
 Engine defaults unchanged (`ENGINE_EPOCH = 1`); no existing chart moves.
