@@ -35,6 +35,7 @@ export const router = createHashRouter([
       { path: "drawer", lazy: screen("drawer/DrawerScreen"), errorElement: <RouteError /> },
       { path: "guide", lazy: screen("guide/GuideScreen"), errorElement: <RouteError /> },
       { path: "story", lazy: screen("story/StoryScreen"), errorElement: <RouteError /> },
+      { path: "journey", lazy: screen("journey/JourneyScreen"), errorElement: <RouteError /> },
       { path: "forecast", lazy: screen("forecast/ForecastScreen"), errorElement: <RouteError /> },
       { path: "forecast/:id", lazy: screen("forecast/ForecastScreen"), errorElement: <RouteError /> },
       { path: "explore", lazy: screen("explore/ExploreScreen"), errorElement: <RouteError /> },

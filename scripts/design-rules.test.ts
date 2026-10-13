@@ -14,7 +14,8 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-const PALETTE = ["src/styles/tokens.css", "src/styles/astral.css"];
+// Palette files: the tokens, the astral layer, and the journey's canvas paint (canvas cannot read CSS variables per pixel).
+const PALETTE = ["src/styles/tokens.css", "src/styles/astral.css", "src/features/journey/scenes.ts"];
 const files = walk("src").filter((f) => !PALETTE.some((p) => f.split(String.fromCharCode(92)).join("/").endsWith(p)));
 
 describe("design rules", () => {

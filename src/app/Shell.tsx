@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { ExplainSheet } from "../components/ui/Explain";
 import { Toasts } from "../components/ui/Toasts";
+import { Journey, markJourneySeen, shouldPlayJourney } from "../features/journey/Journey";
 import { setHapticsEnabled } from "../platform/haptics";
 import { isNative } from "../platform/native";
 import { setCalmSound, setSoundEnabled } from "../platform/sound";
@@ -16,7 +17,9 @@ export function Shell() {
   const navigate = useNavigate();
   const settings = useSettings();
   const swUpdate = useUi((s) => s.desk.swUpdate);
-  const fullBleed = /\/capture$|\/sky$/.test(loc.pathname);
+  const fullBleed = /\/capture$|\/sky$|\/journey$/.test(loc.pathname);
+  // The opening journey plays once per visit when Vyom opens on Home.
+  const [journey, setJourney] = useState(() => loc.pathname === "/" && shouldPlayJourney());
 
   useEffect(() => {
     setSoundEnabled(settings.sound);
@@ -51,7 +54,7 @@ export function Shell() {
       <div className="desk__top" aria-hidden="true" />
       {swUpdate ? (
         <button type="button" className="sw-tab paper" onClick={() => swUpdate()}>
-          A newer desk is ready — reload
+          A newer version of Vyom is ready — reload
         </button>
       ) : null}
       <div className="screens">
@@ -60,6 +63,19 @@ export function Shell() {
       </div>
       <ExplainSheet />
       {fullBleed ? null : <Ledge />}
+      {journey ? (
+        <Journey
+          onDone={() => {
+            markJourneySeen();
+            setJourney(false);
+          }}
+          onStory={() => {
+            markJourneySeen();
+            setJourney(false);
+            navigate("/story");
+          }}
+        />
+      ) : null}
     </div>
   );
 }

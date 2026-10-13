@@ -17,6 +17,7 @@ import { saveFile } from "../../platform/files";
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
 import { toast } from "../../state/ui";
+import { journeyAtStart, setJourneyAtStart } from "../journey/Journey";
 import { zoneClock } from "../today/zone";
 import "./drawer.css";
 
@@ -113,6 +114,26 @@ function Radio<T extends string | number>({
 }
 
 /** The three ayanāṃśa presets as ticks on a magnified brass arc, labelled at the chart's date. */
+/** Whether the opening journey plays when Vyom opens (stored on this device only). */
+function JourneyToggle() {
+  const [on, setOn] = useState(journeyAtStart);
+  return (
+    <Radio
+      label="Opening journey"
+      help="The universe-to-you story that plays once when Vyom opens. Replay it any time from Home."
+      value={on ? "on" : "off"}
+      options={[
+        ["on", "Play"],
+        ["off", "Skip"],
+      ]}
+      onChange={(v) => {
+        setJourneyAtStart(v === "on");
+        setOn(v === "on");
+      }}
+    />
+  );
+}
+
 function DialSegment({ jdTt, value, onChange }: { jdTt: number; value: AyanamsaPreset; onChange: (p: AyanamsaPreset) => void }) {
   const vals = useMemo(() => AYANAMSA_PRESETS.map((p) => [p, ayanamsa(jdTt, p)] as const), [jdTt]);
   const lo = Math.min(...vals.map((v) => v[1]));
@@ -211,7 +232,7 @@ export default function DrawerScreen() {
   const setPreset = (patch: Partial<EnginePreset>) => {
     clearPatriCache();
     void saveSettings({ preset: { ...settings.preset, ...patch } }).then(() =>
-      toast("Presets changed. Every cached patri grows a haldi “recompute” tab on its seal.", "warn"),
+      toast("Presets changed. Every saved chart now shows a “recompute” tag.", "warn"),
     );
   };
   const set = (patch: Partial<Settings>) => void saveSettings(patch);
@@ -221,12 +242,12 @@ export default function DrawerScreen() {
     setBusy(true);
     try {
       const blob = await exportEnvelope(pass);
-      await saveFile(blob, envelopeFileName(), "Vyom wax envelope");
+      await saveFile(blob, envelopeFileName(), "Vyom encrypted backup");
       play("thunk");
-      toast("Sealed in a wax envelope (AES-GCM). Keep the passphrase — it cannot be recovered.");
+      toast("Encrypted backup saved (AES-GCM). Keep the passphrase — it cannot be recovered.");
       setMode("none");
     } catch (e) {
-      toast(`The envelope would not seal: ${e instanceof Error ? e.message : String(e)}`, "danger");
+      toast(`Could not create the backup: ${e instanceof Error ? e.message : String(e)}`, "danger");
     } finally {
       setBusy(false);
       setPass("");
@@ -241,16 +262,16 @@ export default function DrawerScreen() {
       const r = await importEnvelope(file, pass);
       clearPatriCache();
       play("snap");
-      toast(`Opened the envelope — ${r.counts.profiles} leaves restored.`);
+      toast(`Backup restored — ${r.counts.profiles} ${r.counts.profiles === 1 ? "person" : "people"} restored.`);
       setMode("none");
     } catch (e) {
       const code = e instanceof ImportError ? e.code : "";
       toast(
         code === "BAD_PASSPHRASE"
-          ? "This seal does not match that passphrase."
+          ? "That passphrase does not match this backup."
           : code === "NEWER_FORMAT"
-            ? "This envelope was sealed by a newer Vyom — update the app first."
-            : "This file is not a Vyom envelope.",
+            ? "This backup was made by a newer Vyom — update the app first."
+            : "This file is not a Vyom backup.",
         "danger",
       );
     } finally {
@@ -272,7 +293,7 @@ export default function DrawerScreen() {
       for (const u of urls) {
         const r = await fetch(u);
         if (r.ok) bytes += (await r.arrayBuffer()).byteLength;
-        setWarm(`${(bytes / 1e6).toFixed(1)} MB in the drawer…`);
+        setWarm(`${(bytes / 1e6).toFixed(1)} MB downloaded…`);
       }
       // The lazy screens themselves: importing them puts their chunks in the runtime cache.
       await Promise.allSettled(Object.values(HEAVY_SCREENS).map((load) => load()));
@@ -288,7 +309,7 @@ export default function DrawerScreen() {
   ];
 
   return (
-    <main className="screen drawer-screen" aria-label="The drawer">
+    <main className="screen drawer-screen" aria-label="Settings">
       <div className="drawer-screen__dim">
         <button
           type="button"
@@ -296,13 +317,13 @@ export default function DrawerScreen() {
           style={{ color: "var(--surface)" }}
           onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/"))}
         >
-          ⇩ close the drawer
+          ⇩ close settings
         </button>
       </div>
       <div className="drawer-box">
         <span className="drawer-knob" aria-hidden="true" />
         <div className="paper">
-          <TurmericBand dev="दराज़" title="Settings" meta={`Vyom ${__APP_VERSION__}`} level={1} />
+          <TurmericBand dev="सेटिंग्स" title="Settings" meta={`Vyom ${__APP_VERSION__}`} level={1} />
           <p className="p drawer-guide">
             The defaults are right for almost everyone. Unsure what a word means?{" "}
             <Link to="/guide" className="linkish">
@@ -348,7 +369,8 @@ export default function DrawerScreen() {
             onChange={(v) => setPreset({ sunrise: v })}
           />
 
-          <TurmericBand title="The desk" plain level={2} />
+          <TurmericBand title="Display" plain level={2} />
+          <JourneyToggle />
           <Radio
             label="Chart"
             value={settings.chartStyle}
@@ -368,13 +390,13 @@ export default function DrawerScreen() {
             onChange={(v) => set({ chartScript: v })}
           />
           <Radio
-            label="Lamp"
+            label="Theme"
             help="Auto follows the real Sun at the active birthplace."
             value={settings.theme}
             options={[
               ["auto", "auto (sun)"],
-              ["night", "lit"],
-              ["day", "snuffed"],
+              ["night", "night"],
+              ["day", "day"],
             ]}
             onChange={(v) => set({ theme: v })}
           />
@@ -409,7 +431,7 @@ export default function DrawerScreen() {
           <Toggle label="Sound" on={settings.sound} onChange={(v) => set({ sound: v })} />
           <Toggle label="Haptics" on={settings.haptics} onChange={(v) => set({ haptics: v })} />
           <Toggle
-            label="Calm desk"
+            label="Calm mode"
             help="No flicker, no rustle, no inertia — whatever the OS says."
             on={settings.calmDesk}
             onChange={(v) => set({ calmDesk: v })}
@@ -450,22 +472,22 @@ export default function DrawerScreen() {
           </div>
           {est ? (
             <p className="p p--muted">
-              The drawer holds {(est.usage / 1e6).toFixed(1)} MB of {(est.quota / 1e9).toFixed(1)} GB
+              Vyom is using {(est.usage / 1e6).toFixed(1)} MB of {(est.quota / 1e9).toFixed(1)} GB
               {est.persisted ? " (kept safe from eviction)" : ""}.
             </p>
           ) : null}
 
-          <TurmericBand title="Wax envelope" meta="AES-GCM-256" plain level={2} />
+          <TurmericBand title="Encrypted backup" meta="AES-GCM-256" plain level={2} />
           <p className="p p--muted">
             Export is always encrypted with your passphrase (PBKDF2, 600 000 rounds). There is no unencrypted export.
           </p>
           <BackupAge zone={active?.birth.zone ?? null} />
           <div className="tools">
             <button type="button" className="linkish" onClick={() => setMode("export")}>
-              Export the drawer ▸
+              Create an encrypted backup ▸
             </button>
             <button type="button" className="linkish" onClick={() => setMode("import")}>
-              Import an envelope ▸
+              Restore from a backup ▸
             </button>
           </div>
 
@@ -509,7 +531,7 @@ export default function DrawerScreen() {
           setPass2("");
           setFile(null);
         }}
-        label={mode === "export" ? "Export the drawer" : "Import an envelope"}
+        label={mode === "export" ? "Create an encrypted backup" : "Restore from a backup"}
       >
         {mode === "export" ? (
           <form
@@ -519,7 +541,7 @@ export default function DrawerScreen() {
               void doExport();
             }}
           >
-            <TurmericBand title="Seal the envelope" level={2} />
+            <TurmericBand title="Create an encrypted backup" level={2} />
             <label className="help">
               Passphrase (6+ characters)
               <input type="password" autoComplete="new-password" value={pass} onChange={(e) => setPass(e.target.value)} />
@@ -534,7 +556,7 @@ export default function DrawerScreen() {
               </p>
             ) : null}
             <button type="submit" className="stamp" disabled={busy || pass.length < 6 || pass !== pass2}>
-              <span>{busy ? "sealing…" : "Seal and save"}</span>
+              <span>{busy ? "encrypting…" : "Encrypt and save"}</span>
             </button>
           </form>
         ) : mode === "import" ? (
@@ -545,9 +567,9 @@ export default function DrawerScreen() {
               void doImport();
             }}
           >
-            <TurmericBand title="Open an envelope" level={2} />
+            <TurmericBand title="Restore from a backup" level={2} />
             <p className="note-lac" style={{ margin: 0 }}>
-              Importing replaces everything in this drawer with the envelope's contents.
+              Restoring replaces everything in Vyom on this device with the backup's contents.
             </p>
             <input
               ref={fileInput}
@@ -560,7 +582,7 @@ export default function DrawerScreen() {
               <input type="password" autoComplete="current-password" value={pass} onChange={(e) => setPass(e.target.value)} />
             </label>
             <button type="submit" className="stamp" disabled={busy || !file || !pass}>
-              <span>{busy ? "opening…" : "Break the seal"}</span>
+              <span>{busy ? "restoring…" : "Restore"}</span>
             </button>
           </form>
         ) : null}
@@ -569,7 +591,7 @@ export default function DrawerScreen() {
   );
 }
 
-const leaves = (n: number): string => (n === 1 ? "1 leaf lives" : `${n} leaves live`);
+const leaves = (n: number): string => (n === 1 ? "1 person lives" : `${n} people live`);
 
 /** The backup line: counted in calendar days in `zone` (the active leaf's), not in 24-hour spans.
  *  Exported for tests. */
@@ -577,13 +599,13 @@ export function backupAge(count: number, lastMs: number | null, nowMs: number, z
   if (lastMs === null) {
     return {
       days: null,
-      text: `${leaves(count)} only on this device and ${count === 1 ? "has" : "have"} never been sealed in an envelope.`,
+      text: `${leaves(count)} only on this device and ${count === 1 ? "has" : "have"} never been backed up.`,
     };
   }
   const clock = zoneClock(zone);
   const days = Math.max(0, clock.dayNumber(nowMs) - clock.dayNumber(lastMs));
   const when = days === 0 ? "today" : days === 1 ? "yesterday" : `${days} days ago`;
-  return { days, text: `Last sealed in an envelope ${when}.` };
+  return { days, text: `Last backed up ${when}.` };
 }
 
 /** When was the drawer last sealed in an envelope? Leaves live only on this device. */
@@ -595,7 +617,7 @@ function BackupAge({ zone }: { zone: string | null }) {
   return days === null || days > 30 ? (
     <p className="note-haldi">
       <span aria-hidden="true">⚑</span>
-      <span>{text} A phone can be lost; an envelope kept elsewhere cannot be read without your passphrase.</span>
+      <span>{text} A phone can be lost; an encrypted backup kept elsewhere cannot be read without your passphrase.</span>
     </p>
   ) : (
     <p className="p p--muted">{text}</p>
