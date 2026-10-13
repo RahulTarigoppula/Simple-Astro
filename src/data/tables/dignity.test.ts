@@ -12,7 +12,7 @@ describe("BPHS dignity tables", () => {
     for (const id of SEVEN) expect(DEBILITATION[id]).toBe((EXALTATION[id][0] + 6) % 12);
   });
 
-  it("each of the seven owns 1–2 signs and the twelve signs are covered exactly once (Sun/Moon one each)", () => {
+  it("each of the seven owns 1-2 signs and the twelve signs are covered exactly once (Sun/Moon one each)", () => {
     const owned = SEVEN.flatMap((id) => [...OWN_SIGNS[id]]).sort((a, b) => a - b);
     expect(owned).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
   });

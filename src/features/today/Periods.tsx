@@ -22,7 +22,7 @@ export function QualityMark({ q }: { q: MuhurtaQuality }) {
 /** "21:14–22:44", with "+1" once the period has crossed into the next civil day. */
 export function spanLabel(clock: ZoneClock, a: number, b: number, dayMs: number): string {
   const dd = clock.dayNumber(b - 1) - clock.dayNumber(dayMs);
-  return `${clock.hm(a)}–${clock.hm(b)}${dd > 0 ? ` +${dd}` : ""}`;
+  return `${clock.hm(a)}-${clock.hm(b)}${dd > 0 ? ` +${dd}` : ""}`;
 }
 
 interface Item {

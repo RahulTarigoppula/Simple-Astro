@@ -179,7 +179,7 @@ describe("birth pañcāṅga and daśā", () => {
     expect(Math.round(b.moonIllumination * 1000) / 10).toBeCloseTo(E.panchang.moonLitPercent, 0);
   });
 
-  it("Viṃśottarī: Budha balance, MD end within a day, Budha – Ketu – Śani at birth", () => {
+  it("Viṃśottarī: Budha balance, MD end within a day, Budha - Ketu - Śani at birth", () => {
     const v = E.vimshottari;
     const bal = dashaBalance(pTrue.grahas.MO.lonSidereal);
     expect(bal.lord).toBe(v.lord);
@@ -225,7 +225,7 @@ describe("the Patri object", () => {
     }
   });
 
-  it("refuses instants outside 1600–2400", () => {
+  it("refuses instants outside 1600-2400", () => {
     const old = { ...REFERENCE_PROFILE, birth: { ...REFERENCE_PROFILE.birth, utcMs: Date.UTC(1500, 0, 1) } };
     expect(() => computePatri(old, PRESET, NOW)).toThrow(/EPHEMERIS_RANGE/);
   });

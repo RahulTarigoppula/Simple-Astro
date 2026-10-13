@@ -75,7 +75,7 @@ describe("geometry", () => {
     expect(new Set(Array.from({ length: 12 }, (_, s) => wholeSignHouse(s, 3))).size).toBe(12);
   });
 
-  it("L-5: Bhāva Chalit (Śrīpati) — monotonic madhyas, 1st = ASC, 7th = ASC + 180°, sandhis between", () => {
+  it("L-5: Bhāva Chalit (Śrīpati), monotonic madhyas, 1st = ASC, 7th = ASC + 180°, sandhis between", () => {
     const rows = bhavaChalit(L.ascSid, L.mcSid);
     expect(rows).toHaveLength(12);
     expect(rows[0]?.madhyaSid).toBe(L.ascSid);

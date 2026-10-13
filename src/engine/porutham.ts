@@ -108,7 +108,7 @@ const META: Record<PoruthamId, { name: string; nameDev: string; rule: string; we
   vedha: {
     name: "Vedha",
     nameDev: "वेध",
-    rule: "Certain nakṣatras pierce one another: Aśvinī–Jyeṣṭhā, Bharaṇī–Anurādhā, Kṛttikā–Viśākhā, Rohiṇī–Svātī, Ārdrā–Śravaṇa, Punarvasu–Uttara Āṣāḍhā, Puṣya–Pūrva Āṣāḍhā, Āśleṣā–Mūla, Maghā–Revatī, Pūrva Phalgunī–Uttara Bhādrapadā, Uttara Phalgunī–Pūrva Bhādrapadā, Hasta–Śatabhiṣā, and Mṛgaśīrṣa, Citrā and Dhaniṣṭhā with each other. Such a pair leaves the knot open.",
+    rule: "Certain nakṣatras pierce one another: Aśvinī-Jyeṣṭhā, Bharaṇī-Anurādhā, Kṛttikā-Viśākhā, Rohiṇī-Svātī, Ārdrā-Śravaṇa, Punarvasu-Uttara Āṣāḍhā, Puṣya-Pūrva Āṣāḍhā, Āśleṣā-Mūla, Maghā-Revatī, Pūrva Phalgunī-Uttara Bhādrapadā, Uttara Phalgunī-Pūrva Bhādrapadā, Hasta-Śatabhiṣā, and Mṛgaśīrṣa, Citrā and Dhaniṣṭhā with each other. Such a pair leaves the knot open.",
     weighs: "mutual obstruction: friction the pair would carry",
   },
 };

@@ -63,7 +63,7 @@ describe("shape", () => {
   });
 });
 
-describe("worked pair — Revatī (Mīna) first, Rohiṇī (Vṛṣabha) second", () => {
+describe("worked pair, Revatī (Mīna) first, Rohiṇī (Vṛṣabha) second", () => {
   it("ties 7 of 10: Mahendra, Rāśyādhipati and Vaśya stay open", () => {
     const ps = poruthams(moon(REVATI), moon(ROHINI));
     expect(Object.fromEntries(ps.map((p) => [p.id, p.pass]))).toEqual({

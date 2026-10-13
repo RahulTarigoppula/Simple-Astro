@@ -96,7 +96,7 @@ describe("bands", () => {
 });
 
 describe("cancellations", () => {
-  it("Bhakūṭa: Meṣa × Siṃha (5/9) with friendly lords — recorded, applied only when asked", () => {
+  it("Bhakūṭa: Meṣa × Siṃha (5/9) with friendly lords, recorded, applied only when asked", () => {
     const off = kootas(moon(0, 1), moon(9, 1)).find((k) => k.id === "bhakoot");
     expect(off).toMatchObject({ score: 0, dosha: true, cancellation: { applied: false, rule: "bhakoot-lords-friends" } });
     const on = kootas(moon(0, 1), moon(9, 1), { bhakootCancellation: true }).find((k) => k.id === "bhakoot");
@@ -110,7 +110,7 @@ describe("cancellations", () => {
     expect(k?.cancellation).toBeUndefined();
   });
 
-  it("Nāḍī: same nakshatra, different pada — exception recorded, never applied", () => {
+  it("Nāḍī: same nakshatra, different pada, exception recorded, never applied", () => {
     const k = kootas(moon(0, 1), moon(0, 2)).find((x) => x.id === "nadi");
     expect(k).toMatchObject({ score: 0, dosha: true, cancellation: { applied: false, rule: "nadi-same-nakshatra-different-pada" } });
   });
@@ -156,7 +156,7 @@ describe("schools", () => {
     expect(score(moon(26, 1), moon(0, 1), "varna", PYJHORA)).toBe(1);
   });
 
-  it("Vaśya: the North-Indian common 5×5 (rows = boy) — the cells the fact-check named", () => {
+  it("Vaśya: the North-Indian common 5×5 (rows = boy), the cells the fact-check named", () => {
     expect(VASHYA_NORTH.chatushpada.manava).toBe(1);
     expect(VASHYA_PYJHORA.chatushpada.manava).toBe(0.5);
     expect(VASHYA_NORTH.manava.jalachara).toBe(0.5);

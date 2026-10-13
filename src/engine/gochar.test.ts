@@ -97,7 +97,7 @@ describe("gocharReport", () => {
     expect(isGocharFavourable("RA", 6)).toBe(true);
     expect(isGocharFavourable("KE", 1)).toBe(false);
   });
-  it("vedha: obstructs, spares the father–son pairs, and is silent for the nodes", () => {
+  it("vedha: obstructs, spares the father-son pairs, and is silent for the nodes", () => {
     // Guru in the 11th is obstructed by any graha but itself in the 8th.
     expect(vedhaBy("JU", 11, { JU: 11, MA: 8 })).toEqual(["MA"]);
     expect(vedhaBy("JU", 11, { JU: 11, MA: 7 })).toEqual([]);
@@ -115,7 +115,7 @@ describe("gocharReport", () => {
   });
 });
 
-describe("sadeSati — reference chart (Moon in Mīna)", () => {
+describe("sadeSati, reference chart (Moon in Mīna)", () => {
   const spellAround = (y: number) =>
     ss.spells.find((s) => s.kind === "sade-sati" && s.startMs < Date.UTC(y, 0, 1) && s.endMs > Date.UTC(y, 0, 1));
 
@@ -123,7 +123,7 @@ describe("sadeSati — reference chart (Moon in Mīna)", () => {
     expect(ssMs).toBeLessThan(300 * SLACK);
   });
 
-  it("finds Śani's Kumbha–Mīna–Meṣa spell around 2022–2030", () => {
+  it("finds Śani's Kumbha-Mīna-Meṣa spell around 2022-2030", () => {
     const s = spellAround(2026);
     expect(s).toBeDefined();
     if (!s) return;
@@ -140,7 +140,7 @@ describe("sadeSati — reference chart (Moon in Mīna)", () => {
     if (peak) expect(Math.abs(peak[0] - Date.UTC(2025, 2, 29)) / MS_PER_DAY).toBeLessThan(15);
   });
 
-  it("handles retrograde re-entry: Kumbha entered, left and re-entered in 2022–23", () => {
+  it("handles retrograde re-entry: Kumbha entered, left and re-entered in 2022-23", () => {
     const s = spellAround(2026);
     if (!s) throw new Error("no spell");
     const rising = s.phases.rising ?? [];
@@ -155,7 +155,7 @@ describe("sadeSati — reference chart (Moon in Mīna)", () => {
     }
   });
 
-  it("finds the earlier spell (c. 1993–2000) and the next one (c. 2051–2058)", () => {
+  it("finds the earlier spell (c. 1993-2000) and the next one (c. 2051-2058)", () => {
     const at = (y: number) => spellAround(y);
     expect(at(1997)).toBeDefined(); // Śani over Kumbha–Mīna–Meṣa in the 1990s
     expect(at(2055)).toBeDefined();

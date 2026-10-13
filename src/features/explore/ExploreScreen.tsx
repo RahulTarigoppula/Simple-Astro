@@ -105,7 +105,7 @@ function GrahaDetail({ id }: { id: GrahaId }) {
               </span>,
             ],
             ["Rules", own.length ? own.map((s) => RASHI_LORE[s]?.name).join(", ") : "no sign (a shadow graha)"],
-            ["Exalted in", ex ? `${RASHI_LORE[ex[0]]?.name} (${RASHI_LORE[ex[0]]?.western})` : "–"],
+            ["Exalted in", ex ? `${RASHI_LORE[ex[0]]?.name} (${RASHI_LORE[ex[0]]?.western})` : "-"],
           ]}
         />
       </section>
@@ -340,7 +340,7 @@ function Numbers() {
         <div>
           <p className="ex-kicker">Aṅka Jyotiṣa · Numerology</p>
           <h1>Your numbers</h1>
-          <p className="ex-sub">Each digit 1–9 belongs to a graha. Just for fun. There is no scientific basis.</p>
+          <p className="ex-sub">Each digit 1-9 belongs to a graha. Just for fun. There is no scientific basis.</p>
         </div>
       </header>
       {profiles && profiles.length > 1 ? (

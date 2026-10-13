@@ -478,3 +478,169 @@
     grid-column: 1;
   }
 }
+
+/* ── Your life in simple words ── */
+.life {
+  display: grid;
+  gap: 14px;
+}
+.life__kicker {
+  margin: 0;
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+.life__h {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  line-height: 1.15;
+  color: var(--ink);
+}
+.life__lead {
+  margin: 0;
+  font-size: var(--text-lg);
+  line-height: 1.55;
+  color: var(--ink);
+}
+.life__lead b,
+.life__dl b {
+  color: var(--accent-2);
+  font-weight: 600;
+}
+.life__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+}
+.life__card {
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: rgba(9, 11, 30, 0.45);
+}
+.life__k {
+  margin: 0 0 2px;
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.life__v {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--ink);
+}
+.life__p {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+.life__pm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.life__plus,
+.life__minus {
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(74, 222, 128, 0.32);
+  background: rgba(74, 222, 128, 0.06);
+}
+.life__minus {
+  border-color: rgba(251, 191, 36, 0.32);
+  background: rgba(251, 191, 36, 0.06);
+}
+.life__plus .life__k {
+  color: var(--success);
+}
+.life__minus .life__k {
+  color: var(--warning-text);
+}
+.life__pm ul {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+.life__pm li {
+  line-height: 1.4;
+  color: var(--ink);
+}
+.life__plus li::before {
+  content: "+ ";
+  color: var(--success);
+}
+.life__minus li::before {
+  content: "− ";
+  color: var(--warning-text);
+}
+.life__dl {
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+.life__dl dt {
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.life__dl dd {
+  margin: 2px 0 0;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.life__dl a {
+  color: var(--accent-text);
+  white-space: nowrap;
+}
+.life__note {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+@media (max-width: 420px) {
+  .life__pm {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Full detail (astro tech) ── */
+.astro-tech > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  margin: var(--space-2) var(--paper-margin, 0);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-edge-strong);
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+}
+.astro-tech > summary::-webkit-details-marker {
+  display: none;
+}
+.astro-tech > summary small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+.astro-tech > summary::after {
+  content: "+";
+  font-size: var(--text-2xl);
+  color: var(--accent-text);
+}
+.astro-tech[open] > summary::after {
+  content: "−";
+}

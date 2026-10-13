@@ -304,3 +304,111 @@
   border-left-width: 2px;
   padding-left: 18px;
 }
+
+.journey__say--narr {
+  font-weight: 600;
+  font-size: clamp(1.35rem, 5.4vw, 2rem);
+}
+
+/* How Vyom was made, on the last slide */
+.journey__made {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(245, 196, 107, 0.35);
+  background: rgba(3, 4, 11, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  animation: jr-rise 900ms var(--ease-out) 2.4s both;
+}
+.journey__made-h {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--accent-2);
+}
+.journey__made-p {
+  margin: 4px 0 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.journey__made-n {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.journey__made-n li {
+  display: grid;
+  font-size: 11px;
+  color: var(--ink-muted);
+  text-align: center;
+}
+.journey__made-n b {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--ink);
+}
+
+/* How to use: three plain steps before Home */
+.journey__steps {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: s;
+  display: grid;
+  gap: 10px;
+}
+.journey__steps li {
+  counter-increment: s;
+  position: relative;
+  padding: 12px 14px 12px 50px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-edge-strong);
+  background: rgba(3, 4, 11, 0.6);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  line-height: 1.5;
+  color: var(--ink-muted);
+  animation: jr-rise 700ms var(--ease-out) both;
+}
+.journey__steps li:nth-child(2) {
+  animation-delay: 0.25s;
+}
+.journey__steps li:nth-child(3) {
+  animation-delay: 0.5s;
+}
+.journey__steps li::before {
+  content: counter(s);
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--aurora);
+  color: var(--accent-ink);
+  font-weight: 700;
+  font-size: 13px;
+}
+.journey__steps b {
+  color: var(--ink);
+}
+.journey__steps-note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.journey__howto .journey__cta {
+  animation-delay: 0.8s;
+}
+
+.journey__howto .journey__cta {
+  animation-delay: 0.8s;
+}

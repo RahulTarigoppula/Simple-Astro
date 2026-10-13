@@ -29,7 +29,7 @@ describe("format", () => {
     expect(fmtDate(lateUtc, "Asia/Kolkata")).toBe("29 Mar 2025");
     expect(fmtDate(lateUtc, "America/New_York")).toBe("28 Mar 2025");
     expect(fmtDate(lateUtc, "Not/AZone")).toBe("28 Mar 2025"); // falls back to UTC
-    expect(yearSpan(Date.UTC(2022, 3, 1), Date.UTC(2030, 3, 1), "UTC")).toBe("2022–30");
+    expect(yearSpan(Date.UTC(2022, 3, 1), Date.UTC(2030, 3, 1), "UTC")).toBe("2022-30");
   });
 });
 

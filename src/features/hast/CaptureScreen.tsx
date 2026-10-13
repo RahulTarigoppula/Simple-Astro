@@ -296,13 +296,13 @@ export default function CaptureScreen() {
             label="sharpness"
             pips={quality ? sharpnessPips(quality.sharpness.value) : 0}
             low={!sharpOk}
-            value={quality ? quality.sharpness.value.toFixed(0) : "–"}
+            value={quality ? quality.sharpness.value.toFixed(0) : "-"}
           />
           <Gauge
             label="exposure"
             pips={quality ? exposurePips(quality.exposure.score) : 0}
             low={!expOk}
-            value={quality ? quality.exposure.label : "–"}
+            value={quality ? quality.exposure.label : "-"}
           />
         </div>
         <p className="p p--muted" style={{ marginTop: 6 }} aria-live="polite">

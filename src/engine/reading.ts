@@ -104,7 +104,7 @@ export const TEMPLATES: Readonly<Record<string, readonly string[]>> = {
     "Tradition says the Durudharā pattern, Candra flanked by {grahas}, describes a mind that rarely feels unaccompanied.",
   ],
   "kala-sarpa": [
-    "Tradition says all seven grahas gathered on one side of the Rāhu–Ketu axis ({direction}) is read as a life of focused, single-minded striving.",
+    "Tradition says all seven grahas gathered on one side of the Rāhu-Ketu axis ({direction}) is read as a life of focused, single-minded striving.",
     "Tradition says the Kāla-Sarpa pattern ({direction}) describes intensity of purpose; later authors name it, the classical texts do not.",
   ],
   manglik: [

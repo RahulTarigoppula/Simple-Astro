@@ -356,12 +356,12 @@ export default function LeafScreen() {
         </p>
 
         <div className="field leaf-place">
-          <label htmlFor="leaf-place">Place</label>
+          <label htmlFor="leaf-place">Place of birth</label>
           <input
             id="leaf-place"
             type="search"
             value={query}
-            placeholder="Search a town or city…"
+            placeholder="Town or city where they were born…"
             spellCheck={false}
             autoComplete="off"
             aria-describedby="leaf-place-chosen"
@@ -431,13 +431,13 @@ export default function LeafScreen() {
                 <span>
                   LAGNA {lg != null ? `${SIGN_MARK[lg]} ` : ""}
                   <b className="lg">
-                    <DigitSet text={lg != null ? (SIGN_ENGRAVED[lg] ?? "") : "–"} />
+                    <DigitSet text={lg != null ? (SIGN_ENGRAVED[lg] ?? "") : "-"} />
                   </b>
                 </span>
               </>
             ) : (
               <span>
-                {resolved.err?.code === "TIME_AMBIGUOUS" || resolved.err?.code === "TIME_INVALID" ? "THE CLOCK NEEDS THE OFFSET DRUM" : "–"}
+                {resolved.err?.code === "TIME_AMBIGUOUS" || resolved.err?.code === "TIME_INVALID" ? "THE CLOCK NEEDS THE OFFSET DRUM" : "-"}
               </span>
             )}
           </div>

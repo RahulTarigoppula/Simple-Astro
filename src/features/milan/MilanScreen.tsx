@@ -103,7 +103,7 @@ function LeafChart({
           </span>{" "}
           {NAKSHATRA_NAMES[m.nak]} pada {m.pada} · {SIGN_NAMES[m.sign]}
         </span>
-        <span className={`milan-chart__mk${manglik?.present ? " is-present" : ""}`}>{manglik ? manglikLabel(manglik) : "–"}</span>
+        <span className={`milan-chart__mk${manglik?.present ? " is-present" : ""}`}>{manglik ? manglikLabel(manglik) : "-"}</span>
       </figcaption>
     </figure>
   );
@@ -502,7 +502,7 @@ function MilanScreen() {
                 ? "the classical exception is applied (Settings)"
                 : "the classical exception is recorded, not applied (Settings)",
             ],
-            ["Bands", "under 18 not recommended · 18–24½ acceptable · 25–32½ very good · 33–36 excellent"],
+            ["Bands", "under 18 not recommended · 18-24½ acceptable · 25-32½ very good · 33-36 excellent"],
             ["Ayanāṃśa", AYANAMSA_LABEL[settings.preset.ayanamsa]],
           ]}
         >
@@ -557,7 +557,7 @@ function MoonLine({ who, p, m }: { who: string; p: Profile; m: MoonFacts | null 
             {SIGN_NAMES[m.sign]}
           </>
         ) : (
-          "–"
+          "-"
         )}
       </dd>
     </div>
@@ -606,7 +606,7 @@ function KootaSheet({
       </h2>
       <p className="p">{RULE_TEXT[k.id]}</p>
       <p className="p kootasheet__plain">
-        <strong>In plain English: </strong>
+        <strong>Simply put: </strong>
         {glossary(KOOTA_PLAIN[k.id])?.short} {glossary(KOOTA_PLAIN[k.id])?.long}
       </p>
       <dl className="kootasheet__dl">

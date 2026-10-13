@@ -90,7 +90,7 @@ export function castCore(profile: Profile, preset: EnginePreset, eph: Ephemeris 
   if (!Number.isFinite(utcMs)) throw new EngineError("TIME_INVALID", "birth instant is not a number");
   const year = new Date(utcMs).getUTCFullYear();
   if (year < MIN_YEAR || year > MAX_YEAR) {
-    throw new EngineError("EPHEMERIS_RANGE", `year ${year} is outside ${MIN_YEAR}–${MAX_YEAR}`);
+    throw new EngineError("EPHEMERIS_RANGE", `year ${year} is outside ${MIN_YEAR}-${MAX_YEAR}`);
   }
   if (!Number.isFinite(place.lat) || !Number.isFinite(place.lon)) {
     throw new EngineError("PLACE_MISSING", "birthplace has no coordinates");

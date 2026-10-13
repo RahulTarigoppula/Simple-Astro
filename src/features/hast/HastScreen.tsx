@@ -512,7 +512,7 @@ export default function HastScreen() {
         <Colophon
           rows={[
             ["Landmarks", "MediaPipe Hand Landmarker (Apache-2.0), on this device"],
-            ["Lines", "rectified 512 px print · CLAHE · black-hat · Hessian ridge · Zhang–Suen"],
+            ["Lines", "rectified 512 px print · CLAHE · black-hat · Hessian ridge · Zhang-Suen"],
             ["Tradition", "Sāmudrika Śāstra, read as temperament, never as fate"],
           ]}
         />

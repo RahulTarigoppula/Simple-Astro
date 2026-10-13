@@ -64,7 +64,7 @@ export function DashaRibbon({ tree, nowMs, zone, yearDays }: DashaRibbonProps) {
                 {GRAHA_NAMES[d.lord]}
               </span>
               <span className="y">
-                {yearOf(d.startMs, zone)}–{yearOf(d.endMs, zone)}
+                {yearOf(d.startMs, zone)}-{yearOf(d.endMs, zone)}
               </span>
               <span className="y">{intervalYears(d, yearDays).toFixed(1)} yr</span>
             </button>

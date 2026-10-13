@@ -54,7 +54,7 @@ export function panelFor(sel: WheelSel, sky: Record<GrahaId, TransitGraha>, patr
         ["Gem", g?.gem ?? ""],
         ["Rides", g?.vehicle ?? ""],
         ["Rules", own.length ? own.map((s) => RASHI_LORE[s]?.name).join(", ") : "no sign (a shadow graha)"],
-        ["Exalted in", ex ? `${RASHI_LORE[ex[0]]?.name}` : "–"],
+        ["Exalted in", ex ? `${RASHI_LORE[ex[0]]?.name}` : "-"],
         ["Mantra", g?.mantra ?? ""],
       ],
       now: `Now in ${RASHI_LORE[now.sign]?.name} (${RASHI_LORE[now.sign]?.western}), ${NAKSHATRA_NAMES[now.nakshatra]}${now.retrograde && sel.id !== "RA" && sel.id !== "KE" ? ", retrograde" : ""}.`,

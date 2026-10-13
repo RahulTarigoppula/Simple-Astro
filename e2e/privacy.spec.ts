@@ -21,6 +21,7 @@ test("zero leakage across a full session", async ({ page, baseURL }) => {
   await hold(page, /hold to save/i);
   await page.waitForURL(/#\/patri\//);
   const id = page.url().split("#/patri/")[1] ?? "";
+  await page.getByText("Full detail (astro tech)").click();
   await page.getByRole("tab", { name: "D2" }).click();
   for (const route of ["#/today", "#/circle", `#/milan/${id}/${id}`, "#/drawer", `#/hast/${id}`, `#/patri/${id}/sky`]) {
     await page.goto(route);

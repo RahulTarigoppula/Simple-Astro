@@ -240,7 +240,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
       k: "Sunrise · set",
       v: (
         <span className="mono today-num">
-          {clock.hm(p.sunriseMs)} – {clock.hm(p.sunsetMs)}
+          {clock.hm(p.sunriseMs)} - {clock.hm(p.sunsetMs)}
         </span>
       ),
       end: `${Math.floor((p.sunsetMs - p.sunriseMs) / 3_600_000)}h ${String(Math.round(((p.sunsetMs - p.sunriseMs) % 3_600_000) / 60_000)).padStart(2, "0")}m light`,
@@ -258,7 +258,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
       k: "Moonrise · set",
       v: (
         <span className="mono today-num">
-          {p.moonriseMs !== null ? clock.hm(p.moonriseMs) : "–"} – {p.moonsetMs !== null ? clock.hm(p.moonsetMs) : "–"}
+          {p.moonriseMs !== null ? clock.hm(p.moonriseMs) : "-"} - {p.moonsetMs !== null ? clock.hm(p.moonsetMs) : "-"}
         </span>
       ),
       foot: {
@@ -749,8 +749,8 @@ export default function TodayScreen() {
 
           <Colophon
             rows={[
-              ["Place", place ? `${place.name} · ${place.lat.toFixed(4)}°, ${place.lon.toFixed(4)}°` : "–"],
-              ["Zone", place ? `${clock.zone} (the birthplace's, not this device's)` : "–"],
+              ["Place", place ? `${place.name} · ${place.lat.toFixed(4)}°, ${place.lon.toFixed(4)}°` : "-"],
+              ["Zone", place ? `${clock.zone} (the birthplace's, not this device's)` : "-"],
               ["Sunrise", SUNRISE_LABEL[preset.sunrise]],
               ["Ayanāṃśa", AYANAMSA_LABEL[preset.ayanamsa]],
               ["Engine", `astronomy-engine ${ASTRONOMY_ENGINE_VERSION} · computed on this device, offline`],
@@ -785,7 +785,7 @@ export default function TodayScreen() {
             {foot.explain && glossary(foot.explain) ? (
               <div className="footnote__plain">
                 <p>
-                  <strong>In plain English: </strong>
+                  <strong>Simply put: </strong>
                   {glossary(foot.explain)?.short}
                 </p>
                 <button

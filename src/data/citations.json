@@ -3,7 +3,7 @@
   "works": {
     "BPHS": "Bṛhat Parāśara Horā Śāstra, the foundational Parāśarī text on natal astrology.",
     "Phaladīpikā": "Phaladīpikā of Mantreśvara (c. 14th century), a compact manual of natal rules and yogas.",
-    "Sārāvalī": "Sārāvalī of Kalyāṇavarmā (c. 9th–10th century), notable for its chapters on planetary combinations.",
+    "Sārāvalī": "Sārāvalī of Kalyāṇavarmā (c. 9th-10th century), notable for its chapters on planetary combinations.",
     "Sūrya Siddhānta": "Sūrya Siddhānta, the classical astronomical treatise; its chapter on conjunctions defines planetary contests.",
     "Muhūrta Cintāmaṇi": "Muhūrta Cintāmaṇi of Rāma Daivajña (1600), the standard muhūrta text; its sixth chapter sets out the Aṣṭakūṭa.",
     "Later tradition": "A convention found in later manuals and commentaries rather than in a verse of the classical texts.",
@@ -78,7 +78,7 @@
       "text": "Later tradition",
       "ref": "Kāla-Sarpa",
       "title": "Kāla-Sarpa",
-      "description": "All seven grahas on one side of the Rāhu–Ketu axis. Widely used in modern practice; not described in BPHS or the other classical texts."
+      "description": "All seven grahas on one side of the Rāhu-Ketu axis. Widely used in modern practice; not described in BPHS or the other classical texts."
     },
     {
       "text": "Later tradition",
@@ -180,7 +180,7 @@
       "text": "Phaladīpikā",
       "ref": "ch. 26",
       "title": "Gocara-phala",
-      "description": "Transits are counted from the natal Moon's sign. Favourable houses: Sūrya 3, 6, 10, 11; Candra 1, 3, 6, 7, 10, 11; Maṅgala, Śani, Rāhu and Ketu 3, 6, 11; Budha 2, 4, 6, 8, 10, 11; Guru 2, 5, 7, 9, 11; Śukra 1–5, 8, 9, 11, 12. A favourable transit is obstructed (vedha) by another graha in its paired house, except between Sūrya and Śani or Candra and Budha."
+      "description": "Transits are counted from the natal Moon's sign. Favourable houses: Sūrya 3, 6, 10, 11; Candra 1, 3, 6, 7, 10, 11; Maṅgala, Śani, Rāhu and Ketu 3, 6, 11; Budha 2, 4, 6, 8, 10, 11; Guru 2, 5, 7, 9, 11; Śukra 1-5, 8, 9, 11, 12. A favourable transit is obstructed (vedha) by another graha in its paired house, except between Sūrya and Śani or Candra and Budha."
     },
     {
       "text": "Muhūrta Cintāmaṇi",

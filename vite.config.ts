@@ -56,13 +56,13 @@ export default defineConfig({
       ? []
       : [
           VitePWA({
-            registerType: "prompt",
+            registerType: "autoUpdate",
             injectRegister: false,
             includeAssets: ["favicon.svg", "grain.svg", "seal-edge.svg", "icon.svg"],
             manifest: {
               name: "Vyom",
               short_name: "Vyom",
-              description: "Your sky, explained — Indian astrology in plain English, private and offline",
+              description: "Your sky, explained, Indian astrology in plain English, private and offline",
               lang: "en-IN",
               theme_color: "#04050d",
               background_color: "#04050d",
@@ -77,6 +77,10 @@ export default defineConfig({
               ],
             },
             workbox: {
+              // A new deploy takes over at once; IndexedDB (people, charts, settings) is untouched.
+              skipWaiting: true,
+              clientsClaim: true,
+              cleanupOutdatedCaches: true,
               globPatterns: ["**/*.{js,css,html,svg,png,woff2,webmanifest,webm,mp3,bin,gz}"],
               globIgnores: ["**/models/**", "**/mediapipe/**", "**/*.wasm", "**/opencv*.js", "**/cv-*.js", "**/SkyDome-*.js"],
               maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,

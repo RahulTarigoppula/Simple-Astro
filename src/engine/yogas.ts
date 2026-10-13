@@ -87,7 +87,7 @@ export function kalaSarpaCheck(core: PatriCore): KalaSarpaCheck {
   if (onAxis.length > 0) {
     const note =
       oneSide !== null
-        ? `near boundary: ${joinNames(onAxis)} on the Rāhu–Ketu axis (within ${AXIS_ORB_DEG}°), so Kāla-Sarpa is not counted`
+        ? `near boundary: ${joinNames(onAxis)} on the Rāhu-Ketu axis (within ${AXIS_ORB_DEG}°), so Kāla-Sarpa is not counted`
         : null;
     return { hemmed: false, direction: null, onAxis, note };
   }

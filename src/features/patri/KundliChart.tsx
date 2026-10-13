@@ -229,8 +229,8 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
                 <tr key={id}>
                   <th scope="row">{GRAHA_ENGLISH[id]}</th>
                   <td>{SIGN_NAMES[b.sign]}</td>
-                  <td>{b.degInSign != null ? `${Math.floor(b.degInSign)} degrees ${Math.floor((b.degInSign % 1) * 60)} minutes` : "–"}</td>
-                  <td>{b.nakshatra != null ? `${NAKSHATRA_NAMES[b.nakshatra]} pada ${b.pada ?? ""}` : "–"}</td>
+                  <td>{b.degInSign != null ? `${Math.floor(b.degInSign)} degrees ${Math.floor((b.degInSign % 1) * 60)} minutes` : "-"}</td>
+                  <td>{b.nakshatra != null ? `${NAKSHATRA_NAMES[b.nakshatra]} pada ${b.pada ?? ""}` : "-"}</td>
                 </tr>
               );
             })}

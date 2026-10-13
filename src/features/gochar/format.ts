@@ -52,5 +52,5 @@ export function yearSpan(a: number, b: number, zone: string): string {
   const ya = yearIn(a, zone);
   const yb = yearIn(b, zone);
   if (ya === yb) return String(ya);
-  return Math.floor(ya / 100) === Math.floor(yb / 100) ? `${ya}–${String(yb).slice(2)}` : `${ya}–${yb}`;
+  return Math.floor(ya / 100) === Math.floor(yb / 100) ? `${ya}-${String(yb).slice(2)}` : `${ya}-${yb}`;
 }

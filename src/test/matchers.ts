@@ -18,7 +18,7 @@ expect.extend({
     return {
       pass,
       message: () =>
-        `expected ${received.toFixed(6)}° to be within ${arcsec}″ of ${expected.toFixed(6)}° — difference ${fmt(diff)} (${(diff * 3600).toFixed(2)}″)`,
+        `expected ${received.toFixed(6)}° to be within ${arcsec}″ of ${expected.toFixed(6)}°, difference ${fmt(diff)} (${(diff * 3600).toFixed(2)}″)`,
     };
   },
 });

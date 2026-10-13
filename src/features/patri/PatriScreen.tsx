@@ -30,6 +30,7 @@ import { haptics } from "../../platform/haptics";
 import { isNative, reducedMotion } from "../../platform/native";
 import { play, rustle } from "../../platform/sound";
 import { CosmicProfile } from "../cosmic/CosmicProfile";
+import { LifeReading } from "../cosmic/LifeReading";
 import { MeetGrahas } from "../cosmic/MeetGrahas";
 import { GocharSection } from "../gochar";
 import { ChartFigure } from "./ChartFigure";
@@ -324,6 +325,7 @@ export default function PatriScreen() {
 
             {patri && profile && patri.profileId === profile.id ? (
               <div className="patri-cosmic">
+                <LifeReading profile={profile} patri={patri} nowMs={nowMs} />
                 <Link to={`/forecast/${profile.id}`} className="patri-forecast">
                   <span className="patri-forecast__k">Forecast</span>
                   <span className="patri-forecast__t">What the sky holds for {profile.name}</span>
@@ -332,39 +334,47 @@ export default function PatriScreen() {
               </div>
             ) : null}
 
-            {patri && b ? (
-              <PatriBody
-                patri={patri}
-                zone={b.zone}
-                style={style}
-                script={settings.chartScript}
-                inkKey={inkKey}
-                skipInk={skipInk}
-                lit={lit}
-                setLit={setLit}
-                onFlip={() => setStyle((s) => (s === "north" ? "south" : "north"))}
-                varga={varga}
-                setVarga={setVarga}
-                vchart={vchart}
-                setFoot={setFoot}
-                nowMs={nowMs}
-                profileId={profile?.id ?? ""}
-                devDigits={settings.devanagariDigits}
-                name={profile?.name ?? ""}
-              />
-            ) : (
-              <div className="figure" aria-busy="true">
-                <svg className="chart" viewBox="-4 -4 408 408" aria-label="The patri is being written">
-                  <path className="stroke stroke--faint" d="M2 2H398V398H2Z" />
-                </svg>
-              </div>
-            )}
+            <details className="astro-tech">
+              <summary>
+                <span>
+                  Full detail (astro tech)
+                  <small>The birth chart, almanac, planets, life chapters, yogas and every number</small>
+                </span>
+              </summary>
+              {patri && b ? (
+                <PatriBody
+                  patri={patri}
+                  zone={b.zone}
+                  style={style}
+                  script={settings.chartScript}
+                  inkKey={inkKey}
+                  skipInk={skipInk}
+                  lit={lit}
+                  setLit={setLit}
+                  onFlip={() => setStyle((s) => (s === "north" ? "south" : "north"))}
+                  varga={varga}
+                  setVarga={setVarga}
+                  vchart={vchart}
+                  setFoot={setFoot}
+                  nowMs={nowMs}
+                  profileId={profile?.id ?? ""}
+                  devDigits={settings.devanagariDigits}
+                  name={profile?.name ?? ""}
+                />
+              ) : (
+                <div className="figure" aria-busy="true">
+                  <svg className="chart" viewBox="-4 -4 408 408" aria-label="The patri is being written">
+                    <path className="stroke stroke--faint" d="M2 2H398V398H2Z" />
+                  </svg>
+                </div>
+              )}
 
-            {patri && profile && patri.profileId === profile.id ? (
-              <div className="patri-cosmic">
-                <CosmicProfile profile={profile} patri={patri} />
-              </div>
-            ) : null}
+              {patri && profile && patri.profileId === profile.id ? (
+                <div className="patri-cosmic">
+                  <CosmicProfile profile={profile} patri={patri} />
+                </div>
+              ) : null}
+            </details>
           </div>
         </div>
       </div>

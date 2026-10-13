@@ -19,6 +19,10 @@ test("writing the reference leaf engraves the contract with reality", async ({ p
 
 test("sealing casts the Patri with the golden numbers", async ({ page }) => {
   await sealReferenceLeaf(page);
+  // Simple words come first; the chart itself sits behind "Full detail (astro tech)".
+  await expect(page.getByRole("heading", { name: /this is you/i })).toBeVisible();
+  await expect(page.locator(".life")).toContainText("Revatī");
+  await page.getByText("Full detail (astro tech)").click();
   await expect(page.locator(".patri-head .engraved")).toContainText("2449425.5799");
   await expect(page.locator(".patri-head .engraved")).toContainText("MEENA");
   const ledger = page.locator("table.ledger--grahas");

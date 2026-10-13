@@ -68,7 +68,7 @@ describe("tzdb guard", () => {
   });
 });
 
-describe("resolveBirthMoment — the fifteen historical rows (§6.1)", () => {
+describe("resolveBirthMoment, the fifteen historical rows (§6.1)", () => {
   it.each(ROWS.map((r) => [r.id, r] as const))("%s resolves to the expected UTC instant", (_id, r) => {
     const b = resolveRow(r);
     expect(new Date(b.utcMs).toISOString().replace(".000Z", "Z")).toBe(r.utc);
@@ -150,7 +150,7 @@ describe("invalid, non-existent and ambiguous local times", () => {
     ).toBe("TIME_INVALID");
   });
 
-  it("throws EPHEMERIS_RANGE outside 1600–2400 and PLACE_MISSING for bad coordinates", () => {
+  it("throws EPHEMERIS_RANGE outside 1600-2400 and PLACE_MISSING for bad coordinates", () => {
     const mk = (y: number) => () =>
       resolveBirthMoment({ localY: y, localMo: 1, localD: 1, localH: 0, localMi: 0, place: PLACE, offsetOverrideMin: 0 });
     expect(codeOf(mk(1599))).toBe("EPHEMERIS_RANGE");
@@ -185,7 +185,7 @@ describe("calendar helpers", () => {
 });
 
 describe("TT", () => {
-  it("jdTt − jdUt is astronomy-engine's ΔT: ≈ 60.1 s in 1994, monotonic 1955–2030", () => {
+  it("jdTt − jdUt is astronomy-engine's ΔT: ≈ 60.1 s in 1994, monotonic 1955-2030", () => {
     // Real ΔT is not monotonic before ~1950 (it fell slightly through the 1930s–40s), so the
     // monotonicity claim of TESTING T-7 is asserted over the modern span only.
     const ms = Date.UTC(1994, 2, 14, 1, 55);

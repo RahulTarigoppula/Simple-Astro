@@ -129,7 +129,7 @@ describe("readings", () => {
       expect(smoothSigns(av, g).every((s) => binduFor(av, g, s) >= 4)).toBe(true);
     }
   });
-  it("section readings: 2–3 calm sentences, cited, no banned words", () => {
+  it("section readings: 2-3 calm sentences, cited, no banned words", () => {
     const rnd = mulberry32(72);
     const s = () => Math.floor(rnd() * 12);
     for (let k = 0; k < 50; k++) {

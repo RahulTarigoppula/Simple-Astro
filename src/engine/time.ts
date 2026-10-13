@@ -122,7 +122,7 @@ export function resolveBirthMoment(input: BirthInput): BirthMoment {
     throw new EngineError("TIME_INVALID", `not a calendar time: ${y}-${mo}-${d} ${h}:${mi}`);
   }
   if (y < MIN_YEAR || y > MAX_YEAR) {
-    throw new EngineError("EPHEMERIS_RANGE", `year ${y} is outside ${MIN_YEAR}–${MAX_YEAR}`);
+    throw new EngineError("EPHEMERIS_RANGE", `year ${y} is outside ${MIN_YEAR}-${MAX_YEAR}`);
   }
   const { lat, lon } = input.place;
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {

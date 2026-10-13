@@ -16,7 +16,7 @@ function ends(m: Uint8Array, w: number): Array<[number, number]> {
   return out;
 }
 
-describe("Zhang–Suen thinning (§6.13 [6])", () => {
+describe("Zhang-Suen thinning (§6.13 [6])", () => {
   it("a 9 px straight stroke thins to a 1 px skeleton with the same endpoints ±1 px", () => {
     const w = 120;
     const h = 40;

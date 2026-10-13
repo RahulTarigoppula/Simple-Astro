@@ -45,11 +45,11 @@ function periodLabel(p: Period, s: number, e: number, zone: string): string {
     case "day":
       return fmt(s, zone, { weekday: "long", day: "numeric", month: "long" });
     case "week":
-      return `${fmt(s, zone, { day: "numeric", month: "short" })} – ${fmt(e - 1, zone, { day: "numeric", month: "short" })}`;
+      return `${fmt(s, zone, { day: "numeric", month: "short" })} - ${fmt(e - 1, zone, { day: "numeric", month: "short" })}`;
     case "month":
       return fmt(s, zone, { month: "long", year: "numeric" });
     case "quarter":
-      return `Q${Math.floor(Number(fmt(s, zone, { month: "numeric" })) / 3) + 1} · ${fmt(s, zone, { month: "short" })} – ${fmt(e - 1, zone, { month: "short", year: "numeric" })}`;
+      return `Q${Math.floor(Number(fmt(s, zone, { month: "numeric" })) / 3) + 1} · ${fmt(s, zone, { month: "short" })} - ${fmt(e - 1, zone, { month: "short", year: "numeric" })}`;
     case "year":
       return fmt(s, zone, { year: "numeric" });
   }

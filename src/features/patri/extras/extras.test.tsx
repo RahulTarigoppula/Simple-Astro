@@ -73,7 +73,7 @@ describe("BhavaChalitTable", () => {
     expect(s.find((x) => x.id === "MO")).toBeUndefined();
   });
 
-  it("renders 12 bhāva rows with start–madhya–end and the shift notes", () => {
+  it("renders 12 bhāva rows with start-madhya-end and the shift notes", () => {
     const { container } = render(<BhavaChalitTable patri={core} />);
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("भाव चलित · Bhāva Chalit");
     const region = screen.getByRole("region", { name: /cusps/ });

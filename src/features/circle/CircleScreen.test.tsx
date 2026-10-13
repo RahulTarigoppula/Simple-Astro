@@ -42,7 +42,7 @@ const PRIYA: Profile = {
 };
 
 describe("leaf facts", () => {
-  it("reads the reference Moon in Revatī, Mīna — the same Moon the Patri casts", () => {
+  it("reads the reference Moon in Revatī, Mīna, the same Moon the Patri casts", () => {
     const m = leafMoon(REFERENCE_PROFILE, "se-true");
     expect(m?.nakName).toBe("Revatī");
     expect(m?.nakDev).toBe("रेवती");

@@ -69,7 +69,7 @@ export default function GuideScreen() {
     <Screen className="guide" scroll label="Guide: Vyom in plain English">
       <header className="guide-hero">
         <p className="guide-kicker">Guide</p>
-        <h1>Vyom in plain English</h1>
+        <h1>How Vyom works</h1>
         <p className="guide-lede">
           Vyom is an Indian astrology (Jyotiṣa) app. It works out exactly where the Sun, Moon and planets are (or were, when someone was
           born) and shows what the old tradition says about it. You don't need to know anything, or believe anything, to use it.

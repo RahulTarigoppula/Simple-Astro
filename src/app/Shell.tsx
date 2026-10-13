@@ -75,10 +75,10 @@ export function Shell() {
             markJourneySeen();
             setJourney(false);
           }}
-          onStory={() => {
+          onAbout={() => {
             markJourneySeen();
             setJourney(false);
-            navigate("/story");
+            navigate("/about");
           }}
         />
       ) : null}

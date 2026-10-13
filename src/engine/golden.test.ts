@@ -110,10 +110,10 @@ function printTable(c: GoldenChart, rows: Row[]) {
         .toFixed(1)
         .padStart(8)}″${Math.abs(r.delta) > r.tol ? `  ✗ (> ${r.tol}″)` : ""}`,
   );
-  console.error(`\n${c.id} ${c.label} — ${c.input.utcIso} (${c.input.lat}, ${c.input.lon})\n${lines.join("\n")}`);
+  console.error(`\n${c.id} ${c.label}, ${c.input.utcIso} (${c.input.lat}, ${c.input.lon})\n${lines.join("\n")}`);
 }
 
-describe("golden-charts.json — fixture integrity", () => {
+describe("golden-charts.json, fixture integrity", () => {
   it("has 50 charts, 10 per decade band, the reference chart first", () => {
     expect(CHARTS).toHaveLength(50);
     for (const band of ["1900-1929", "1930-1959", "1960-1989", "1990-2019", "2020-2030"]) {

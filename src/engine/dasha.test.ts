@@ -35,7 +35,7 @@ describe("reference chart (§6.8 worked example)", () => {
     expect((birthMs - md.startMs) / YEAR).toBeCloseTo(ref.elapsedYears, 4);
   });
 
-  it("at birth: Budha – Ketu – Śani with the documented dates (±1 day)", () => {
+  it("at birth: Budha - Ketu - Śani with the documented dates (±1 day)", () => {
     const cur = currentDasha(tree, birthMs);
     expect(cur?.md.lord).toBe("ME");
     expect(cur?.ad.lord).toBe(ref.adAtBirth.lord);
@@ -111,7 +111,7 @@ describe("invariants (VD-1…VD-5)", () => {
     expect(t.map((n) => n.lord)).toEqual(order);
   });
 
-  it("VD-4: half-open — a boundary instant belongs to the later interval at all levels", () => {
+  it("VD-4: half-open, a boundary instant belongs to the later interval at all levels", () => {
     const md1 = tree[1] as DashaNode;
     const cur = currentDasha(tree, md1.startMs);
     expect(cur?.md.lord).toBe(md1.lord);

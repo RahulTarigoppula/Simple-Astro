@@ -96,7 +96,7 @@ describe("the birth pañcāṅga of the reference chart", () => {
     expect(p.moonIllumination).toBeLessThan(0.034);
   });
 
-  it("sunrise ≈ 06:28–06:29 IST, Hindu day bounds, divisions", () => {
+  it("sunrise ≈ 06:28-06:29 IST, Hindu day bounds, divisions", () => {
     expect(["06:28", "06:29"]).toContain(hhmm(p.sunriseMs, IST));
     expect(p.sunriseMs).toBeLessThan(BIRTH);
     expect(p.nextSunriseMs).toBeGreaterThan(BIRTH);

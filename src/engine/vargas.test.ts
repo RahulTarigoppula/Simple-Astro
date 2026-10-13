@@ -8,7 +8,7 @@ type Row = Record<string, number | string>;
 
 describe("vargas.json hand-derived rows (§6.7)", () => {
   for (const row of fixture.rows as Row[]) {
-    it.each(VARGAS)(`${row.note} — D%i`, (v) => {
+    it.each(VARGAS)(`${row.note}, D%i`, (v) => {
       expect(vargaSign(row.lonSid as number, v)).toBe(row[`D${v}`]);
     });
   }

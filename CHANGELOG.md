@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.11.0 (2026-10-14)
+
+### Always the latest version
+- The app now updates itself: it checks for a new version on every visit and every 30 minutes, and reloads once when one arrives. Only the app's own files are replaced. People, charts and settings live in the browser's database and are never touched. If you are typing, it waits until you move to another screen.
+
+### Simple first
+- Every chart now opens with **In simple words**: who you are at heart (Moon sign), your birth star, your birth-date numbers, plus points and things to watch out for, love, work, and the life chapter you are in right now. The full chart, almanac and every number sit behind **Full detail (astro tech)**.
+- Adding a person says **Place of birth**.
+
+### The intro
+- Plain sentences, no dashes. The last slide shows how Vyom was made: about 18 weeks of planning, building, gathering and cleaning data by Rahul (RT), with the numbers.
+- A short **How to use Vyom** step before Home: add yourself, read your day, tap ⓘ on any word.
+- Em-dashes removed from every screen.
+
 ## 0.10.0 (2026-10-14)
 
 ### Your tradition, per person

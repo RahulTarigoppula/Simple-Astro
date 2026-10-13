@@ -136,7 +136,7 @@ export const STORY: StoryChapter[] = [
     cards: [
       {
         id: "vedanga",
-        era: "c. 1400–1200 BCE (traditional dating)",
+        era: "c. 1400-1200 BCE (traditional dating)",
         kind: "history",
         title: "The first textbook: Vedāṅga Jyotiṣa",
         dev: "वेदाङ्ग ज्योतिष",
@@ -163,13 +163,13 @@ export const STORY: StoryChapter[] = [
       },
       {
         id: "yavana",
-        era: "2nd–3rd century CE",
+        era: "2nd-3rd century CE",
         kind: "history",
         title: "When India met the Greeks",
         dev: "यवनजातक",
         art: "ship",
         body: [
-          'After Alexander\'s armies reached the Indus, trade and ideas flowed between India and the Greek world. In 149–150 CE a scholar called Yavaneśvara ("lord of the Greeks") translated a Greek astrology book into Sanskrit, and in 269 CE Sphujidhvaja turned it into verse: the Yavanajātaka.',
+          'After Alexander\'s armies reached the Indus, trade and ideas flowed between India and the Greek world. In 149-150 CE a scholar called Yavaneśvara ("lord of the Greeks") translated a Greek astrology book into Sanskrit, and in 269 CE Sphujidhvaja turned it into verse: the Yavanajātaka.',
           "That's where the twelve zodiac signs and horoscope charts entered Indian astrology. India joined them to its own far older nakṣatras, and made something new.",
           "You can still hear the Greek in the Sanskrit words: horā (hour) from hōra, kendra (angle) from kentron, jāmitra (the 7th house) from diametron, liptā (arc-minute) from leptón.",
         ],
@@ -209,7 +209,7 @@ export const STORY: StoryChapter[] = [
       },
       {
         id: "jantar",
-        era: "1724–1735",
+        era: "1724-1735",
         kind: "history",
         title: "Instruments of stone",
         dev: "जंतर मंतर",
@@ -236,7 +236,7 @@ export const STORY: StoryChapter[] = [
         body: [
           "Sāmudrika Śāstra, the science of the body's marks, is traditionally credited to a sage named Samudra. It reads the face, the body and above all the palm: its lines, mounts and marks.",
           'Buddhist texts list 32 marks of a "great person", including wheels on the palms and soles; statues of the Buddha often show them. Palm reading also flourished in China, Greece and Romani tradition, each with its own rules.',
-          "Science sees palm lines as folds that form before birth, shaped by how the hand bends. Vyom reads them the way the old books do: as a mirror for reflection, never as fate.",
+          "Science sees palm lines as folds that form before birth, shaped by how the hand bends. Vyom reads them the way the old books do, for fun and reflection. It doesn't predict anything.",
         ],
       },
       {
@@ -248,10 +248,10 @@ export const STORY: StoryChapter[] = [
         art: "numbers",
         body: [
           'Around 530 BCE, the Greek Pythagoras taught that "all is number": that numbers hold the hidden order of the world. Indian thinkers held numbers sacred too: 108 is 27 nakṣatras × 4 quarters, and also 12 signs × 9 planets, which is why a mālā has 108 beads.',
-          'Modern Indian numerology (Aṅka Jyotiṣa) joins the two: each digit 1–9 is given to a planet. 1 Sun, 2 Moon, 3 Jupiter, 4 Rāhu, 5 Mercury, 6 Venus, 7 Ketu, 8 Saturn, 9 Mars. You reduce a birth date to a single digit and read that planet\'s "nature".',
+          'Modern Indian numerology (Aṅka Jyotiṣa) joins the two: each digit 1-9 is given to a planet. 1 Sun, 2 Moon, 3 Jupiter, 4 Rāhu, 5 Mercury, 6 Venus, 7 Ketu, 8 Saturn, 9 Mars. You reduce a birth date to a single digit and read that planet\'s "nature".',
           'This form is young. Writers like "Cheiro" popularised it in the late 1800s and 1900s, but it borrows its planets from very old Jyotiṣa.',
         ],
-        fact: 'Our numerals 0–9 are Indian in origin; Europe called them "Arabic" because it learned them from Arab scholars.',
+        fact: 'Our numerals 0-9 are Indian in origin; Europe called them "Arabic" because it learned them from Arab scholars.',
       },
     ],
   },

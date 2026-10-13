@@ -41,7 +41,7 @@ describe("zone clock", () => {
     const rise = Date.UTC(2026, 9, 6, 0, 40); // 06:10 IST
     const end = Date.UTC(2026, 9, 6, 19, 4); // 00:34 IST next day
     expect(endsLabel(c, end, rise)).toBe("ends 00:34 +1");
-    expect(rangeLabel(c, [Date.UTC(2026, 9, 6, 9, 52), Date.UTC(2026, 9, 6, 11, 24)])).toBe("15:22–16:54");
+    expect(rangeLabel(c, [Date.UTC(2026, 9, 6, 9, 52), Date.UTC(2026, 9, 6, 11, 24)])).toBe("15:22-16:54");
   });
   it("survives an unknown zone", () => {
     expect(zoneClock("Not/AZone").zone).toBe("UTC");
@@ -75,7 +75,7 @@ describe("TodayScreen", { timeout: 60_000 }, () => {
     expect(within(tithi).getByText(/^ends \d{2}:\d{2}( \+\d)?$/)).toBeInTheDocument();
     expect(within(tithi).getByText(/[ऀ-ॿ]/, { selector: "[lang='hi']" })).toBeInTheDocument();
     const rahu = screen.getByRole("button", { name: /^Rāhu Kāla/ });
-    expect(rahu.textContent).toMatch(/\d{2}:\d{2}–\d{2}:\d{2}/);
+    expect(rahu.textContent).toMatch(/\d{2}:\d{2}-\d{2}:\d{2}/);
     expect(screen.getByRole("img", { name: /Brass dial/ })).toBeInTheDocument();
   });
 
@@ -104,8 +104,8 @@ describe("TodayScreen", { timeout: 60_000 }, () => {
   it("prints Brahma-muhūrta and Godhūli in the Kāla section", async () => {
     renderToday();
     const brahma = await screen.findByRole("button", { name: /^Brahma-muhūrta/ }, { timeout: 5000 });
-    expect(brahma.textContent).toMatch(/\d{2}:\d{2}–\d{2}:\d{2}/);
-    expect(screen.getByRole("button", { name: /^Godhūli/ }).textContent).toMatch(/\d{2}:\d{2}–\d{2}:\d{2}/);
+    expect(brahma.textContent).toMatch(/\d{2}:\d{2}-\d{2}:\d{2}/);
+    expect(screen.getByRole("button", { name: /^Godhūli/ }).textContent).toMatch(/\d{2}:\d{2}-\d{2}:\d{2}/);
   });
 
   it("lists the day and night choghaḍiyās with quality in words and at most one 'now'", async () => {
@@ -119,7 +119,7 @@ describe("TodayScreen", { timeout: 60_000 }, () => {
       expect(items).toHaveLength(8);
       for (const li of items) {
         expect(li.textContent).toMatch(/good|neutral|bad/);
-        expect(li.textContent).toMatch(/\d{2}:\d{2}–\d{2}:\d{2}/);
+        expect(li.textContent).toMatch(/\d{2}:\d{2}-\d{2}:\d{2}/);
         expect(li.querySelector("[lang='hi']")).not.toBeNull();
       }
     }

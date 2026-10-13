@@ -105,5 +105,5 @@ export function endsLabel(clock: ZoneClock, endMs: number, dayMs: number): strin
 /** "15:22–16:54" (with "+1" on the end when it crosses midnight). */
 export function rangeLabel(clock: ZoneClock, [a, b]: readonly [number, number]): string {
   const dd = clock.dayNumber(b) - clock.dayNumber(a);
-  return `${clock.hm(a)}–${clock.hm(b)}${dd > 0 ? ` +${dd}` : ""}`;
+  return `${clock.hm(a)}-${clock.hm(b)}${dd > 0 ? ` +${dd}` : ""}`;
 }

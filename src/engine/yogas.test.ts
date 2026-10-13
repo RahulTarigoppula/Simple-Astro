@@ -74,17 +74,17 @@ describe("Candra-Maṅgala", () => {
 });
 
 describe("Pañca-Mahāpuruṣa", () => {
-  it("Y-4: Rucaka — Maṅgala in Meṣa, Lagna Meṣa", () => {
+  it("Y-4: Rucaka, Maṅgala in Meṣa, Lagna Meṣa", () => {
     expect(find(yogasOf(0, { MA: 0 }), "rucaka")?.strength).toBe("full");
   });
-  it("Rucaka by exaltation — Maṅgala in Makara, the 10th", () => {
+  it("Rucaka by exaltation, Maṅgala in Makara, the 10th", () => {
     const h = find(yogasOf(0, { MA: 9 }), "rucaka");
     expect(h?.because[0]?.note).toContain("exaltation");
   });
-  it("Y-5: Rucaka negative — Maṅgala in Meṣa but Lagna Vṛṣabha (12th)", () => {
+  it("Y-5: Rucaka negative, Maṅgala in Meṣa but Lagna Vṛṣabha (12th)", () => {
     expect(find(yogasOf(1, { MA: 0 }), "rucaka")).toBeUndefined();
   });
-  it("Rucaka negative — Maṅgala in a kendra but not dignified", () => {
+  it("Rucaka negative, Maṅgala in a kendra but not dignified", () => {
     expect(find(yogasOf(0, { MA: 3 }), "rucaka")).toBeUndefined();
   });
   it("Bhadra: Budha in Mithuna in the 1st; not in the 3rd", () => {
@@ -239,7 +239,7 @@ describe("Graha Yuddha", () => {
 });
 
 describe("Adhi", () => {
-  it("all three benefics in the 6th–8th from Candra → full; two → partial", () => {
+  it("all three benefics in the 6th-8th from Candra → full; two → partial", () => {
     expect(find(yogasOf(0, { MO: 0, ME: 5, JU: 6, VE: 7 }), "adhi")?.strength).toBe("full");
     expect(find(yogasOf(0, { MO: 0, ME: 5, JU: 6, VE: 1 }), "adhi")?.strength).toBe("partial");
   });

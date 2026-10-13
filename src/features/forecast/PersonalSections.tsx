@@ -162,7 +162,7 @@ export function DayGuideCard({ g, zone, name }: { g: DayGuide; zone: string; nam
             ? g.bestHours.map((h) => (
                 <span key={h.startMs} className="fc-chip">
                   <span className="mono">
-                    {hm(h.startMs, zone)}–{hm(h.endMs, zone)}
+                    {hm(h.startMs, zone)}-{hm(h.endMs, zone)}
                   </span>{" "}
                   {GRAHA_LORE.find((x) => x.id === h.lord)?.english}
                 </span>
@@ -174,7 +174,7 @@ export function DayGuideCard({ g, zone, name }: { g: DayGuide; zone: string; nam
         <span className="fc-guide__k">Pause new starts</span>
         <InfoDot id="rahu-kala" />
         <span className="fc-chip fc-chip--warn mono">
-          {hm(g.avoid[0], zone)}–{hm(g.avoid[1], zone)}
+          {hm(g.avoid[0], zone)}-{hm(g.avoid[1], zone)}
         </span>
       </div>
       <div className="fc-guide__row">

@@ -71,7 +71,7 @@ describe("MilanScreen", () => {
     await db.settings.clear();
   });
 
-  it("strings exactly milan()'s output on the mala — every row, the total and the band", async () => {
+  it("strings exactly milan()'s output on the mala, every row, the total and the band", async () => {
     await upsertProfile(REFERENCE_PROFILE);
     await upsertProfile(PRIYA);
     const want = engineResult(REFERENCE_PROFILE, PRIYA);
@@ -146,7 +146,7 @@ describe("MilanScreen", () => {
   });
 });
 
-describe("MilanScreen — porutham, compare and summary", () => {
+describe("MilanScreen, porutham, compare and summary", () => {
   beforeEach(async () => {
     await db.profiles.clear();
     await db.patris.clear();
@@ -155,7 +155,7 @@ describe("MilanScreen — porutham, compare and summary", () => {
     await upsertProfile(PRIYA);
   });
 
-  it("strings the ten poruthams as knots — tied or open, as milan() says — and opens each rule", async () => {
+  it("strings the ten poruthams as knots, tied or open, as milan() says, and opens each rule", async () => {
     const want = engineResult(REFERENCE_PROFILE, PRIYA).porutham ?? [];
     expect(want).toHaveLength(10);
     renderAt(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`);

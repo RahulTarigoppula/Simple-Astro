@@ -191,7 +191,7 @@ export default function ChowkiScreen() {
               <li className="is-caution">
                 <span className="k">Rāhu Kāla</span>
                 <span className="v mono">
-                  {hhmm(p.rahuKaal[0], zone)}–{hhmm(p.rahuKaal[1], zone)}
+                  {hhmm(p.rahuKaal[0], zone)}-{hhmm(p.rahuKaal[1], zone)}
                 </span>
                 <InfoDot id="rahu-kala" />
               </li>

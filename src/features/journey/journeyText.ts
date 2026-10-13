@@ -21,26 +21,22 @@ export interface Beat {
 
 export const BEATS: Beat[] = [
   // ── Act I · Scale ─────────────────────────────────────────────────────
-  // Observable universe ≈ 93 billion light-years across.
-  { id: "universe", scene: "universe", title: "Ninety-three billion light-years.", line: "That is as far as we can see.", hold: 7 },
-  // Milky Way: 100–400 billion stars.
-  { id: "milkyway", scene: "milkyway", title: "Hundreds of billions of stars.", line: "One of them is ours.", hold: 7 },
-  { id: "solar", scene: "solar", title: "One ordinary star.", line: "Eight worlds around it.", hold: 6 },
-  { id: "earth", scene: "earth", title: "One pale blue dot.", line: "The only place we know of with life.", hold: 7 },
-
-  // ── Act II · Wonder ───────────────────────────────────────────────────
+  // Observable universe ≈ 93 billion light-years across; Milky Way 100-400 billion stars.
+  { id: "universe", scene: "universe", title: "The part of the universe we can see is about 93 billion light-years across.", hold: 7 },
+  { id: "milkyway", scene: "milkyway", title: "Our galaxy, the Milky Way, has a few hundred billion stars in it.", hold: 7 },
+  { id: "solar", scene: "solar", title: "The Sun is one of them. Eight planets go around it.", hold: 6 },
+  { id: "earth", scene: "earth", title: "Earth is still the only place where we know there is life.", hold: 7 },
   // Crowther et al. 2015: ≈3 trillion trees.
-  { id: "life", scene: "life", title: "Three trillion trees.", line: "No other world we know has ever grown a leaf.", hold: 7 },
+  { id: "life", scene: "life", title: "There are about three trillion trees here. We haven't found a single leaf anywhere else.", hold: 8 },
   // Strobilanthes kunthiana flowers about every 12 years; Jupiter circles the zodiac in 11.86 years.
   {
     id: "rare",
     scene: "rare",
-    title: "Some flowers wait twelve years.",
-    line: "Neelakurinji, in the Western Ghats. About as long as Jupiter takes to circle the sky.",
-    hold: 8,
+    title:
+      "In the Western Ghats, the Neelakurinji flowers about once every twelve years. Jupiter takes about as long to go once around the sky.",
+    hold: 9,
   },
-  { id: "us", scene: "us", title: "And we looked up.", line: "We named the lights, and told stories about them.", hold: 7 },
-
+  { id: "us", scene: "us", title: "People have always looked up, named the stars and told stories about them.", hold: 7 },
   // ── Act III · In Rahul's words ────────────────────────────────────────
   {
     id: "stories",

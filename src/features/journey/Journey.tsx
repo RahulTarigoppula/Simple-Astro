@@ -10,7 +10,7 @@ import { countEvent } from "../../platform/stats";
 
 const FADE = 1.1; // seconds of crossfade between scenes
 
-export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () => void }) {
+export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () => void }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [at, setAt] = useState(0);
   const atRef = useRef(0);
@@ -19,32 +19,31 @@ export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () =
   const prev = useRef<{ i: number; t: number } | null>(null);
   const reduce = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   const [paused, setPaused] = useState(false);
+  // After the story: one short "how to use" card, then Home.
+  const [howto, setHowto] = useState(false);
   const pausedRef = useRef(false);
   pausedRef.current = paused || reduce;
 
-  const go = useCallback(
-    (i: number) => {
-      if (i >= BEATS.length) {
-        onDone();
-        return;
-      }
-      const k = Math.max(0, i);
-      if (k === atRef.current) return;
-      const from = BEATS[atRef.current];
-      const to = BEATS[k];
-      const now = performance.now();
-      if (from && to && from.scene === to.scene) {
-        prev.current = null;
-      } else {
-        prev.current = { i: atRef.current, t: (now - sceneSince.current) / 1000 };
-        sceneSince.current = now;
-      }
-      atRef.current = k;
-      since.current = now;
-      setAt(k);
-    },
-    [onDone],
-  );
+  const go = useCallback((i: number) => {
+    if (i >= BEATS.length) {
+      setHowto(true);
+      return;
+    }
+    const k = Math.max(0, i);
+    if (k === atRef.current) return;
+    const from = BEATS[atRef.current];
+    const to = BEATS[k];
+    const now = performance.now();
+    if (from && to && from.scene === to.scene) {
+      prev.current = null;
+    } else {
+      prev.current = { i: atRef.current, t: (now - sceneSince.current) / 1000 };
+      sceneSince.current = now;
+    }
+    atRef.current = k;
+    since.current = now;
+    setAt(k);
+  }, []);
 
   // The render loop: draw the current scene, crossfading from the last one.
   useEffect(() => {
@@ -92,7 +91,8 @@ export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () =
             g.restore();
           }
         }
-        if (beat && !pausedRef.current && t > beat.hold) go(atRef.current + 1);
+        // The last slide waits for the reader; everything before it moves on by itself.
+        if (beat && atRef.current < BEATS.length - 1 && !pausedRef.current && t > beat.hold) go(atRef.current + 1);
       }
       raf = requestAnimationFrame(frame);
     };
@@ -160,14 +160,37 @@ export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () =
           className="journey__skip"
           onClick={() => {
             countEvent("intro-skipped");
-            onDone();
+            setHowto(true);
           }}
         >
           Skip ›
         </button>
       </header>
 
-      {beat ? (
+      {howto ? (
+        <section className="journey__text journey__howto" aria-labelledby="howto-h">
+          <h2 id="howto-h" className="journey__say journey__say--narr">
+            How to use Vyom
+          </h2>
+          <ol className="journey__steps">
+            <li>
+              <b>Add yourself.</b> Your name, birth date, time and place. It takes about a minute.
+            </li>
+            <li>
+              <b>Read your day.</b> Home shows what today looks like for you. Forecast goes from a day up to a year.
+            </li>
+            <li>
+              <b>Tap ⓘ on any word</b> you don't know. It explains it in simple words.
+            </li>
+          </ol>
+          <p className="journey__steps-note">Everything stays on this device. Nothing to sign up for.</p>
+          <div className="journey__cta">
+            <button type="button" className="stamp" onClick={onDone}>
+              <span>Start</span>
+            </button>
+          </div>
+        </section>
+      ) : beat ? (
         <section
           key={beat.id}
           className={`journey__text journey__text--${beat.scene}${beat.quote ? " journey__text--maker" : ""}`}
@@ -177,23 +200,43 @@ export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () =
             <blockquote className="journey__quote">
               {beat.id === BEATS.find((b) => b.quote)?.id ? <p className="journey__kicker">In Rahul's words</p> : null}
               <p className="journey__say">{beat.quote}</p>
-              {beat.sign ? <footer className="journey__sig">Rahul, who made Vyom</footer> : null}
+              {beat.sign ? <footer className="journey__sig">Rahul (RT), who made Vyom</footer> : null}
             </blockquote>
           ) : (
             <>
-              <h2 className="journey__title">{beat.title}</h2>
+              <h2 className="journey__say journey__say--narr">{beat.title}</h2>
               {beat.line ? <p className="journey__line">{beat.line}</p> : null}
             </>
           )}{" "}
           {last ? (
-            <div className="journey__cta">
-              <button type="button" className="stamp" onClick={onDone}>
-                <span>Enter Vyom</span>
-              </button>
-              <button type="button" className="journey__ghost" onClick={onStory}>
-                The history of the stars →
-              </button>
-            </div>
+            <>
+              <section className="journey__made" aria-label="How Vyom was made">
+                <p className="journey__made-h">Made by Rahul (RT)</p>
+                <p className="journey__made-p">Almost 18 weeks of extensive planning, development, data gathering and cleaning.</p>
+                <ul className="journey__made-n">
+                  <li>
+                    <b>82,505</b> places
+                  </li>
+                  <li>
+                    <b>9,096</b> real stars
+                  </li>
+                  <li>
+                    <b>50</b> charts checked
+                  </li>
+                  <li>
+                    <b>704</b> tests
+                  </li>
+                </ul>
+              </section>
+              <div className="journey__cta">
+                <button type="button" className="stamp" onClick={() => setHowto(true)}>
+                  <span>Enter Vyom</span>
+                </button>
+                <button type="button" className="journey__ghost" onClick={onAbout}>
+                  How Vyom was made
+                </button>
+              </div>
+            </>
           ) : null}
         </section>
       ) : null}
@@ -209,8 +252,8 @@ export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () =
         <button
           type="button"
           className="journey__btn journey__btn--next"
-          onClick={() => go(at + 1)}
-          aria-label={last ? "Enter Vyom" : "Next"}
+          onClick={() => (howto ? onDone() : go(at + 1))}
+          aria-label={howto ? "Start" : last ? "Enter Vyom" : "Next"}
         >
           {last ? "✓" : "→"}
         </button>

@@ -9,7 +9,7 @@ const NUMBERS: Array<[string, string]> = [
   ["82,505", "places, offline"],
   ["9,096", "real stars"],
   ["50", "charts checked against Swiss Ephemeris"],
-  ["695", "automated tests"],
+  ["704", "automated tests"],
   ["0", "bytes of your data uploaded"],
 ];
 
@@ -108,7 +108,7 @@ const ALGORITHMS: Array<[string, string]> = [
   ],
   [
     "Palm lines",
-    "21 hand points, then a flattened 512-pixel print, contrast evened out (CLAHE), creases lifted (black-hat), ridges found (Hessian) and thinned to lines (Zhang–Suen).",
+    "21 hand points, then a flattened 512-pixel print, contrast evened out (CLAHE), creases lifted (black-hat), ridges found (Hessian) and thinned to lines (Zhang-Suen).",
   ],
   ["Chinese zodiac", "The year turns at the first new moon after 21 January in China Standard Time, found from the real Moon."],
   ["Numerology", "Root and destiny numbers from the birth date; name numbers by the Chaldean letter values."],
@@ -119,7 +119,7 @@ const CHECKS: string[] = [
   "Almanac names and end times compared with Drik Panchang for 6 days in 3 cities: names exact, times within 2 minutes.",
   "Guna Milan compared with PyJHora on all 11,664 possible pairings.",
   "Every published table checked by hand against the classical texts.",
-  "695 automated tests and 22 browser tests run on every change, on a phone-sized and a desktop screen.",
+  "704 automated tests and 22 browser tests run on every change, on a phone-sized and a desktop screen.",
   "A privacy test watches every network request in a full session and fails if any of your data leaves.",
 ];
 
@@ -132,7 +132,7 @@ export default function AboutScreen() {
           <h1>How Vyom was made</h1>
           <blockquote className="about-quote">
             <p>It took almost 18 weeks of extensive planning, development, data gathering and cleaning. This is the result: Vyom.</p>
-            <footer>Rahul, who made Vyom</footer>
+            <footer>Rahul (RT), who made Vyom</footer>
           </blockquote>
         </header>
 
