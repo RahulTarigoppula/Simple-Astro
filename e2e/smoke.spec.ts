@@ -4,7 +4,7 @@ import { sealReferenceLeaf } from "./helpers";
 test("empty desk invites the first leaf", async ({ page }) => {
   await page.goto("./");
   await expect(page.getByRole("heading", { name: /write your first leaf/i })).toBeVisible();
-  await expect(page.getByRole("navigation", { name: "The Ledge" })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Main navigation" })).toBeVisible();
 });
 
 test("writing the reference leaf engraves the contract with reality", async ({ page }) => {
