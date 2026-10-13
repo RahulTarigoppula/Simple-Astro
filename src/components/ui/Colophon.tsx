@@ -10,15 +10,18 @@ interface ColophonProps {
 export function Colophon({ rows, children }: ColophonProps) {
   return (
     <footer className="colophon">
-      <dl>
-        {rows.map(([k, v]) => (
-          <div key={k} style={{ display: "contents" }}>
-            <dt>{k}</dt>
-            <dd>{v}</dd>
-          </div>
-        ))}
-      </dl>
-      {children}
+      <details className="colophon__how">
+        <summary>How this was calculated</summary>
+        <dl>
+          {rows.map(([k, v]) => (
+            <div key={k} style={{ display: "contents" }}>
+              <dt>{k}</dt>
+              <dd>{v}</dd>
+            </div>
+          ))}
+        </dl>
+        {children}
+      </details>
       <p className="disclaimer">{DISCLAIMER}</p>
       <p style={{ margin: "var(--space-2) 0 0" }}>All computation happened on this device. Nothing left it.</p>
     </footer>

@@ -921,3 +921,40 @@ body,
     linear-gradient(120deg, rgba(139, 92, 246, 0.16), rgba(34, 211, 238, 0.05)),
     repeating-linear-gradient(180deg, transparent 0 21px, var(--border) 21px 22px);
 }
+
+/* Quiet labels: the old engraved brass plates become soft glass captions */
+.engraved {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-edge);
+  box-shadow: none;
+  color: var(--ink-muted);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.engraved b {
+  color: var(--ink);
+  font-weight: 600;
+}
+.engraved .sep {
+  color: var(--ink-faint);
+}
+/* Method notes fold away; the disclaimer stays in view */
+.colophon__how summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  color: var(--accent-text);
+}
+.colophon__how summary::-webkit-details-marker {
+  display: none;
+}
+.colophon__how summary::before {
+  content: "＋ ";
+}
+.colophon__how[open] summary::before {
+  content: "－ ";
+}
+.colophon__how dl {
+  margin-top: 10px;
+}
