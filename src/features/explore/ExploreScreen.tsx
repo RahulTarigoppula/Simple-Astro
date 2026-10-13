@@ -15,7 +15,12 @@ import { transitsAt } from "../../engine/gochar";
 import { birthNumbers, CHINESE_ANIMALS, chineseZodiac, NUMBER_GRAHA, nameNumber, personalYear } from "../../engine/profile";
 import { GRAHA_IDS, type GrahaId } from "../../engine/types";
 import "../cosmic/cosmic.css";
+import { StoryPlayer } from "../../components/ui/StoryPlayer";
+import { StoryRings } from "../story/StoryRings";
+import { SkyWheel, type WheelSel } from "./SkyWheel";
+import { panelFor, slidesFor } from "./skyStories";
 import "./explore.css";
+import "./wheel.css";
 
 const lore = (id: GrahaId) => GRAHA_LORE.find((g) => g.id === id);
 const NAK_SPAN = 360 / 27;
@@ -467,30 +472,105 @@ function Chinese() {
   );
 }
 
-// ── hub ───────────────────────────────────────────────────────────────────
+// ── hub: the Sky Wheel and its story panel ────────────────────────────────
 function Hub() {
   const sky = useSky();
+  const active = useActiveProfile();
+  const settings = useSettings();
+  const { patri: p } = usePatri(active, settings.preset);
+  const patri = p && active && p.profileId === active.id ? p : null;
+  const [sel, setSel] = useState<WheelSel>(() => ({ kind: "nak", i: sky.MO.nakshatra }));
+  const [playing, setPlaying] = useState(false);
+  const panel = panelFor(sel, sky, patri, active?.name ?? null);
+  const kinds = [
+    ["graha", "9 Planets"],
+    ["rashi", "12 Signs"],
+    ["nak", "27 Stars"],
+  ] as const;
+  const pick = (k: (typeof kinds)[number][0]) => {
+    if (k === "graha") setSel({ kind: "graha", id: "MO" });
+    else if (k === "rashi") setSel({ kind: "rashi", i: sky.MO.sign });
+    else setSel({ kind: "nak", i: sky.MO.nakshatra });
+  };
   return (
     <>
-      <header className="ex-head">
+      <header className="ex-head ex-head--wheel">
         <p className="ex-kicker">Explore · अन्वेषण</p>
-        <h1>The library of the sky</h1>
+        <h1>The sky, and its stories</h1>
         <p className="ex-lede">
-          Every graha, sign and star — its myth, its meaning in the tradition, the real astronomy, and where it is tonight.
+          Turn the wheel. Every planet, sign and star has a myth, a meaning in the tradition, and real stars behind it.
         </p>
       </header>
 
-      <nav className="ex-learn" aria-label="Learn">
-        <Link to="/story" className="ex-learn__card ex-learn__card--gold">
-          <span className="ex-learn__k">Roots · 16 cards</span>
-          <span className="ex-learn__t">The story of the stars</span>
-          <span className="ex-learn__s">Gods, ṛṣis, Greeks and astronomers</span>
-        </Link>
-        <Link to="/guide" className="ex-learn__card ex-learn__card--cyan">
-          <span className="ex-learn__k">Guide · 50+ words</span>
-          <span className="ex-learn__t">Plain English</span>
-          <span className="ex-learn__s">What every term means</span>
-        </Link>
+      <div className="seg ex-kinds" role="group" aria-label="Choose a ring">
+        {kinds.map(([k, label]) => (
+          <button key={k} type="button" aria-pressed={sel.kind === k} onClick={() => pick(k)}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="ex-stage">
+        <SkyWheel
+          key={`${sel.kind}`}
+          sky={sky}
+          sel={sel}
+          onSelect={setSel}
+          onPlay={() => setPlaying(true)}
+          natalMoon={patri?.grahas.MO.sign}
+        />
+        <article className={`ex-panel ex-panel--${panel.tone}`} aria-live="polite" key={JSON.stringify(sel)}>
+          <div className="ex-panel__art">{panel.art}</div>
+          <p className="ex-kicker">{panel.kicker}</p>
+          <h2 className="ex-panel__t">
+            {panel.title}{" "}
+            {panel.dev ? (
+              <span lang="hi" className="ex-dev">
+                {panel.dev}
+              </span>
+            ) : null}
+          </h2>
+          <p className="ex-panel__tag">{panel.tagline}</p>
+          {panel.now || panel.mine ? (
+            <div className="ex-panel__badges">
+              {panel.now ? <span className="ex-badge ex-badge--now">{panel.now}</span> : null}
+              {panel.mine ? <span className="ex-badge ex-badge--mine">{panel.mine}</span> : null}
+            </div>
+          ) : null}
+          <p className="ex-panel__story">{panel.story}</p>
+          <dl className="ex-panel__facts">
+            {panel.facts.map(([k, v]) => (
+              <div key={k}>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <div className="ex-panel__actions">
+            <button type="button" className="stamp" onClick={() => setPlaying(true)}>
+              <span>▶ Play its story</span>
+            </button>
+            <Link to={panel.to} className="linkish">
+              Full page →
+            </Link>
+          </div>
+        </article>
+      </div>
+
+      {playing ? (
+        <StoryPlayer
+          title={`${panel.title} · ${panel.kicker.split("·")[0]?.trim()}`}
+          slides={slidesFor(sel, panel)}
+          onClose={() => setPlaying(false)}
+        />
+      ) : null}
+
+      <section className="ex-sec" aria-labelledby="ex-roots">
+        <h2 id="ex-roots">Stories to play</h2>
+        <StoryRings />
+      </section>
+
+      <nav className="ex-learn" aria-label="More to explore">
         <Link to="/explore/numbers" className="ex-learn__card ex-learn__card--violet">
           <span className="ex-learn__k">Aṅka</span>
           <span className="ex-learn__t">Numerology</span>
@@ -501,30 +581,33 @@ function Hub() {
           <span className="ex-learn__t">Chinese zodiac</span>
           <span className="ex-learn__s">The Great Race and your animal</span>
         </Link>
+        <Link to="/guide" className="ex-learn__card ex-learn__card--cyan">
+          <span className="ex-learn__k">Guide · 50+ words</span>
+          <span className="ex-learn__t">Plain English</span>
+          <span className="ex-learn__s">What every term means</span>
+        </Link>
+        <Link to="/forecast" className="ex-learn__card ex-learn__card--gold">
+          <span className="ex-learn__k">Bhaviṣya</span>
+          <span className="ex-learn__t">Your forecast</span>
+          <span className="ex-learn__s">Day to year, read from the sky</span>
+        </Link>
       </nav>
 
-      <section className="ex-sec" aria-labelledby="ex-g">
-        <h2 id="ex-g">
-          Navagraha · the nine <InfoDot id="graha" />
-        </h2>
+      <details className="ex-browse">
+        <summary>Browse everything as a list</summary>
+        <h3>Navagraha</h3>
         <ul className="ex-grid ex-grid--graha">
           {GRAHA_LORE.map((g) => (
             <li key={g.id}>
               <Link to={`/explore/graha/${g.id}`} className="ex-tile">
-                <GrahaGlyph id={g.id} size={52} />
+                <GrahaGlyph id={g.id} size={44} />
                 <span className="ex-tile__t">{g.name}</span>
                 <span className="ex-tile__s">{g.english}</span>
-                <span className="ex-tile__n">in {RASHI_LORE[sky[g.id].sign]?.name} now</span>
               </Link>
             </li>
           ))}
         </ul>
-      </section>
-
-      <section className="ex-sec" aria-labelledby="ex-r">
-        <h2 id="ex-r">
-          Rāśi · the twelve signs <InfoDot id="rashi" />
-        </h2>
+        <h3>Rāśis</h3>
         <ul className="ex-grid ex-grid--rashi">
           {RASHI_LORE.map((r, i) => (
             <li key={r.name}>
@@ -533,43 +616,29 @@ function Hub() {
                   {i + 1}
                 </span>
                 <span className="ex-tile__t">{r.name}</span>
-                <span className="ex-tile__s">
-                  {r.western} · {r.symbol}
-                </span>
+                <span className="ex-tile__s">{r.western}</span>
               </Link>
             </li>
           ))}
         </ul>
-      </section>
-
-      <section className="ex-sec" aria-labelledby="ex-n">
-        <h2 id="ex-n">
-          Nakṣatra · the twenty-seven stars <InfoDot id="nakshatra" />
-        </h2>
+        <h3>Nakṣatras</h3>
         <ol className="ex-naks">
           {NAKSHATRA_LORE.map((n, i) => (
-            <li key={NAKSHATRA_NAMES[i]} className={sky.MO.nakshatra === i ? "is-moon" : undefined}>
+            <li key={NAKSHATRA_NAMES[i]}>
               <Link to={`/explore/nakshatra/${i}`}>
                 <span className="ex-naks__i">{i + 1}</span>
-                <span className="ex-naks__t">
-                  {NAKSHATRA_NAMES[i]}{" "}
-                  <span lang="hi" className="ex-dev">
-                    {NAKSHATRA_DEV[i]}
-                  </span>
-                </span>
+                <span className="ex-naks__t">{NAKSHATRA_NAMES[i]}</span>
                 <span className="ex-naks__s">
                   {n.deity.split(",")[0]} · {n.symbol}
                 </span>
-                {sky.MO.nakshatra === i ? <span className="ex-naks__moon">☾ Moon now</span> : null}
               </Link>
             </li>
           ))}
         </ol>
-      </section>
+      </details>
     </>
   );
 }
-
 export default function ExploreScreen() {
   const { kind, key } = useParams();
   const i = Number(key);
