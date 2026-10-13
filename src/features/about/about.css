@@ -1,0 +1,205 @@
+.about-screen {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.about {
+  display: grid;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: calc(env(safe-area-inset-top, 0px) + var(--space-6)) var(--space-5) var(--space-8);
+}
+.about-kicker {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--accent-text);
+}
+.about-hero h1 {
+  margin: 6px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 8vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+}
+.about-quote {
+  margin: var(--space-5) 0 0;
+  padding: 4px 0 4px 18px;
+  border-left: 2px solid var(--accent-2);
+}
+.about-quote p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 4.6vw, 1.5rem);
+  line-height: 1.45;
+  color: var(--ink);
+}
+.about-quote footer {
+  margin-top: 10px;
+  font-weight: 600;
+  color: var(--accent-2);
+}
+.about-numbers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.about-numbers li {
+  display: grid;
+  gap: 2px;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-edge);
+  background: radial-gradient(260px 120px at 0% 0%, rgba(139, 92, 246, 0.18), transparent 70%), rgba(14, 17, 46, 0.72);
+}
+.about-numbers__n {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 6vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.about-numbers__l {
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+.about-sec h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.about-p {
+  margin: 0 0 var(--space-3);
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+.about-sources {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.about-sources li {
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-edge);
+  background: rgba(14, 17, 46, 0.65);
+}
+.about-sources__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.about-sources h3 {
+  margin: 0;
+  font-size: var(--text-base);
+  color: var(--ink);
+}
+.about-lic {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  color: var(--accent-text);
+  background: rgba(139, 92, 246, 0.15);
+}
+.about-by {
+  margin: 2px 0 8px !important;
+  font-size: 12.5px;
+  color: var(--ink-muted) !important;
+}
+.about-sources p {
+  margin: 0;
+  line-height: 1.55;
+  color: var(--ink);
+  font-size: 14px;
+}
+.about-clean {
+  margin-top: 8px !important;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(103, 232, 249, 0.06);
+  border: 1px solid rgba(103, 232, 249, 0.18);
+  color: var(--ink-muted) !important;
+}
+.about-clean strong {
+  color: var(--cyan);
+}
+.about-alg {
+  margin: 0;
+  display: grid;
+  gap: 0;
+}
+.about-alg div {
+  display: grid;
+  gap: 4px;
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+}
+.about-alg dt {
+  font-weight: 600;
+  color: var(--ink);
+}
+.about-alg dd {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--ink-muted);
+  font-size: 14px;
+}
+.about-checks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.about-checks li {
+  position: relative;
+  padding-left: 26px;
+  line-height: 1.55;
+  color: var(--ink);
+  font-size: 14px;
+}
+.about-checks li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--success);
+  font-weight: 700;
+}
+.about-private {
+  padding: 18px;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  background: rgba(74, 222, 128, 0.05);
+}
+.about-private .about-p {
+  margin: 0;
+  color: var(--ink);
+}
+.about-foot {
+  margin: 0;
+  text-align: center;
+  color: var(--ink-muted);
+}
+.about-foot a {
+  color: var(--accent-text);
+}
+@media (min-width: 700px) {
+  .about-numbers {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .about-alg div {
+    grid-template-columns: 200px 1fr;
+    gap: 20px;
+  }
+}

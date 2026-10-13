@@ -302,7 +302,9 @@ export default function ChowkiScreen() {
         <Tile to="/guide" title="Guide" dev="मार्गदर्शिका" sub="Every word explained" icon={<IconGuide />} tone="violet" />
       </nav>
 
-      <p className="home-foot">Computed on this device · nothing leaves it · karma, not fate</p>
+      <p className="home-foot">
+        Computed on this device · nothing leaves it · karma, not fate · <Link to="/about">How Vyom was made</Link>
+      </p>
     </Screen>
   );
 }

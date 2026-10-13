@@ -455,46 +455,49 @@ export default function LeafScreen() {
           </p>
         ) : null}
 
-        <div className="radio-row leaf-override" role="radiogroup" aria-label="Clock offset">
-          <span className="v">
-            Clock offset <InfoDot id="timezone" />
-            <span className="help">
-              {pre1955India
-                ? "Before 1955 some Indian births used Bombay Time (+04:51). Leave on automatic unless you know the clock used."
-                : "Worked out automatically from the time-zone database (tzdb). Leave it unless you know better."}
+        <details className="leaf-adv" open={draft.override !== "none"}>
+          <summary>Advanced: clock offset (rarely needed)</summary>
+          <div className="radio-row leaf-override" role="radiogroup" aria-label="Clock offset">
+            <span className="v">
+              Clock offset <InfoDot id="timezone" />
+              <span className="help">
+                {pre1955India
+                  ? "Before 1955 some Indian births used Bombay Time (+04:51). Leave on automatic unless you know the clock used."
+                  : "Worked out automatically from the time-zone database (tzdb). Leave it unless you know better."}
+              </span>
             </span>
-          </span>
-          <span className="seg">
-            {(["none", "bombay", "manual"] as const).map((o) => (
-              <button key={o} type="button" role="radio" aria-checked={draft.override === o} onClick={() => set("override", o)}>
-                {o === "none" ? "automatic" : o === "bombay" ? "Bombay +04:51" : "manual"}
-              </button>
-            ))}
-          </span>
-        </div>
-        {draft.override === "manual" ? (
-          <div className="leaf-override">
-            <div className="drums" role="group" aria-label="Manual UTC offset">
-              <BrassDrum
-                label="Offset hours"
-                short="± hh"
-                min={-12}
-                max={14}
-                value={offSign * Math.floor(offAbs / 60)}
-                format={(v) => `${v < 0 ? "−" : "+"}${String(Math.abs(v)).padStart(2, "0")}`}
-                onChange={(v) => set("manualOffsetMin", (v < 0 ? -1 : 1) * (Math.abs(v) * 60 + (offAbs % 60)))}
-              />
-              <BrassDrum
-                label="Offset minutes"
-                short="mm"
-                min={0}
-                max={59}
-                value={offAbs % 60}
-                onChange={(m) => set("manualOffsetMin", offSign * (Math.floor(offAbs / 60) * 60 + m))}
-              />
-            </div>
+            <span className="seg">
+              {(["none", "bombay", "manual"] as const).map((o) => (
+                <button key={o} type="button" role="radio" aria-checked={draft.override === o} onClick={() => set("override", o)}>
+                  {o === "none" ? "automatic" : o === "bombay" ? "Bombay +04:51" : "manual"}
+                </button>
+              ))}
+            </span>
           </div>
-        ) : null}
+          {draft.override === "manual" ? (
+            <div className="leaf-override">
+              <div className="drums" role="group" aria-label="Manual UTC offset">
+                <BrassDrum
+                  label="Offset hours"
+                  short="± hh"
+                  min={-12}
+                  max={14}
+                  value={offSign * Math.floor(offAbs / 60)}
+                  format={(v) => `${v < 0 ? "−" : "+"}${String(Math.abs(v)).padStart(2, "0")}`}
+                  onChange={(v) => set("manualOffsetMin", (v < 0 ? -1 : 1) * (Math.abs(v) * 60 + (offAbs % 60)))}
+                />
+                <BrassDrum
+                  label="Offset minutes"
+                  short="mm"
+                  min={0}
+                  max={59}
+                  value={offAbs % 60}
+                  onChange={(m) => set("manualOffsetMin", offSign * (Math.floor(offAbs / 60) * 60 + m))}
+                />
+              </div>
+            </div>
+          ) : null}
+        </details>
 
         <div className="toggle-row">
           <span className="v">

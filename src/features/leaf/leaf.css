@@ -94,3 +94,15 @@
     max-width: 620px;
   }
 }
+
+.leaf-adv {
+  margin: 0 var(--paper-margin);
+  border-top: 1px solid var(--border);
+}
+.leaf-adv summary {
+  padding: 14px 0;
+  cursor: pointer;
+  color: var(--accent-text);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}

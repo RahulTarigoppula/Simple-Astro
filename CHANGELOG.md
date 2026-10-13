@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.0 (2026-10-14)
+
+- **About Vyom** (#/about): how Vyom was made. Rahul's note on the 18 weeks it took; Vyom in numbers; every data source with its licence, what we used it for and how we cleaned it; every algorithm in plain English; how each part was checked (Swiss Ephemeris, Drik Panchang, PyJHora, the classical texts, 695 tests, a privacy test); privacy. Linked from Home and Settings.
+- Add a person: the clock offset control folds under Advanced.
+
 ## 0.7.1 (2026-10-14)
 
 - Every user-facing sentence rewritten without em-dashes and without stock phrases: short, plain sentences across screens, the glossary, the myths, Roots, forecasts and rules.

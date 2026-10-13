@@ -13,6 +13,7 @@ test("no screen overflows horizontally", async ({ page }) => {
     "#/circle",
     "#/drawer",
     "#/guide",
+    "#/about",
     "#/story",
     "#/explore",
     "#/explore/graha/SA",

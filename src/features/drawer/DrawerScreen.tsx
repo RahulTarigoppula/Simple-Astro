@@ -456,6 +456,9 @@ export default function DrawerScreen() {
             Planet positions by astronomy-engine {__ENGINE_BUILD__}, computed on this device. For reflection, not advice.{" "}
             <Link to="/guide">Read the guide</Link>.
           </p>
+          <p className="settings-link">
+            <Link to="/about">How Vyom was made: sources, methods and checks →</Link>
+          </p>
           <ul className="credits">
             {credits.map((c) => (
               <li key={c.name}>

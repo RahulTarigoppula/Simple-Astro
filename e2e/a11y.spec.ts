@@ -15,6 +15,7 @@ test("no serious or critical axe violations on the main screens", async ({ page 
     `#/milan/${id}/${id}`,
     `#/hast/${id}`,
     "#/guide",
+    "#/about",
     "#/story",
     "#/explore",
     "#/explore/graha/MO",
