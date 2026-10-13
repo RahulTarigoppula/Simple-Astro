@@ -38,6 +38,8 @@ export interface Profile {
   name: string;
   birth: BirthMoment;
   handedness: "right" | "left"; // dominant hand, for the palm framing
+  /** How this person reads a chart: names (Sanskrit, Telugu, Tamil) and chart drawing. Same sky either way. */
+  tradition?: "north" | "telugu" | "tamil";
   /** The clock time was not recorded: the leaf is cast for local noon and says so everywhere. */
   timeUnknown?: boolean;
   gender?: "a" | "b"; // labels the two sides of a Milan; never a rule input

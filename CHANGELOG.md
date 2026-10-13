@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.0 (2026-10-14)
+
+### Your tradition, per person
+- Adding a person now asks **How do you read your chart?** North Indian, Telugu or Tamil. It sets the names shown (Telugu and Tamil rāśi and nakṣatra names, with the Sanskrit beside them) and draws the South Indian chart for Telugu and Tamil readers. The sky and the calculation are the same everywhere in India (Lahiri), so nothing about the positions changes.
+- The birth star card warns when the Moon was within about an hour of a nakṣatra or sign edge, where a slightly different birth time would read differently.
+
+### Polish
+- Today's month calendar speaks plain English: 5↑ / 11↓ for the lunar day, Full and New, Ek for Ekādaśī, ☉ when the Sun changes sign.
+- Forecast without a person explains what you'll get before asking for birth details.
+- The 108 badge on Numerology is a circle again.
+
 ## 0.9.0 (2026-10-14)
 
 ### Privacy

@@ -460,3 +460,11 @@
     grid-template-columns: 1fr 1fr 1fr;
   }
 }
+
+.ex-bignum {
+  flex: none;
+  aspect-ratio: 1;
+  height: 96px;
+  width: 96px;
+  border-radius: 50%;
+}

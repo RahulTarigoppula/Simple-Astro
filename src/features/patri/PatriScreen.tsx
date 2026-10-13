@@ -40,6 +40,7 @@ import { GrahaLedger } from "./GrahaLedger";
 import { KundliChart } from "./KundliChart";
 import { TimeUnknownNote } from "./TimeUnknownNote";
 import "./patri.css";
+import { chartStyleFor } from "../../data/regional";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const PAGER: VargaNumber[] = [9, 2, 3, 7, 10, 12, 30, 60];
@@ -85,7 +86,8 @@ export default function PatriScreen() {
   const [lit, setLit] = useState<GrahaId | null>(null);
   const [varga, setVarga] = useState<VargaNumber>(9);
   const [foot, setFoot] = useState<Foot>(null);
-  const [style, setStyle] = useState(settings.chartStyle);
+  const personStyle = chartStyleFor(profile?.tradition);
+  const [style, setStyle] = useState(personStyle ?? settings.chartStyle);
   const port = useRef<HTMLDivElement>(null);
   const sheet = useRef<HTMLDivElement>(null);
   const topRoll = useRef<HTMLDivElement>(null);
@@ -100,7 +102,7 @@ export default function PatriScreen() {
   const wheelT = useRef(0);
   const nowMs = useNowMs(60_000);
 
-  useEffect(() => setStyle(settings.chartStyle), [settings.chartStyle]);
+  useEffect(() => setStyle(personStyle ?? settings.chartStyle), [personStyle, settings.chartStyle]);
   useEffect(() => {
     if (profile && settings.activeProfileId !== profile.id) void saveSettings({ activeProfileId: profile.id });
   }, [profile, settings.activeProfileId]);

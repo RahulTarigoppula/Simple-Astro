@@ -25,6 +25,13 @@ export const devDigits = (n: number): string =>
     .join("");
 
 /** "शु ५", "कृ ११", "पू", "अ" — the tithi at sunrise, short. */
+/** "5↑", "11↓", "Full", "New": the tithi at sunrise, in plain words. */
+export function tithiPlain(index: number): string {
+  if (index === 15) return "Full";
+  if (index === 30) return "New";
+  return `${((index - 1) % 15) + 1}${index < 15 ? "↑" : "↓"}`;
+}
+
 export function tithiShort(index: number): string {
   if (index === 15) return "पू";
   if (index === 30) return "अ";
@@ -224,14 +231,12 @@ export function MonthGrid({ place, preset, clock, ym, onMonth, today, selected, 
                   >
                     <span className="mcell__d mono">{c.day}</span>
                     <MoonGlyph k={c.moonK} waxing={c.elongation < 180} south={south} />
-                    <span className="mcell__t" lang="hi">
-                      {tithiShort(c.tithi.index)}
-                    </span>
-                    <span className="mcell__m" lang="hi">
-                      {c.marks.includes("purnima") && c.tithi.index !== 15 ? <i className="mmark">पू</i> : null}
-                      {c.marks.includes("amavasya") && c.tithi.index !== 30 ? <i className="mmark">अ</i> : null}
-                      {c.marks.includes("ekadashi") ? <i className="mmark">ए</i> : null}
-                      {c.marks.includes("sankranti") ? <i className="mmark mmark--sun">सं</i> : null}
+                    <span className="mcell__t">{tithiPlain(c.tithi.index)}</span>
+                    <span className="mcell__m">
+                      {c.marks.includes("purnima") && c.tithi.index !== 15 ? <i className="mmark">Full</i> : null}
+                      {c.marks.includes("amavasya") && c.tithi.index !== 30 ? <i className="mmark">New</i> : null}
+                      {c.marks.includes("ekadashi") ? <i className="mmark">Ek</i> : null}
+                      {c.marks.includes("sankranti") ? <i className="mmark mmark--sun">☉</i> : null}
                     </span>
                   </button>
                 ) : (
@@ -248,26 +253,12 @@ export function MonthGrid({ place, preset, clock, ym, onMonth, today, selected, 
         </p>
       )}
       <p className="month__legend">
+        <span>Number = lunar day (tithi) at sunrise; ↑ waxing, ↓ waning</span>
         <span>
-          <span lang="hi">शु/कृ</span> tithi at sunrise
+          <i className="mmark">Ek</i> Ekādaśī (fasting day)
         </span>
         <span>
-          <span lang="hi">पू</span> Pūrṇimā
-        </span>
-        <span>
-          <span lang="hi">अ</span> Amāvasyā
-        </span>
-        <span>
-          <i className="mmark" lang="hi">
-            ए
-          </i>{" "}
-          Ekādaśī
-        </span>
-        <span>
-          <i className="mmark mmark--sun" lang="hi">
-            सं
-          </i>{" "}
-          Saṅkrānti
+          <i className="mmark mmark--sun">☉</i> the Sun changes sign
         </span>
       </p>
       {picked && cal ? (

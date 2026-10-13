@@ -4,10 +4,11 @@ import { useMemo } from "react";
 import { Link } from "react-router";
 import { GrahaGlyph } from "../../components/ui/GrahaGlyph";
 import { GRAHA_LORE, NAKSHATRA_LORE, RASHI_LORE } from "../../data/lore";
-import { NAK_LORDS, NAKSHATRA_DEV, NAKSHATRA_NAMES } from "../../data/tables/names";
+import { NAK_LORDS, NAKSHATRA_DEV, NAKSHATRA_NAMES, SIGN_NAMES } from "../../data/tables/names";
 import { birthNumbers, chineseZodiac, NUMBER_GRAHA, tropicalSunSign } from "../../engine/profile";
 import type { Patri, Profile } from "../../engine/types";
 import "./cosmic.css";
+import { nakBoth, nakName, rashiBoth, rashiName } from "../../data/regional";
 
 interface Item {
   key: string;
@@ -31,13 +32,26 @@ export function CosmicProfile({ profile, patri, compact = false }: { profile: Pr
     const cz = chineseZodiac(profile.birth.utcMs);
     const n = birthNumbers(profile.birth.localY, profile.birth.localMo, profile.birth.localD);
     const r = (i: number) => RASHI_LORE[i];
+    const regional = profile.tradition && profile.tradition !== "north";
+    const sk = (s: number) => (regional && rashiBoth(s, profile.tradition) !== SIGN_NAMES[s] ? `${SIGN_NAMES[s]} in Sanskrit · ` : "");
+    const skN = (i: number) =>
+      regional && nakBoth(i, profile.tradition) !== NAKSHATRA_NAMES[i] ? `${NAKSHATRA_NAMES[i]} in Sanskrit · ` : "";
+    // A Moon close to the edge of its nakṣatra or sign could fall on the other side with a slightly different birth time.
+    const SPAN = 360 / 27;
+    const inNak = mo.lonSidereal % SPAN;
+    const inSign = mo.lonSidereal % 30;
+    const near = Math.min(inNak, SPAN - inNak, inSign, 30 - inSign);
+    const edge =
+      !profile.timeUnknown && near < 0.55
+        ? `The Moon was within about an hour of the edge of this ${Math.min(inSign, 30 - inSign) < 0.55 ? "sign" : "nakṣatra"}. If the birth time is off by an hour, it could read differently.`
+        : undefined;
     return [
       {
         key: "lagna",
         k: "Rising sign · Lagna",
-        v: r(L)?.name ?? "",
+        v: rashiName(L, profile.tradition),
         dev: r(L)?.dev,
-        s: `${r(L)?.western} rising: how you meet the world`,
+        s: `${sk(L)}${r(L)?.western} rising: how you meet the world`,
         to: `/explore/rashi/${L}`,
         glyph: <span className="cp-sign">{L + 1}</span>,
         ...(profile.timeUnknown ? { warn: "birth time unknown, so uncertain" } : {}),
@@ -45,25 +59,26 @@ export function CosmicProfile({ profile, patri, compact = false }: { profile: Pr
       {
         key: "moon",
         k: "Moon sign · Rāśi",
-        v: r(mo.sign)?.name ?? "",
+        v: rashiName(mo.sign, profile.tradition),
         dev: r(mo.sign)?.dev,
-        s: `${r(mo.sign)?.western}: your sign in Indian astrology`,
+        s: `${sk(mo.sign)}${r(mo.sign)?.western}: your sign in Indian astrology`,
         to: `/explore/rashi/${mo.sign}`,
         glyph: <GrahaGlyph id="MO" size={38} />,
       },
       {
         key: "nak",
         k: "Birth star · Nakṣatra",
-        v: NAKSHATRA_NAMES[nak] ?? "",
+        v: nakName(nak, profile.tradition),
         dev: NAKSHATRA_DEV[nak],
-        s: `pada ${mo.pada} · ${lore?.symbol} · deity ${lore?.deity.split(",")[0]}`,
+        s: `${skN(nak)}pada ${mo.pada} · ${lore?.symbol} · deity ${lore?.deity.split(",")[0]}`,
+        ...(edge ? { warn: edge } : {}),
         to: `/explore/nakshatra/${nak}`,
         glyph: <GrahaGlyph id={NAK_LORDS[nak % 9] ?? "KE"} size={38} />,
       },
       {
         key: "sun",
         k: "Sun sign",
-        v: r(su.sign)?.name ?? "",
+        v: rashiName(su.sign, profile.tradition),
         dev: r(su.sign)?.dev,
         s: `Indian (sidereal) · Western: ${r(west)?.western}`,
         to: `/explore/rashi/${su.sign}`,

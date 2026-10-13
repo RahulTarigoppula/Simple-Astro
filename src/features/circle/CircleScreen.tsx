@@ -17,6 +17,7 @@ import { leafMoon } from "./leafFacts";
 import "./circle.css";
 import "./people.css";
 import { useState } from "react";
+import { nakBoth, rashiBoth } from "../../data/regional";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -118,11 +119,11 @@ export default function CircleScreen() {
                     </span>
                     {m ? (
                       <span className="person__moon">
-                        Moon in {m.nakName}{" "}
+                        Moon in {nakBoth(m.nak, p.tradition)}{" "}
                         <span lang="hi" className="person__dev">
                           {m.nakDev}
                         </span>{" "}
-                        · {m.signName} ({RASHI_LORE[m.sign]?.western})
+                        · {rashiBoth(m.sign, p.tradition)}, {RASHI_LORE[m.sign]?.western}
                       </span>
                     ) : null}
                     <span className="person__birth">{birthLine(p)}</span>

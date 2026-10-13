@@ -16,6 +16,7 @@ import type { GrahaId } from "../../engine/types";
 import "../cosmic/cosmic.css";
 import { AreasCard, ContactsCard, DayGuideCard, DayNotes, StrengthCard } from "./PersonalSections";
 import "./forecast.css";
+import { rashiBoth } from "../../data/regional";
 import { countEvent } from "../../platform/stats";
 
 const PERIODS: Array<{ id: Period; label: string }> = [
@@ -206,11 +207,20 @@ export default function ForecastScreen() {
     return (
       <Screen className="forecast" label="Forecast">
         <div className="fc-empty">
-          <h1>Your forecast</h1>
-          <p className="p p--muted">Forecasts are read from a birth chart. Save someone's birth details first.</p>
+          <p className="fc-kicker">Forecast · भविष्य</p>
+          <h1>Your sky ahead</h1>
+          <p className="fc-empty__lede">
+            Add your birth date, time and place once. Vyom then reads every day, week, month and year from where the planets really are.
+          </p>
+          <ul className="fc-empty__list">
+            <li>A guide for today: good for, go easy on, and your best hours</li>
+            <li>Your life area by area: work, money, love, health, mind, home and luck</li>
+            <li>Planets crossing your own birth chart, and your current life chapter</li>
+          </ul>
           <Link to="/leaf/new" className="stamp">
-            <span>Add a person</span>
+            <span>Add your birth details</span>
           </Link>
+          <p className="fc-empty__note">Takes about a minute. Stays on this device.</p>
         </div>
       </Screen>
     );
@@ -228,7 +238,8 @@ export default function ForecastScreen() {
         <h1>{profile ? `${profile.name}'s sky ahead` : "Your sky ahead"}</h1>
         <p className="fc-lede">
           Read the classical way: where the planets are, counted from {profile?.name ?? "your"}'s Moon sign
-          {moonSign ? ` (${moonSign.name} · ${moonSign.western})` : ""}, plus the running life chapter (daśā). <InfoDot id="gochar" />
+          {moonSign && patri ? ` (${rashiBoth(patri.grahas.MO.sign, profile?.tradition)} · ${moonSign.western})` : ""}, plus the running
+          life chapter (daśā). <InfoDot id="gochar" />
         </p>
         {profiles && profiles.length > 1 ? (
           <div className="fc-people" role="group" aria-label="Whose forecast">

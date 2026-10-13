@@ -23,6 +23,7 @@ import { toast } from "../../state/ui";
 import { ParapetSky } from "../chowki/ParapetSky";
 import { BrassDrum } from "./BrassDrum";
 import "./leaf.css";
+import { TRADITION_LABEL, type Tradition } from "../../data/regional";
 import { countEvent } from "../../platform/stats";
 
 const BENGALURU: Place = { name: "Bengaluru", admin1: "Karnataka", country: "IN", lat: 12.9716, lon: 77.5946, source: "manual" };
@@ -41,6 +42,7 @@ interface Draft {
   manualOffsetMin: number;
   handedness: "right" | "left";
   timeUnknown: boolean;
+  tradition: Tradition;
 }
 
 function draftFromProfile(p: Profile): Draft {
@@ -58,6 +60,7 @@ function draftFromProfile(p: Profile): Draft {
     manualOffsetMin: b.offsetOverrideMin ?? b.offsetMin,
     handedness: p.handedness,
     timeUnknown: p.timeUnknown === true,
+    tradition: p.tradition ?? "north",
   };
 }
 
@@ -75,6 +78,7 @@ function freshDraft(): Draft {
     manualOffsetMin: 330,
     handedness: "right",
     timeUnknown: false,
+    tradition: "north",
   };
 }
 
@@ -192,6 +196,7 @@ export default function LeafScreen() {
       name,
       birth: resolved.m,
       handedness: draft.handedness,
+      tradition: draft.tradition,
       ...(draft.timeUnknown ? { timeUnknown: true } : {}),
       createdAt: editing?.createdAt ?? now,
       updatedAt: now,
@@ -520,6 +525,23 @@ export default function LeafScreen() {
               play("tick");
             }}
           />
+        </div>
+
+        <div className="radio-row leaf-trad" role="radiogroup" aria-label="How do you read your chart?">
+          <span className="v">
+            How do you read your chart?
+            <span className="help">
+              Sets the names you see (Telugu and Tamil names appear beside the Sanskrit) and how the chart is drawn. The planets and the
+              calculation are the same everywhere in India.
+            </span>
+          </span>
+          <span className="seg">
+            {(Object.keys(TRADITION_LABEL) as Tradition[]).map((k) => (
+              <button key={k} type="button" role="radio" aria-checked={draft.tradition === k} onClick={() => set("tradition", k)}>
+                {TRADITION_LABEL[k]}
+              </button>
+            ))}
+          </span>
         </div>
 
         <div className="radio-row" role="radiogroup" aria-label="Dominant hand">

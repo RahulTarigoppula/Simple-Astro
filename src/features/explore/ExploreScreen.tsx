@@ -22,6 +22,7 @@ import { SkyWheel, type WheelSel } from "./SkyWheel";
 import { panelFor, slidesFor } from "./skyStories";
 import "./explore.css";
 import "./wheel.css";
+import { nakName, rashiName } from "../../data/regional";
 import { countEvent } from "../../platform/stats";
 
 const lore = (id: GrahaId) => GRAHA_LORE.find((g) => g.id === id);
@@ -524,13 +525,13 @@ function Hub() {
       {patri && active ? (
         <div className="ex-you" role="group" aria-label={`Start with ${active.name}'s sky`}>
           <button type="button" onClick={() => setSel({ kind: "nak", i: patri.grahas.MO.nakshatra })}>
-            ★ {NAKSHATRA_NAMES[patri.grahas.MO.nakshatra]} <span>birth star</span>
+            ★ {nakName(patri.grahas.MO.nakshatra, active.tradition)} <span>birth star</span>
           </button>
           <button type="button" onClick={() => setSel({ kind: "rashi", i: patri.grahas.MO.sign })}>
-            ☾ {RASHI_LORE[patri.grahas.MO.sign]?.name} <span>Moon sign</span>
+            ☾ {rashiName(patri.grahas.MO.sign, active.tradition)} <span>Moon sign</span>
           </button>
           <button type="button" onClick={() => setSel({ kind: "rashi", i: patri.lagna.sign })}>
-            ↑ {RASHI_LORE[patri.lagna.sign]?.name} <span>rising sign</span>
+            ↑ {rashiName(patri.lagna.sign, active.tradition)} <span>rising sign</span>
           </button>
         </div>
       ) : null}
