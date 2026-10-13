@@ -76,19 +76,6 @@ export default function GuideScreen() {
         </p>
       </header>
 
-      <Link to="/story" className="maker maker--link">
-        <span className="maker__av" aria-hidden="true">
-          R
-        </span>
-        <span className="maker__text">
-          <span className="maker__k">A note from the maker</span>
-          <span className="maker__t">
-            From the Ramayana at bedtime to the question 'is astrology real?' — and why the answer is karma, not fate.
-          </span>
-          <span className="maker__s">Read the prologue in Roots →</span>
-        </span>
-      </Link>
-
       <Link to="/story" className="guide-story">
         <span className="guide-story__k">New · Roots</span>
         <span className="guide-story__t">The story of the stars</span>

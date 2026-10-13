@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.1 — 2026-10-14
+
+### The maker's story, in his own words
+- The intro's last three scenes now quote Rahul's own words, tidied only for grammar and signed. Nothing is paraphrased or added. Removed lines that were never his: "the Mahābhārata in full… the commentaries", "gods as people who chose", "turned them into questions", "do the planets decide our lives", the weather-forecast line, and an earlier claim about reading books on Jyotiṣa.
+- The terrace scene no longer shows figures that implied a memory he never described: a diya, with the names of the epics rising into the night.
+- His story lives only in the intro, which plays when Vyom opens. The Roots prologue, the Home "story behind Vyom" card and the Guide's maker card are gone; the intro can be replayed from Settings.
+
+### Fact fixes
+- The Moon is "he" in the myth of the 27 nakṣatras (the epilogue said "her").
+- Sāmudrika Śāstra: replaced an unsupported "legend" with what is commonly stated — traditionally credited to a sage named Samudra.
+- Red sanders: "grows wild almost nowhere but the hills of Andhra Pradesh" (it also reaches small border areas).
+- The epilogue is no longer labelled "From the maker".
+
 ## 0.6.0 — 2026-10-14
 
 ### The Journey

@@ -202,9 +202,6 @@ export default function ChowkiScreen() {
               <Link to="/leaf/new" className="stamp home-cta">
                 <span>Add a person</span>
               </Link>
-              <Link to="/journey" className="home-cta-ghost">
-                ▶ Watch the journey
-              </Link>
             </div>
           ) : null}
         </div>
@@ -280,25 +277,6 @@ export default function ChowkiScreen() {
       <div className="home-stack">
         <SkyEvents nowMs={now} place={{ lat, lon, name: placeName }} zone={zone} preset={settings.preset} days={40} limit={4} />
       </div>
-
-      <section className="home-origin" aria-labelledby="home-origin-h">
-        <div className="home-origin__art" aria-hidden="true">
-          <span />
-        </div>
-        <div className="home-origin__text">
-          <p className="home-origin__k">The story behind Vyom</p>
-          <h2 id="home-origin-h">From the edge of the universe to a bedtime Rāmāyaṇa.</h2>
-          <p>Ninety-three billion light-years, one pale blue dot, and one question asked by a curious engineer: is astrology real?</p>
-          <div className="home-origin__actions">
-            <Link to="/journey" className="stamp">
-              <span>▶ Watch the journey</span>
-            </Link>
-            <Link to="/story" className="linkish">
-              Read Roots →
-            </Link>
-          </div>
-        </div>
-      </section>
 
       <h2 className="home-sec">More in Vyom</h2>
       <nav className="home-tiles" aria-label="More">

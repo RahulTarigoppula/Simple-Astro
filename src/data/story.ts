@@ -37,53 +37,6 @@ export interface StoryChapter {
 
 export const STORY: StoryChapter[] = [
   {
-    id: "prologue",
-    title: "Prologue · Why Vyom",
-    cards: [
-      {
-        id: "why",
-        era: "A note from the maker",
-        kind: "personal",
-        title: "Why I built this",
-        dev: "व्योम",
-        art: "maker",
-        body: [
-          "Hi, I'm Rahul. Like almost everyone in India, I grew up with the great stories — the Rāmāyaṇa and the Mahābhārata, heard long before I could read them. The love and the belief were always there; that was about the extent of it.",
-          "Then I read Amish Tripathi's Shiva Trilogy and his Ram Chandra series. They showed me the old stories from a new angle — gods as people who chose, struggled and grew. I wanted more, so I went on to countless books and audiobooks: the Mahābhārata in full, the Vedas, the commentaries.",
-          "Somewhere along the way my curiosity asked a blunt question: is astrology real? Are the doṣas and their predictions true?",
-        ],
-        fact: "Vyom (व्योम) is Sanskrit for the sky — the open space where every one of these stories begins.",
-      },
-      {
-        id: "karma",
-        era: "What I found",
-        kind: "personal",
-        title: "Karma, not fate",
-        dev: "कर्म",
-        art: "sky",
-        body: [
-          "The answer I came to: astrology's predictions behave like predictions. They describe things that could happen — the way a weather forecast does — not things that must.",
-          "We humans are good at exactly this: we learn, we foresee, and we better ourselves. Read that way, the old science is a mirror for reflection, not a sentence passed on us. Our karma — our own actions — is the only thing that is truly ours.",
-          "I'm a software engineer who specialises in AI; building is how I understand things. So I built Vyom: to make all of this simple, to separate the facts from the fear, and to share what I learned.",
-        ],
-        fact: "The Gītā says it in one line (2.47): your right is to the action alone, never to its fruits.",
-      },
-      {
-        id: "promise",
-        era: "How to read Vyom",
-        kind: "personal",
-        title: "Facts first, stories second, fear never",
-        art: "sky",
-        body: [
-          "Everything Vyom calculates — where the planets are, sunrise, the Moon's phase, eclipses — is real astronomy, computed on your device and checked against professional ephemerides. You could verify it with a telescope.",
-          "What the tradition says those positions mean is shown too, clearly labelled as tradition — never as fate, never as a reason to be afraid. A 'bad' Rāhu Kāla is a custom worth knowing, not a curse.",
-          "And the stories — the Moon's 27 wives, the demon who swallows the Sun, the boy who became the Pole Star — are here because they're wonderful. Read them as our ancestors' way of remembering the sky.",
-        ],
-        fact: "Nothing you enter ever leaves your device. No accounts, no tracking — just you and the sky.",
-      },
-    ],
-  },
-  {
     id: "sky",
     title: "I · The sky before books",
     cards: [
@@ -281,7 +234,7 @@ export const STORY: StoryChapter[] = [
         dev: "सामुद्रिक शास्त्र",
         art: "hand",
         body: [
-          "Legend says the ocean-god Samudra first read the marks on Viṣṇu's body, and the art took his name. Sāmudrika Śāstra reads face, body and above all the palm — its lines, mounts and marks.",
+          "Sāmudrika Śāstra — the science of the body's marks — is traditionally credited to a sage named Samudra. It reads the face, the body and above all the palm: its lines, mounts and marks.",
           'Buddhist texts list 32 marks of a "great person", including wheels on the palms and soles; statues of the Buddha often show them. Palm reading also flourished in China, Greece and Romani tradition, each with its own rules.',
           "Science sees palm lines as folds that form before birth, shaped by how the hand bends. Vyom reads them the way the old books do — as a mirror for reflection, never as fate.",
         ],
@@ -329,15 +282,14 @@ export const STORY: StoryChapter[] = [
       {
         id: "full-circle",
         era: "Back to the beginning",
-        kind: "personal",
+        kind: "idea",
         title: "The same sky, your own eyes",
-        art: "maker",
+        art: "sky",
         body: [
           "From farmers watching the dawn stars, to the ṛṣis naming the Moon's mansions, to Āryabhaṭa saying the Earth spins — every chapter of this story is someone being curious about the sky and refusing to stop at fear.",
           "That's all Vyom asks of you, too. Look at your chart, read the myths, check the forecast — and then decide for yourself what you believe. The astronomy will always be true. The meaning is yours.",
-          "Thank you for reading. Go outside tonight and find the Moon — Vyom will tell you which of her 27 houses she's visiting.",
+          "Thank you for reading. Go outside tonight and find the Moon — Vyom will tell you which of the 27 nakṣatras it is passing through.",
         ],
-        fact: "— Rahul, who built Vyom out of curiosity",
       },
     ],
   },

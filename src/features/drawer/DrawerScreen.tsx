@@ -120,7 +120,7 @@ function JourneyToggle() {
   return (
     <Radio
       label="Opening journey"
-      help="The universe-to-you story that plays once when Vyom opens. Replay it any time from Home."
+      help="The intro — from the universe to why Vyom exists — plays when Vyom opens."
       value={on ? "on" : "off"}
       options={[
         ["on", "Play"],
@@ -371,6 +371,11 @@ export default function DrawerScreen() {
 
           <TurmericBand title="Display" plain level={2} />
           <JourneyToggle />
+          <p className="p drawer-replay">
+            <Link to="/journey" className="linkish">
+              ▶ Play the intro now
+            </Link>
+          </p>
           <Radio
             label="Chart"
             value={settings.chartStyle}

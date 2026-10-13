@@ -1,7 +1,6 @@
-// Roots: the story of Jyotiṣa, palmistry and numerology — from the maker's prologue through the
+// Roots: the history of Jyotiṣa, palmistry and numerology — through the
 // gods, the ṛṣis, the Greeks and the astronomers to the epilogue — played as full-screen stories.
 import { useMemo, useState } from "react";
-import { Link } from "react-router";
 import { Screen } from "../../components/ui/Screen";
 import { StoryPlayer } from "../../components/ui/StoryPlayer";
 import { STORY } from "../../data/story";
@@ -22,8 +21,7 @@ export default function StoryScreen() {
         <p className="story-kicker">Roots · कथा</p>
         <h1>The story of the stars</h1>
         <p className="story-lede">
-          Why Vyom exists, and four thousand years of people looking up — gods and ṛṣis, Greeks and astronomers, palm-readers and
-          number-mystics.
+          Four thousand years of people looking up — gods and ṛṣis, Greeks and astronomers, palm-readers and number-mystics.
         </p>
         <div className="story-hero__actions">
           <button type="button" className="stamp story-play" onClick={() => setPlay(0)}>
@@ -63,14 +61,6 @@ export default function StoryScreen() {
           ))}
         </ol>
       </section>
-
-      <p className="story-foot">
-        Prefer pictures to words?{" "}
-        <Link to="/journey" className="linkish">
-          Watch the two-minute journey
-        </Link>{" "}
-        — from the edge of the universe to a bedtime Rāmāyaṇa.
-      </p>
 
       {play !== null ? (
         <StoryPlayer title="Roots — the story of the stars" slides={slides} start={play} onClose={() => setPlay(null)} />
