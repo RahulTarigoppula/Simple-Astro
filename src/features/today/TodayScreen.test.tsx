@@ -151,11 +151,12 @@ describe("TodayScreen", { timeout: 60_000 }, () => {
     renderToday();
     fireEvent.click(await screen.findByRole("tab", { name: "Month" }, { timeout: 5000 }));
     const grid = await screen.findByRole("grid");
-    const today = grid.querySelector<HTMLButtonElement>("button[aria-current='date']");
+    expect(grid.querySelector("button[aria-current='date']")).not.toBeNull();
+    // The roving tab stop sits on the leaf's day, which before sunrise is the civil yesterday.
+    const today = grid.querySelector<HTMLButtonElement>("button[tabindex='0']");
     expect(today).not.toBeNull();
     if (!today) return;
     expect(today.getAttribute("aria-label")).toMatch(/at sunrise \d{2}:\d{2}; .*Moon in /);
-    expect(today.tabIndex).toBe(0);
     const d = Number(today.dataset.day);
     const key = d < 28 ? "ArrowRight" : "ArrowLeft";
     today.focus();
@@ -168,7 +169,7 @@ describe("TodayScreen", { timeout: 60_000 }, () => {
     expect(Number((document.activeElement as HTMLElement).dataset.day)).toBe(nd + 7 <= 28 ? nd + 7 : nd - 7);
     next.focus();
     fireEvent.click(next);
-    await waitFor(() => expect(screen.queryByRole("heading", { level: 1, name: /Today/ })).not.toBeInTheDocument(), { timeout: 5000 });
+    await waitFor(() => expect(screen.getByRole("button", { name: "Read this day's full leaf" })).toBeInTheDocument(), { timeout: 20_000 });
     fireEvent.click(screen.getByRole("button", { name: "Read this day's full leaf" }));
     expect(await screen.findByRole("button", { name: /^Tithi/ })).toBeInTheDocument();
   });

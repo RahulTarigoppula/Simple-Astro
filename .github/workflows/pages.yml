@@ -26,8 +26,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx vitest run --project engine --project dom
-      - name: Build (served from /jyoti/)
+      # Engine maths gate the deploy; UI tests live in ci.yml so a slow runner never blocks it.
+      - run: npx vitest run --project engine
+      - name: Build (served from /<repo>/)
         run: npm run build
         env:
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
