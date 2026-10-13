@@ -96,3 +96,11 @@ export const IconGuide = (p: IconProps) => (
     <path d="M12 6.5v13" />
   </Svg>
 );
+/** The story: a star over an open scroll. */
+export const IconStory = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M5 19.5h11a3 3 0 0 0 3-3V8" />
+    <path d="M5 19.5a2 2 0 0 1-2-2V9h14v8.5" />
+    <path d="M12 2.8l1 2.2 2.4.2-1.8 1.6.5 2.3L12 7.9l-2.1 1.2.5-2.3-1.8-1.6L11 5z" />
+  </Svg>
+);

@@ -63,6 +63,12 @@ export default function GuideScreen() {
         </p>
       </header>
 
+      <Link to="/story" className="guide-story">
+        <span className="guide-story__k">New · Roots</span>
+        <span className="guide-story__t">The story of the stars</span>
+        <span className="guide-story__s">Gods, ṛṣis, Greeks and astronomers — 16 short cards →</span>
+      </Link>
+
       <section className="guide-card guide-honest" aria-labelledby="g-real">
         <h2 id="g-real">What's real and what's tradition?</h2>
         <div className="guide-two">

@@ -11,7 +11,19 @@ import { computePanchang } from "../../engine/panchang";
 import type { Panchang } from "../../engine/types";
 import { play } from "../../platform/sound";
 import { DailyStrengthCard } from "../gochar";
-import { IconArrow, IconChart, IconCircle, IconDrawer, IconGuide, IconMilan, IconPalm, IconPlus, IconSky, IconToday } from "./icons";
+import {
+  IconArrow,
+  IconChart,
+  IconCircle,
+  IconDrawer,
+  IconGuide,
+  IconMilan,
+  IconPalm,
+  IconPlus,
+  IconSky,
+  IconStory,
+  IconToday,
+} from "./icons";
 import { ZodiacOrbit } from "./ZodiacOrbit";
 import "./chowki.css";
 
@@ -265,6 +277,7 @@ export default function ChowkiScreen() {
           tone="cyan"
         />
         {active ? <Tile to="/leaf/new" title="New leaf" dev="नया पत्ता" sub="Cast another chart" icon={<IconPlus />} tone="violet" /> : null}
+        <Tile to="/story" title="The story" dev="कथा" sub="Gods, sages and stars: where it all began" icon={<IconStory />} tone="gold" />
         <Tile to="/guide" title="Guide" dev="मार्गदर्शिका" sub="What everything means, in plain English" icon={<IconGuide />} tone="cyan" />
         <Tile to="/drawer" title="Settings" dev="दराज़" sub="Accuracy options, backup and privacy" icon={<IconDrawer />} tone="violet" />
       </nav>

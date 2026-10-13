@@ -36,6 +36,7 @@ for (const [tag, viewport] of [
     drawer: "drawer",
     leaf: "leaf/new",
     guide: "guide",
+    story: "story",
   };
   for (const [name, r] of Object.entries(routes)) {
     await page.goto(`${base}#/${r}`);
