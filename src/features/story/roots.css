@@ -1,0 +1,198 @@
+/* Roots v2: hero, maker's note, chapter rings */
+.story-hero {
+  padding: var(--space-6) var(--space-5) 0;
+}
+.story-hero h1 {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+}
+.story-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin-top: var(--space-4);
+}
+.story-play {
+  min-height: 52px;
+  padding: 0 26px;
+  font-size: var(--text-lg);
+}
+.story-hero__meta {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+}
+.maker {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+  margin: var(--space-5) var(--space-5) 0;
+  padding: 16px;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(196, 181, 253, 0.4);
+  background: radial-gradient(420px 180px at 0% 0%, rgba(139, 92, 246, 0.25), transparent 70%), rgba(14, 17, 46, 0.75);
+  color: var(--ink);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.maker:hover {
+  transform: translateY(-2px);
+}
+.maker__av {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--aurora);
+  color: var(--accent-ink);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  box-shadow:
+    0 0 0 3px var(--void-0),
+    0 0 0 5px rgba(196, 181, 253, 0.6),
+    var(--glow-violet);
+}
+.maker__text {
+  display: grid;
+  gap: 3px;
+}
+.maker__k {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+.maker__t {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  line-height: 1.4;
+}
+.maker__s {
+  font-size: 12.5px;
+  color: var(--accent-2);
+}
+.story-sub {
+  margin: var(--space-6) var(--space-5) var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--ink);
+}
+.story-sub--deck {
+  margin-bottom: 0;
+}
+.story-ringsec .rings {
+  padding: 0 var(--space-5) 6px;
+}
+.rings {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 6px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 96px;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rings::-webkit-scrollbar {
+  display: none;
+}
+.ring {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+.ring__disc {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  padding: 3px;
+  background: conic-gradient(from 210deg, var(--accent-2), var(--accent), var(--cyan), var(--accent-2));
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.ring:hover .ring__disc,
+.ring:focus-visible .ring__disc {
+  transform: scale(1.06);
+}
+.ring__disc .story-art {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  border-radius: 50%;
+  border: 3px solid var(--void-0);
+}
+.ring--prologue .ring__disc,
+.ring--epilogue .ring__disc {
+  background: conic-gradient(from 0deg, var(--accent), var(--danger), var(--accent-2), var(--accent));
+}
+.ring__t {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.ring__s {
+  font-size: 10.5px;
+  color: var(--ink-muted);
+}
+.story-tag--personal {
+  background: rgba(251, 113, 133, 0.14);
+  color: var(--danger);
+  border: 1px solid rgba(251, 113, 133, 0.35);
+}
+@media (min-width: 900px) {
+  .story-hero,
+  .story-sub,
+  .story-ringsec {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    width: calc(100% - 2 * var(--space-5));
+  }
+  .story-ringsec .rings {
+    padding: 0 0 6px;
+  }
+  .maker {
+    max-width: 720px;
+    margin-left: max(var(--space-5), calc((100% - 1100px) / 2));
+  }
+}
+
+.maker--link {
+  text-decoration: none;
+}
+.guide .maker {
+  margin-left: 0;
+  margin-right: 0;
+}
+@media (min-width: 900px) {
+  .home-maker {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.ring,
+.ring:hover {
+  box-shadow: none;
+}

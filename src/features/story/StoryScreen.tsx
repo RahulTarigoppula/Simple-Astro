@@ -4,16 +4,20 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 import { useActiveProfile } from "../../app/hooks";
 import { Screen } from "../../components/ui/Screen";
+import { StoryPlayer } from "../../components/ui/StoryPlayer";
 import { birthNumbers, NUMBER_PLANET, STORY, type StoryCard } from "../../data/story";
 import { StoryArt } from "./StoryArt";
+import { StoryRings } from "./StoryRings";
+import { chapterStart, rootsSlides } from "./storySlides";
 import "./story.css";
+import "./roots.css";
 
 interface Flat {
   card: StoryCard | "numbers";
   chapter: number;
 }
 
-const KIND_LABEL = { myth: "Myth", history: "History", idea: "Tradition" } as const;
+const KIND_LABEL = { myth: "Myth", history: "History", idea: "Tradition", personal: "From the maker" } as const;
 
 function NumbersCard() {
   const active = useActiveProfile();
@@ -108,15 +112,45 @@ export default function StoryScreen() {
   }, []);
 
   const chapter = flat[at]?.chapter ?? 0;
+  const slides = useMemo(() => rootsSlides(), []);
+  const [play, setPlay] = useState<number | null>(null);
 
   return (
     <Screen className="story" label="Roots — the story of the stars">
-      <header className="story-head">
+      <header className="story-hero">
         <p className="story-kicker">Roots · कथा</p>
         <h1>The story of the stars</h1>
-        <p className="story-lede">Gods, sages, Greeks, astronomers — how Indian astrology, palm reading and numerology came to be.</p>
+        <p className="story-lede">
+          Four thousand years of people looking up — gods and ṛṣis, Greeks and astronomers — and why one software engineer decided to build
+          Vyom.
+        </p>
+        <div className="story-hero__actions">
+          <button type="button" className="stamp story-play" onClick={() => setPlay(0)}>
+            <span>▶ Start the story</span>
+          </button>
+          <span className="story-hero__meta">{slides.length} cards · about 8 minutes · tap to move, hold to pause</span>
+        </div>
       </header>
 
+      <button type="button" className="maker" onClick={() => setPlay(chapterStart("prologue"))}>
+        <span className="maker__av" aria-hidden="true">
+          R
+        </span>
+        <span className="maker__text">
+          <span className="maker__k">A note from the maker</span>
+          <span className="maker__t">"I believed God exists — that was the extent of it. Then I started reading…"</span>
+          <span className="maker__s">Why I built Vyom · 1 minute ▶</span>
+        </span>
+      </button>
+
+      <section className="story-ringsec" aria-labelledby="rings-h">
+        <h2 id="rings-h" className="story-sub">
+          Jump to a chapter
+        </h2>
+        <StoryRings />
+      </section>
+
+      <h2 className="story-sub story-sub--deck">Or read it as cards</h2>
       <nav className="story-chapters" aria-label="Chapters">
         {STORY.map((ch, i) => (
           <button
@@ -218,6 +252,9 @@ export default function StoryScreen() {
           What every word means →
         </Link>
       </p>
+      {play !== null ? (
+        <StoryPlayer title="Roots — the story of the stars" slides={slides} start={play} onClose={() => setPlay(null)} />
+      ) : null}
     </Screen>
   );
 }

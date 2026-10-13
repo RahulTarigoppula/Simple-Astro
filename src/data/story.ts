@@ -15,12 +15,13 @@ export type StoryArt =
   | "wheel"
   | "hand"
   | "numbers"
-  | "today";
+  | "today"
+  | "maker";
 
 export interface StoryCard {
   id: string;
   era: string;
-  kind: "myth" | "history" | "idea";
+  kind: "myth" | "history" | "idea" | "personal";
   title: string;
   dev?: string;
   art: StoryArt;
@@ -35,6 +36,39 @@ export interface StoryChapter {
 }
 
 export const STORY: StoryChapter[] = [
+  {
+    id: "prologue",
+    title: "Prologue · Why Vyom",
+    cards: [
+      {
+        id: "why",
+        era: "A note from the maker",
+        kind: "personal",
+        title: "Why I built this",
+        dev: "व्योम",
+        art: "maker",
+        body: [
+          "Hi, I'm Rahul. I've always believed that God exists — and honestly, that was about the extent of my belief. Horoscopes, lucky stones, auspicious hours: I never knew which parts were knowledge and which were just fear passed down.",
+          "So I started reading. Old books on Jyotiṣa, astronomy, the myths behind the stars. The more I read, the more curious I got — because underneath the superstition there was real astronomy, real mathematics, and some of the most beautiful stories ever told about the sky.",
+          "I'm a software engineer who specialises in AI. Building is how I understand things. So I built Vyom: to make all of this simple, to separate the facts from the fear, and to share what I've learned — honestly.",
+        ],
+        fact: "Vyom (व्योम) is Sanskrit for the sky — the open space where every one of these stories begins.",
+      },
+      {
+        id: "promise",
+        era: "How to read Vyom",
+        kind: "personal",
+        title: "Facts first, stories second, fear never",
+        art: "sky",
+        body: [
+          "Everything Vyom calculates — where the planets are, sunrise, the Moon's phase, eclipses — is real astronomy, computed on your device and checked against professional ephemerides. You could verify it with a telescope.",
+          "What the tradition says those positions mean is shown too, clearly labelled as tradition — never as fate, never as a reason to be afraid. A 'bad' Rāhu Kāla is a custom worth knowing, not a curse.",
+          "And the stories — the Moon's 27 wives, the demon who swallows the Sun, the boy who became the Pole Star — are here because they're wonderful. Read them as our ancestors' way of remembering the sky.",
+        ],
+        fact: "Nothing you enter ever leaves your device. No accounts, no tracking — just you and the sky.",
+      },
+    ],
+  },
   {
     id: "sky",
     title: "I · The sky before books",
@@ -274,8 +308,26 @@ export const STORY: StoryChapter[] = [
       },
     ],
   },
+  {
+    id: "epilogue",
+    title: "Epilogue · Your turn",
+    cards: [
+      {
+        id: "full-circle",
+        era: "Back to the beginning",
+        kind: "personal",
+        title: "The same sky, your own eyes",
+        art: "maker",
+        body: [
+          "From farmers watching the dawn stars, to the ṛṣis naming the Moon's mansions, to Āryabhaṭa saying the Earth spins — every chapter of this story is someone being curious about the sky and refusing to stop at fear.",
+          "That's all Vyom asks of you, too. Look at your chart, read the myths, check the forecast — and then decide for yourself what you believe. The astronomy will always be true. The meaning is yours.",
+          "Thank you for reading. Go outside tonight and find the Moon — Vyom will tell you which of her 27 houses she's visiting.",
+        ],
+        fact: "— Rahul, who built Vyom out of curiosity",
+      },
+    ],
+  },
 ];
-
 /** Digital root: keep adding digits until one is left (0 stays 0). */
 export function digitalRoot(n: number): number {
   const a = Math.abs(Math.trunc(n));

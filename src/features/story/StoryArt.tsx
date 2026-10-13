@@ -1,5 +1,6 @@
 // Small line illustrations for the story cards. Original artwork; colours from tokens only.
 import type { StoryArt as Art } from "../../data/story";
+import "./story.css";
 
 // A fixed, hand-placed scatter of background stars (deterministic — no randomness at render).
 const STARS: Array<[number, number, number]> = [
@@ -184,6 +185,21 @@ function Motif({ art }: { art: Art }) {
           <text className="sa-num sa-num--big" x="104" y="64" textAnchor="middle">
             108
           </text>
+        </g>
+      );
+    case "maker":
+      return (
+        <g>
+          <rect className="sa-card" x="58" y="40" width="92" height="56" rx="6" />
+          <path className="sa-thin" d="M48 100h112" />
+          <path className="sa-line" d="M78 80l14-16 14 10 16-22 12 12" />
+          <circle className="sa-star" cx="78" cy="80" r="2.6" />
+          <circle className="sa-star" cx="92" cy="64" r="2.6" />
+          <circle className="sa-star" cx="106" cy="74" r="2.6" />
+          <circle className="sa-star" cx="122" cy="52" r="2.6" />
+          <circle className="sa-star" cx="134" cy="64" r="2.6" />
+          <path className="sa-gold-star" d="M150 14l2.4 5.6 6 .5-4.6 3.9 1.4 5.9-5.2-3.2-5.2 3.2 1.4-5.9-4.6-3.9 6-.5z" />
+          <path className="sa-orbit" d="M40 30q50-26 104-14" />
         </g>
       );
     case "today":
