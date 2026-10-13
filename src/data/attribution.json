@@ -81,28 +81,36 @@
       "use": "CLAHE, black-hat, Hessian, warpPerspective — lazy-loaded on the Hast screen only"
     },
     {
-      "id": "font-yatra-one",
-      "name": "Yatra One",
-      "author": "Catharsis Fonts",
+      "id": "font-sora",
+      "name": "Sora",
+      "author": "Jonathan Barnbrook, Julián Moncada",
       "licence": "SIL OFL 1.1",
-      "url": "https://fonts.google.com/specimen/Yatra+One",
-      "use": "Display: screen titles, the name on the seal"
+      "url": "https://fonts.google.com/specimen/Sora",
+      "use": "Display: screen titles and headings"
     },
     {
-      "id": "font-tiro-devanagari-hindi",
-      "name": "Tiro Devanagari Hindi",
-      "author": "Tiro Typeworks",
+      "id": "font-inter",
+      "name": "Inter",
+      "author": "Rasmus Andersson",
       "licence": "SIL OFL 1.1",
-      "url": "https://fonts.google.com/specimen/Tiro+Devanagari+Hindi",
-      "use": "Body: readings, ledger, leaf lines"
+      "url": "https://rsms.me/inter/",
+      "use": "Body text and labels"
     },
     {
-      "id": "font-martian-mono",
-      "name": "Martian Mono",
-      "author": "Evil Martians",
+      "id": "font-jetbrains-mono",
+      "name": "JetBrains Mono",
+      "author": "JetBrains",
       "licence": "SIL OFL 1.1",
-      "url": "https://github.com/evilmartians/mono",
-      "use": "Engraved brass labels, degrees, end-times"
+      "url": "https://www.jetbrains.com/lp/mono/",
+      "use": "Degrees, times and instrument labels"
+    },
+    {
+      "id": "font-noto-sans-devanagari",
+      "name": "Noto Sans Devanagari",
+      "author": "Google",
+      "licence": "SIL OFL 1.1",
+      "url": "https://fonts.google.com/noto/specimen/Noto+Sans+Devanagari",
+      "use": "Devanagari names and terms"
     },
     {
       "id": "dexie",

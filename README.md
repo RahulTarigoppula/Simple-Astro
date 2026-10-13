@@ -1,12 +1,13 @@
 # Chowki
 
-*Your Janam Patri, written in ink under one lamp.*
+*Your Janam Patri under a live sky — explained in plain English.*
 
 **Codename:** Jyoti (project 02 of 8) · **Repo:** [Simple-Astro](https://github.com/RahulTarigoppula/Simple-Astro) · **App / brand:** Chowki (चौकी) · **Live:** https://rahultarigoppula.github.io/Simple-Astro/
-**Status: v0.2.0 (2026-10-12), live at https://rahultarigoppula.github.io/Simple-Astro/** — install it from the browser menu ("Install app") and it works offline. The Android APK is built by CI from a `v*` tag once the signing secrets exist (see [docs/HANDOFF.md](docs/HANDOFF.md)). What changed is in [CHANGELOG.md](CHANGELOG.md); what was measured is in [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
+**Status: v0.3.0 (2026-10-13), live at https://rahultarigoppula.github.io/Simple-Astro/** — install it from the browser menu ("Install app") and it works offline. The Android APK is built by CI from a `v*` tag once the signing secrets exist (see [docs/HANDOFF.md](docs/HANDOFF.md)). What changed is in [CHANGELOG.md](CHANGELOG.md); what was measured is in [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
 
 ## Summary
 
+- **Astral design (0.3.0):** deep-space glass UI, a live sidereal zodiac wheel on Home, and plain-English help everywhere — an ⓘ beside every term, a Guide with the full glossary, and **Roots**, 16 story cards on the gods, sages, Greeks and astronomers behind Jyotiṣa, palmistry and numerology.
 - A private, offline Jyotisha desk: write a "leaf" (name, birth date, time, place) and it casts a full Janam Patri — nine grahas in sidereal longitude, Lagna, Rāśi (D1) and Navāṁśa (D9) drawn in ink, nakshatra/pada, the Vimshottari dasha tree, birth panchang, and yogas cited to BPHS chapter and verse.
 - Every number shows its work: ayanamsa preset (SE-true / SE-mean / Drik-compatible), resolved IANA zone and historical UTC offset, Julian Day, and a vermilion asterisk whenever a body sits within 2′ of a sign, pada or tithi boundary.
 - Lay two leaves side by side and Guna Milan counts out on a real 36-bead mala; photograph a palm and MediaPipe finds 21 landmarks, OpenCV rectifies the print and traces heart/head/life lines, with a stylus fallback when the camera is unsure.
@@ -73,9 +74,10 @@ Chowki's own code is MIT. The classical tables (nakshatra lords, yoni animals, g
 | MediaPipe `hand_landmarker.task` (Google) | Apache-2.0 (model card, Oct 2021) | 21 hand landmarks, self-hosted in `public/models` |
 | `@mediapipe/tasks-vision` + its `wasm/` folder | Apache-2.0 | Self-hosted for offline use |
 | `@techstark/opencv-js` 4.12.0-release.1 | Apache-2.0 | CLAHE, black-hat, Hessian, warpPerspective — lazy-loaded on the Hast screen only |
-| Yatra One (Catharsis Fonts) via `@fontsource/yatra-one` | SIL OFL 1.1 | Display: screen titles, the name on the seal |
-| Tiro Devanagari Hindi (Tiro Typeworks) via `@fontsource/tiro-devanagari-hindi` | SIL OFL 1.1 | Body: readings, ledger, leaf lines |
-| Martian Mono (Evil Martians) via `@fontsource-variable/martian-mono` | SIL OFL 1.1 | Engraved brass labels, degrees, end-times |
+| Sora via `@fontsource-variable/sora` | SIL OFL 1.1 | Display: screen titles and headings |
+| Inter (Rasmus Andersson) via `@fontsource-variable/inter` | SIL OFL 1.1 | Body text and labels |
+| Noto Sans Devanagari (Google) via `@fontsource-variable/noto-sans-devanagari` | SIL OFL 1.1 | Devanagari names and terms |
+| JetBrains Mono via `@fontsource-variable/jetbrains-mono` | SIL OFL 1.1 | Degrees, times and instrument labels |
 | `dexie`, `dexie-react-hooks`, `dexie-export-import` | Apache-2.0 | IndexedDB profiles, palm Blobs, backup envelope |
 | `three`, `@react-three/fiber`, `d3-geo` | MIT | Rooftop dome (lazy chunk), painted-sky fallback |
 | `motion` | MIT | Ink draw (`pathLength`), springs, drag; **GSAP is not used** (non-OSI, and Motion covers the draw) |
