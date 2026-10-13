@@ -218,7 +218,7 @@ export default function HastScreen() {
           <p className="p">This leaf is not in the bundle.</p>
           <p className="p">
             <Link className="linkish" to="/">
-              Return to the Chowki
+              Back home
             </Link>
           </p>
         </div>

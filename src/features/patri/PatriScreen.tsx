@@ -29,6 +29,7 @@ import { VARGA_NAMES } from "../../engine/vargas";
 import { haptics } from "../../platform/haptics";
 import { isNative, reducedMotion } from "../../platform/native";
 import { play, rustle } from "../../platform/sound";
+import { CosmicProfile } from "../cosmic/CosmicProfile";
 import { GocharSection } from "../gochar";
 import { ChartFigure } from "./ChartFigure";
 import { DashaRibbon } from "./DashaRibbon";
@@ -179,7 +180,7 @@ export default function PatriScreen() {
           <p className="p">This leaf is not in the bundle.</p>
           <p className="p">
             <Link className="linkish" to="/">
-              Return to the Chowki
+              Back home
             </Link>
           </p>
         </div>
@@ -317,6 +318,17 @@ export default function PatriScreen() {
                 </p>
               ) : null}
             </header>
+
+            {patri && profile && patri.profileId === profile.id ? (
+              <div className="patri-cosmic">
+                <CosmicProfile profile={profile} patri={patri} />
+                <Link to={`/forecast/${profile.id}`} className="patri-forecast">
+                  <span className="patri-forecast__k">Forecast</span>
+                  <span className="patri-forecast__t">What the sky holds for {profile.name}</span>
+                  <span className="patri-forecast__s">Day · week · month · quarter · year →</span>
+                </Link>
+              </div>
+            ) : null}
 
             {patri && b ? (
               <PatriBody

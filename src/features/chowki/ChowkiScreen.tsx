@@ -10,14 +10,19 @@ import { NAKSHATRA_NAMES, SIGN_NAMES, TITHI_DEV, VARA_NAMES, YOGA_NAMES } from "
 import { computePanchang } from "../../engine/panchang";
 import type { Panchang } from "../../engine/types";
 import { play } from "../../platform/sound";
-import { DailyStrengthCard } from "../gochar";
+import { CosmicProfile } from "../cosmic/CosmicProfile";
+import { SkyEvents } from "../cosmic/SkyEvents";
+import { TodayForYou } from "../cosmic/TodayForYou";
 import {
   IconArrow,
   IconChart,
   IconCircle,
   IconDrawer,
+  IconForecast,
   IconGuide,
   IconMilan,
+  IconMoon,
+  IconNumbers,
   IconPalm,
   IconPlus,
   IconSky,
@@ -108,19 +113,24 @@ export default function ChowkiScreen() {
   const strengthOk = active && activePatri && activePatri.profileId === active.id;
 
   return (
-    <Screen className="chowki" label="Chowki — home">
+    <Screen className="chowki" label="Vyom — home">
       <header className="home-head">
         <div className="home-brand">
           <span className="home-mark" aria-hidden="true" />
-          <span className="home-name">Chowki</span>
+          <span className="home-name">Vyom</span>
           <span lang="hi" className="home-name-dev">
-            चौकी
+            व्योम
           </span>
         </div>
-        <span className="home-clock mono">
-          <span className="vh">Local time at {placeName}: </span>
-          {hhmm(now, zone)} · {placeName}
-        </span>
+        <div className="home-tools">
+          <span className="home-clock mono">
+            <span className="vh">Local time at {placeName}: </span>
+            {hhmm(now, zone)} · {placeName}
+          </span>
+          <Link to="/drawer" className="home-gear" aria-label="Settings">
+            <IconDrawer size={18} />
+          </Link>
+        </div>
       </header>
 
       <section className="home-hero" aria-labelledby="home-greet">
@@ -218,70 +228,70 @@ export default function ChowkiScreen() {
       </section>
 
       {strengthOk && active ? (
-        <div className="chowki__strength">
-          <DailyStrengthCard patri={activePatri} nowMs={now} zone={active.birth.zone} />
+        <div className="home-stack">
+          <TodayForYou profile={active} patri={activePatri} nowMs={now} preset={settings.preset} />
+          <CosmicProfile profile={active} patri={activePatri} compact />
         </div>
       ) : null}
 
-      <nav className="home-tiles" aria-label="Instruments">
+      <div className="home-stack">
+        <SkyEvents nowMs={now} place={{ lat, lon, name: placeName }} zone={zone} preset={settings.preset} days={40} limit={6} />
+      </div>
+
+      <h2 className="home-sec">Everything in Vyom</h2>
+      <nav className="home-tiles" aria-label="Features">
         {active ? (
           <Tile
             to={`/patri/${active.id}`}
-            title="Janam Patri"
+            title="Birth chart"
             dev="जन्म पत्री"
-            sub={`${active.name}'s birth chart, life chapters and patterns`}
+            sub={`${active.name}'s Janam Patri`}
             icon={<IconChart />}
             tone="violet"
           />
         ) : (
-          <Tile
-            to="/leaf/new"
-            title="New leaf"
-            dev="नया पत्ता"
-            sub="Save someone's birth details to begin"
-            icon={<IconPlus />}
-            tone="violet"
-          />
+          <Tile to="/leaf/new" title="Add a person" dev="नया पत्ता" sub="Birth date, time and place" icon={<IconPlus />} tone="violet" />
         )}
-        <Tile to="/today" title="Today" dev="आज" sub="Hindu almanac · good and bad times" icon={<IconToday />} tone="gold" />
         <Tile
-          to="/circle"
-          title="Your circle"
-          dev="पत्ते"
-          sub={`${profiles?.length ?? 0} saved ${profiles?.length === 1 ? "person" : "people"} · add, edit, back up`}
-          icon={<IconCircle />}
-          tone="cyan"
+          to={active ? `/forecast/${active.id}` : "/forecast"}
+          title="Forecast"
+          dev="भविष्य"
+          sub="Day, week, month, year"
+          icon={<IconForecast />}
+          tone="gold"
         />
+        <Tile to="/today" title="Today's almanac" dev="पंचांग" sub="Good and bad times" icon={<IconToday />} tone="gold" />
+        <Tile to="/explore" title="Explore" dev="अन्वेषण" sub="Gods, signs and stars" icon={<IconSky />} tone="cyan" />
         <Tile
           to={active && second ? `/milan/${active.id}/${second.id}` : "/milan"}
-          title="Guna Milan"
+          title="Compatibility"
           dev="गुण मिलान"
-          sub="Traditional compatibility score out of 36"
+          sub="Guna Milan out of 36"
           icon={<IconMilan />}
           tone="rose"
         />
         <Tile
           to={active ? `/hast/${active.id}` : "/leaf/new"}
-          title="Hast Rekha"
+          title="Palm reading"
           dev="हस्त रेखा"
-          sub="Palm reading · photo never leaves this device"
+          sub="Read on this device"
           icon={<IconPalm />}
-          tone="gold"
+          tone="rose"
         />
+        <Tile to="/story" title="The story" dev="कथा" sub="Where it all began" icon={<IconStory />} tone="gold" />
+        <Tile to="/explore/numbers" title="Numerology" dev="अंक" sub="Your numbers" icon={<IconNumbers />} tone="violet" />
         <Tile
           to={active ? `/patri/${active.id}/sky` : "/leaf/new"}
           title="Birth sky"
           dev="आकाश"
-          sub="A planetarium view of the birth moment"
-          icon={<IconSky />}
+          sub="Planetarium view"
+          icon={<IconMoon />}
           tone="cyan"
         />
-        {active ? <Tile to="/leaf/new" title="New leaf" dev="नया पत्ता" sub="Cast another chart" icon={<IconPlus />} tone="violet" /> : null}
-        <Tile to="/story" title="The story" dev="कथा" sub="Gods, sages and stars: where it all began" icon={<IconStory />} tone="gold" />
-        <Tile to="/guide" title="Guide" dev="मार्गदर्शिका" sub="What everything means, in plain English" icon={<IconGuide />} tone="cyan" />
-        <Tile to="/drawer" title="Settings" dev="दराज़" sub="Accuracy options, backup and privacy" icon={<IconDrawer />} tone="violet" />
+        <Tile to="/circle" title="Your people" dev="पत्ते" sub={`${profiles?.length ?? 0} saved`} icon={<IconCircle />} tone="cyan" />
+        <Tile to="/guide" title="Guide" dev="मार्गदर्शिका" sub="Every word explained" icon={<IconGuide />} tone="violet" />
+        <Tile to="/drawer" title="Settings" dev="दराज़" sub="Accuracy, backup" icon={<IconDrawer />} tone="violet" />
       </nav>
-
       <p className="home-foot">
         New to all this?{" "}
         <Link to="/guide" className="linkish">

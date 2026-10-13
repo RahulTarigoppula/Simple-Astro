@@ -1,4 +1,4 @@
-// Domain types for Chowki. Angles are degrees, always normalised to [0, 360).
+// Domain types for Vyom. Angles are degrees, always normalised to [0, 360).
 // Times are UTC epoch milliseconds plus the resolved zone — never local strings.
 
 // ─── identity & storage ──────────────────────────────────────────────────────

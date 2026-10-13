@@ -1,5 +1,5 @@
 // Plain-English help: an ⓘ beside any traditional term opens one shared sheet that explains it
-// simply, then in depth, then how Chowki calculates it.
+// simply, then in depth, then how Vyom calculates it.
 import { Link } from "react-router";
 import { GROUP_TITLES, glossary } from "../../data/glossary";
 import { useUi } from "../../state/ui";
@@ -73,7 +73,7 @@ export function ExplainSheet() {
           <p>{g.long}</p>
           {g.how ? (
             <>
-              <h3>How Chowki works it out</h3>
+              <h3>How Vyom works it out</h3>
               <p>{g.how}</p>
             </>
           ) : null}

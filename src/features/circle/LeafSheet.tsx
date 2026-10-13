@@ -144,7 +144,7 @@ function ExportForm({ onDone, onBack }: { onDone: () => void; onBack: () => void
     setErr(null);
     try {
       const blob = await exportEnvelope(pass);
-      await saveFile(blob, envelopeFileName(), "Chowki wax envelope");
+      await saveFile(blob, envelopeFileName(), "Vyom wax envelope");
       play("thunk");
       toast("Sealed in a wax envelope (AES-GCM). Keep the passphrase — it cannot be recovered.");
       onDone();

@@ -14,7 +14,7 @@ export interface GlossaryEntry {
   short: string;
   /** The in-depth explanation. */
   long: string;
-  /** How Chowki works it out. */
+  /** How Vyom works it out. */
   how?: string;
   group: GlossaryGroup;
 }
@@ -37,7 +37,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "ज्योतिष",
     plain: "Indian astrology",
     short: "The Indian tradition of reading meaning into the positions of the Sun, Moon and planets.",
-    long: 'Jyotiṣa ("science of light") is over two thousand years old. It has two halves: the astronomy (where every body in the sky is, which is real and checkable) and the interpretation (what those positions are said to mean for a person, which is tradition, not science). Chowki does the astronomy to professional accuracy and shows the interpretation clearly labelled as tradition.',
+    long: 'Jyotiṣa ("science of light") is over two thousand years old. It has two halves: the astronomy (where every body in the sky is, which is real and checkable) and the interpretation (what those positions are said to mean for a person, which is tradition, not science). Vyom does the astronomy to professional accuracy and shows the interpretation clearly labelled as tradition.',
     how: "All positions are computed on your device from NASA-grade astronomy formulas (astronomy-engine), checked against Swiss Ephemeris to within 20 arc-seconds.",
     group: "basics",
   },
@@ -47,7 +47,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "पत्ता",
     plain: "a saved person",
     short: "One person's birth details — name, date, time and place of birth.",
-    long: "Old astrologers wrote each horoscope on a palm leaf; Chowki keeps the name. A leaf stores only what is needed to rebuild the chart: name, birth date and time, birth place and its time zone. Everything else is recalculated whenever you open it.",
+    long: "Old astrologers wrote each horoscope on a palm leaf; Vyom keeps the name. A leaf stores only what is needed to rebuild the chart: name, birth date and time, birth place and its time zone. Everything else is recalculated whenever you open it.",
     how: "Leaves are stored in your browser's private database on this device only. Nothing is uploaded.",
     group: "basics",
   },
@@ -66,7 +66,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     plain: "zodiac fixed to the stars",
     short: "Indian astrology measures the zodiac against the fixed stars, not the seasons.",
     long: "Western astrology starts Aries at the spring equinox (the tropical zodiac). Because Earth's axis slowly wobbles, that starting point drifts against the real stars by about 1° every 72 years. Indian astrology keeps the zodiac pinned to the stars (sidereal), so today the two systems differ by about 24°. That's why your Indian Sun sign is usually one sign earlier than your Western one.",
-    how: "Chowki subtracts the ayanāṃśa (the size of that drift) from tropical positions.",
+    how: "Vyom subtracts the ayanāṃśa (the size of that drift) from tropical positions.",
     group: "basics",
   },
   {
@@ -206,7 +206,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "मुहूर्त",
     plain: "auspicious moment",
     short: "A time chosen as favourable for an important event like a wedding or housewarming.",
-    long: "Picking a muhūrta combines the pañcāṅga limbs, the slots above, and sometimes the people's own charts. Chowki shows the ingredients; it does not pick dates for you.",
+    long: "Picking a muhūrta combines the pañcāṅga limbs, the slots above, and sometimes the people's own charts. Vyom shows the ingredients; it does not pick dates for you.",
     group: "day",
   },
 
@@ -227,7 +227,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "लग्न",
     plain: "rising sign / ascendant",
     short: "The zodiac sign that was rising on the eastern horizon at the moment of birth.",
-    long: 'Because the Earth spins, all twelve signs rise in turn every day — a new one roughly every two hours. That makes the Lagna the most time-sensitive part of a chart: a few minutes can change it. It becomes "house 1", and every other house is counted from it. If the birth time is unknown, the Lagna and houses are unreliable — Chowki will say so.',
+    long: 'Because the Earth spins, all twelve signs rise in turn every day — a new one roughly every two hours. That makes the Lagna the most time-sensitive part of a chart: a few minutes can change it. It becomes "house 1", and every other house is counted from it. If the birth time is unknown, the Lagna and houses are unreliable — Vyom will say so.',
     group: "chart",
   },
   {
@@ -236,7 +236,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "भाव",
     plain: "house = area of life",
     short: "Twelve houses, each linked by tradition to an area of life.",
-    long: "Chowki uses whole-sign houses, the classical method: the rising sign is house 1, the next sign house 2, and so on. Traditional meanings: 1 self and body, 2 wealth and speech, 3 siblings and courage, 4 home and mother, 5 children and creativity, 6 health, debts and rivals, 7 marriage and partners, 8 longevity and sudden change, 9 luck, teachers and faith, 10 career, 11 gains and friends, 12 losses, expense and liberation.",
+    long: "Vyom uses whole-sign houses, the classical method: the rising sign is house 1, the next sign house 2, and so on. Traditional meanings: 1 self and body, 2 wealth and speech, 3 siblings and courage, 4 home and mother, 5 children and creativity, 6 health, debts and rivals, 7 marriage and partners, 8 longevity and sudden change, 9 luck, teachers and faith, 10 career, 11 gains and friends, 12 losses, expense and liberation.",
     group: "chart",
   },
   {
@@ -279,7 +279,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "योग",
     plain: "special planet pattern",
     short: "A named combination of planets that classical books say produces a particular result.",
-    long: "Hundreds are described; Chowki checks the well-known ones (e.g. Gaja-Kesarī: Jupiter in a key position from the Moon; Pañca-Mahāpuruṣa: a planet strong in a key house). Each one listed shows the rule and the book it comes from, so you can see exactly why it was flagged. Having a yoga is tradition's promise, not a prediction.",
+    long: "Hundreds are described; Vyom checks the well-known ones (e.g. Gaja-Kesarī: Jupiter in a key position from the Moon; Pañca-Mahāpuruṣa: a planet strong in a key house). Each one listed shows the rule and the book it comes from, so you can see exactly why it was flagged. Having a yoga is tradition's promise, not a prediction.",
     group: "chart",
   },
   {
@@ -288,7 +288,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "दोष",
     plain: 'traditional "flaw"',
     short: "A placement tradition flags as a difficulty — most famously Maṅgal (Mars) doṣa.",
-    long: "Maṅgal doṣa: Mars in certain houses, said to strain marriage. It is extremely common (roughly 40–50% of people have it by the broad rule), the rules vary between schools, and many exceptions cancel it. Chowki shows the rule, the exceptions applied, and doesn't dramatise it.",
+    long: "Maṅgal doṣa: Mars in certain houses, said to strain marriage. It is extremely common (roughly 40–50% of people have it by the broad rule), the rules vary between schools, and many exceptions cancel it. Vyom shows the rule, the exceptions applied, and doesn't dramatise it.",
     group: "chart",
   },
   {
@@ -428,7 +428,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "भकूट",
     plain: "Moon-sign distance",
     short: "The distance between the two Moon signs; some distances are said to strain finances or family; 7 points or 0.",
-    long: 'Moon signs 2/12, 5/9 or 6/8 apart score 0 (a "Bhakūṭa doṣa"); all other distances score 7. Classical exceptions can cancel the doṣa — Chowki notes them and lets you choose whether to apply them.',
+    long: 'Moon signs 2/12, 5/9 or 6/8 apart score 0 (a "Bhakūṭa doṣa"); all other distances score 7. Classical exceptions can cancel the doṣa — Vyom notes them and lets you choose whether to apply them.',
     group: "match",
   },
   {
@@ -457,7 +457,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "हस्त रेखा",
     plain: "palm reading",
     short: "Reading character from the lines and shape of the hand (Sāmudrika Śāstra).",
-    long: "Palmistry is folklore, not science — the lines are mostly shaped by how the hand folds. Chowki treats it as a fun, reflective reading: it photographs your palm, finds the main lines on your device, and describes them using the classical texts' language about temperament, never about fate or health.",
+    long: "Palmistry is folklore, not science — the lines are mostly shaped by how the hand folds. Vyom treats it as a fun, reflective reading: it photographs your palm, finds the main lines on your device, and describes them using the classical texts' language about temperament, never about fate or health.",
     how: "Google's MediaPipe hand model finds 21 points on your hand; image processing then traces the creases. The photo never leaves your device and can be burned (deleted) in one hold.",
     group: "palm",
   },
@@ -501,7 +501,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "अयनांश",
     plain: "zodiac offset (~24°)",
     short: "The gap between the Western (season-based) and Indian (star-based) zodiacs.",
-    long: "It grows by about 50 arc-seconds a year and is roughly 24° today. Astrologers disagree slightly on its exact value; the Indian government's standard is Lahiri. Chowki offers three Lahiri variants that differ by under a minute of arc — this only matters for births right on a sign or nakṣatra boundary.",
+    long: "It grows by about 50 arc-seconds a year and is roughly 24° today. Astrologers disagree slightly on its exact value; the Indian government's standard is Lahiri. Vyom offers three Lahiri variants that differ by under a minute of arc — this only matters for births right on a sign or nakṣatra boundary.",
     group: "settings",
   },
   {
@@ -509,14 +509,14 @@ export const GLOSSARY: GlossaryEntry[] = [
     term: "Time zone & offset",
     plain: "clock correction",
     short: "Converts the birth time on the clock into universal time; old Indian births often used different offsets.",
-    long: "Before 1955 India used several local times (Bombay time was +4:51, Calcutta +5:53), and wartime India ran clocks an hour ahead in 1942–45. Chowki looks this up from the time-zone database automatically; override only if you know the clock used was different.",
+    long: "Before 1955 India used several local times (Bombay time was +4:51, Calcutta +5:53), and wartime India ran clocks an hour ahead in 1942–45. Vyom looks this up from the time-zone database automatically; override only if you know the clock used was different.",
     group: "settings",
   },
   {
     id: "unknown-time",
     term: "Birth time unknown",
     plain: "chart cast for noon",
-    short: "Without a birth time Chowki uses noon; the Moon sign and almanac stay useful but the rising sign and houses don't.",
+    short: "Without a birth time Vyom uses noon; the Moon sign and almanac stay useful but the rising sign and houses don't.",
     long: "The Moon moves about 6° in 12 hours, so its sign is right most of the time even at noon. The Lagna changes every ~2 hours, so it, the houses, divisional charts and daśā dates are flagged as unreliable.",
     group: "settings",
   },

@@ -36,7 +36,7 @@ export function RouteError() {
         </p>
         <p className="p">
           <Link className="linkish" to="/">
-            Return to the Chowki
+            Back home
           </Link>
         </p>
       </div>

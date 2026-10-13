@@ -25,7 +25,7 @@ export function Shell() {
     document.documentElement.dataset.calm = settings.calmDesk ? "true" : "false";
   }, [settings.sound, settings.haptics, settings.calmDesk]);
 
-  // Predictive back on Android returns to the Chowki rather than exiting.
+  // Predictive back on Android returns home rather than exiting.
   useEffect(() => {
     if (!isNative()) return;
     let remove: (() => void) | undefined;

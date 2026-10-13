@@ -155,7 +155,7 @@ export const STORY: StoryChapter[] = [
         art: "sage",
         body: [
           "Tradition names the sage Parāśara — grandson of Vasiṣṭha and father of Vyāsa, who compiled the Mahābhārata — as the teacher of horoscope astrology. In the Bṛhat Parāśara Horā Śāstra he answers the questions of his student Maitreya.",
-          "Almost everything a Vedic astrologer uses today comes from that book: the twelve houses, the divisional charts, planetary strengths, and the Viṃśottarī daśā — the 120-year cycle of life chapters that Chowki draws for you.",
+          "Almost everything a Vedic astrologer uses today comes from that book: the twelve houses, the divisional charts, planetary strengths, and the Viṃśottarī daśā — the 120-year cycle of life chapters that Vyom draws for you.",
           "Historians date the text as we have it to many centuries after the Vedas, gathered and re-edited over time — but Parāśara's name is honoured as its source.",
         ],
         fact: "The Viṃśottarī cycle adds up to 120 years because that was taken as the full span of a human life.",
@@ -235,7 +235,7 @@ export const STORY: StoryChapter[] = [
         body: [
           "Legend says the ocean-god Samudra first read the marks on Viṣṇu's body, and the art took his name. Sāmudrika Śāstra reads face, body and above all the palm — its lines, mounts and marks.",
           'Buddhist texts list 32 marks of a "great person", including wheels on the palms and soles; statues of the Buddha often show them. Palm reading also flourished in China, Greece and Romani tradition, each with its own rules.',
-          "Science sees palm lines as folds that form before birth, shaped by how the hand bends. Chowki reads them the way the old books do — as a mirror for reflection, never as fate.",
+          "Science sees palm lines as folds that form before birth, shaped by how the hand bends. Vyom reads them the way the old books do — as a mirror for reflection, never as fate.",
         ],
       },
       {
@@ -266,11 +266,11 @@ export const STORY: StoryChapter[] = [
         dev: "पंचांग आज",
         art: "today",
         body: [
-          "In 1952 newly independent India asked the physicist Meghnad Saha to tidy its tangle of some thirty local calendars. His committee chose a national calendar (adopted in 1957) and fixed an official ayanāṃśa — the Lahiri value Chowki uses by default.",
+          "In 1952 newly independent India asked the physicist Meghnad Saha to tidy its tangle of some thirty local calendars. His committee chose a national calendar (adopted in 1957) and fixed an official ayanāṃśa — the Lahiri value Vyom uses by default.",
           "Today the pañcāṅga still sets the dates of Diwali, Holi, Navarātri and countless family rituals; millions check Rāhu Kāla before signing a lease, and families still compare charts before a wedding.",
           "You don't need to believe any of it to find it beautiful: four thousand years of people looking up, giving the lights names and stories, and trying to fit their lives to the rhythm of the sky.",
         ],
-        fact: "Every number Chowki shows is computed fresh on your device, checked against modern ephemerides — the ṛṣis' sky, with today's arithmetic.",
+        fact: "Every number Vyom shows is computed fresh on your device, checked against modern ephemerides — the ṛṣis' sky, with today's arithmetic.",
       },
     ],
   },

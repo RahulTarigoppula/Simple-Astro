@@ -28,7 +28,7 @@ const FAN_X = 18;
 const HOLE_X = 22;
 
 /** Remembered for the session, so coming back from a Patri finds the bundle as you left it. */
-let untiedThisSession = false;
+let untiedThisSession = true;
 
 function useWidth(el: HTMLElement | null, fallback: number): number {
   const [w, setW] = useState(fallback);
@@ -167,7 +167,8 @@ export default function CircleScreen() {
         <div className="paper paper--cut sheet-col circle__col">
           <h1 className="circle__empty-h display">Write your first leaf</h1>
           <p className="circle__empty-p">
-            The bundle is empty. A leaf holds one person's birth — date, time, place — and everything here is cast from it, on this device.
+            Nobody saved yet. A "leaf" is one person's birth details — date, time and place. Everything in Vyom is worked out from it, on this
+            device.
           </p>
           <BlankLeaf first />
         </div>
@@ -182,18 +183,18 @@ export default function CircleScreen() {
           <TurmericBand
             level={1}
             dev="पोथी"
-            title="Leaves"
+            title="Your people"
             meta={
               <>
-                {n} {n === 1 ? "leaf" : "leaves"} · {tied ? "tied" : "untied"}
+                {n} {n === 1 ? "person" : "people"}
               </>
             }
           />
           <div className="circle__hintrow">
             <p className="circle__hint">
               {tied
-                ? "Pull the thread's end — or press Untie — to fan the leaves."
-                : "Tap a leaf to open its patri · swipe left or ⋯ for more."}
+                ? "Tied in a bundle, like palm-leaf manuscripts. Press Untie to see everyone."
+                : "Tap a person to open their birth chart · ⋯ to compare, edit, back up or delete."}
             </p>
             <button type="button" className="circle__toggle" onClick={toggle} aria-pressed={!tied}>
               {tied ? "Untie" : "Tie it up"}

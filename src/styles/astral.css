@@ -879,3 +879,25 @@ body,
   text-transform: none;
   letter-spacing: 0;
 }
+
+/* Navagraha colours (traditional): gold Sun, pearl Moon, coral Mars, emerald Mercury, yellow Jupiter,
+   diamond-white Venus, sapphire Saturn, smoke Rāhu, cat's-eye Ketu */
+:root {
+  --g-SU: #fbbf24;
+  --g-MO: #e0e7ff;
+  --g-MA: #fb7185;
+  --g-ME: #4ade80;
+  --g-JU: #fde047;
+  --g-VE: #f5d0fe;
+  --g-SA: #60a5fa;
+  --g-RA: #a5b4fc;
+  --g-KE: #fdba74;
+}
+
+/* The four elements of the signs */
+:root {
+  --el-fire: #f97316;
+  --el-earth: #84cc16;
+  --el-air: #38bdf8;
+  --el-water: #6366f1;
+}

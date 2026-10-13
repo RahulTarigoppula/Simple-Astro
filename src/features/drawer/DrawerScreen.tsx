@@ -221,7 +221,7 @@ export default function DrawerScreen() {
     setBusy(true);
     try {
       const blob = await exportEnvelope(pass);
-      await saveFile(blob, envelopeFileName(), "Chowki wax envelope");
+      await saveFile(blob, envelopeFileName(), "Vyom wax envelope");
       play("thunk");
       toast("Sealed in a wax envelope (AES-GCM). Keep the passphrase — it cannot be recovered.");
       setMode("none");
@@ -249,8 +249,8 @@ export default function DrawerScreen() {
         code === "BAD_PASSPHRASE"
           ? "This seal does not match that passphrase."
           : code === "NEWER_FORMAT"
-            ? "This envelope was sealed by a newer Chowki — update the app first."
-            : "This file is not a Chowki envelope.",
+            ? "This envelope was sealed by a newer Vyom — update the app first."
+            : "This file is not a Vyom envelope.",
         "danger",
       );
     } finally {
@@ -302,7 +302,7 @@ export default function DrawerScreen() {
       <div className="drawer-box">
         <span className="drawer-knob" aria-hidden="true" />
         <div className="paper">
-          <TurmericBand dev="दराज़" title="Settings" meta={`Chowki ${__APP_VERSION__}`} level={1} />
+          <TurmericBand dev="दराज़" title="Settings" meta={`Vyom ${__APP_VERSION__}`} level={1} />
           <p className="p drawer-guide">
             The defaults are right for almost everyone. Unsure what a word means?{" "}
             <Link to="/guide" className="linkish">
@@ -484,7 +484,7 @@ export default function DrawerScreen() {
           </ul>
           <Colophon
             rows={[
-              ["Version", `Chowki ${__APP_VERSION__} · engine astronomy-engine ${__ENGINE_BUILD__}`],
+              ["Version", `Vyom ${__APP_VERSION__} · engine astronomy-engine ${__ENGINE_BUILD__}`],
               [
                 "Presets",
                 `${settings.preset.ayanamsa} · ${settings.preset.node} node · ${settings.preset.dashaYearDays} d · ${settings.preset.sunrise}`,
@@ -494,7 +494,7 @@ export default function DrawerScreen() {
           >
             <p style={{ margin: "var(--space-3) 0 0" }}>
               <Link className="linkish" to="/">
-                Back to the Chowki
+                Back home
               </Link>
             </p>
           </Colophon>

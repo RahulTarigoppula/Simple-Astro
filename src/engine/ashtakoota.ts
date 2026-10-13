@@ -11,11 +11,11 @@
 // Graha Maitrī, Gaṇa and Nāḍī agree with PyJHora's all_nak_pad_boy_girl.csv cell for cell. Three PyJHora defects are NOT
 // reproduced, each modelled exactly in the oracle test:
 //   1. Tārā — PyJHora awards 1.5 per direction whose tārā IS Vipat/Pratyari/Vadha (inverted), so its
-//      Tārā equals 3 − the classical score. Chowki awards points for the kind tārās.
+//      Tārā equals 3 − the classical score. Vyom awards points for the kind tārās.
 //   2. Bhakūṭa — PyJHora scores Karka (a) × Kumbha (b) as 7; it is a 6/8 axis (doṣa, 0) like every
 //      other 6/8 pair, including its own mirror Kumbha × Karka.
 //   3. Vaśya class — PyJHora splits Dhanu and Makara by pada number (1–2 vs 3–4 in every nakshatra)
-//      instead of at 15°; Chowki uses the Moon's degree (or the pada's midpoint when only the pada is
+//      instead of at 15°; Vyom uses the Moon's degree (or the pada's midpoint when only the pada is
 //      known).
 import {
   BHAKOOT_DOSHA_DISTANCES,

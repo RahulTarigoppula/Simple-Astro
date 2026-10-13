@@ -1,4 +1,4 @@
-// The guide: what Chowki is, how to use it, and every term in plain English — written for someone
+// The guide: what Vyom is, how to use it, and every term in plain English — written for someone
 // who has never met Indian astrology, or doesn't believe in it.
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
@@ -53,12 +53,12 @@ export default function GuideScreen() {
   );
 
   return (
-    <Screen className="guide" scroll label="Guide — Chowki in plain English">
+    <Screen className="guide" scroll label="Guide — Vyom in plain English">
       <header className="guide-hero">
         <p className="guide-kicker">Guide</p>
-        <h1>Chowki in plain English</h1>
+        <h1>Vyom in plain English</h1>
         <p className="guide-lede">
-          Chowki is an Indian astrology (Jyotiṣa) app. It works out exactly where the Sun, Moon and planets are — or were when someone was
+          Vyom is an Indian astrology (Jyotiṣa) app. It works out exactly where the Sun, Moon and planets are — or were when someone was
           born — and shows what the old tradition says about it. You don't need to know anything, or believe anything, to use it.
         </p>
       </header>
@@ -83,7 +83,7 @@ export default function GuideScreen() {
             <h3>Tradition, not science</h3>
             <p>
               What those positions are said to mean — personality, good and bad times, compatibility, palm lines. There's no scientific
-              evidence for them. Chowki shows them as a cultural reference and for reflection, never as advice or fate.
+              evidence for them. Vyom shows them as a cultural reference and for reflection, never as advice or fate.
             </p>
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function GuideScreen() {
       <section className="guide-card" aria-labelledby="g-private">
         <h2 id="g-private">Your privacy</h2>
         <p>
-          Everything is calculated on this device. Birth details and palm photos are stored only here, never uploaded. The only time Chowki
+          Everything is calculated on this device. Birth details and palm photos are stored only here, never uploaded. The only time Vyom
           uses the internet is the optional place search when you type a town name. You can back up or delete everything from Settings.
         </p>
       </section>
@@ -154,7 +154,7 @@ export default function GuideScreen() {
                     <p>{g.long}</p>
                     {g.how ? (
                       <p className="guide-item__how">
-                        <strong>How Chowki works it out: </strong>
+                        <strong>How Vyom works it out: </strong>
                         {g.how}
                       </p>
                     ) : null}

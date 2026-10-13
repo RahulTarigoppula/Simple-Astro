@@ -346,7 +346,7 @@ function MilanScreen() {
       haptics.selection();
       toast("Summary copied — plain text, with the disclaimer.");
     } catch {
-      toast("This browser would not let Chowki copy. Nothing was sent anywhere.", "warn");
+      toast("This browser would not let Vyom copy. Nothing was sent anywhere.", "warn");
     }
   };
 

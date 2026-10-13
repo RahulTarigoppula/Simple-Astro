@@ -252,7 +252,7 @@ export default function LeafScreen() {
           <p className="p">This leaf is not in the bundle.</p>
           <p className="p">
             <Link className="linkish" to="/">
-              Return to the Chowki
+              Back home
             </Link>
           </p>
         </div>
@@ -576,7 +576,7 @@ export default function LeafScreen() {
       <Sheet open={online === "asking"} onClose={() => setOnline("idle")} label="Search online?">
         <TurmericBand title="Search online?" level={2} />
         <p className="p">
-          Chowki works offline. To look up “{query.trim()}”, only the place name would be sent to Open-Meteo’s geocoder (and, if that finds
+          Vyom works offline. To look up “{query.trim()}”, only the place name would be sent to Open-Meteo’s geocoder (and, if that finds
           nothing, to OpenStreetMap Nominatim). No birth details, no names of people. You will be asked once.
         </p>
         <div className="tools" style={{ paddingBottom: "var(--space-4)" }}>

@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-import { IconChart, IconCircle, IconDrawer, IconPalm, IconToday } from "../features/chowki/icons";
+import { IconChart, IconCircle, IconForecast, IconSky, IconToday } from "../features/chowki/icons";
 import { useActiveProfile } from "./hooks";
 import { rememberOrigin } from "./origin";
 
@@ -22,11 +22,11 @@ function IconHome() {
   );
 }
 
-/** The navigation bar: Home · Patri · Today · Circle · Palm · Settings. */
+/** The navigation bar: Home · Chart · Forecast · Today · Explore · People. */
 export function Ledge() {
   const active = useActiveProfile();
   const patriTo = active ? `/patri/${active.id}` : "/leaf/new";
-  const hastTo = active ? `/hast/${active.id}` : "/leaf/new";
+  const forecastTo = active ? `/forecast/${active.id}` : "/forecast";
   const item = (to: string, label: string, name: string, icon: React.ReactNode, end = false) => (
     <NavLink to={to} end={end} aria-label={name} onClick={(e) => rememberOrigin(e.currentTarget)}>
       <span className="obj" aria-hidden="true">
@@ -40,11 +40,11 @@ export function Ledge() {
   return (
     <nav className="ledge" aria-label="Main navigation">
       {item("/", "Home", "Home — the sky now", <IconHome />, true)}
-      {item(patriTo, "Patri", active ? `Janam Patri of ${active.name}` : "Write a leaf", <IconChart />)}
-      {item("/today", "Today", "Today's pañcāṅga", <IconToday />)}
-      {item("/circle", "Circle", "Your circle of leaves", <IconCircle />)}
-      {item(hastTo, "Palm", "Palm reading", <IconPalm />)}
-      {item("/drawer", "Settings", "Settings and backup", <IconDrawer />)}
+      {item(patriTo, "Chart", active ? `Birth chart of ${active.name}` : "Add a person", <IconChart />)}
+      {item(forecastTo, "Forecast", "Forecast — day to year", <IconForecast />)}
+      {item("/today", "Today", "Today's almanac", <IconToday />)}
+      {item("/explore", "Explore", "Explore gods, signs and stars", <IconSky />)}
+      {item("/circle", "People", "Your saved people", <IconCircle />)}
     </nav>
   );
 }

@@ -104,3 +104,18 @@ export const IconStory = (p: IconProps) => (
     <path d="M12 2.8l1 2.2 2.4.2-1.8 1.6.5 2.3L12 7.9l-2.1 1.2.5-2.3-1.8-1.6L11 5z" />
   </Svg>
 );
+/** Forecast: a crescent over a rising line. */
+export const IconForecast = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3.5 19.5l5-5 3.5 3 8-8" />
+    <path d="M15.5 9.5h4.5V14" />
+    <path d="M8.5 4.2a3.4 3.4 0 1 0 3.3 4.4 2.7 2.7 0 1 1-3.3-4.4z" />
+  </Svg>
+);
+/** Numerology: a nine in a circle of dots. */
+export const IconNumbers = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="8.5" strokeDasharray="1.5 3" />
+    <path d="M14 10.2a2.4 2.4 0 1 1-2.4-2.4A2.4 2.4 0 0 1 14 10.2v3.3a2.8 2.8 0 0 1-4.6 2.1" />
+  </Svg>
+);

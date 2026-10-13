@@ -37,11 +37,27 @@ for (const [tag, viewport] of [
     leaf: "leaf/new",
     guide: "guide",
     story: "story",
+    forecast: "forecast",
+    explore: "explore",
+    graha: "explore/graha/SA",
+    nak: "explore/nakshatra/3",
+    numbers: "explore/numbers",
   };
   for (const [name, r] of Object.entries(routes)) {
     await page.goto(`${base}#/${r}`);
     await page.waitForTimeout(1800);
-    await page.screenshot({ path: `${out}/${tag}-${name}.png`, fullPage: true });
+    // Scroll the routed screen (it scrolls, not the page) and take up to four viewports.
+    for (let i = 0; i < 4; i++) {
+      const more = await page.evaluate((k) => {
+        const s = [...document.querySelectorAll("main, .screen, .paper")].find((e) => e.scrollHeight > e.clientHeight + 4);
+        if (!s) return k === 0;
+        s.scrollTop = k * s.clientHeight * 0.9;
+        return s.scrollTop + s.clientHeight < s.scrollHeight || k === 0;
+      }, i);
+      await page.waitForTimeout(250);
+      await page.screenshot({ path: `${out}/${tag}-${name}-${i}.png` });
+      if (!more) break;
+    }
   }
   await page.goto(`${base}#/today`);
   await page.waitForTimeout(1500);

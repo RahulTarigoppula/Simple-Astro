@@ -2,7 +2,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "com.rahul.jyoti", // immutable after the first install
-  appName: "Chowki",
+  appName: "Vyom",
   webDir: "dist",
   android: {
     webContentsDebuggingEnabled: false,
