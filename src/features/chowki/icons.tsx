@@ -89,3 +89,10 @@ export const IconMoon = (p: IconProps) => (
     <path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z" />
   </Svg>
 );
+/** The guide: an open book. */
+export const IconGuide = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 6.5C10 5 7.5 4.5 4 4.8v13c3.5-.3 6 .2 8 1.7 2-1.5 4.5-2 8-1.7v-13c-3.5-.3-6 .2-8 1.7z" />
+    <path d="M12 6.5v13" />
+  </Svg>
+);

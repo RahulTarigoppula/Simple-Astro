@@ -4,13 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { rememberOrigin } from "../../app/origin";
+import { InfoDot } from "../../components/ui/Explain";
 import { Screen } from "../../components/ui/Screen";
 import { NAKSHATRA_NAMES, SIGN_NAMES, TITHI_DEV, VARA_NAMES, YOGA_NAMES } from "../../data/tables/names";
 import { computePanchang } from "../../engine/panchang";
 import type { Panchang } from "../../engine/types";
 import { play } from "../../platform/sound";
 import { DailyStrengthCard } from "../gochar";
-import { IconArrow, IconChart, IconCircle, IconDrawer, IconMilan, IconPalm, IconPlus, IconSky, IconToday } from "./icons";
+import { IconArrow, IconChart, IconCircle, IconDrawer, IconGuide, IconMilan, IconPalm, IconPlus, IconSky, IconToday } from "./icons";
 import { ZodiacOrbit } from "./ZodiacOrbit";
 import "./chowki.css";
 
@@ -104,7 +105,8 @@ export default function ChowkiScreen() {
             चौकी
           </span>
         </div>
-        <span className="home-clock mono" aria-label={`Local time at ${placeName}: ${hhmm(now, zone)}`}>
+        <span className="home-clock mono">
+          <span className="vh">Local time at {placeName}: </span>
           {hhmm(now, zone)} · {placeName}
         </span>
       </header>
@@ -123,30 +125,42 @@ export default function ChowkiScreen() {
             )}
           </h1>
           {p ? (
-            <ul className="home-angas" aria-label="Today's pañcāṅga">
+            <ul className="home-angas" aria-label="Today's pañcāṅga — the Hindu almanac">
               <li>
-                <span className="k">Tithi</span>
+                <span className="k">
+                  Tithi <InfoDot id="tithi" />
+                </span>
+                <span className="g">lunar day</span>
                 <span className="v">
                   {p.tithi.index === 30 ? "अमावस्या" : `${p.tithi.paksha === "shukla" ? "शुक्ल" : "कृष्ण"} ${TITHI_DEV[tithiNo] ?? ""}`}
                 </span>
                 <span className="s">{p.tithi.name}</span>
               </li>
               <li>
-                <span className="k">Nakṣatra</span>
+                <span className="k">
+                  Nakṣatra <InfoDot id="nakshatra" />
+                </span>
+                <span className="g">Moon's star</span>
                 <span className="v">{NAKSHATRA_NAMES[p.nakshatra.index]}</span>
                 <span className="s">pada {p.nakshatra.pada}</span>
               </li>
               <li>
-                <span className="k">Yoga</span>
+                <span className="k">
+                  Yoga <InfoDot id="yoga-panchang" />
+                </span>
+                <span className="g">Sun + Moon</span>
                 <span className="v">{YOGA_NAMES[p.yoga.index - 1] ?? p.yoga.name}</span>
                 <span className="s">{VARA_NAMES[p.vara.index]}</span>
               </li>
               <li className="is-caution">
-                <span className="k">Rāhu Kāla</span>
+                <span className="k">
+                  Rāhu Kāla <InfoDot id="rahu-kala" />
+                </span>
+                <span className="g">avoid new starts</span>
                 <span className="v mono">
                   {hhmm(p.rahuKaal[0], zone)}–{hhmm(p.rahuKaal[1], zone)}
                 </span>
-                <span className="s">avoid beginnings</span>
+                <span className="s">by tradition</span>
               </li>
             </ul>
           ) : (
@@ -171,9 +185,22 @@ export default function ChowkiScreen() {
             lon={lon}
             natalMoonSign={strengthOk ? activePatri.grahas.MO.sign : undefined}
           />
+          <span className="home-legend" aria-hidden="true">
+            <span>
+              <i className="lg lg--asc" /> rising sign here
+            </span>
+            {strengthOk ? (
+              <span>
+                <i className="lg lg--natal" /> your Moon sign
+              </span>
+            ) : null}
+            <span>
+              <i className="lg lg--planet" /> planet now
+            </span>
+          </span>
           <span className="home-orbit__cap">
-            Sky now · Moon in {p ? NAKSHATRA_NAMES[p.nakshatra.index] : "—"}
-            {strengthOk ? ` · your Moon ${SIGN_NAMES[activePatri.grahas.MO.sign]}` : ""}
+            The sky right now · Moon in {p ? NAKSHATRA_NAMES[p.nakshatra.index] : "—"}
+            {strengthOk ? ` · your Moon sign ${SIGN_NAMES[activePatri.grahas.MO.sign]}` : ""} · tap to explore
           </span>
         </Link>
       </section>
@@ -190,19 +217,26 @@ export default function ChowkiScreen() {
             to={`/patri/${active.id}`}
             title="Janam Patri"
             dev="जन्म पत्री"
-            sub={`${active.name}'s chart, daśā, yogas, transits`}
+            sub={`${active.name}'s birth chart, life chapters and patterns`}
             icon={<IconChart />}
             tone="violet"
           />
         ) : (
-          <Tile to="/leaf/new" title="New leaf" dev="नया पत्ता" sub="Name, date, time and place of birth" icon={<IconPlus />} tone="violet" />
+          <Tile
+            to="/leaf/new"
+            title="New leaf"
+            dev="नया पत्ता"
+            sub="Save someone's birth details to begin"
+            icon={<IconPlus />}
+            tone="violet"
+          />
         )}
-        <Tile to="/today" title="Today" dev="आज" sub="Pañcāṅga, Choghaḍiyā, Horā, month" icon={<IconToday />} tone="gold" />
+        <Tile to="/today" title="Today" dev="आज" sub="Hindu almanac · good and bad times" icon={<IconToday />} tone="gold" />
         <Tile
           to="/circle"
           title="Your circle"
           dev="पत्ते"
-          sub={`${profiles?.length ?? 0} ${profiles?.length === 1 ? "leaf" : "leaves"} · add, edit, back up`}
+          sub={`${profiles?.length ?? 0} saved ${profiles?.length === 1 ? "person" : "people"} · add, edit, back up`}
           icon={<IconCircle />}
           tone="cyan"
         />
@@ -210,7 +244,7 @@ export default function ChowkiScreen() {
           to={active && second ? `/milan/${active.id}/${second.id}` : "/milan"}
           title="Guna Milan"
           dev="गुण मिलान"
-          sub="Aṣṭakūṭa on 36 beads, Daśa Porutham"
+          sub="Traditional compatibility score out of 36"
           icon={<IconMilan />}
           tone="rose"
         />
@@ -218,7 +252,7 @@ export default function ChowkiScreen() {
           to={active ? `/hast/${active.id}` : "/leaf/new"}
           title="Hast Rekha"
           dev="हस्त रेखा"
-          sub="Palm lines, read on this device"
+          sub="Palm reading · photo never leaves this device"
           icon={<IconPalm />}
           tone="gold"
         />
@@ -226,16 +260,22 @@ export default function ChowkiScreen() {
           to={active ? `/patri/${active.id}/sky` : "/leaf/new"}
           title="Birth sky"
           dev="आकाश"
-          sub="The real sky at the moment of birth"
+          sub="A planetarium view of the birth moment"
           icon={<IconSky />}
           tone="cyan"
         />
-        {active ? (
-          <Tile to="/leaf/new" title="New leaf" dev="नया पत्ता" sub="Cast another chart" icon={<IconPlus />} tone="violet" />
-        ) : null}
-        <Tile to="/drawer" title="Settings" dev="दराज़" sub="Ayanāṃśa, node, schools, backup" icon={<IconDrawer />} tone="violet" />
+        {active ? <Tile to="/leaf/new" title="New leaf" dev="नया पत्ता" sub="Cast another chart" icon={<IconPlus />} tone="violet" /> : null}
+        <Tile to="/guide" title="Guide" dev="मार्गदर्शिका" sub="What everything means, in plain English" icon={<IconGuide />} tone="cyan" />
+        <Tile to="/drawer" title="Settings" dev="दराज़" sub="Accuracy options, backup and privacy" icon={<IconDrawer />} tone="violet" />
       </nav>
 
+      <p className="home-foot">
+        New to all this?{" "}
+        <Link to="/guide" className="linkish">
+          Read the 2-minute guide
+        </Link>
+        .
+      </p>
       <p className="home-foot">Computed on this device · nothing leaves it · for reflection, not advice</p>
     </Screen>
   );

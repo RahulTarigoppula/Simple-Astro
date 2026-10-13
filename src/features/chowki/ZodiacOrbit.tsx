@@ -1,8 +1,8 @@
-﻿// The live sidereal wheel: the nine grahas where they truly are right now, around the twelve rÄÅ›is
+// The live sidereal wheel: the nine grahas where they truly are right now, around the twelve rÄÅ›is
 // and twenty-seven naká¹£atras, with the Moon's phase at the centre and the sign rising at the place.
 import * as A from "astronomy-engine";
 import { useMemo } from "react";
-import { GRAHA_ABBR_DEV, GRAHA_ENGLISH, NAKSHATRA_NAMES, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
+import { GRAHA_ENGLISH, NAKSHATRA_NAMES, SIGN_NAMES, SIGN_WESTERN } from "../../data/tables/names";
 import { ayanamsa } from "../../engine/ayanamsa";
 import { transitsAt } from "../../engine/gochar";
 import { lagna } from "../../engine/lagna";
@@ -13,10 +13,22 @@ const C = 160;
 const R_SIGN = 138;
 const R_NAK = 118;
 const R_PLANET = 96;
+/** English two-letter planet marks: Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rāhu, Ketu. */
+export const ABBR_EN: Record<GrahaId, string> = {
+  SU: "Su",
+  MO: "Mo",
+  MA: "Ma",
+  ME: "Me",
+  JU: "Ju",
+  VE: "Ve",
+  SA: "Sa",
+  RA: "Ra",
+  KE: "Ke",
+};
 
 /** Ecliptic longitude â†’ screen angle: Meá¹£a 0Â° at the left (east), increasing anticlockwise. */
 function pos(lon: number, r: number): [number, number] {
-  const a = ((180 - lon) * Math.PI) / 180;
+  const a = ((180 + lon) * Math.PI) / 180;
   return [C + r * Math.cos(a), C - r * Math.sin(a)];
 }
 
@@ -93,10 +105,10 @@ export function ZodiacOrbit({ nowMs, preset, lat, lon, natalMoonSign }: Props) {
           className={`orbit__sign${s === ascSign ? " is-rising" : ""}${s === natalMoonSign ? " is-natal" : ""}`}
         />
       ))}
-      {SIGN_DEV.map((d, s) => {
+      {SIGN_WESTERN.map((d, s) => {
         const [x, y] = pos(s * 30 + 15, R_SIGN - 3);
         return (
-          <text key={d} x={x} y={y + 4} className="orbit__signlbl" lang="hi">
+          <text key={d} x={x} y={y + 3.5} className="orbit__signlbl">
             {d}
           </text>
         );
@@ -124,9 +136,10 @@ export function ZodiacOrbit({ nowMs, preset, lat, lon, natalMoonSign }: Props) {
         return (
           <g key={id} className={`orbit__planet orbit__planet--${id}`}>
             <line x1={lx} y1={ly} x2={x} y2={y} className="orbit__spoke" />
-            <circle cx={x} cy={y} r="9" />
-            <text x={x} y={y + 3.6} lang="hi">
-              {GRAHA_ABBR_DEV[id]}
+            <title>{`${GRAHA_ENGLISH[id]} in ${SIGN_WESTERN[sky.tr[id].sign]} (${SIGN_NAMES[sky.tr[id].sign]})`}</title>
+            <circle cx={x} cy={y} r="9.5" />
+            <text x={x} y={y + 3.2}>
+              {ABBR_EN[id]}
             </text>
           </g>
         );

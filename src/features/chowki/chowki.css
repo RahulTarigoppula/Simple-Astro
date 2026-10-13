@@ -115,9 +115,11 @@
   font-size: var(--text-base);
   font-weight: 600;
   color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
+}
+.home-angas .v.mono {
+  font-size: 14px;
+  letter-spacing: -0.02em;
 }
 .home-angas .s {
   font-size: 12px;
@@ -178,11 +180,13 @@
   stroke: rgba(196, 181, 253, 0.6);
 }
 .orbit__sign.is-natal {
-  fill: rgba(103, 232, 249, 0.12);
+  fill: rgba(103, 232, 249, 0.18);
+  stroke: rgba(103, 232, 249, 0.55);
 }
 .orbit__signlbl {
   fill: var(--ink-muted);
-  font-size: 10px;
+  font-size: 8.5px;
+  letter-spacing: 0.02em;
   text-anchor: middle;
   font-family: var(--font-body);
 }
@@ -220,7 +224,7 @@
 }
 .orbit__planet text {
   fill: var(--ink);
-  font-size: 9.5px;
+  font-size: 8.5px;
   font-weight: 700;
   text-anchor: middle;
   font-family: var(--font-body);
@@ -243,7 +247,7 @@
   filter: drop-shadow(0 0 14px rgba(224, 231, 255, 0.7));
 }
 .orbit__moonshade {
-  fill: var(--space-1);
+  fill: var(--void-1);
 }
 
 .chowki__strength {
@@ -316,6 +320,7 @@
   letter-spacing: -0.01em;
 }
 .tile__dev {
+  display: block;
   font-family: var(--font-body);
   font-weight: 400;
   font-size: 12.5px;
@@ -376,4 +381,48 @@
   .orbit__spin {
     animation: none;
   }
+}
+
+/* plain-English additions */
+.home-angas .k {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.home-angas .g {
+  font-size: 11.5px;
+  color: var(--accent-text);
+  margin-top: -2px;
+}
+.home-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  font-size: 11.5px;
+  color: var(--ink-muted);
+}
+.home-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.lg {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+.lg--asc {
+  background: rgba(139, 92, 246, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(196, 181, 253, 0.8);
+}
+.lg--natal {
+  background: rgba(103, 232, 249, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(103, 232, 249, 0.7);
+}
+.lg--planet {
+  border-radius: 50%;
+  background: var(--surface-solid);
+  box-shadow: 0 0 0 1px var(--accent-text);
 }
