@@ -455,6 +455,14 @@ export default function ForecastScreen() {
             </section>
           ) : null}
 
+          <aside className="fc-karma">
+            <span className="fc-karma__k">कर्म · Karma, not fate</span>
+            <p>
+              A forecast shows what <em>could</em> happen — like the weather. What does happen is shaped by your karma: your own choices and
+              actions. Use this to reflect and plan, never to fear.
+            </p>
+          </aside>
+
           <p className="fc-foot">
             How this is read: each planet's house is counted from the natal Moon sign and checked against the classical table of favourable
             houses (Phaladīpikā ch. 26); days add the Moon's Tārā-bala and Candra-bala. It is a traditional reading for reflection — not a

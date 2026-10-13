@@ -54,7 +54,7 @@ const META: Record<PoruthamId, { name: string; nameDev: string; rule: string; we
   dina: {
     name: "Dina",
     nameDev: "दिन",
-    rule: "Count the nakṣatras from the second leaf's to the first leaf's, inclusively, and divide by nine. A remainder of 2, 4, 6, 8 or 0 ties the knot; 1, 3, 5 or 7 leaves it open.",
+    rule: "Count the nakṣatras from the second person's to the first person's, inclusively, and divide by nine. A remainder of 2, 4, 6, 8 or 0 ties the knot; 1, 3, 5 or 7 leaves it open.",
     weighs: "the day-to-day accord of the two lives",
   },
   gana: {
@@ -66,14 +66,14 @@ const META: Record<PoruthamId, { name: string; nameDev: string; rule: string; we
   mahendra: {
     name: "Mahendra",
     nameDev: "माहेन्द्र",
-    rule: "Count from the second leaf's nakṣatra to the first leaf's. The 4th, 7th, 10th, 13th, 16th, 19th, 22nd and 25th tie the knot.",
+    rule: "Count from the second person's nakṣatra to the first person's. The 4th, 7th, 10th, 13th, 16th, 19th, 22nd and 25th tie the knot.",
     weighs: "the growth and continuity of the household",
   },
   "stri-dirgha": {
     name: "Strī-dīrgha",
     nameDev: "स्त्रीदीर्घ",
-    rule: "Count from the second leaf's nakṣatra to the first leaf's. Beyond the 13th the knot is tied; at the 13th or nearer it stays open.",
-    weighs: "the second leaf's ease and standing through the long years",
+    rule: "Count from the second person's nakṣatra to the first person's. Beyond the 13th the knot is tied; at the 13th or nearer it stays open.",
+    weighs: "the second person's ease and standing through the long years",
   },
   yoni: {
     name: "Yoni",
@@ -84,7 +84,7 @@ const META: Record<PoruthamId, { name: string; nameDev: string; rule: string; we
   rashi: {
     name: "Rāśi",
     nameDev: "राशि",
-    rule: "Count the signs from the second leaf's Moon sign to the first leaf's. The same sign, the 7th, and the 9th to the 12th tie the knot; the 2nd to the 6th and the 8th leave it open. School followed: the 6/8 pair is read as open whichever way it falls.",
+    rule: "Count the signs from the second person's Moon sign to the first person's. The same sign, the 7th, and the 9th to the 12th tie the knot; the 2nd to the 6th and the 8th leave it open. School followed: the 6/8 pair is read as open whichever way it falls.",
     weighs: "the harmony of the two Moon signs",
   },
   rashyadhipati: {
@@ -120,7 +120,7 @@ export const DINA_GOOD_REMAINDERS: readonly number[] = [2, 4, 6, 8, 0];
 export const MAHENDRA_COUNTS: readonly number[] = [4, 7, 10, 13, 16, 19, 22, 25];
 /** Strī-dīrgha: the count must exceed this. */
 export const STRI_DIRGHA_BEYOND = 13;
-/** Rāśi: sign counts (second leaf's sign → first leaf's) that tie the knot. */
+/** Rāśi: sign counts (second person's sign → first person's) that tie the knot. */
 export const RASHI_GOOD_COUNTS: readonly number[] = [1, 7, 9, 10, 11, 12];
 
 /** Vaśya: the signs each sign holds under its sway (0 = Meṣa). */
