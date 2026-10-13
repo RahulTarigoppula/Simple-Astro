@@ -409,3 +409,57 @@
     animation: none;
   }
 }
+
+/* Meet the grahas strip */
+.meet {
+  margin: var(--space-4) var(--paper-margin) 0;
+}
+.meet__k {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--accent-text);
+}
+.meet ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 6px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 76px;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.meet a {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  padding: 10px 4px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-edge);
+  background: rgba(255, 255, 255, 0.03);
+  text-decoration: none;
+  text-align: center;
+}
+.meet a:hover {
+  border-color: var(--glass-edge-strong);
+}
+.meet__t {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.meet__s {
+  font-size: 10.5px;
+  color: var(--ink-muted);
+}
+
+/* In narrow columns (the chart page), one profile card per row reads better than two squeezed ones. */
+.cosmic-profile {
+  container-type: inline-size;
+}
+@container (max-width: 300px) {
+  .cp-grid {
+    grid-template-columns: 1fr;
+  }
+}

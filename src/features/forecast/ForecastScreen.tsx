@@ -86,6 +86,11 @@ function keepEvent(p: Period, e: SkyEvent): boolean {
   return true;
 }
 
+/** 0 = Monday … 6 = Sunday, in the zone. */
+function monIndex(ms: number, zone: string): number {
+  return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(fmt(ms, zone, { weekday: "short" }));
+}
+
 function Steps({ f, zone }: { f: Forecast; zone: string }) {
   if (f.period === "day") return null;
   const best = [...f.steps].sort((a, b) => b.score - a.score)[0];
@@ -102,6 +107,13 @@ function Steps({ f, zone }: { f: Forecast; zone: string }) {
           </span>
         </h2>
       </header>
+      {cal ? (
+        <div className="fc-wd" aria-hidden="true">
+          {["M", "T", "W", "T", "F", "S", "S"].map((d, k) => (
+            <span key={`wd${k}`}>{d}</span>
+          ))}
+        </div>
+      ) : null}
       <ol className={`fc-bars${cal ? " fc-bars--cal" : ""}`}>
         {f.steps.map((s) => {
           const tone = s.score >= 0.35 ? "bright" : s.score >= 0 ? "steady" : s.score >= -0.35 ? "mixed" : "testing";
@@ -113,7 +125,13 @@ function Steps({ f, zone }: { f: Forecast; zone: string }) {
                 : fmt(s.ms + DAY, zone, { month: "short" });
           const title = `${f.period === "week" || cal ? fmt(s.ms + DAY / 2, zone, { weekday: "long", day: "numeric", month: "short" }) : fmt(s.ms + DAY, zone, { month: "long" })}: ${TONE_WORD[tone]}${s.tara ? ` · Moon in your ${ord(s.moonHouse)} · ${s.tara} tārā` : ""}`;
           return (
-            <li key={s.ms} className={`fc-bar fc-bar--${tone}${s === best ? " is-best" : ""}`} title={title} aria-label={title}>
+            <li
+              key={s.ms}
+              className={`fc-bar fc-bar--${tone}${s === best ? " is-best" : ""}`}
+              title={title}
+              aria-label={title}
+              style={cal && s === f.steps[0] ? { gridColumnStart: monIndex(s.ms + DAY / 2, zone) + 1 } : undefined}
+            >
               <span className="fc-bar__fill" style={{ height: `${Math.round(18 + ((s.score + 1) / 2) * 82)}%` }} />
               <span className="fc-bar__k">{label}</span>
             </li>

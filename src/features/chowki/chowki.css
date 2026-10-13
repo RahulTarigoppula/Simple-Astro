@@ -510,3 +510,30 @@
   color: var(--ink);
   border-color: var(--glass-edge-strong);
 }
+
+/* a slow mandala of petals behind the live wheel */
+.home-orbit {
+  position: relative;
+}
+.home-orbit::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(100%, 470px);
+  aspect-ratio: 1;
+  translate: -50% -5%;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    repeating-conic-gradient(from 0deg, rgba(196, 181, 253, 0.1) 0deg 1.5deg, transparent 1.5deg 10deg),
+    radial-gradient(circle, rgba(139, 92, 246, 0.12), transparent 65%);
+  -webkit-mask: radial-gradient(circle, transparent 52%, black 53%, black 66%, transparent 67%);
+  mask: radial-gradient(circle, transparent 52%, black 53%, black 66%, transparent 67%);
+  animation: orbit-spin 300s linear infinite reverse;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-orbit::before {
+    animation: none;
+  }
+}

@@ -901,3 +901,23 @@ body,
   --el-air: #38bdf8;
   --el-water: #6366f1;
 }
+
+.explain__story {
+  display: block;
+  margin-top: 6px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(245, 196, 107, 0.35);
+  background: rgba(245, 196, 107, 0.08);
+  color: var(--warning-text);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* People cards are solid so the swipe-tray behind them never shows through */
+.leaf {
+  background-color: var(--surface-solid);
+  background-image:
+    linear-gradient(120deg, rgba(139, 92, 246, 0.16), rgba(34, 211, 238, 0.05)),
+    repeating-linear-gradient(180deg, transparent 0 21px, var(--border) 21px 22px);
+}

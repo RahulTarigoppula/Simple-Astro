@@ -145,7 +145,8 @@ export default function StoryScreen() {
           }
         }}
       >
-        <div className="story-track" ref={deck}>
+        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a horizontally scrolling region must be reachable by keyboard (WCAG 2.1.1) */}
+        <div className="story-track" ref={deck} role="group" aria-label="Cards — use the arrow keys" tabIndex={0}>
           {flat.map((f, i) => {
             const c = f.card;
             return (

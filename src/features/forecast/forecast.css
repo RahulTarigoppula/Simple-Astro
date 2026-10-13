@@ -410,3 +410,15 @@
     animation: none;
   }
 }
+
+.fc-wd {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
