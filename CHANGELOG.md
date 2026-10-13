@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.2 — 2026-10-14
+
+- The intro, re-cut as one continuous story: the universe narrows to the pale blue dot, life and the people who looked up, then Rahul's own words — one thought per frame, large, quoted and signed. No act labels, no extra trivia; scenes carry over between frames instead of restarting, and the dawn breaks as he says "then I understood".
+
 ## 0.6.1 — 2026-10-14
 
 ### The maker's story, in his own words

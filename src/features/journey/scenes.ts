@@ -3,7 +3,19 @@
 // deterministic (seeded PRNG) — Math.random is never used.
 import { mulberry32 } from "../../engine/math";
 
-export type SceneId = "universe" | "milkyway" | "solar" | "earth" | "life" | "rare" | "us" | "child" | "question" | "vyom";
+export type SceneId =
+  | "universe"
+  | "milkyway"
+  | "solar"
+  | "earth"
+  | "life"
+  | "rare"
+  | "us"
+  | "child"
+  | "study"
+  | "question"
+  | "dawn"
+  | "vyom";
 
 export interface Ctx {
   g: CanvasRenderingContext2D;
@@ -545,6 +557,58 @@ function child(c: Ctx) {
   g.globalAlpha = 1;
 }
 
+// ── study: lines of text rising like pages, and the slow wave of a voice reading ──
+const LINES = (() => {
+  const r = mulberry32(83);
+  return Array.from({ length: 70 }, () => ({ x: r(), w: 0.08 + r() * 0.22, y: r(), s: 0.4 + r() * 0.8 }));
+})();
+
+function study(c: Ctx) {
+  const { g, w, h, t } = c;
+  backdrop(c, 0.6);
+  glow(g, focusX(w, h), focusY(w, h), Math.max(w, h) * 0.5, "rgba(99, 102, 241, 0.18)");
+  for (const l of LINES) {
+    const y = (((l.y - t * 0.02 * l.s) % 1) + 1) % 1;
+    g.globalAlpha = Math.sin(y * Math.PI) * 0.35;
+    g.fillStyle = "#c7d2fe";
+    g.fillRect(l.x * w, y * h * 0.75, l.w * w, 2);
+  }
+  g.globalAlpha = 1;
+  // the audiobook: a calm wave across the frame
+  const cy = focusY(w, h);
+  g.strokeStyle = "rgba(245, 196, 107, 0.75)";
+  g.lineWidth = 2;
+  g.beginPath();
+  for (let x = 0; x <= w; x += 4) {
+    const env = Math.sin((x / w) * Math.PI);
+    const y = cy + Math.sin(x * 0.03 + t * 2.2) * 18 * env * (0.6 + 0.4 * Math.sin(t * 0.9 + x * 0.004));
+    if (x === 0) g.moveTo(x, y);
+    else g.lineTo(x, y);
+  }
+  g.stroke();
+}
+
+// ── dawn: understanding — the horizon slowly lightening ────────────────
+function dawn(c: Ctx) {
+  const { g, w, h, t } = c;
+  const k = Math.min(1, t / 8);
+  const sky = g.createLinearGradient(0, 0, 0, h);
+  sky.addColorStop(0, "#03040b");
+  sky.addColorStop(0.55, `rgba(49, 46, 129, ${0.3 + k * 0.5})`);
+  sky.addColorStop(1, `rgba(245, 158, 11, ${0.15 + k * 0.45})`);
+  g.fillStyle = "#03040b";
+  g.fillRect(0, 0, w, h);
+  g.fillStyle = sky;
+  g.fillRect(0, 0, w, h);
+  backdrop(c, 1 - k * 0.7, 0, false);
+  const horizon = h > w * 1.2 ? h * 0.52 : h * 0.68;
+  glow(g, focusX(w, h), horizon, Math.max(w, h) * (0.25 + k * 0.35), `rgba(253, 230, 138, ${0.25 + k * 0.4})`);
+  const land = g.createLinearGradient(0, horizon - 40, 0, horizon + 80);
+  land.addColorStop(0, "rgba(3, 4, 11, 0)");
+  land.addColorStop(1, "#03040b");
+  g.fillStyle = land;
+  g.fillRect(0, horizon - 40, w, h - horizon + 40);
+}
 // ── 9. the question: one bright point in the dark, ripples of doubt ──────
 function question(c: Ctx) {
   const { g, w, h, t } = c;
@@ -613,4 +677,17 @@ function vyom(c: Ctx) {
   g.fill();
 }
 
-export const SCENES: Record<SceneId, (c: Ctx) => void> = { universe, milkyway, solar, earth, life, rare, us, child, question, vyom };
+export const SCENES: Record<SceneId, (c: Ctx) => void> = {
+  universe,
+  milkyway,
+  solar,
+  earth,
+  life,
+  rare,
+  us,
+  child,
+  study,
+  question,
+  dawn,
+  vyom,
+};

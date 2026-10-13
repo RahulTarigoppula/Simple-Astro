@@ -14,6 +14,7 @@ export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () =
   const [at, setAt] = useState(0);
   const atRef = useRef(0);
   const since = useRef(performance.now());
+  const sceneSince = useRef(performance.now());
   const prev = useRef<{ i: number; t: number } | null>(null);
   const reduce = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   const [paused, setPaused] = useState(false);
@@ -28,9 +29,17 @@ export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () =
       }
       const k = Math.max(0, i);
       if (k === atRef.current) return;
-      prev.current = { i: atRef.current, t: (performance.now() - since.current) / 1000 };
+      const from = BEATS[atRef.current];
+      const to = BEATS[k];
+      const now = performance.now();
+      if (from && to && from.scene === to.scene) {
+        prev.current = null;
+      } else {
+        prev.current = { i: atRef.current, t: (now - sceneSince.current) / 1000 };
+        sceneSince.current = now;
+      }
       atRef.current = k;
-      since.current = performance.now();
+      since.current = now;
       setAt(k);
     },
     [onDone],
@@ -60,18 +69,21 @@ export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () =
         if (!pausedAt) pausedAt = now;
       } else if (pausedAt) {
         since.current += now - pausedAt;
+        sceneSince.current += now - pausedAt;
         pausedAt = 0;
       }
       const t = ((pausedAt || now) - since.current) / 1000;
       const beat = BEATS[atRef.current];
-      const draw = beat ? SCENES[beat.id] : undefined;
+      const draw = beat ? SCENES[beat.scene] : undefined;
+      // A scene that carries over from the last frame keeps its own clock, so the picture never restarts.
+      const st = ((pausedAt || now) - sceneSince.current) / 1000;
       if (draw) {
         g.globalAlpha = 1;
-        draw({ g, w, h, t: reduce ? 4 : t });
+        draw({ g, w, h, t: reduce ? 4 : st });
         const p = prev.current;
         if (p && t < FADE && !reduce) {
           const old = BEATS[p.i];
-          const od = old ? SCENES[old.id] : undefined;
+          const od = old ? SCENES[old.scene] : undefined;
           if (od) {
             g.save();
             g.globalAlpha = 1 - t / FADE;
@@ -150,33 +162,23 @@ export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () =
       {beat ? (
         <section
           key={beat.id}
-          className={`journey__text journey__text--${beat.id}${beat.voice ? " journey__text--maker" : ""}`}
+          className={`journey__text journey__text--${beat.scene}${beat.quote ? " journey__text--maker" : ""}`}
           aria-live="polite"
         >
-          <p className="journey__kicker">{beat.kicker}</p>
-          <h2 className="journey__title">{beat.title}</h2>
-          {beat.voice === "maker" ? (
+          {beat.quote ? (
             <blockquote className="journey__quote">
-              {beat.lines.map((l, i) => (
-                <p key={l.slice(0, 24)} className="journey__line" style={{ animationDelay: `${1.2 + i * 2.4}s` }}>
-                  {l}
-                </p>
-              ))}
-              {last ? (
-                <footer className="journey__sig" style={{ animationDelay: `${1.2 + beat.lines.length * 2.4}s` }}>
-                  — Rahul, who made Vyom
-                </footer>
-              ) : null}
+              {beat.id === BEATS.find((b) => b.quote)?.id ? <p className="journey__kicker">In Rahul's words</p> : null}
+              <p className="journey__say">{beat.quote}</p>
+              {beat.sign ? <footer className="journey__sig">— Rahul, who made Vyom</footer> : null}
             </blockquote>
           ) : (
-            beat.lines.map((l, i) => (
-              <p key={l.slice(0, 24)} className="journey__line" style={{ animationDelay: `${1.2 + i * 2.4}s` }}>
-                {l}
-              </p>
-            ))
-          )}
+            <>
+              <h2 className="journey__title">{beat.title}</h2>
+              {beat.line ? <p className="journey__line">{beat.line}</p> : null}
+            </>
+          )}{" "}
           {last ? (
-            <div className="journey__cta" style={{ animationDelay: `${1.6 + beat.lines.length * 2.4}s` }}>
+            <div className="journey__cta">
               <button type="button" className="stamp" onClick={onDone}>
                 <span>Enter Vyom</span>
               </button>

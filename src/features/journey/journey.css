@@ -269,3 +269,38 @@
   color: var(--accent-2);
   animation: jr-rise 900ms var(--ease-out) both;
 }
+
+/* Director's cut: title cards and quotes, with an unhurried rhythm */
+.journey__title {
+  animation-delay: 0.3s;
+}
+.journey__line {
+  animation-delay: 1.5s;
+}
+.journey__say {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 5vw, 1.85rem);
+  font-weight: 500;
+  line-height: 1.42;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  text-wrap: pretty;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.7);
+  animation: jr-rise 1400ms var(--ease-out) 0.35s both;
+}
+.journey__quote .journey__kicker {
+  margin-bottom: 10px;
+  animation-delay: 0s;
+}
+.journey__sig {
+  margin-top: 14px;
+  animation-delay: 2.6s;
+}
+.journey__cta {
+  animation-delay: 3.2s;
+}
+.journey__quote {
+  border-left-width: 2px;
+  padding-left: 18px;
+}
