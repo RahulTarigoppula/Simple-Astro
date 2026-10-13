@@ -16,6 +16,7 @@ import type { GrahaId } from "../../engine/types";
 import "../cosmic/cosmic.css";
 import { AreasCard, ContactsCard, DayGuideCard, DayNotes, StrengthCard } from "./PersonalSections";
 import "./forecast.css";
+import { countEvent } from "../../platform/stats";
 
 const PERIODS: Array<{ id: Period; label: string }> = [
   { id: "day", label: "Day" },
@@ -249,6 +250,7 @@ export default function ForecastScreen() {
             aria-selected={period === p.id}
             onClick={() => {
               setPeriod(p.id);
+              countEvent(`forecast-${p.id}`);
               setAt(null);
             }}
           >

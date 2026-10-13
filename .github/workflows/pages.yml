@@ -32,6 +32,8 @@ jobs:
         run: npm run build
         env:
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
+          # Anonymous counts: set a repository variable VITE_GOATCOUNTER to your GoatCounter code. Empty = off.
+          VITE_GOATCOUNTER: ${{ vars.VITE_GOATCOUNTER }}
       - name: Bundle budget and forbidden modules
         run: node scripts/check-bundle.mjs
       - name: SPA fallback for deep links (harmless with hash routing)

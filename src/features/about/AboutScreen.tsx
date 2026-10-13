@@ -147,7 +147,7 @@ export default function AboutScreen() {
 
         <section className="about-sec" aria-labelledby="ab-src">
           <h2 id="ab-src">Where the data comes from</h2>
-          <p className="about-p">Every source is open and credited. Nothing is scraped, nothing is guessed.</p>
+          <p className="about-p">Every source below is open and credited, and the app works only from them.</p>
           <ul className="about-sources">
             {SOURCES.map((s) => (
               <li key={s.name}>
@@ -192,13 +192,14 @@ export default function AboutScreen() {
         <section className="about-sec about-private" aria-labelledby="ab-priv">
           <h2 id="ab-priv">Your privacy</h2>
           <p className="about-p">
-            Everything is calculated on your device. Birth details and palm photos stay there. No accounts, no analytics, no tracking.
-            Backups are encrypted with a passphrase only you know.
+            Everything is calculated on your device. Birth details and palm photos stay there. There are no accounts. The only thing Vyom
+            counts is anonymous: which screens are opened and which buttons are tapped, through GoatCounter, with no cookies, no names, no
+            birth details and no ids. You can switch even that off in Settings. Backups are encrypted with a passphrase only you know.
           </p>
         </section>
 
         <p className="about-foot">
-          Astronomy is fact. Meaning is tradition. Karma is yours. <Link to="/guide">Read the plain-English guide</Link>
+          Questions about any of this? <Link to="/guide">Read the plain-English guide</Link>
         </p>
       </article>
     </Screen>

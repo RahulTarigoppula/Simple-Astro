@@ -9,6 +9,7 @@ import { StoryRings } from "./StoryRings";
 import { chapterStart, rootsSlides } from "./storySlides";
 import "./story.css";
 import "./roots.css";
+import { countEvent } from "../../platform/stats";
 
 export default function StoryScreen() {
   const slides = useMemo(() => rootsSlides(), []);
@@ -24,7 +25,14 @@ export default function StoryScreen() {
           Four thousand years of people looking up: gods and ṛṣis, Greeks and astronomers, palm-readers and number-mystics.
         </p>
         <div className="story-hero__actions">
-          <button type="button" className="stamp story-play" onClick={() => setPlay(0)}>
+          <button
+            type="button"
+            className="stamp story-play"
+            onClick={() => {
+              countEvent("roots-start");
+              setPlay(0);
+            }}
+          >
             <span>▶ Start the story</span>
           </button>
           <span className="story-hero__meta">

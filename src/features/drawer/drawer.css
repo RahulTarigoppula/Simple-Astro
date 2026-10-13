@@ -281,3 +281,17 @@
   font-weight: 400;
   color: var(--ink-muted);
 }
+
+.settings-list {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  color: var(--ink);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+.settings-wipe {
+  margin-top: 6px;
+  background: rgba(251, 113, 133, 0.12) !important;
+  border: 1px solid rgba(251, 113, 133, 0.5) !important;
+  color: var(--danger) !important;
+}

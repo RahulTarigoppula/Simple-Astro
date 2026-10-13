@@ -287,7 +287,7 @@ export const STORY: StoryChapter[] = [
         art: "sky",
         body: [
           "From farmers watching the dawn stars, to the ṛṣis naming the Moon's mansions, to Āryabhaṭa saying the Earth spins, every chapter of this story is someone being curious about the sky and refusing to stop at fear.",
-          "That's all Vyom asks of you, too. Look at your chart, read the myths, check the forecast. Then decide for yourself what you believe. The astronomy will always be true. The meaning is yours.",
+          "That's all Vyom asks of you, too. Look at your chart, read the myths, check the forecast. Then decide for yourself what you believe.",
           "Thank you for reading. Go outside tonight and find the Moon. Vyom will tell you which of the 27 nakṣatras it is passing through.",
         ],
       },

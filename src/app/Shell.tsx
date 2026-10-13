@@ -6,6 +6,7 @@ import { Journey, markJourneySeen, shouldPlayJourney } from "../features/journey
 import { setHapticsEnabled } from "../platform/haptics";
 import { isNative } from "../platform/native";
 import { setCalmSound, setSoundEnabled } from "../platform/sound";
+import { countView } from "../platform/stats";
 import { useUi } from "../state/ui";
 import { useSettings } from "./hooks";
 import { Ledge } from "./Ledge";
@@ -27,6 +28,11 @@ export function Shell() {
     setHapticsEnabled(settings.haptics);
     document.documentElement.dataset.calm = settings.calmDesk ? "true" : "false";
   }, [settings.sound, settings.haptics, settings.calmDesk]);
+
+  // One anonymous count per screen opened (ids stripped; see platform/stats.ts).
+  useEffect(() => {
+    countView(loc.pathname);
+  }, [loc.pathname]);
 
   // Predictive back on Android returns home rather than exiting.
   useEffect(() => {

@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { BEATS } from "./journeyText";
 import { SCENES } from "./scenes";
 import "./journey.css";
+import { countEvent } from "../../platform/stats";
 
 const FADE = 1.1; // seconds of crossfade between scenes
 
@@ -154,7 +155,14 @@ export function Journey({ onDone, onStory }: { onDone: () => void; onStory: () =
           <span className="journey__mark" aria-hidden="true" />
           Vyom <span lang="hi">व्योम</span>
         </span>
-        <button type="button" className="journey__skip" onClick={onDone}>
+        <button
+          type="button"
+          className="journey__skip"
+          onClick={() => {
+            countEvent("intro-skipped");
+            onDone();
+          }}
+        >
           Skip ›
         </button>
       </header>

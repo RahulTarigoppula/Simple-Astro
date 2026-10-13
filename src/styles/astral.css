@@ -974,3 +974,10 @@ body,
 .fc-tone span::before {
   content: none;
 }
+
+/* Today: the dial and Moon sit on open sky, not in a box */
+.today__cloth {
+  border: 0;
+  box-shadow: none;
+  background: radial-gradient(420px 180px at 50% 50%, rgba(139, 92, 246, 0.16), transparent 70%);
+}

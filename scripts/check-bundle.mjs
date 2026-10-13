@@ -26,7 +26,9 @@ const FORBIDDEN = [
   /(?:require\(|import\(|from)\s*["'][^"']*swisseph/,
   /\bswe_calc(?:_ut)?\(/,
   /require\(["']fs["']\)/,
-  /gtag\(|google-analytics\.com|@sentry\/|posthog|plausible\.io|sendBeacon\(/,
+  // Third-party trackers stay banned. The one allowed counter is GoatCounter (anonymous, no cookies),
+  // sent with fetch from src/platform/stats.ts; sendBeacon stays banned so nothing else slips in.
+  /gtag\(|google-analytics\.com|@sentry\/|posthog|plausible\.io|mixpanel|segment\.io|hotjar|sendBeacon\(/,
 ];
 for (const f of files.filter((x) => x.endsWith(".js") && !x.includes(`${join(DIST, "mediapipe")}`))) {
   const src = readFileSync(f, "utf8");

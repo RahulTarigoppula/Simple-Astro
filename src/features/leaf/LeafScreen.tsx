@@ -23,6 +23,7 @@ import { toast } from "../../state/ui";
 import { ParapetSky } from "../chowki/ParapetSky";
 import { BrassDrum } from "./BrassDrum";
 import "./leaf.css";
+import { countEvent } from "../../platform/stats";
 
 const BENGALURU: Place = { name: "Bengaluru", admin1: "Karnataka", country: "IN", lat: 12.9716, lon: 77.5946, source: "manual" };
 const BOMBAY_TIME = 291; // +04:51, not in the IANA database
@@ -201,6 +202,7 @@ export default function LeafScreen() {
       play("thunk");
       haptics.impact("medium");
       toast(`Saved ${name}. Their birth chart is ready.`);
+      countEvent(editing ? "person-edited" : "person-added");
       navigate(`/patri/${profile.id}`);
     } catch (e) {
       toast(`Could not save: ${e instanceof Error ? e.message : String(e)}`, "danger");

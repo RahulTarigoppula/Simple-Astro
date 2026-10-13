@@ -22,6 +22,7 @@ import { reducedMotion } from "../../platform/native";
 import { play } from "../../platform/sound";
 import { toast } from "../../state/ui";
 import "./hast.css";
+import { countEvent } from "../../platform/stats";
 
 const S = 512; // canonical print frame
 const Z = 2.4;
@@ -241,11 +242,11 @@ export default function HastScreen() {
   );
 
   return (
-    <Screen scroll label={`Hast Rekha: ${profile?.name ?? ""}`}>
+    <Screen scroll className="hast-screen" label={`Palm reading: ${profile?.name ?? ""}`}>
       <div className="paper sheet-col">
         <TurmericBand
           dev="हस्त रेखा"
-          title={`Palm reading · ${hand} hand`}
+          title="Palm reading"
           meta={capture ? (reading ? `${lines.length} lines` : "hand found") : "no photo yet"}
           level={1}
           explain="hast-rekha"
@@ -344,7 +345,12 @@ export default function HastScreen() {
                   </svg>
                   <b>Lay your hand here</b>
                   <span style={{ fontSize: "var(--text-sm)" }}>Fill the frame · palm flat · even light</span>
-                  <Link className="stamp" to={`/hast/${id ?? ""}/capture?hand=${hand}`} style={{ marginTop: 8, textDecoration: "none" }}>
+                  <Link
+                    className="stamp"
+                    to={`/hast/${id ?? ""}/capture?hand=${hand}`}
+                    style={{ marginTop: 8, textDecoration: "none" }}
+                    onClick={() => countEvent("palm-camera")}
+                  >
                     <span>◉ &nbsp;Open the camera</span>
                   </Link>
                 </div>
@@ -488,9 +494,8 @@ export default function HastScreen() {
               <p className="p">This print has landmarks but no reading yet. Retake it to read the lines.</p>
             ) : (
               <p className="p p--muted">
-                Take one photo and Vyom traces your heart, head and life lines and explains what tradition says about each, for fun and
-                reflection. Your palm is photographed and read on this device. The photo is kept only on this device and can be deleted with
-                one hold.
+                One photo of your {hand} palm. Vyom traces the heart, head and life lines and tells you what tradition says about each. The
+                photo stays on this device, and one hold deletes it.
               </p>
             )}
 

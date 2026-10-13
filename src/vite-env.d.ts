@@ -3,3 +3,7 @@
 
 declare const __APP_VERSION__: string;
 declare const __ENGINE_BUILD__: string;
+
+interface ImportMetaEnv {
+  readonly VITE_GOATCOUNTER?: string;
+}

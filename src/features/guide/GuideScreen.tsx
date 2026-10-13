@@ -128,8 +128,9 @@ export default function GuideScreen() {
       <section className="guide-card" aria-labelledby="g-private">
         <h2 id="g-private">Your privacy</h2>
         <p>
-          Everything is calculated on this device. Birth details and palm photos are stored only here, never uploaded. The only time Vyom
-          uses the internet is the optional place search when you type a town name. You can back up or delete everything from Settings.
+          Everything is calculated on this device. Birth details and palm photos are stored only here, never uploaded. Vyom uses the
+          internet for only two things: the optional place search (just the town name), and anonymous counts of which screens are opened (no
+          names, no birth details, no cookies, and you can turn it off). You can back up or delete everything from Settings.
         </p>
       </section>
 

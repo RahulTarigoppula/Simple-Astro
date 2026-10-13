@@ -374,3 +374,18 @@ export async function requestPersistentStorage(): Promise<boolean> {
     return false;
   }
 }
+
+/** Erase everything Vyom keeps on this device: every table, the in-memory chart cache, and the few
+ *  browser-storage flags (theme, intro seen). Nothing exists anywhere else to erase. */
+export async function wipeEverything(): Promise<void> {
+  await db.transaction("rw", db.tables, async () => {
+    await Promise.all(db.tables.map((t) => t.clear()));
+  });
+  clearPatriCache();
+  try {
+    for (const k of Object.keys(localStorage)) if (/^(vyom|chowki)/.test(k)) localStorage.removeItem(k);
+    sessionStorage.clear();
+  } catch {
+    // storage may be unavailable; the database is already empty
+  }
+}

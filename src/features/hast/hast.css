@@ -114,3 +114,22 @@
 .printframe:not(.is-empty) {
   touch-action: none;
 }
+
+/* Palm reading: open layout like the newer pages, no boxed sheet */
+.hast-screen .paper.sheet-col {
+  max-width: 680px;
+  margin: 0 auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.hast-screen .band:first-child h1 {
+  font-size: clamp(1.6rem, 6.5vw, 2.2rem);
+}
+.hast-screen .capture,
+.hast-screen [class*="loupe"] {
+  border-radius: var(--radius-xl);
+}

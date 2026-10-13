@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.9.0 (2026-10-14)
+
+### Privacy
+- Settings: **What Vyom keeps, and where** (only in this browser; a plain list of what is stored) and **Hold to delete everything**, which empties every table and Vyom's browser flags.
+- **Anonymous usage counts** through GoatCounter: screens opened (ids stripped) and a few named taps (intro skipped, forecast tabs, Surprise me, story played, person added, palm camera). No cookies, no names, no birth details, no ids, no referrer. Off when no counter code is set, under Do Not Track / Global Privacy Control, on localhost, in automation, or when switched off in Settings. The bundle guard still bans every other tracker.
+- About and the Guide now say exactly this.
+
+### Polish
+- Palm reading: open layout, a plain title, a one-line intro.
+- Today: the dial sits on open sky.
+- Removed rule-of-three slogans from About and the Roots epilogue.
+
 ## 0.8.0 (2026-10-14)
 
 - **About Vyom** (#/about): how Vyom was made. Rahul's note on the 18 weeks it took; Vyom in numbers; every data source with its licence, what we used it for and how we cleaned it; every algorithm in plain English; how each part was checked (Swiss Ephemeris, Drik Panchang, PyJHora, the classical texts, 695 tests, a privacy test); privacy. Linked from Home and Settings.

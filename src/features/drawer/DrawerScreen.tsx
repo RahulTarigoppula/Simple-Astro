@@ -3,12 +3,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useActiveProfile, useSettings } from "../../app/hooks";
 import { InfoDot } from "../../components/ui/Explain";
+import { HoldStamp } from "../../components/ui/HoldStamp";
 import { Sheet } from "../../components/ui/Sheet";
 import { TurmericBand } from "../../components/ui/TurmericBand";
 import attribution from "../../data/attribution.json";
 import { envelopeFileName, exportEnvelope, ImportError, importEnvelope } from "../../data/crypto";
 import { db } from "../../data/db";
-import { clearPatriCache, type StorageEstimateInfo, saveSettings, storageEstimate } from "../../data/repo";
+import { clearPatriCache, type StorageEstimateInfo, saveSettings, storageEstimate, wipeEverything } from "../../data/repo";
 import { AYANAMSA_PRESETS, ayanamsa } from "../../engine/ayanamsa";
 import { formatDms } from "../../engine/math";
 import { jdTtFromUtcMs } from "../../engine/time";
@@ -16,6 +17,7 @@ import type { AyanamsaPreset, EnginePreset, Settings } from "../../engine/types"
 import { saveFile } from "../../platform/files";
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
+import { setStatsOn, statsOn } from "../../platform/stats";
 import { toast } from "../../state/ui";
 import { journeyAtStart, setJourneyAtStart } from "../journey/Journey";
 import { zoneClock } from "../today/zone";
@@ -114,6 +116,22 @@ function Radio<T extends string | number>({
 }
 
 /** The three ayanāṃśa presets as ticks on a magnified brass arc, labelled at the chart's date. */
+/** Anonymous counts (screens opened and named clicks, never personal data). */
+function StatsToggle() {
+  const [on, setOn] = useState(statsOn);
+  return (
+    <Toggle
+      label="Anonymous usage counts"
+      help="Counts which screens are opened and which buttons are tapped, so Rahul can see how Vyom is used. Never your name, birth details, places or photos. No cookies. Off automatically if your browser asks not to be tracked."
+      on={on}
+      onChange={(v) => {
+        setStatsOn(v);
+        setOn(v);
+      }}
+    />
+  );
+}
+
 /** Whether the opening journey plays when Vyom opens (stored on this device only). */
 function JourneyToggle() {
   const [on, setOn] = useState(journeyAtStart);
@@ -367,6 +385,32 @@ export default function DrawerScreen() {
           </div>
         </section>
 
+        <section className="settings-card" aria-labelledby="set-priv">
+          <h2 id="set-priv">What Vyom keeps, and where</h2>
+          <p className="settings-note">
+            Only in this browser, on this device. Vyom has no server and no account, so there is no copy anywhere else.
+          </p>
+          <ul className="settings-list">
+            <li>The people you add: name, birth date, time and place.</li>
+            <li>Palm photos, only if you take one.</li>
+            <li>Your settings, and charts it has already worked out (to open faster).</li>
+            <li>Place names you searched online, for up to 90 days.</li>
+          </ul>
+          <p className="settings-note">Clearing this site's data in your browser removes all of it too.</p>
+          <StatsToggle />
+          <HoldStamp
+            className="settings-wipe"
+            ms={1500}
+            ariaLabel="Delete everything Vyom keeps on this device. Hold to confirm"
+            label={<span>Hold to delete everything</span>}
+            onFire={() => {
+              void wipeEverything().then(() => {
+                toast("Everything is deleted from this device.", "danger");
+                navigate("/");
+              });
+            }}
+          />
+        </section>
         <details className="settings-card settings-more">
           <summary>
             <span>Advanced</span>

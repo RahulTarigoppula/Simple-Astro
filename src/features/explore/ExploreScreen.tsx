@@ -22,6 +22,7 @@ import { SkyWheel, type WheelSel } from "./SkyWheel";
 import { panelFor, slidesFor } from "./skyStories";
 import "./explore.css";
 import "./wheel.css";
+import { countEvent } from "../../platform/stats";
 
 const lore = (id: GrahaId) => GRAHA_LORE.find((g) => g.id === id);
 const NAK_SPAN = 360 / 27;
@@ -483,6 +484,7 @@ function Hub() {
   const [sel, setSel] = useState<WheelSel>(() => ({ kind: "nak", i: sky.MO.nakshatra }));
   const [playing, setPlaying] = useState(false);
   const surprise = () => {
+    countEvent("explore-surprise");
     // Seeded from the clock (Math.random is never used in Vyom).
     const r = mulberry32(Date.now() % 2147483647)();
     const k = Math.floor(r * 48);
@@ -574,7 +576,14 @@ function Hub() {
             ))}
           </dl>
           <div className="ex-panel__actions">
-            <button type="button" className="stamp" onClick={() => setPlaying(true)}>
+            <button
+              type="button"
+              className="stamp"
+              onClick={() => {
+                countEvent("explore-play-story");
+                setPlaying(true);
+              }}
+            >
               <span>▶ Play its story</span>
             </button>
             <Link to={panel.to} className="linkish">
