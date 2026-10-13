@@ -258,7 +258,7 @@ export default function ChowkiScreen() {
           <Link to={`/patri/${active.id}`} className="home-big home-big--violet">
             <IconChart size={26} />
             <span className="home-big__t">Birth chart</span>
-            <span className="home-big__s">{active.name}'s sky at birth</span>
+            <span className="home-big__s">{active.name}'s life in simple words</span>
           </Link>
         ) : (
           <Link to="/leaf/new" className="home-big home-big--violet">
@@ -267,10 +267,10 @@ export default function ChowkiScreen() {
             <span className="home-big__s">Birth date, time and place</span>
           </Link>
         )}
-        <Link to="/explore" className="home-big home-big--cyan">
-          <IconSky size={26} />
-          <span className="home-big__t">Explore the sky</span>
-          <span className="home-big__s">Planets, signs, stars and their myths</span>
+        <Link to={active && second ? `/milan/${active.id}/${second.id}` : "/milan"} className="home-big home-big--rose">
+          <IconMilan size={26} />
+          <span className="home-big__t">Bond and marriage</span>
+          <span className="home-big__s">Trust, companionship and a score for two people</span>
         </Link>
       </nav>
 
@@ -281,14 +281,7 @@ export default function ChowkiScreen() {
       <h2 className="home-sec">More in Vyom</h2>
       <nav className="home-tiles" aria-label="More">
         <Tile to="/today" title="Today's almanac" dev="पंचांग" sub="Good and bad times" icon={<IconToday />} tone="gold" />
-        <Tile
-          to={active && second ? `/milan/${active.id}/${second.id}` : "/milan"}
-          title="Compatibility"
-          dev="गुण मिलान"
-          sub="Guna Milan out of 36"
-          icon={<IconMilan />}
-          tone="rose"
-        />
+        <Tile to="/explore" title="Explore the sky" dev="आकाश" sub="Planets, signs, stars, myths" icon={<IconSky />} tone="cyan" />
         <Tile
           to={active ? `/hast/${active.id}` : "/leaf/new"}
           title="Palm reading"

@@ -32,6 +32,7 @@ import { Mala } from "./Mala";
 import { PoruthamThread } from "./PoruthamThread";
 import { becauseBody, doshaLine, exceptionLine, fmtPts, RULE_TEXT, SCHOOL_LABEL, SCHOOL_NOTE, summaryText, WEIGHS } from "./rules";
 import "./milan.css";
+import { BondCard } from "./BondCard";
 
 const VERDICT: Record<string, string> = {
   "not-recommended": "tradition does not recommend this match",
@@ -414,69 +415,79 @@ function MilanScreen() {
               </button>
             </p>
 
-            {wide && patA && patB ? (
-              <div className="milan-charts">
-                <LeafChart
-                  who="first person"
-                  profile={pa}
-                  patri={patA}
-                  manglik={r?.manglik.a ?? null}
-                  style={settings.chartStyle}
-                  script={settings.chartScript}
+            {r && patA && patB ? <BondCard r={r} pa={pa} pb={pb} patA={patA} patB={patB} /> : null}
+
+            <details className="astro-tech milan-tech" open={r ? undefined : true}>
+              <summary>
+                <span>
+                  Full detail (astro tech)
+                  <small>The 36-point Guna Milan, every factor and its rule, Porutham and Manglik</small>
+                </span>
+              </summary>
+              {wide && patA && patB ? (
+                <div className="milan-charts">
+                  <LeafChart
+                    who="first person"
+                    profile={pa}
+                    patri={patA}
+                    manglik={r?.manglik.a ?? null}
+                    style={settings.chartStyle}
+                    script={settings.chartScript}
+                  />
+                  <LeafChart
+                    who="second person"
+                    profile={pb}
+                    patri={patB}
+                    manglik={r?.manglik.b ?? null}
+                    style={settings.chartStyle}
+                    script={settings.chartScript}
+                  />
+                </div>
+              ) : null}
+
+              {err ? (
+                <div className="note-lac" role="alert">
+                  The mala would not count: {err}
+                </div>
+              ) : r ? (
+                <Mala
+                  key={`${r.a}|${r.b}|${r.presetHash}|${settings.bhakootCancellation}|${settings.ashtakootaSchool}`}
+                  result={r}
+                  onOpen={(k) => setSheet({ kind: "koota", k })}
                 />
-                <LeafChart
-                  who="second person"
-                  profile={pb}
-                  patri={patB}
-                  manglik={r?.manglik.b ?? null}
-                  style={settings.chartStyle}
-                  script={settings.chartScript}
-                />
-              </div>
-            ) : null}
-
-            {err ? (
-              <div className="note-lac" role="alert">
-                The mala would not count: {err}
-              </div>
-            ) : r ? (
-              <Mala
-                key={`${r.a}|${r.b}|${r.presetHash}|${settings.bhakootCancellation}|${settings.ashtakootaSchool}`}
-                result={r}
-                onOpen={(k) => setSheet({ kind: "koota", k })}
-              />
-            ) : (
-              <p className="p p--muted" role="status">
-                Casting both charts…
-              </p>
-            )}
-
-            {r ? (
-              <div className="milan-verdict">
-                <p className="milan-verdict__t">
-                  {pa.name} and {pb.name}: <strong>{r.total} of 36</strong>: {VERDICT[r.band]}.
-                  {r.kootas.some((k) => k.dosha)
-                    ? ` Tradition flags ${r.kootas
-                        .filter((k) => k.dosha)
-                        .map((k) => k.name)
-                        .join(" and ")}; tap a row to see why.`
-                    : " No factor is flagged."}
+              ) : (
+                <p className="p p--muted" role="status">
+                  Casting both charts…
                 </p>
-                <p className="milan-verdict__k">
-                  A score is tradition's arithmetic on two Moons. It is not a verdict on two people. Karma, your own actions, decides the
-                  rest.
-                </p>
-              </div>
-            ) : null}
+              )}
 
-            {poruthamList.length > 0 ? (
-              <details className="milan-more">
-                <summary>
-                  South Indian check · Porutham <span>{poruthamList.filter((p) => p.pass).length} of 10 agree</span>
-                </summary>
-                <PoruthamThread list={poruthamList} onOpen={(p) => setSheet({ kind: "porutham", p })} />
-              </details>
-            ) : null}
+              {r ? (
+                <div className="milan-verdict">
+                  <p className="milan-verdict__t">
+                    {pa.name} and {pb.name}: <strong>{r.total} of 36</strong>: {VERDICT[r.band]}.
+                    {r.kootas.some((k) => k.dosha)
+                      ? ` Tradition flags ${r.kootas
+                          .filter((k) => k.dosha)
+                          .map((k) => k.name)
+                          .join(" and ")}; tap a row to see why.`
+                      : " No factor is flagged."}
+                  </p>
+                  <p className="milan-verdict__k">
+                    A score is tradition's arithmetic on two Moons. It is not a verdict on two people. Karma, your own actions, decides the
+                    rest.
+                  </p>
+                </div>
+              ) : null}
+
+              {poruthamList.length > 0 ? (
+                <details className="milan-more">
+                  <summary>
+                    South Indian check · Porutham <span>{poruthamList.filter((p) => p.pass).length} of 10 agree</span>
+                  </summary>
+                  <PoruthamThread list={poruthamList} onOpen={(p) => setSheet({ kind: "porutham", p })} />
+                </details>
+              ) : null}
+            </details>
 
             {r ? (
               <p className="milan__share">

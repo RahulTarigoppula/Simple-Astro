@@ -100,6 +100,9 @@
 .home-big--gold {
   --c: var(--accent-2);
 }
+.home-big--rose {
+  --c: var(--danger);
+}
 .home-big--cyan {
   --c: var(--cyan);
 }

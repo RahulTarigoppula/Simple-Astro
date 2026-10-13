@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.12.0 (2026-10-14)
+
+### Bond and marriage
+- Pick two people and Vyom shows how they fit, in plain words: a bond score out of 100, and five parts people actually ask about: **Understanding**, **Companionship**, **Trust**, **Closeness**, and **Family and health**. Each has a bar and one line on what it means.
+- What is strongest together, what to work on, what each person brings (from their Moon sign), one practical thing to try, and the Manglik check in one sentence.
+- Every one of the 36 Guna Milan points is counted exactly once, so the bond score is simply the traditional total as a percentage. The full 36-bead Guna Milan, every rule and the South Indian Porutham sit behind **Full detail (astro tech)**.
+- Home has a **Bond and marriage** card.
+
 ## 0.11.0 (2026-10-14)
 
 ### Always the latest version

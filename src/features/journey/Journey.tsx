@@ -224,7 +224,7 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
                     <b>50</b> charts checked
                   </li>
                   <li>
-                    <b>704</b> tests
+                    <b>708</b> tests
                   </li>
                 </ul>
               </section>
