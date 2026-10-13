@@ -86,6 +86,16 @@ function keepEvent(p: Period, e: SkyEvent): boolean {
   return true;
 }
 
+const WEEKDAYS = [
+  ["mon", "M"],
+  ["tue", "T"],
+  ["wed", "W"],
+  ["thu", "T"],
+  ["fri", "F"],
+  ["sat", "S"],
+  ["sun", "S"],
+] as const;
+
 /** 0 = Monday … 6 = Sunday, in the zone. */
 function monIndex(ms: number, zone: string): number {
   return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(fmt(ms, zone, { weekday: "short" }));
@@ -109,8 +119,8 @@ function Steps({ f, zone }: { f: Forecast; zone: string }) {
       </header>
       {cal ? (
         <div className="fc-wd" aria-hidden="true">
-          {["M", "T", "W", "T", "F", "S", "S"].map((d, k) => (
-            <span key={`wd${k}`}>{d}</span>
+          {WEEKDAYS.map(([key, d]) => (
+            <span key={key}>{d}</span>
           ))}
         </div>
       ) : null}
