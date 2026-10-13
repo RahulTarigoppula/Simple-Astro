@@ -20,6 +20,9 @@ interface UiState {
   desk: { themeOverride: "night" | "day" | null; resolvedTheme: "night" | "day"; swUpdate: (() => void) | null };
   setResolvedTheme: (t: "night" | "day") => void;
   setSwUpdate: (fn: (() => void) | null) => void;
+  // explain slice: the plain-English sheet for one glossary term
+  explain: string | null;
+  setExplain: (id: string | null) => void;
   // toast slice
   toasts: Toast[];
   toast: (text: string, kind?: ToastKind) => void;
@@ -36,6 +39,8 @@ export const useUi = create<UiState>()((set, get) => ({
   desk: { themeOverride: null, resolvedTheme: "night", swUpdate: null },
   setResolvedTheme: (resolvedTheme) => set((s) => ({ desk: { ...s.desk, resolvedTheme } })),
   setSwUpdate: (swUpdate) => set((s) => ({ desk: { ...s.desk, swUpdate } })),
+  explain: null,
+  setExplain: (explain) => set({ explain }),
   toasts: [],
   toast: (text, kind = "info") => {
     const id = toastSeq++;

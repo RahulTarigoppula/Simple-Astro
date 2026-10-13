@@ -33,6 +33,7 @@ export const router = createHashRouter([
       { path: "milan/:a/:b", lazy: screen("milan/MilanScreen"), errorElement: <RouteError /> },
       { path: "milan", lazy: screen("milan/MilanScreen"), errorElement: <RouteError /> },
       { path: "drawer", lazy: screen("drawer/DrawerScreen"), errorElement: <RouteError /> },
+      { path: "guide", lazy: screen("guide/GuideScreen"), errorElement: <RouteError /> },
       { path: "lost", lazy: screen("chowki/LostScreen") },
       { path: "*", element: <Navigate to="/lost" replace /> },
     ],

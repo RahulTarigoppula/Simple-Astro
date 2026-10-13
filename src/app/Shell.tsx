@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router";
+import { ExplainSheet } from "../components/ui/Explain";
 import { Toasts } from "../components/ui/Toasts";
 import { setHapticsEnabled } from "../platform/haptics";
 import { isNative } from "../platform/native";
@@ -57,6 +58,7 @@ export function Shell() {
         <Outlet />
         <Toasts />
       </div>
+      <ExplainSheet />
       {fullBleed ? null : <Ledge />}
     </div>
   );

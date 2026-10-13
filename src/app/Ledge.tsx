@@ -5,7 +5,16 @@ import { rememberOrigin } from "./origin";
 
 function IconHome() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="12" r="8.5" />
       <circle cx="12" cy="12" r="3" />
       <path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3" />
