@@ -29,7 +29,7 @@ const MIN_PASS = 6;
 
 export function LeafSheet(props: LeafSheetProps) {
   const { profile, others, mode } = props;
-  const name = profile.name || "Unnamed leaf";
+  const name = profile.name || "Unnamed person";
   const moon = leafMoon(profile, props.ayanamsa);
 
   return (
@@ -59,7 +59,7 @@ export function LeafSheet(props: LeafSheetProps) {
           </li>
           <li>
             <button type="button" className="leafsheet__row" onClick={() => props.onTool("edit")}>
-              Edit the leaf
+              Edit birth details
             </button>
           </li>
           <li>
@@ -74,14 +74,14 @@ export function LeafSheet(props: LeafSheetProps) {
           </li>
           <li>
             <button type="button" className="leafsheet__row" onClick={() => props.setMode("export")}>
-              Export in a wax envelope
+              Create an encrypted backup
             </button>
           </li>
           <li>
             <BurnHold
               className="leafsheet__row leafsheet__burn"
-              label="Burn this leaf — hold"
-              ariaLabel={`Burn ${name}'s leaf — hold to burn it and its palm prints from this device`}
+              label="Hold to delete"
+              ariaLabel={`Delete ${name} — hold to delete them and their palm photos from this device`}
               onProgress={props.onBurnProgress}
               onBurn={props.onBurn}
             />
@@ -92,10 +92,10 @@ export function LeafSheet(props: LeafSheetProps) {
       {mode === "milan" ? (
         <div className="leafsheet__pick">
           <p className="p p--muted">
-            First leaf: <b>{name}</b>. Choose the second leaf to lay beside it.
+            First person: <b>{name}</b>. Choose the second person to compare.
           </p>
           {others.length === 0 ? (
-            <p className="p">There is no other leaf in the bundle yet — write one first.</p>
+            <p className="p">There is no one else saved yet — add another person first.</p>
           ) : (
             <ul className="leafsheet__list">
               {others.map((o) => {
@@ -144,12 +144,12 @@ function ExportForm({ onDone, onBack }: { onDone: () => void; onBack: () => void
     setErr(null);
     try {
       const blob = await exportEnvelope(pass);
-      await saveFile(blob, envelopeFileName(), "Vyom wax envelope");
+      await saveFile(blob, envelopeFileName(), "Vyom encrypted backup");
       play("thunk");
-      toast("Sealed in a wax envelope (AES-GCM). Keep the passphrase — it cannot be recovered.");
+      toast("Encrypted backup saved (AES-GCM). Keep the passphrase — it cannot be recovered.");
       onDone();
     } catch (e) {
-      setErr(`The envelope would not seal: ${e instanceof Error ? e.message : String(e)}`);
+      setErr(`Could not create the backup: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       setBusy(false);
       setPass("");
@@ -166,8 +166,8 @@ function ExportForm({ onDone, onBack }: { onDone: () => void; onBack: () => void
       }}
     >
       <p className="p p--muted">
-        The envelope carries the whole bundle — every leaf, chart and palm print — sealed with your passphrase (AES-GCM, PBKDF2 600 000
-        rounds). Nothing is sent anywhere; the file is handed to you.
+        The backup holds everything — every person, chart and palm photo — encrypted with your passphrase (AES-GCM, PBKDF2 600 000 rounds).
+        Nothing is sent anywhere; the file is handed to you.
       </p>
       <div className="field">
         <label htmlFor="env-pass">Passphrase</label>
@@ -186,7 +186,7 @@ function ExportForm({ onDone, onBack }: { onDone: () => void; onBack: () => void
       ) : null}
       {busy ? (
         <p className="p p--muted" role="status">
-          Pressing the wax…
+          Encrypting…
         </p>
       ) : null}
       <div className="leafsheet__actions">
@@ -194,7 +194,7 @@ function ExportForm({ onDone, onBack }: { onDone: () => void; onBack: () => void
           ‹ Back
         </button>
         <button type="submit" className="stamp" disabled={!ok}>
-          <span>Seal the envelope</span>
+          <span>Create an encrypted backup</span>
         </button>
       </div>
     </form>

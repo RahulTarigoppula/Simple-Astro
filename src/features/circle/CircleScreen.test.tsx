@@ -41,13 +41,6 @@ const PRIYA: Profile = {
   updatedAt: 1,
 };
 
-/** The bundle remembers being untied for the session; make sure it is open. */
-async function untie() {
-  const t = await screen.findByRole("button", { name: /^(Untie|Tie it up)$/ });
-  if (t.textContent === "Untie") fireEvent.click(t);
-  await screen.findByRole("button", { name: "Tie it up" });
-}
-
 describe("leaf facts", () => {
   it("reads the reference Moon in Revatī, Mīna — the same Moon the Patri casts", () => {
     const m = leafMoon(REFERENCE_PROFILE, "se-true");
@@ -66,20 +59,16 @@ describe("CircleScreen", () => {
 
   it("shows only the blank leaf when the bundle is empty", async () => {
     renderCircle();
-    expect(await screen.findByRole("heading", { name: "Write your first leaf" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Write your first leaf/ })).toHaveAttribute("href", "/leaf/new");
+    expect(await screen.findByRole("heading", { name: "Add your first person" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Add your first person/ })).toHaveAttribute("href", "/leaf/new");
   });
 
-  it("unties the bundle into tappable leaves and opens a leaf's Patri", async () => {
+  it("lists people as cards and opens a person's birth chart", async () => {
     await upsertProfile(REFERENCE_PROFILE);
     await upsertProfile(PRIYA);
     const { router } = renderCircle();
-    const toggle = await screen.findByRole("button", { name: /^(Untie|Tie it up)$/ });
-    if (toggle.textContent === "Tie it up") fireEvent.click(toggle);
-    // tied: the leaves are inert until the thread is pulled
-    expect(await screen.findByRole("list", { name: "Leaves" })).toHaveAttribute("inert");
-    await untie();
-    expect(screen.getByRole("list", { name: "Leaves" })).not.toHaveAttribute("inert");
+    const people = await screen.findByRole("list", { name: "People" });
+    expect(within(people).getAllByRole("listitem")).toHaveLength(2);
     const rahul = await screen.findByRole("button", { name: /^Rahul — Moon in Revatī/ });
     expect(screen.getByText("रेवती")).toHaveAttribute("lang", "hi");
     fireEvent.click(rahul);
@@ -91,8 +80,7 @@ describe("CircleScreen", () => {
     await upsertProfile(REFERENCE_PROFILE);
     await upsertProfile(PRIYA);
     const { router } = renderCircle();
-    await untie();
-    fireEvent.click(await screen.findByRole("button", { name: "Actions for Rahul's leaf" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Actions for Rahul" }));
     const dlg = await screen.findByRole("dialog");
     fireEvent.click(within(dlg).getByRole("button", { name: "Milan with…" }));
     fireEvent.click(await within(dlg).findByRole("button", { name: /^Priya/ }));
@@ -103,10 +91,9 @@ describe("CircleScreen", () => {
     await upsertProfile(REFERENCE_PROFILE);
     await upsertProfile(PRIYA);
     renderCircle();
-    await untie();
-    fireEvent.click(await screen.findByRole("button", { name: "Actions for Priya's leaf" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Actions for Priya" }));
     const dlg = await screen.findByRole("dialog");
-    const burn = within(dlg).getByRole("button", { name: /Burn Priya's leaf/ });
+    const burn = within(dlg).getByRole("button", { name: /Delete Priya —/ });
     act(() => {
       fireEvent.keyDown(burn, { key: " " });
     });
@@ -117,10 +104,9 @@ describe("CircleScreen", () => {
   it("an early release cools the leaf and burns nothing", async () => {
     await upsertProfile(PRIYA);
     renderCircle();
-    await untie();
-    fireEvent.click(await screen.findByRole("button", { name: "Actions for Priya's leaf" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Actions for Priya" }));
     const dlg = await screen.findByRole("dialog");
-    const burn = within(dlg).getByRole("button", { name: /Burn Priya's leaf/ });
+    const burn = within(dlg).getByRole("button", { name: /Delete Priya —/ });
     fireEvent.keyDown(burn, { key: " " });
     fireEvent.keyUp(burn, { key: " " });
     await new Promise((r) => setTimeout(r, 800));

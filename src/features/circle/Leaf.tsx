@@ -64,7 +64,7 @@ export function Leaf(props: LeafProps) {
     else animate(sx, target, PAPER);
   }, [trayOpen, tied, trayW, sx]);
 
-  const name = profile.name || "Unnamed leaf";
+  const name = profile.name || "Unnamed person";
   const moonText = moon ? `Moon in ${moon.nakName}, pada ${moon.pada}, ${moon.signName}` : "Moon not cast";
 
   return (
@@ -94,10 +94,10 @@ export function Leaf(props: LeafProps) {
           className="leaf-tray__btn leaf-tray__burn"
           label={
             <>
-              Burn<small>hold</small>
+              Delete<small>hold</small>
             </>
           }
-          ariaLabel={`Burn ${name}'s leaf — hold to burn it and its palm prints`}
+          ariaLabel={`Delete ${name} — hold to delete them and their palm photos`}
           onProgress={(k) => charTo(char.current, k)}
           onBurn={props.onBurn}
         />
@@ -128,7 +128,7 @@ export function Leaf(props: LeafProps) {
         <button
           type="button"
           className="leaf__face"
-          aria-label={`${name} — ${moonText}; born ${birthLine(profile)}. Opens the Janam Patri${active ? " (the active leaf)" : ""}`}
+          aria-label={`${name} — ${moonText}; born ${birthLine(profile)}. Opens the Janam Patri${active ? " (the active person)" : ""}`}
           onClick={(e) => {
             if (dragged.current) return;
             if (trayOpen) {
@@ -160,13 +160,7 @@ export function Leaf(props: LeafProps) {
             </span>
           </span>
         </button>
-        <button
-          type="button"
-          className="leaf__more"
-          aria-label={`Actions for ${name}'s leaf`}
-          aria-haspopup="dialog"
-          onClick={props.onMenu}
-        >
+        <button type="button" className="leaf__more" aria-label={`Actions for ${name}`} aria-haspopup="dialog" onClick={props.onMenu}>
           <span aria-hidden="true">⋯</span>
         </button>
         <span className="leaf__char" ref={char} aria-hidden="true" />
