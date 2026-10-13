@@ -1,5 +1,5 @@
 // Stage [3]: rectification. A homography from four stable landmarks into the canonical 512 × 512
-// print — fingers at the top, wrist at the bottom, thumb on the left. Solved here in plain TS (a
+// print, fingers at the top, wrist at the bottom, thumb on the left. Solved here in plain TS (a
 // getPerspectiveTransform equivalent), so it is testable without OpenCV; the worker may apply it
 // with cv.warpPerspective, and `warpPerspective` below is the bit-exact pure fallback.
 //
@@ -55,7 +55,7 @@ export function solveLinear(A: number[][], b: number[]): number[] | null {
 }
 
 /**
- * The homography H (row-major, h33 = 1) with H·src[i] ∝ dst[i] for four point pairs — the direct
+ * The homography H (row-major, h33 = 1) with H·src[i] ∝ dst[i] for four point pairs, the direct
  * linear transform, as cv.getPerspectiveTransform. Null when three points are collinear.
  */
 export function getPerspectiveTransform(src: readonly Pt[], dst: readonly Pt[]): Mat3 | null {

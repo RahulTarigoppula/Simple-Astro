@@ -1,5 +1,5 @@
-// The Sāḍe-sātī ribbon: a 90-year rule from birth with Śani's spells laid on it — brass for the
-// three phases of the Sāḍe-sātī, a haldi underline for Kaṇṭaka and Aṣṭama — a brass "now" clip,
+// The Sāḍe-sātī ribbon: a 90-year rule from birth with Śani's spells laid on it, brass for the
+// three phases of the Sāḍe-sātī, a haldi underline for Kaṇṭaka and Aṣṭama, a brass "now" clip,
 // and a row of spell tabs (the keyboard path) that open each spell's dated phases.
 import { type KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
 import { ORDINAL, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";

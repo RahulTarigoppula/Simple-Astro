@@ -1,5 +1,5 @@
-// Explore: the library of the sky — nine grahas, twelve rāśis, twenty-seven nakṣatras, numerology and
-// the Chinese zodiac — each with its myth, its meaning, the real astronomy, and where it sits right now.
+// Explore: the library of the sky, nine grahas, twelve rāśis, twenty-seven nakṣatras, numerology and
+// the Chinese zodiac, each with its myth, its meaning, the real astronomy, and where it sits right now.
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";

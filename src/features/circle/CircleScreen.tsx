@@ -1,4 +1,4 @@
-// People: everyone saved on this device, as clear cards — tap for the birth chart, open the forecast,
+// People: everyone saved on this device, as clear cards, tap for the birth chart, open the forecast,
 // or ⋯ for compatibility, editing, encrypted backup and delete.
 import { Link, useNavigate } from "react-router";
 import { useActiveProfile, useProfiles, useSettings } from "../../app/hooks";

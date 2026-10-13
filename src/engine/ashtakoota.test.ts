@@ -5,11 +5,11 @@
 // textbook Vaśya, Yoni and Gaṇa cells. The oracle (PyJHora all_nak_pad_boy_girl.csv) follows another
 // published school for those three tables: Jalacara×Catuṣpada Vaśya = 1 (not 2), elephant×serpent
 // Yoni = 3 (friendly, not neutral) and Deva×Manuṣya Gaṇa = 5 (not 6). Chowki adopts the oracle's
-// school, so the pair reads 1/1/1.5/3/0.5/5/7/0 = 19 — still "acceptable", still with Nāḍī as the
+// school, so the pair reads 1/1/1.5/3/0.5/5/7/0 = 19, still "acceptable", still with Nāḍī as the
 // single doṣa. The oracle row for this pair is 19 too (ashtakoota.oracle.test.ts).
 //
 // Two schools (Settings.ashtakootaSchool): "north-common" (default) and "pyjhora". They differ only in
-// Varṇa of earth/air signs, the Vaśya 5×5 and Yoni Aśva × Mṛga — see "schools" below. Tests that pin a
+// Varṇa of earth/air signs, the Vaśya 5×5 and Yoni Aśva × Mṛga, see "schools" below. Tests that pin a
 // school-dependent number name the school explicitly.
 import { describe, expect, it } from "vitest";
 import { VASHYA_NORTH, VASHYA_PYJHORA, type VashyaClass } from "../data/tables/koota";
@@ -123,9 +123,9 @@ describe("cancellations", () => {
 describe("Vaśya split of Dhanu and Makara", () => {
   it("uses the Moon's degree when given, else the pada's midpoint", () => {
     const vashya = (m: MoonPlacement): number => score(m, moon(0, 1), "vashya", PYJHORA);
-    // Mūla 3 (Dhanu 6°40′–10°) is the human first half: Mānava × Catuṣpada = 0.5.
+    // Mūla 3 (Dhanu 6°40′-10°) is the human first half: Mānava × Catuṣpada = 0.5.
     expect(vashya(moon(18, 3))).toBe(0.5);
-    // Pūrva Āṣāḍhā 2 (Dhanu 16°40′–20°) is the quadruped half: Catuṣpada × Catuṣpada = 2.
+    // Pūrva Āṣāḍhā 2 (Dhanu 16°40′-20°) is the quadruped half: Catuṣpada × Catuṣpada = 2.
     expect(vashya(moon(19, 2))).toBe(2);
     // Pūrva Āṣāḍhā 1 straddles 15°: the exact degree decides.
     expect(vashya(moon(19, 1, 14))).toBe(0.5);
@@ -235,15 +235,15 @@ describe("schools", () => {
 
   it("the reference pair Revatī (boy, Mīna) × Rohiṇī (girl, Vṛṣabha) is 19 under north-common too", () => {
     // Derivation under north-common, koota by koota:
-    //   Varṇa    Mīna Brāhmaṇa ≥ Vṛṣabha Vaiśya (PyJHora: Śūdra) — 1 either way ........ 1
-    //   Vaśya    Jalacara boy × Catuṣpada girl — 1 in both tables ...................... 1
+    //   Varṇa    Mīna Brāhmaṇa ≥ Vṛṣabha Vaiśya (PyJHora: Śūdra), 1 either way ........ 1
+    //   Vaśya    Jalacara boy × Catuṣpada girl, 1 in both tables ...................... 1
     //   Tārā     26→3 is the 5th (Pratyari, unkind) 0; 3→26 the 6th (Sādhaka, kind) 1.5 . 1.5
-    //   Yoni     Gaja (elephant) × Sarpa (serpent), friendly — not the Aśva × Mṛga cell .. 3
+    //   Yoni     Gaja (elephant) × Sarpa (serpent), friendly, not the Aśva × Mṛga cell .. 3
     //   Maitrī   Guru regards Śukra as enemy, Śukra regards Guru as neutral ............ 0.5
     //   Gaṇa     Deva × Manuṣya ......................................................... 5
     //   Bhakūṭa  Mīna → Vṛṣabha is the 3/11 axis, no doṣa ............................... 7
     //   Nāḍī     both Antya, doṣa .................................................... 0
-    //   total 19 — none of the three school cells changes this pair, so both schools agree.
+    //   total 19, none of the three school cells changes this pair, so both schools agree.
     const r = ashtakoota("rahul", "priya", moon(26, 1), moon(3, 1), "hash", NORTH);
     expect(r.kootas.map((k) => k.score)).toEqual([1, 1, 1.5, 3, 0.5, 5, 7, 0]);
     expect(r.total).toBe(19);

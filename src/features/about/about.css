@@ -203,3 +203,15 @@
     gap: 20px;
   }
 }
+.about-hours {
+  margin: var(--space-4) 0 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(245, 196, 107, 0.35);
+  background: rgba(245, 196, 107, 0.07);
+  color: var(--ink);
+  line-height: 1.5;
+}
+.about-hours b {
+  color: var(--accent-2);
+}

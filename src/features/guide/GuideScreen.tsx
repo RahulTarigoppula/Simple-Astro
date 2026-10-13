@@ -1,4 +1,4 @@
-// The guide: what Vyom is, how to use it, and every term in plain English — written for someone
+// The guide: what Vyom is, how to use it, and every term in plain English, written for someone
 // who has never met Indian astrology, or doesn't believe in it.
 import { useMemo, useState } from "react";
 import { Link } from "react-router";

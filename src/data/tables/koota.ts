@@ -1,15 +1,15 @@
-// Aṣṭakūṭa (Guna Milan) tables — classical facts, re-typed by hand. Never copied as code from any
+// Aṣṭakūṭa (Guna Milan) tables, classical facts, re-typed by hand. Never copied as code from any
 // implementation. The koota scheme is that of Muhūrta Cintāmaṇi ch. 6 (vivāha-prakaraṇa); where the
 // published tables vary between schools, Vyom carries BOTH schools (Settings.ashtakootaSchool):
-//   • "north-common" (the default) — the North-Indian almanac tables most families compare against
+//   • "north-common" (the default), the North-Indian almanac tables most families compare against
 //     (Drik Panchang, AstroSage, most printed pañcāṅgas);
-//   • "pyjhora" — the saravali.de tables used by PyJHora, whose totals agree with the PyJHora oracle data
-//     (all_nak_pad_boy_girl.csv) — see src/engine/ashtakoota.oracle.test.ts for the cell-by-cell evidence.
+//   • "pyjhora", the saravali.de tables used by PyJHora, whose totals agree with the PyJHora oracle data
+//     (all_nak_pad_boy_girl.csv), see src/engine/ashtakoota.oracle.test.ts for the cell-by-cell evidence.
 // The schools differ in exactly three places: Varṇa of the earth/air signs, the Vaśya 5×5 and Yoni
 // Aśva × Mṛga. Every other table below is shared.
 //
 // Every two-sided table is read [first][second] = [vara (boy) column][kanyā (girl) column]. The
-// sides are positional — `a` and `b` in milan() — never derived from a profile's gender field.
+// sides are positional, `a` and `b` in milan(), never derived from a profile's gender field.
 import type { AshtakootaSchool, SignIdx } from "../../engine/types";
 
 // ─── Varṇa (1) ───────────────────────────────────────────────────────────────
@@ -23,7 +23,7 @@ export const VARNA_LABEL: Record<Varna, string> = {
 export const VARNA_RANK: Record<Varna, number> = { brahmana: 4, kshatriya: 3, vaishya: 2, shudra: 1 };
 
 /**
- * Varṇa by Moon sign, by element — PyJHora school: water signs Brāhmaṇa, fire Kṣatriya, AIR signs
+ * Varṇa by Moon sign, by element, PyJHora school: water signs Brāhmaṇa, fire Kṣatriya, AIR signs
  * Vaiśya and EARTH signs Śūdra (the saravali.de / PyJHora reading).
  */
 export const VARNA_BY_SIGN_PYJHORA: readonly Varna[] = [
@@ -42,7 +42,7 @@ export const VARNA_BY_SIGN_PYJHORA: readonly Varna[] = [
 ];
 
 /**
- * Varṇa by Moon sign — North-Indian common school: water Brāhmaṇa, fire Kṣatriya, EARTH (Vṛṣabha,
+ * Varṇa by Moon sign, North-Indian common school: water Brāhmaṇa, fire Kṣatriya, EARTH (Vṛṣabha,
  * Kanyā, Makara) Vaiśya, AIR (Mithuna, Tulā, Kumbha) Śūdra. Sources: drikpanchang.com
  * tutorials/jyotisha/kundali-match/ashta-kuta/varna-kuta.html; astromedha.in insights/vedic/varna-koota.
  * Differs from PyJHora only when one Moon is in an earth sign and the other in an air sign.
@@ -108,8 +108,8 @@ export function vashyaClass(sign: SignIdx, degInSign: number): VashyaClass {
 type VashyaTable = Record<VashyaClass, Record<VashyaClass, number>>;
 
 /**
- * VASHYA_PYJHORA[first][second] — the saravali.de class table (as used by PyJHora), every cell pinned
- * by the oracle test. It is not symmetric — e.g. Kīṭa→Catuṣpada 2 but Catuṣpada→Kīṭa 1.
+ * VASHYA_PYJHORA[first][second], the saravali.de class table (as used by PyJHora), every cell pinned
+ * by the oracle test. It is not symmetric, e.g. Kīṭa→Catuṣpada 2 but Catuṣpada→Kīṭa 1.
  */
 export const VASHYA_PYJHORA: VashyaTable = {
   chatushpada: { chatushpada: 2, manava: 0.5, jalachara: 1, vanachara: 0, keeta: 1 },
@@ -120,7 +120,7 @@ export const VASHYA_PYJHORA: VashyaTable = {
 };
 
 /**
- * VASHYA_NORTH[vara (boy)][kanyā (girl)] — the North-Indian common table: same class 2; Vanacara (Siṃha)
+ * VASHYA_NORTH[vara (boy)][kanyā (girl)], the North-Indian common table: same class 2; Vanacara (Siṃha)
  * 0 with every class but Jalacara (1); Mānava × Jalacara ½; every other pair 1. Re-typed from two
  * sources that agree on 24 of 25 cells: onlinejyotish.com articles/marriage-matching/english/
  * vashya-kootam.php and ganeshmitra.co.in/vasya-matching (both print bride rows × groom columns). They
@@ -222,7 +222,7 @@ export const YONI_SWORN: ReadonlyArray<readonly [Yoni, Yoni]> = [
 ];
 
 /**
- * Friendly pairs (3 points), shared by both schools — the common North-Indian 14×14 yoni table. The one
+ * Friendly pairs (3 points), shared by both schools, the common North-Indian 14×14 yoni table. The one
  * cell where the schools part (Aśva × Mṛga) lives in YONI_BY_SCHOOL below, not here.
  */
 export const YONI_FRIENDLY: ReadonlyArray<readonly [Yoni, Yoni]> = [
@@ -348,7 +348,7 @@ export const GANA_BY_NAK: readonly Gana[] = [
 ];
 
 /**
- * GANA[first][second]. School followed: the saravali.de table as used by PyJHora —
+ * GANA[first][second]. School followed: the saravali.de table as used by PyJHora,
  * Deva×Manuṣya 5 but Manuṣya×Deva 6; Deva×Rākṣasa 1 but Rākṣasa×Deva 0.
  */
 export const GANA: Record<Gana, Record<Gana, number>> = {

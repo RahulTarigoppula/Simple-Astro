@@ -1,4 +1,4 @@
-// What each koota row's sheet says. Descriptions of the classical rules only — the scores themselves
+// What each koota row's sheet says. Descriptions of the classical rules only, the scores themselves
 // come from engine/ashtakoota.ts and are never computed here.
 import { NAKSHATRA_NAMES, SIGN_NAMES } from "../../data/tables/names";
 import { ganaParihara } from "../../engine/porutham";

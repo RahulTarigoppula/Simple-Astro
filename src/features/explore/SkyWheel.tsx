@@ -45,7 +45,7 @@ interface Props {
 export function SkyWheel({ sky, sel, onSelect, onPlay, natalMoon }: Props) {
   const box = useRef<HTMLDivElement>(null);
   const drag = useRef<{ a: number; rot: number; moved: number; x: number; y: number } | null>(null);
-  // rot (degrees, clockwise on screen) — start with the selection at the top.
+  // rot (degrees, clockwise on screen), start with the selection at the top.
   const [rot, setRot] = useState(() => 90 + selLon(sel, sky));
   const [dragging, setDragging] = useState(false);
 

@@ -1,6 +1,6 @@
 // The opening journey, drawn live on a 2D canvas: the observable universe, the Milky Way, the Solar
 // System, Earth, a forest, the rare plants, us under the stars, and the zodiac wheel. Every scene is
-// deterministic (seeded PRNG) — Math.random is never used.
+// deterministic (seeded PRNG), Math.random is never used.
 import { mulberry32 } from "../../engine/math";
 
 export type SceneId =
@@ -588,7 +588,7 @@ function study(c: Ctx) {
   g.stroke();
 }
 
-// ── dawn: understanding — the horizon slowly lightening ────────────────
+// ── dawn: understanding, the horizon slowly lightening ────────────────
 function dawn(c: Ctx) {
   const { g, w, h, t } = c;
   const k = Math.min(1, t / 8);

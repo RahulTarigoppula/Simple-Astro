@@ -33,7 +33,7 @@ describe("Zhang-Suen thinning (§6.13 [6])", () => {
     expect(e).toHaveLength(2);
     const [left, right] = e;
     if (!left || !right) throw new Error("ends");
-    // Zhang–Suen erodes a thick stroke's ends by about half its width: the skeleton's endpoints
+    // Zhang-Suen erodes a thick stroke's ends by about half its width: the skeleton's endpoints
     // sit at the stroke's ends measured from its centre-line caps (x = 10 + 4, x = 109 − 4).
     expect(Math.abs(left[0] - 14)).toBeLessThanOrEqual(1);
     expect(Math.abs(right[0] - 105)).toBeLessThanOrEqual(1);
@@ -75,7 +75,7 @@ describe("Zhang-Suen thinning (§6.13 [6])", () => {
     const w = 512;
     const h = 512;
     const m = new Uint8Array(w * h);
-    // thick bands and blobs — the worst a hysteresis mask could plausibly be
+    // thick bands and blobs, the worst a hysteresis mask could plausibly be
     for (let y = 0; y < h; y++)
       for (let x = 0; x < w; x++) if ((x * 7 + y * 3) % 97 < 30 || (x - 256) ** 2 + (y - 256) ** 2 < 40 ** 2) m[y * w + x] = 1;
     const { iterations } = zhangSuenStats(m, w, h);

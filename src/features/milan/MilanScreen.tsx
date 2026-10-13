@@ -1,5 +1,5 @@
 // Guna Milan (§4.9): two small scrolls tied with a mauli thread, the score, and the 36-bead mala.
-// Every bead, number and word of judgement here is milan()'s output — nothing is typed in.
+// Every bead, number and word of judgement here is milan()'s output, nothing is typed in.
 import { motion } from "motion/react";
 import { useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
@@ -49,7 +49,7 @@ interface MoonFacts {
 }
 const moonOfPatri = (p: Patri): MoonFacts => ({ nak: p.grahas.MO.nakshatra, pada: p.grahas.MO.pada, sign: p.grahas.MO.sign });
 
-/** "Manglik (from Lagna, Candra) — bhaṅga noted" / "no Manglik mark". */
+/** "Manglik (from Lagna, Candra), bhaṅga noted" / "no Manglik mark". */
 export function manglikLabel(m: ManglikStatus): string {
   if (!m.present) return "no Manglik mark";
   return `Manglik (from ${m.from.map((f) => MANGLIK_REF_LABEL[f]).join(", ")})${m.cancellations.length > 0 ? ", bhaṅga noted" : ""}`;

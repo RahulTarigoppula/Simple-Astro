@@ -1,4 +1,4 @@
-// PosterAction's renderer: a 1080 × 1920 PNG of the painted sky on indigo cloth — the person's name
+// PosterAction's renderer: a 1080 × 1920 PNG of the painted sky on indigo cloth, the person's name
 // in Yatra One, the birth line, the Lagna, the engraved strip and a colophon. Canvas 2D only, drawn
 // from the same PaintedScene the SVG uses (both renderers export this one poster). No network:
 // web saves through an anchor with a data: URL; Android writes to the cache and opens the share sheet.

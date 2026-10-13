@@ -1,4 +1,4 @@
-// The painted sky's projection: stereographic, centred on the zenith, viewed from below — the way
+// The painted sky's projection: stereographic, centred on the zenith, viewed from below, the way
 // you see the sky lying on a rooftop with your feet to the east. East is at the bottom (towards
 // the parapet strip and the Lagna), West at the top, North on the left, South on the right.
 //

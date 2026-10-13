@@ -101,7 +101,7 @@ describe("gocharReport", () => {
     // Guru in the 11th is obstructed by any graha but itself in the 8th.
     expect(vedhaBy("JU", 11, { JU: 11, MA: 8 })).toEqual(["MA"]);
     expect(vedhaBy("JU", 11, { JU: 11, MA: 7 })).toEqual([]);
-    // Sūrya in the 3rd is obstructed from the 9th — but never by Śani.
+    // Sūrya in the 3rd is obstructed from the 9th, but never by Śani.
     expect(vedhaBy("SU", 3, { SU: 3, SA: 9 })).toEqual([]);
     expect(vedhaBy("SU", 3, { SU: 3, VE: 9 })).toEqual(["VE"]);
     // Candra and Budha spare each other.
@@ -144,7 +144,7 @@ describe("sadeSati, reference chart (Moon in Mīna)", () => {
     const s = spellAround(2026);
     if (!s) throw new Error("no spell");
     const rising = s.phases.rising ?? [];
-    expect(rising.length).toBeGreaterThanOrEqual(2); // [Apr–Jul 2022], [Jan 2023 – Mar 2025]
+    expect(rising.length).toBeGreaterThanOrEqual(2); // [Apr-Jul 2022], [Jan 2023 - Mar 2025]
     expect(iso(rising[0]?.[0] ?? 0).slice(0, 4)).toBe("2022");
     expect(iso(rising[1]?.[0] ?? 0).slice(0, 4)).toBe("2023");
     // the spell is one spell despite the gap in Makara
@@ -157,7 +157,7 @@ describe("sadeSati, reference chart (Moon in Mīna)", () => {
 
   it("finds the earlier spell (c. 1993-2000) and the next one (c. 2051-2058)", () => {
     const at = (y: number) => spellAround(y);
-    expect(at(1997)).toBeDefined(); // Śani over Kumbha–Mīna–Meṣa in the 1990s
+    expect(at(1997)).toBeDefined(); // Śani over Kumbha-Mīna-Meṣa in the 1990s
     expect(at(2055)).toBeDefined();
     // nothing in, say, 2010
     expect(at(2010)).toBeUndefined();
@@ -170,7 +170,7 @@ describe("sadeSati, reference chart (Moon in Mīna)", () => {
     expect(a.length).toBeGreaterThanOrEqual(3);
     for (const s of k) for (const i of s.intervals) expect(i.sign).toBe(2);
     for (const s of a) for (const i of s.intervals) expect(i.sign).toBe(6);
-    // Śani in sidereal Tulā c. Nov 2011 – Nov 2014
+    // Śani in sidereal Tulā c. Nov 2011 - Nov 2014
     expect(a.some((s) => s.startMs < Date.UTC(2013, 0, 1) && s.endMs > Date.UTC(2013, 0, 1))).toBe(true);
     // never in Aṣṭama during the Sāḍe-sātī
     expect(a.some((s) => s.startMs < Date.UTC(2026, 0, 1) && s.endMs > Date.UTC(2026, 0, 1))).toBe(false);

@@ -23,7 +23,7 @@ import { type BlobRow, db, type MetaKey, type PlaceCacheRow, type ReadingRow } f
 
 export type StorageErrorCode = "QUOTA" | "NOT_FOUND" | "INVALID";
 
-/** Storage failures the UI can explain ("the drawer is full — burn a print or export"). */
+/** Storage failures the UI can explain ("the drawer is full, burn a print or export"). */
 export class StorageError extends Error {
   readonly code: StorageErrorCode;
   readonly detail: string;
@@ -56,7 +56,7 @@ async function guard<T>(what: string, op: () => Promise<T>): Promise<T> {
 /**
  * Insert or update a profile. `createdAt` is preserved, `updatedAt` stamped. When the birth
  * data changed, every derived row for the profile (patris, milans, memo entries) is dropped
- * in the same transaction — a chart for the old birth time must never be served again.
+ * in the same transaction, a chart for the old birth time must never be served again.
  */
 export async function upsertProfile(profile: Profile, now: number = Date.now()): Promise<Profile> {
   return guard("upsertProfile", () =>
@@ -79,8 +79,8 @@ export async function upsertProfile(profile: Profile, now: number = Date.now()):
 }
 
 /**
- * Burn: delete a profile and everything derived from or attached to it — cached charts,
- * palm captures, their photos, readings and milans — in ONE transaction. No tombstones.
+ * Burn: delete a profile and everything derived from or attached to it, cached charts,
+ * palm captures, their photos, readings and milans, in ONE transaction. No tombstones.
  * Clears `settings.activeProfileId` when it pointed at the burnt profile.
  */
 export async function burnProfile(id: ProfileId): Promise<void> {
@@ -125,7 +125,7 @@ export async function getSettings(): Promise<Settings> {
 
 /**
  * Patch settings. A preset change bumps `meta.presetRevision` in the same transaction;
- * cached patris are not migrated — rows with another presetHash are simply stale.
+ * cached patris are not migrated, rows with another presetHash are simply stale.
  */
 export async function saveSettings(patch: Partial<Settings>): Promise<Settings> {
   return guard("saveSettings", () =>
@@ -192,7 +192,7 @@ export function patriCacheKeys(): string[] {
 }
 
 /**
- * A stored chart is stale when it was cast under another preset (or engine epoch — both live
+ * A stored chart is stale when it was cast under another preset (or engine epoch, both live
  * in the hash) or before the profile's last edit.
  */
 export function isPatriStale(row: Patri, preset: EnginePreset, profile?: Profile): boolean {

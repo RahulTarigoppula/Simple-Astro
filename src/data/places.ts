@@ -1,9 +1,9 @@
 // Birthplace lookup (IMPLEMENTATION-PROMPT §7).
 //
 // Two strictly separated paths:
-//   1. searchPlaces()  — the bundled GeoNames gazetteer, in memory, synchronous. Typing calls
+//   1. searchPlaces() , the bundled GeoNames gazetteer, in memory, synchronous. Typing calls
 //      only this. It NEVER touches the network.
-//   2. searchOnline()  — Open-Meteo, then Nominatim; called only from an explicit
+//   2. searchOnline() , Open-Meteo, then Nominatim; called only from an explicit
 //      "search online ⌑" submit, only when settings.onlineLookupAllowed is true. Results are
 //      cached in db.places for 90 days so a place looked up once is offline forever.
 
@@ -22,7 +22,7 @@ import { getPlaceCache, getSettings, PLACE_CACHE_TTL, putPlaceCache } from "./re
 //   lookup    prefix → binary search over the sorted keys, compared in place with
 //             charCodeAt (no allocation); exact = prefix of equal length; word-start =
 //             indexOf(" q") and substring = indexOf(q) over the joined string; fuzzy =
-//             a bounded Levenshtein (≤ 1 for 4–6 letters, ≤ 2 for 7+) over keys sharing the
+//             a bounded Levenshtein (≤ 1 for 4-6 letters, ≤ 2 for 7+) over keys sharing the
 //             query's first letter.
 //   ranking   match quality tier, then population (log scale, South Asia slightly boosted).
 
@@ -30,7 +30,7 @@ import { getPlaceCache, getSettings, PLACE_CACHE_TTL, putPlaceCache } from "./re
 export interface GazetteerEntry {
   id: number; // geonameId
   name: string;
-  alt: string; // "Bombay|Bombaim" — a few historical / English alternates
+  alt: string; // "Bombay|Bombaim", a few historical / English alternates
   admin1: string;
   country: string;
   lat: number;
@@ -88,7 +88,7 @@ function canonSlow(s: string): string {
 }
 
 const SOUTH_ASIA = new Set(["IN", "NP", "LK", "PK", "BD", "BT"]);
-const SOUTH_ASIA_BOOST = 0.5; // in log10(population) units — about ×3
+const SOUTH_ASIA_BOOST = 0.5; // in log10(population) units, about ×3
 
 const KIND_NAME = 0;
 const KIND_ALT = 1;
@@ -264,8 +264,8 @@ function buildCompact(rows: unknown[], idx: FieldIndex): Compact {
   nameOff[n] = nameLen;
   wordsOff[n] = wordsLen;
 
-  // Sort keys: a numeric sort on (six-character prefix code, key index) — comparator-less
-  // and fast — then settle runs that share a six-character prefix by string compare.
+  // Sort keys: a numeric sort on (six-character prefix code, key index), comparator-less
+  // and fast, then settle runs that share a six-character prefix by string compare.
   const K = keys.length;
   if (K >= SPAN) throw new Error(`gazetteer: ${K} keys exceeds ${SPAN}`);
   const codes = new Float64Array(K);
@@ -460,7 +460,7 @@ function makeGazetteer(c: Compact): Gazetteer {
       return s;
     };
 
-    // 1. whole-key exact / prefix — one binary-searched range scan.
+    // 1. whole-key exact / prefix, one binary-searched range scan.
     const [lo, hi] = prefixRange(qc);
     for (let k = lo; k < hi; k++) {
       const e = keyEntry[k] as number;
@@ -501,7 +501,7 @@ function makeGazetteer(c: Compact): Gazetteer {
       }
     }
 
-    // 4. fuzzy: one typo for 4–6 letters, two for 7+, among keys sharing the first letter.
+    // 4. fuzzy: one typo for 4-6 letters, two for 7+, among keys sharing the first letter.
     const letters = qc.replace(/ /g, "").length;
     if (strong < limit && letters >= 4) {
       const maxD = letters <= 6 ? 1 : 2;
@@ -622,7 +622,7 @@ export async function loadGazetteerFromBytes(bytes: Uint8Array): Promise<Gazette
 }
 
 /**
- * Fetch the bundled asset (same-origin, precached by the service worker — not a network
+ * Fetch the bundled asset (same-origin, precached by the service worker, not a network
  * lookup in the privacy sense) and build the index once. Concurrent callers share one load.
  */
 export function loadGazetteer(): Promise<Gazetteer> {
@@ -663,7 +663,7 @@ export function searchPlaces(q: string, limit = 8): Place[] {
 
 export type NetErrorCode = "RATE_LIMIT" | "NETWORK" | "BAD_RESPONSE" | "NOT_ALLOWED" | `HTTP_${number}`;
 
-/** "The wire is quiet — type the coordinates." */
+/** "The wire is quiet, type the coordinates." */
 export class NetError extends Error {
   readonly code: NetErrorCode;
   constructor(code: NetErrorCode, detail?: string) {

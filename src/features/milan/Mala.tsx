@@ -169,7 +169,7 @@ export function Mala({ result, onOpen }: MalaProps) {
     })();
   }, [phase, animateKnot, knotScope]);
 
-  // Tap anywhere — or any key — finishes the count at once.
+  // Tap anywhere, or any key, finishes the count at once.
   useEffect(() => {
     if (phase === "done") return;
     const onAny = () => {

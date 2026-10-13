@@ -1,4 +1,4 @@
-// Daśa Porutham — the ten agreements of South Indian (Tamil) marriage matching, read from the two
+// Daśa Porutham, the ten agreements of South Indian (Tamil) marriage matching, read from the two
 // Moons' nakshatra and sign. Each porutham either holds (tied) or does not (open); there are no
 // points. Rajju and Vedha are the two the tradition weighs heaviest.
 //
@@ -30,7 +30,7 @@ export interface PoruthamResult {
   because: string;
   /** The classical rule, stated once. */
   rule: string;
-  /** What the tradition weighs in this agreement — one line. */
+  /** What the tradition weighs in this agreement, one line. */
   weighs: string;
   /** Rajju and Vedha: the two the tradition weighs heaviest. */
   weighty: boolean;
@@ -125,18 +125,18 @@ export const RASHI_GOOD_COUNTS: readonly number[] = [1, 7, 9, 10, 11, 12];
 
 /** Vaśya: the signs each sign holds under its sway (0 = Meṣa). */
 export const VASHYA_SIGNS: readonly (readonly number[])[] = [
-  [4, 7], // Meṣa — Siṃha, Vṛścika
-  [3, 6], // Vṛṣabha — Karka, Tulā
-  [5], // Mithuna — Kanyā
-  [7, 8], // Karka — Vṛścika, Dhanu
-  [6], // Siṃha — Tulā
-  [2, 11], // Kanyā — Mithuna, Mīna
-  [5, 9], // Tulā — Kanyā, Makara
-  [3], // Vṛścika — Karka
-  [11], // Dhanu — Mīna
-  [0, 10], // Makara — Meṣa, Kumbha
-  [0], // Kumbha — Meṣa
-  [9], // Mīna — Makara
+  [4, 7], // Meṣa, Siṃha, Vṛścika
+  [3, 6], // Vṛṣabha, Karka, Tulā
+  [5], // Mithuna, Kanyā
+  [7, 8], // Karka, Vṛścika, Dhanu
+  [6], // Siṃha, Tulā
+  [2, 11], // Kanyā, Mithuna, Mīna
+  [5, 9], // Tulā, Kanyā, Makara
+  [3], // Vṛścika, Karka
+  [11], // Dhanu, Mīna
+  [0, 10], // Makara, Meṣa, Kumbha
+  [0], // Kumbha, Meṣa
+  [9], // Mīna, Makara
 ];
 
 export type Rajju = "pada" | "kati" | "nabhi" | "kantha" | "shiras";
@@ -329,7 +329,7 @@ export interface GanaParihara {
 /**
  * Gaṇa doṣa is eased, by the later commentaries, when the two Moon-sign lords are one graha or
  * mutual friends (Graha Maitrī at its full 5), or when Bhakūṭa is free of doṣa. Returns null when
- * Gaṇa is not a doṣa. Recorded only — the score is never changed.
+ * Gaṇa is not a doṣa. Recorded only, the score is never changed.
  */
 export function ganaParihara(ks: readonly KootaResult[]): GanaParihara | null {
   const gana = ks.find((k) => k.id === "gana");

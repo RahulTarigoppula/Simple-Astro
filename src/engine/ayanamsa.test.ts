@@ -67,7 +67,7 @@ describe("AY-1…AY-7", () => {
     expect(ayanamsaRateDegPerDay(2451545.0) * 36525 * 3600).toBeCloseTo(5028.796, 2);
   });
 
-  // 200 dates, 1900–2030, evenly spaced (deterministic — no Math.random).
+  // 200 dates, 1900-2030, evenly spaced (deterministic, no Math.random).
   const dates = Array.from({ length: 200 }, (_, i) => 2415020.5 + (i * (2462502.5 - 2415020.5)) / 199);
 
   it("AY-3: the nutation term is bounded and its sign flips (Δψ is not a constant)", () => {

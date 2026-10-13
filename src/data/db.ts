@@ -8,7 +8,7 @@ export const DB_NAME = "chowki";
 /** Bumped together with a new `db.version(n)` block + upgrade function + migration test. */
 export const SCHEMA_VERSION = 1;
 
-/** Cached chart — disposable derived data, primary key [profileId+presetHash]. */
+/** Cached chart, disposable derived data, primary key [profileId+presetHash]. */
 export type PatriRow = Patri;
 /** A palm capture; photos live out of line in `blobs`. */
 export type PalmRow = HandCapture;
@@ -18,7 +18,7 @@ export type ReadingRow = PalmReading & { profileId: ProfileId };
 export type MilanRow = MilanResult;
 
 export interface BlobRow {
-  /** `${profileId}/${captureId}/${kind}` — the prefix lets Burn sweep orphans by key range. */
+  /** `${profileId}/${captureId}/${kind}`, the prefix lets Burn sweep orphans by key range. */
   key: string;
   blob: Blob;
   /** MIME type, duplicated so the row survives a Blob that lost its type in transit. */
@@ -26,7 +26,7 @@ export interface BlobRow {
 }
 
 export interface PlaceCacheRow {
-  /** The lower-cased, whitespace-collapsed query — the primary key. */
+  /** The lower-cased, whitespace-collapsed query, the primary key. */
   name: string;
   results: Place[];
   fetchedAt: number;
@@ -45,7 +45,7 @@ export interface MetaRow {
 
 /**
  * Version-1 stores. Deviation from §5: `places` is keyed by `name` (the normalised query)
- * because a cache row holds the *results of a query*, not one place — a `geonameId` key
+ * because a cache row holds the *results of a query*, not one place, a `geonameId` key
  * cannot hold Nominatim results (no id) or several hits per query.
  */
 export const SCHEMA_V1 = {

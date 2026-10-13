@@ -1,5 +1,5 @@
 // Burn: hold 600 ms. While held the leaf's edge chars toward lac (an overlay whose opacity follows
-// the hold — transform/opacity only); release early and it cools back.
+// the hold, transform/opacity only); release early and it cools back.
 import { useRef } from "react";
 import { useHold } from "../../components/ui/useHold";
 

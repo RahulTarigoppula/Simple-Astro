@@ -1,4 +1,4 @@
-// Design rules that are tests, not opinions (IMPLEMENTATION-PROMPT §3.2–§3.3, §10.6 VT-3).
+// Design rules that are tests, not opinions (IMPLEMENTATION-PROMPT §3.2-§3.3, §10.6 VT-3).
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";

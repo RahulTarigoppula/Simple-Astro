@@ -1,4 +1,4 @@
-// Stages [3]–[6] as one pure function: (ImageData-like, landmarks, settings) → print + lines.
+// Stages [3]-[6] as one pure function: (ImageData-like, landmarks, settings) → print + lines.
 // Byte-identical on repeat. The worker swaps in OpenCV for the warp, the enhancement and the
 // closing via `ops`; everything else (ridge, NMS, hysteresis, thinning, labelling) is shared TS.
 import type { Landmark, PalmLine, PalmLineId } from "../types";
@@ -28,7 +28,7 @@ export interface PipelineResult {
   /** the rectified 512 × 512 RGBA print */
   print: ImageLike;
   lines: PalmLine[];
-  /** true when any of heart/head/life is missing or below 0.6 — hand over the stylus */
+  /** true when any of heart/head/life is missing or below 0.6, hand over the stylus */
   suggestTrace: boolean;
   /** every labelled candidate, including a sub-threshold fate line, for diagnostics */
   candidates: Candidate[];

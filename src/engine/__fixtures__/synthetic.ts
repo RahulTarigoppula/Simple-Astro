@@ -1,4 +1,4 @@
-// Synthetic PatriCore builder for rule tests: sign placements in, a complete chart out — no ephemeris.
+// Synthetic PatriCore builder for rule tests: sign placements in, a complete chart out, no ephemeris.
 // Dignity and combustion are derived here with the rule layer's own tables so a fixture only states
 // where each graha sits.
 import { NAK_LORDS } from "../../data/tables/names";

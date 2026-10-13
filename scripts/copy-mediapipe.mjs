@@ -12,7 +12,7 @@ const src = join(root, "node_modules", "@mediapipe", "tasks-vision", "wasm");
 const dst = join(root, "public", "mediapipe");
 
 if (!existsSync(src)) {
-  console.error(`copy-mediapipe: ${src} is missing — run npm ci first.`);
+  console.error(`copy-mediapipe: ${src} is missing, run npm ci first.`);
   process.exit(1);
 }
 mkdirSync(dst, { recursive: true });
@@ -23,7 +23,7 @@ let copied = 0;
 let kept = 0;
 // FilesetResolver.forVisionTasks(base) (no ES-module flag) loads vision_wasm_internal.* or, on
 // engines without wasm SIMD, vision_wasm_nosimd_internal.*. The *_module_internal pair is only for
-// the ES-module loader we never use — skipping it keeps 12 MB out of the APK.
+// the ES-module loader we never use, skipping it keeps 12 MB out of the APK.
 const SKIP = /_module_internal\./;
 for (const name of readdirSync(dst)) if (SKIP.test(name)) rmSync(join(dst, name));
 for (const name of readdirSync(src)) {

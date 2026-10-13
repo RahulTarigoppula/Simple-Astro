@@ -62,7 +62,7 @@ export function vimshottari(moonLonSid: Deg, birthMs: number, yearDays: 365.25 |
   return out;
 }
 
-/** Pratyantardaśās of an antardaśā — generated on demand, never eagerly. `_md` names the parent
+/** Pratyantardaśās of an antardaśā, generated on demand, never eagerly. `_md` names the parent
  *  mahādaśā for the call site's readability; the split depends only on the antar's own interval
  *  (len = MD·AD·PD / 120² years, which is AD length × PD / 120). */
 export function pratyantars(_md: DashaNode, ad: DashaNode, _yearDays: 365.25 | 360): DashaNode[] {

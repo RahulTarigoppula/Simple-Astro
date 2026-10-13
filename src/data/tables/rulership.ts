@@ -1,4 +1,4 @@
-// Sign rulership, exaltation and natural (naisargika) friendship — classical facts, re-typed by hand.
+// Sign rulership, exaltation and natural (naisargika) friendship, classical facts, re-typed by hand.
 // Sources: BPHS ch. 3 (graha guṇa-svarūpa: exaltation/debilitation signs, natural friendship),
 // BPHS ch. 4 (rāśi lords). These tables serve the yoga and Guna Milan rules; the astronomy core's
 // own dignity table (dignity.ts) is independent and owned elsewhere.

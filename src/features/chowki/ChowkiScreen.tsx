@@ -1,5 +1,5 @@
 // Home: the live sky wheel, today's pañcāṅga at a glance, the person's day, and the doors to
-// every instrument — an astral dashboard rather than a desk.
+// every instrument, an astral dashboard rather than a desk.
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
@@ -218,10 +218,10 @@ export default function ChowkiScreen() {
 
       <section className="home-trust" aria-label="How Vyom was made and your privacy">
         <div className="home-card home-card--made">
-          <h2 className="home-card__h">How Vyom was made</h2>
+          <h2 className="home-card__h">How Vyom 1.0 was made</h2>
           <p>
-            Rahul (RT) spent almost 18 weeks planning, building, gathering and cleaning the data. Every chart is worked out from real
-            astronomy and checked against the professional standard.
+            <b>252 hours</b> of work and dedication by Rahul (RT): 18 weeks, 7 days a week, 2 hours a day. Planning, building, gathering and
+            cleaning the data. Every chart is worked out from real astronomy and checked against the professional standard.
           </p>
           <ul className="home-card__n">
             <li>
@@ -251,7 +251,7 @@ export default function ChowkiScreen() {
       </section>
 
       <p className="home-foot">
-        Made by Rahul (RT) · <Link to="/about">How Vyom was made</Link>
+        Vyom 1.0 · Made by Rahul (RT) · <Link to="/about">How Vyom was made</Link>
       </p>
     </Screen>
   );

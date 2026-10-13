@@ -1,4 +1,4 @@
-// "गोचर · Transits now" — a section for the Janam Patri scroll: where the nine grahas walk today,
+// "गोचर · Transits now", a section for the Janam Patri scroll: where the nine grahas walk today,
 // counted from the natal Moon (and Lagna), Śani's spells on a 90-year ribbon, and a few calm
 // "Tradition says…" sentences, each with its source.
 import { useEffect, useMemo, useState } from "react";

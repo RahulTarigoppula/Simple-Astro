@@ -1,6 +1,6 @@
 // The ten poruthams as a second, shorter thread beneath the mala: ten knots, tied in brass where the
 // porutham holds, left open (an empty ring with a lac ×) where it does not. Every knot is a button
-// opening its rule. Pass/fail always also reads as text — colour is never the only signal.
+// opening its rule. Pass/fail always also reads as text, colour is never the only signal.
 import type { PoruthamResult } from "../../engine/porutham";
 
 function Knot({ tied }: { tied: boolean }) {

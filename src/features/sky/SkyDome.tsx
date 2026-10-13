@@ -1,11 +1,11 @@
-// SkyDome (§4.6, §6.14) — the lazy 3D Rooftop: three r185 + R3F 9, frameloop "demand", DPR ≤ 1.5.
+// SkyDome (§4.6, §6.14), the lazy 3D Rooftop: three r185 + R3F 9, frameloop "demand", DPR ≤ 1.5.
 // Stars are one Points with per-vertex size/alpha on the celestial sphere; the sidereal zodiac is
 // a brass torus with 12 rāśi dividers and 27 nakshatra ticks; grahas are brass billboards with
 // Devanagari abbreviations; the Moon shows its phase with the lit limb turned towards the Sun;
 // the Lagna is a sindoor beam at the eastern horizon; a parapet rings the roof.
 //
 // Nothing here animates by itself: a frame renders only when the sky changes (scrub), when the
-// view is dragged (with BRASS inertia), or on resize — and never while the page is hidden.
+// view is dragged (with BRASS inertia), or on resize, and never while the page is hidden.
 // This module is the ONLY importer of three / @react-three/fiber, so they stay out of the entry.
 // R3F through `createRoot` rather than <Canvas>: <Canvas> registers the entire THREE namespace in
 // its catalogue (defeating tree-shaking, ~+40 kB gz). The scene is built imperatively and mounted
@@ -46,7 +46,7 @@ import { moonLitPath } from "./scene";
 export interface SkyDomeProps {
   sky: RooftopSky;
   stars: StarCatalog;
-  /** Initial look azimuth (degrees) — the Lagna's, so the dome opens facing the eastern horizon. */
+  /** Initial look azimuth (degrees), the Lagna's, so the dome opens facing the eastern horizon. */
   lookAz: number;
   paused: boolean;
   noInertia: boolean;
@@ -503,7 +503,7 @@ export default function SkyDome({ sky, stars, lookAz, paused, noInertia, onReady
     };
   }, [size, paused]);
 
-  // The sky changed (a scrub frame): hand the new model to the scene — it invalidates once.
+  // The sky changed (a scrub frame): hand the new model to the scene, it invalidates once.
   useLayoutEffect(() => {
     if (!configured) return;
     root.current?.render(

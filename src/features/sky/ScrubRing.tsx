@@ -1,7 +1,7 @@
 // ScrubRing (§4.6): a brass ring turned with the thumb to scrub ±12 h around the birth moment.
 // BRASS feel: the ring follows the finger 1:1 (zero easing), keeps turning on release with
 // rotational inertia (v *= 0.94 per frame, capped at 4 detents per frame) and settles into a
-// detent every 10 minutes — each detent a brass tick and a selection haptic. One turn = 2 hours.
+// detent every 10 minutes, each detent a brass tick and a selection haptic. One turn = 2 hours.
 import { useCallback, useEffect, useRef } from "react";
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";

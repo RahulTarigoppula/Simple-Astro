@@ -1,4 +1,4 @@
-// Aṣṭakavarga benefic places (bindu tables), BPHS ch. 66 — re-typed as facts. For each graha whose
+// Aṣṭakavarga benefic places (bindu tables), BPHS ch. 66, re-typed as facts. For each graha whose
 // Bhinnāṣṭakavarga is cast (the key), each of the eight contributors (seven grahas + Lagna) gives one
 // bindu to the signs counted 1..12 (inclusive) from its own position. Row totals are the classical
 // fixed sums: Sun 48, Moon 49, Mars 39, Mercury 54, Jupiter 56, Venus 52, Saturn 39 (Σ 337).

@@ -1,4 +1,4 @@
-// "Roots" — the story of Indian astrology, palmistry and numerology, told as cards. Myth is told as
+// "Roots", the story of Indian astrology, palmistry and numerology, told as cards. Myth is told as
 // myth, history as history (with dates as historians give them), and the line between them is kept.
 
 export type StoryArt =

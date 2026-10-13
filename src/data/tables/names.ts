@@ -164,7 +164,7 @@ export const GRAHA_DEV: Record<GrahaId, string> = {
   KE: "केतु",
 };
 
-/** Chart-chip abbreviations — text, never a glyph font. */
+/** Chart-chip abbreviations, text, never a glyph font. */
 export const GRAHA_ABBR_DEV: Record<GrahaId, string> = {
   SU: "सू",
   MO: "च",

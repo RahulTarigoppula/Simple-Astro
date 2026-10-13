@@ -1,6 +1,6 @@
 // The brass panchang dial: a turned conic face, an outer ring of 27 nakṣatra ticks with the Moon's
 // bead riding it, a 24-hour day track (noon at the top) with daylight in bright brass, Rāhu Kāla as
-// a haldi arc and the sunrise/sunset marks, and the tithi hand pointing at the Moon–Sun elongation.
+// a haldi arc and the sunrise/sunset marks, and the tithi hand pointing at the Moon-Sun elongation.
 import { useRef } from "react";
 
 const C = 60;
@@ -37,7 +37,7 @@ function useUnwrapped(deg: number): number {
 }
 
 export interface BrassDialProps {
-  /** Local clock hours (0–24) of the events, in the place's zone. */
+  /** Local clock hours (0-24) of the events, in the place's zone. */
   sunriseH: number;
   sunsetH: number;
   rahuH: readonly [number, number];

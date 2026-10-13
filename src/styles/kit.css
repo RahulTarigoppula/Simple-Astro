@@ -1,5 +1,5 @@
 /* ==========================================================================
-   The Chowki kit — ported from design/preview.html (the visual contract).
+   The Chowki kit, ported from design/preview.html (the visual contract).
    Class names match the preview so screens can be compared side by side.
    Colours come only from tokens.css. Materials are gradients + one grain tile.
    ========================================================================== */
@@ -146,7 +146,7 @@ a {
   }
 }
 
-/* The Ledge — five miniature objects, 56 px targets */
+/* The Ledge, five miniature objects, 56 px targets */
 .ledge {
   flex: none;
   height: var(--ledge-height);
@@ -224,7 +224,7 @@ a {
   }
 }
 
-/* ── Paper, bands, ledger rows, buttons — the manuscript kit ─────────── */
+/* ── Paper, bands, ledger rows, buttons, the manuscript kit ─────────── */
 .paper {
   position: relative;
   background: var(--paper);
@@ -496,7 +496,7 @@ button.cite:hover {
   color: var(--danger);
 }
 
-/* engraved brass strip — the contract with reality */
+/* engraved brass strip, the contract with reality */
 .engraved {
   display: flex;
   align-items: center;
@@ -526,7 +526,7 @@ button.cite:hover {
   opacity: 0.55;
 }
 
-/* digit-set — numerals set, never fade */
+/* digit-set, numerals set, never fade */
 .setting > i {
   font-style: normal;
   color: var(--ink-faint);
@@ -558,7 +558,7 @@ button.cite:hover {
   }
 }
 
-/* toast — the lac note */
+/* toast, the lac note */
 .toast-wrap {
   position: absolute;
   left: 50%;
@@ -1750,7 +1750,7 @@ button.cite:hover {
   background: var(--tulsi);
 }
 
-/* ── Guna Milan — the 36-bead mala ────────────────────────────────────── */
+/* ── Guna Milan, the 36-bead mala ────────────────────────────────────── */
 .pair {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -2011,7 +2011,7 @@ dialog.sheet-dialog::backdrop {
   }
 }
 
-/* "a newer desk is ready — reload": a small paper tab pinned at the top, never an auto-reload. */
+/* "a newer desk is ready, reload": a small paper tab pinned at the top, never an auto-reload. */
 .sw-tab {
   position: absolute;
   top: calc(env(safe-area-inset-top, 0px) + 6px);

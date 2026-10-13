@@ -74,8 +74,8 @@ describe("grahas", () => {
   it("the five star-planets vs §0.1a: the documented frame error, not ours", () => {
     // §0.1a computed Mars…Saturn from truncated Standish mean elements in the J2000 frame without
     // precessing to the date (≈ −4′52″ in 1994). SE agrees with this engine to ≤ 2″ (test above),
-    // so the §0.1a residuals below are the doc's. They are bounded (a gross error — like the
-    // 130°-wrong Moon of old — would still fail) and printed for the record.
+    // so the §0.1a residuals below are the doc's. They are bounded (a gross error, like the
+    // 130°-wrong Moon of old, would still fail) and printed for the record.
     const deltas: Record<string, number> = {};
     for (const id of ["MA", "ME", "JU", "VE", "SA"] as const) {
       const d = deltaArcsec(pTrue.grahas[id].lonSidereal, E.grahas[id].doc);

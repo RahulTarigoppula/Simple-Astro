@@ -1,4 +1,4 @@
-// Second, cheap Aṣṭakūṭa witness: @ishubhamx/panchangam-js (MIT, devDependency, Node-only — imported
+// Second, cheap Aṣṭakūṭa witness: @ishubhamx/panchangam-js (MIT, devDependency, Node-only, imported
 // only here). It follows a different school for Varṇa, Vaśya, Yoni and Gaṇa, so only the kootas where
 // the classical rule is unambiguous are compared. Its Tārā is the classical one (3 when both counts
 // are kind), which is the independent evidence for not following PyJHora's inverted Tārā column.

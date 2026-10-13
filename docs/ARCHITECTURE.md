@@ -1,4 +1,4 @@
-# Vyom (Jyoti) — Architecture
+# Vyom (Jyoti), Architecture
 
 Written 2026-09-08. Binding alongside `GOAL.md`, `docs/DESIGN.md` and `../_shared/DECISIONS.md` (this project is §D8 row 02). Every version below is the one verified in `docs/RESEARCH.md` on 2026-09-06; pin them in `package.json`.
 
@@ -13,20 +13,20 @@ The whole product is a pure function plus a face: `(birth date, time, place) →
 | Build | Vite | 8.2.2 (MIT) | One static `dist/` serves GitHub Pages and the Capacitor APK; `base` parameterised per target |
 | UI | React 19 + TypeScript (strict) | react 19.2.8 (MIT) | D1; the whole desk is DOM/CSS/SVG, so React's reconciliation is the only runtime cost |
 | Styling | Tailwind CSS v4 (`@tailwindcss/vite`) + `src/styles/tokens.css` | 4.3.3 (MIT) | D7 token names with DESIGN §15 values; hand-written CSS for paper, brass, lac, grain, lamp shadows |
-| Motion | Motion (`motion/react`) | 13.2.0 (MIT) | `pathLength` ink-draw, four material springs, `drag` for drums/loupe/stylus, `useScroll` for the unroll. **GSAP is not used** — DrawSVG's only job here is covered by `pathLength`, and GSAP is not OSI (DESIGN §3) |
+| Motion | Motion (`motion/react`) | 13.2.0 (MIT) | `pathLength` ink-draw, four material springs, `drag` for drums/loupe/stylus, `useScroll` for the unroll. **GSAP is not used**, DrawSVG's only job here is covered by `pathLength`, and GSAP is not OSI (DESIGN §3) |
 | Route transitions | View Transitions API (native) + React Router 7 `createHashRouter` | 7.x (MIT) | `object-open` carries the tapped desk object into its screen; hash routing deep-links on Pages with no rewrite |
 | Persisted data | Dexie + dexie-react-hooks + dexie-export-import | 4.4.5 / 4.4.0 / 4.4.0 (Apache-2.0) | Profiles, cached Patris, palm Blobs; `liveQuery` for the leaf bundle; streaming export feeds the encryption envelope |
 | UI state | Zustand | 5.0.15 (MIT) | Active profile, open drawer, loupe target, drum drag, sound/haptics, theme override |
-| Ephemeris | `astronomy-engine` | 2.1.19 (MIT) | ±1′ vs NOVAS; `Ecliptic(GeoVector(b,t,true))` is true-ecliptic-of-date, the same convention Swiss Ephemeris uses. Frozen upstream (no release since 2023-12-14) — pinned and vendored if it ever disappears |
-| Vedic math | **own `src/engine/`** (ayanamsa, node, lagna, vargas, dasha, panchang, yogas, ashtakoota, palm rules) | — (MIT, ours) | Auditable, unit-testable, citation-carrying; the reason the app exists |
-| Panchang cross-check | `@ishubhamx/panchangam-js` | 3.0.0 (MIT) | MVP accelerator and a permanent second opinion in tests. CJS with one `require("fs")` — stubbed in `vite.config.ts` |
+| Ephemeris | `astronomy-engine` | 2.1.19 (MIT) | ±1′ vs NOVAS; `Ecliptic(GeoVector(b,t,true))` is true-ecliptic-of-date, the same convention Swiss Ephemeris uses. Frozen upstream (no release since 2023-12-14), pinned and vendored if it ever disappears |
+| Vedic math | **own `src/engine/`** (ayanamsa, node, lagna, vargas, dasha, panchang, yogas, ashtakoota, palm rules) |, (MIT, ours) | Auditable, unit-testable, citation-carrying; the reason the app exists |
+| Panchang cross-check | `@ishubhamx/panchangam-js` | 3.0.0 (MIT) | MVP accelerator and a permanent second opinion in tests. CJS with one `require("fs")`, stubbed in `vite.config.ts` |
 | Time zones | `@photostructure/tz-lookup` + `luxon` | 11.6.1 (CC0-1.0) / 3.7.2 (MIT) | lat/lon → IANA zone in 88 kB; Luxon reads the browser's tzdb for historical offsets (+06:30 war time, +05:21:10 MMT). Temporal is not in Safari, so Luxon stays |
-| Gazetteer | GeoNames `cities500` subset + `minisearch` | dump (CC BY 4.0) / 7.2.0 (MIT) | Offline birthplace search; ≤ 1.8 MB gz (the budget `build-gazetteer.mjs` asserts — §11), precached |
+| Gazetteer | GeoNames `cities500` subset + `minisearch` | dump (CC BY 4.0) / 7.2.0 (MIT) | Offline birthplace search; ≤ 1.8 MB gz (the budget `build-gazetteer.mjs` asserts, §11), precached |
 | Hand landmarks | `@mediapipe/tasks-vision` + `hand_landmarker.task` | 1.0.1 (Apache-2.0) / model 7.46 MiB (Apache-2.0) | 21 landmarks + handedness, IMAGE mode, self-hosted wasm for offline |
 | Palm-line CV | `@techstark/opencv-js` pinned `4.12.0-release.1` | 4.12.0-release.1 (Apache-2.0) | CLAHE, black-hat, Sobel/Hessian, warpPerspective, connectedComponents. 14.7 MB unpacked → lazy chunk on the Hast screen only; `ximgproc.thinning` is absent, so Zhang-Suen is ours (§5.13) |
 | Sky | `three` + `@react-three/fiber` + `@react-three/drei`; `d3-geo` for the 2D fallback and the parapet strip | 0.185.1 / 9.7.0 / 10.7.8 / 3.x (MIT) | Rooftop dome with BSC5 stars; lazy chunk, `frameloop="demand"`, painted-SVG fallback |
 | Sound | `howler` + CC0 sprite | 2.2.x (MIT) | One sprite ≤ 300 kB (DESIGN §12); no tanpura, no music |
-| Primitives | shadcn/ui on Base UI (Dialog, RadioGroup, Switch, Tabs) | via `npx shadcn@latest` (MIT) | Focus trap, `role="dialog"`, Esc — restyled through tokens, never forked |
+| Primitives | shadcn/ui on Base UI (Dialog, RadioGroup, Switch, Tabs) | via `npx shadcn@latest` (MIT) | Focus trap, `role="dialog"`, Esc, restyled through tokens, never forked |
 | Icons | `lucide-react` | 1.41.0 (ISC) | 16 px, inside paper content only |
 | Fonts | `@fontsource/yatra-one`, `@fontsource/tiro-devanagari-hindi`, `@fontsource-variable/martian-mono` | 5.3.x (OFL 1.1) | DESIGN §5; subset to Latin + Latin-1 + Devanagari + `°′″℞`, ≤ 260 kB woff2 total |
 | PWA | `vite-plugin-pwa` (Workbox) + `@vite-pwa/assets-generator` | 1.3.0 / 1.0.2 (MIT) | Precache shell/fonts/gazetteer/sounds; runtime cache for models, OpenCV and the sky chunk |
@@ -34,12 +34,12 @@ The whole product is a pure function plus a face: `(birth date, time, place) →
 | Android plugins | `@capacitor/camera` 8.2.4, `/filesystem` 8.1.3, `/preferences` 8.0.1, `/haptics` 8.0.2, `/share` 8.0.1, `/app` 8.1.1, `/status-bar` 8.0.3, `/splash-screen` 8.0.2 | MIT | Palm capture, encrypted export, detent haptics, edge-to-edge, predictive back |
 | Tests | Vitest + Testing Library; Playwright (e2e + screenshots) | latest | Golden charts, the 11,664-pair Ashtakoota oracle, the screenshot contract vs `design/preview.html` |
 | Lint/format | Biome | latest | One tool (D1) |
-| Hosting / CI | GitHub Pages + Actions + Releases | free | D2/D3; **no Cloudflare Worker** — no secret exists anywhere in this app |
+| Hosting / CI | GitHub Pages + Actions + Releases | free | D2/D3; **no Cloudflare Worker**, no secret exists anywhere in this app |
 
 **Deviations from DECISIONS.md, justified.**
 
 - **No `src/wit/`** and no LLM rung at all. D4's wit ladder exists for apps whose text is a joke; Vyom's text is a *citation*. Readings are deterministic sentences composed from rule hits (§5.15). A BYO-key paraphraser is a Someday item (GOAL §7) and would be labelled as a paraphrase of the rule hits, never as the reading.
-- **No `worker/`** — nothing needs a hidden key, so no Cloudflare Worker exists (D2's "when a secret exists" clause never fires).
+- **No `worker/`**, nothing needs a hidden key, so no Cloudflare Worker exists (D2's "when a secret exists" clause never fires).
 - **GSAP is not a dependency** even though D1 permits it; Motion's `pathLength` is the entire ink-draw requirement and staying OSI-clean is worth more than DrawSVG's convenience.
 - **Swiss Ephemeris stays out of `package.json`.** The `Ephemeris` interface (§5.3) has a second implementation sketched for the AGPL lane, but installing it requires relicensing the repo (D5.1), so it is a documented option, not a dependency.
 
@@ -49,7 +49,7 @@ The whole product is a pure function plus a face: `(birth date, time, place) →
 
 ```mermaid
 flowchart TB
-  subgraph UI["React 19 UI — src/features/*"]
+  subgraph UI["React 19 UI, src/features/*"]
     CH[Vyom home<br/>desk objects · parapet strip]
     LF[Leaf entry<br/>drums · place · seal]
     PT[Janam Patri<br/>rollers · kundli · ledger · dasha]
@@ -66,7 +66,7 @@ flowchart TB
     MC[patriCache: Map&lt;profileId+presetHash, Patri&gt;]
   end
 
-  subgraph Engine["src/engine — pure TS, framework-free, 100% unit-tested"]
+  subgraph Engine["src/engine, pure TS, framework-free, 100% unit-tested"]
     TM[time.ts<br/>zone · historical offset · JD]
     AY[ayanamsa.ts<br/>3 Lahiri presets + nutation]
     EP[ephemeris.ts<br/>Ephemeris iface → astronomy-engine]
@@ -83,12 +83,12 @@ flowchart TB
   end
 
   subgraph Data["src/data"]
-    DB[(Dexie 4 — IndexedDB<br/>profiles · patris · palms · places · settings · meta)]
+    DB[(Dexie 4, IndexedDB<br/>profiles · patris · palms · places · settings · meta)]
     GZ[[geonames-in.json.gz<br/>+ minisearch index]]
     ST[[bsc5.bin · classical tables · citations.json]]
   end
 
-  subgraph Platform["src/platform — web vs Capacitor adapters"]
+  subgraph Platform["src/platform, web vs Capacitor adapters"]
     CAM[camera]
     FS[files + share]
     HP[haptics]
@@ -157,7 +157,7 @@ jyoti/
 │   │   ├── hast/                  # CameraView, QualityGauge, PalmPrint, LineOverlay, StylusEditor
 │   │   ├── sky/                   # SkyDome (lazy), PaintedSky, ScrubRing, PosterAction
 │   │   └── drawer/                # DialSegment presets, export/import, Colophon
-│   ├── engine/                    # pure domain logic — no React, no DOM (except palm/cv.ts)
+│   ├── engine/                    # pure domain logic, no React, no DOM (except palm/cv.ts)
 │   │   ├── time.ts  ayanamsa.ts  ephemeris.ts  nodes.ts  lagna.ts
 │   │   ├── vargas.ts  nakshatra.ts  dasha.ts  panchang.ts
 │   │   ├── yogas.ts  ashtakoota.ts  reading.ts  patri.ts
@@ -209,7 +209,7 @@ export interface BirthMoment {
   place: Place;
   zone: string;                    // IANA, e.g. "Asia/Kolkata" (from tz-lookup, editable)
   offsetOverrideMin?: number;      // e.g. 291 for Bombay Time +04:51; wins over the tzdb
-  utcMs: number;                   // resolved instant — the single source of truth
+  utcMs: number;                   // resolved instant, the single source of truth
   offsetMin: number;               // the offset actually used, minutes east of UTC
   jdUt: Jd;                        // utcMs -> JD_UT
   offsetSource: 'tzdb' | 'override';
@@ -261,7 +261,7 @@ export interface Graha {
 export interface BoundaryFlag {
   kind: 'sign' | 'nakshatra' | 'pada';
   arcminutesTo: number;    // distance to the nearest edge, in arcminutes
-  otherSide: string;       // "Jyeṣṭhā" — what a neighbouring preset would read
+  otherSide: string;       // "Jyeṣṭhā", what a neighbouring preset would read
 }
 
 export interface VargaChart {
@@ -323,7 +323,7 @@ export interface KootaResult {
   id: KootaId; nameDev: string; max: 1|2|3|4|5|6|7|8;
   score: number;                 // may be 0.5 / 1.5
   dosha: boolean;
-  because: string;               // "Nadi: both Madhya" — shown under the bead group
+  because: string;               // "Nadi: both Madhya", shown under the bead group
   cancellation?: { applied: boolean; rule: string; citation: Citation };
   citation: Citation;
 }
@@ -350,7 +350,7 @@ export interface HandCapture {
   originalBlobKey: string;       // Dexie blob store key
   rectifiedBlobKey: string;      // 512x512 canonical print
   landmarks: Landmark[];         // 21, in the ORIGINAL image frame
-  worldLandmarks: Landmark[];    // 21, metres, view-invariant — the ratios use these
+  worldLandmarks: Landmark[];    // 21, metres, view-invariant, the ratios use these
   handednessScore: number;       // MediaPipe confidence, reject < 0.8
   homography: number[];          // 9 numbers, row-major 3x3, original -> canonical
   quality: { sharpness: number; exposure: number };   // Laplacian variance; luma-histogram score
@@ -384,7 +384,7 @@ export interface Settings {
   language: 'en' | 'hi' | 'ta' | 'te';   // hi/ta/te are Someday; the shape exists from day 1
   sound: boolean; haptics: boolean; calmDesk: boolean;
   activeProfileId: ProfileId | null;
-  onlineLookupAllowed: boolean;          // default false — the "search online" stamp asks once
+  onlineLookupAllowed: boolean;          // default false, the "search online" stamp asks once
 }
 ```
 
@@ -404,7 +404,7 @@ db.version(1).stores({
 });
 ```
 
-Rules: `blobs` is a separate table so a profile list query never drags 2 MB of JPEG through the main thread; `patris` rows are disposable derived data (a preset change marks them stale, never migrates them); a **Burn** deletes the `profiles`, `patris`, `palms`, `readings`, `milans` and `blobs` rows in one transaction — there are no tombstones, because there is no sync.
+Rules: `blobs` is a separate table so a profile list query never drags 2 MB of JPEG through the main thread; `patris` rows are disposable derived data (a preset change marks them stale, never migrates them); a **Burn** deletes the `profiles`, `patris`, `palms`, `readings`, `milans` and `blobs` rows in one transaction, there are no tombstones, because there is no sync.
 
 ---
 
@@ -412,16 +412,16 @@ Rules: `blobs` is a separate table so a profile list query never drags 2 MB of J
 
 Everything in `src/engine/` is a pure function of its inputs, has no import from React or the DOM (the two exceptions are `palm/enhance.ts` and `palm/ridge.ts`, which take an `ImageData` and return an `ImageData`), and is covered by golden fixtures in `src/engine/__fixtures__/`.
 
-**The running worked example** — used in every subsection below and committed as `__fixtures__/rahul-1994.json`:
+**The running worked example**, used in every subsection below and committed as `__fixtures__/rahul-1994.json`:
 
 > **Rahul · 14 March 1994 · 07:25 · Bengaluru** (12.9716 °N, 77.5946 °E), preset `se-true` / true node / 365.25-day years / upper-limb sunrise.
 
-**The reference chart, recomputed 2026-09-08 — the single source for every golden below.**
+**The reference chart, recomputed 2026-09-08, the single source for every golden below.**
 
-Method: Meeus ch.25 for the Sun (apparent λ), ch.47 for the Moon (full 60-term ΣL + A1/A2/A3), ch.22 nutation, ch.12 GMST + the equation of the equinoxes, Standish/JPL mean elements + Kepler for the five star-planets, mean node for Rāhu/Ketu; positions in **TT** (ΔT = 60.13 s, Espenak–Meeus), sidereal time in **UT**. `design/preview.html`'s embedded engine is the same code and reproduces every row below to the arcsecond, which is the point: no number here was typed by hand.
+Method: Meeus ch.25 for the Sun (apparent λ), ch.47 for the Moon (full 60-term ΣL + A1/A2/A3), ch.22 nutation, ch.12 GMST + the equation of the equinoxes, Standish/JPL mean elements + Kepler for the five star-planets, mean node for Rāhu/Ketu; positions in **TT** (ΔT = 60.13 s, Espenak-Meeus), sidereal time in **UT**. `design/preview.html`'s embedded engine is the same code and reproduces every row below to the arcsecond, which is the point: no number here was typed by hand.
 
 - `jdUt` **2449425.579861** → display **`JD 2449425.5799`** · `jdTt` 2449425.580557
-- Lahiri **SE-true** ayanāṃśa **23.780152° = 23°46′48.5″** at `T = −0.05802654` (the `drik-mean` preset reads 23.782744° = 23°46′57.9″, +9.3″; `se-mean` 23.775998° = 23°46′33.6″) — §5.2's preset table, unchanged
+- Lahiri **SE-true** ayanāṃśa **23.780152° = 23°46′48.5″** at `T = −0.05802654` (the `drik-mean` preset reads 23.782744° = 23°46′57.9″, +9.3″; `se-mean` 23.775998° = 23°46′33.6″), §5.2's preset table, unchanged
 - Δψ +14.9549″ · Δε −4.2998″ · true ε **23.438851°** · GMST 200.2097° · GAST 200.2135° · **RAMC 277.8081°** · MC **Dhanu 13°23′27″** (253.3907°)
 
 | graha | λ_sid | rāśi + degree | nakshatra · pada | lord | house | ℞ | D9 |
@@ -437,15 +437,15 @@ Method: Meeus ch.25 for the Sun (apparent λ), ch.47 for the Moon (full 60-term 
 | Rāhu | 213.4956° | Vṛścika 3°29′44″ | Anurādhā · 1 | Śani | 9 | ℞ | Siṃha |
 | Ketu | 33.4956° | Vṛṣabha 3°29′44″ | Kṛttikā · 3 | Sūrya | 3 | ℞ | Kumbha |
 
-**No graha is within 2′ of a sign, nakshatra or pada edge**, so the reference Patri renders **no vermilion asterisk at all**; the nearest approach is Rāhu, 10′ inside Anurādhā. Maṅgala and Śani stand **23″ apart** in Śatabhiṣā — a genuine Graha Yuddha, and the reason this birth moment is worth shipping as the demo.
+**No graha is within 2′ of a sign, nakshatra or pada edge**, so the reference Patri renders **no vermilion asterisk at all**; the nearest approach is Rāhu, 10′ inside Anurādhā. Maṅgala and Śani stand **23″ apart** in Śatabhiṣā, a genuine Graha Yuddha, and the reason this birth moment is worth shipping as the demo.
 
 **Birth panchāṅga:** tithi **Śukla Dvitīyā** (#2; elongation 19.6877°) · vāra **Somavāra** · nakshatra **Revatī pada 1** · yoga **Śukla** (#24) · karaṇa **Kaulava** (half-tithi 4) · Moon 2.9 % lit.
 
-**Viṃśottarī:** Moon's lord **Budha**, `f` = 0.187659, balance **13.809790 yr = 5044.03 d**; **Budha mahādaśā 1994-03-14 → 2008-01-04 ≈ 08:02 IST**, then Ketu, Śukra, Sūrya, Candra, Maṅgala, Rāhu, Guru, Śani (nominal MD start 1991-01-04). Antardaśā at birth **Ketu** (1993-06-01 → 1994-05-29 ≈ 22:26 IST); pratyantardaśā **Śani** (1994-02-10 → 1994-04-08). The ribbon opens **Budha – Ketu – Śani**.
+**Viṃśottarī:** Moon's lord **Budha**, `f` = 0.187659, balance **13.809790 yr = 5044.03 d**; **Budha mahādaśā 1994-03-14 → 2008-01-04 ≈ 08:02 IST**, then Ketu, Śukra, Sūrya, Candra, Maṅgala, Rāhu, Guru, Śani (nominal MD start 1991-01-04). Antardaśā at birth **Ketu** (1993-06-01 → 1994-05-29 ≈ 22:26 IST); pratyantardaśā **Śani** (1994-02-10 → 1994-04-08). The ribbon opens **Budha - Ketu - Śani**.
 
-**Aṣṭakūṭa vs the showcase partner Priya (Moon in Rohiṇī, Vṛṣabha):** `1 / 2 / 1.5 / 2 / 0.5 / 6 / 7 / 0` = **20 / 36, "acceptable"**. Bhakūṭa is **7/7 — not a doṣa** (Mīna ↔ Vṛṣabha is a 3/11 axis), so those beads are brass; the single lac row is **Nāḍī** (both Moons are Antya). Full derivation in §5.11.
+**Aṣṭakūṭa vs the showcase partner Priya (Moon in Rohiṇī, Vṛṣabha):** `1 / 2 / 1.5 / 2 / 0.5 / 6 / 7 / 0` = **20 / 36, "acceptable"**. Bhakūṭa is **7/7, not a doṣa** (Mīna ↔ Vṛṣabha is a 3/11 axis), so those beads are brass; the single lac row is **Nāḍī** (both Moons are Antya). Full derivation in §5.11.
 
-Every worked example in §5.1–§5.11 is a slice of that table. `design/preview.html`'s embedded engine recomputes it on load, and TESTING E-3 asserts it against `cast(referenceChart)` so no literal here can drift from the engine again.
+Every worked example in §5.1-§5.11 is a slice of that table. `design/preview.html`'s embedded engine recomputes it on load, and TESTING E-3 asserts it against `cast(referenceChart)` so no literal here can drift from the engine again.
 
 ### 5.1 Resolving a birth moment (`time.ts`)
 
@@ -494,7 +494,7 @@ export function resolveBirthMoment(input: {
 | 1943-06-01 06:00 Calcutta | `Asia/Kolkata` | **+06:30** | Second war-time spell, 1942-09-01 → 1945-10-15 |
 | 1942-07-01 06:00 Calcutta | `Asia/Kolkata` | **+05:30** | The gap *between* the two war-time spells |
 | 1900-04-10 09:00 Madras | `Asia/Kolkata` | **+05:21:10** | Madras Mean Time, ends 1906-01-01 |
-| 1950-02-02 04:00 Bombay | `Asia/Kolkata` + override | **+04:51** | Bombay Time is *not* in tzdb — the override drum is the only route |
+| 1950-02-02 04:00 Bombay | `Asia/Kolkata` + override | **+04:51** | Bombay Time is *not* in tzdb, the override drum is the only route |
 | 1985-11-02 22:00 Kathmandu | `Asia/Kathmandu` | **+05:30** | Nepal moved to +05:45 only in 1986 |
 
 The UI must never hide this: DESIGN §9.4's engraved strip prints `ASIA/KOLKATA · +05:30 · JD 2449425.5799`, and `offsetSource === 'override'` adds a haldi note. For the worked example, `utcMs` = 1994-03-14T01:55:00Z and **`jdUt` = 2449425.579861**.
@@ -503,7 +503,7 @@ The UI must never hide this: DESIGN §9.4's engraved strip prints `ASIA/KOLKATA 
 
 ### 5.2 Lahiri ayanamsa, three presets (`ayanamsa.ts`)
 
-RESEARCH §5.4 is the load-bearing discovery of this project: Swiss Ephemeris' Lahiri, its nutation-free mean, and the value Drik Panchang prints are **three different numbers** separated by 19–41″. Shipping one of them silently would make every golden test unwinnable. So the preset is a first-class input and is engraved on every chart.
+RESEARCH §5.4 is the load-bearing discovery of this project: Swiss Ephemeris' Lahiri, its nutation-free mean, and the value Drik Panchang prints are **three different numbers** separated by 19-41″. Shipping one of them silently would make every golden test unwinnable. So the preset is a first-class input and is engraved on every chart.
 
 ```ts
 const J2000_SE_MEAN   = 23.857054;   // deg - SE t0 23d15'00.658" @ JD 2435553.5, propagated (IAU-1976)
@@ -545,9 +545,9 @@ export function ayanamsa(jdTt: Jd, preset: AyanamsaPreset): Deg {
 | `se-mean` | 23.775998° = 23°46′33.6″ |
 | `drik-mean` | 23.782744° = 23°46′57.9″ |
 
-The spread across the three presets is **24.3″** — a quarter of a percent of a pada, but exactly enough to flip a reading when a graha sits on an edge, which is why §5.6 exists. Unit tests assert `se-true − se-mean === Δψ` to 0.01″ and `drik-mean − se-mean === 24.29″ ± 0.05″` at ten dates spanning 1900–2030 (RESEARCH flags the +24.3″ fit as needing more samples; that test is the place that confirms it).
+The spread across the three presets is **24.3″**, a quarter of a percent of a pada, but exactly enough to flip a reading when a graha sits on an edge, which is why §5.6 exists. Unit tests assert `se-true − se-mean === Δψ` to 0.01″ and `drik-mean − se-mean === 24.29″ ± 0.05″` at ten dates spanning 1900-2030 (RESEARCH flags the +24.3″ fit as needing more samples; that test is the place that confirms it).
 
-The Drawer's `DialSegment` renders these three as ticks on a magnified brass arc, labelled with their arcsecond difference at the *current* chart's date — the instrument metaphor doing real work (DESIGN §3, graft 4).
+The Drawer's `DialSegment` renders these three as ticks on a magnified brass arc, labelled with their arcsecond difference at the *current* chart's date, the instrument metaphor doing real work (DESIGN §3, graft 4).
 
 ### 5.3 Ephemeris interface and graha longitudes (`ephemeris.ts`)
 
@@ -592,7 +592,7 @@ export const astronomyEngineEphemeris: Ephemeris = {
 };
 ```
 
-`A.Ecliptic()` converts a J2000 mean-equator vector to the **true ecliptic of date** — the apparent-longitude convention Swiss Ephemeris uses by default (RESEARCH verification item 1), so the two lanes are directly comparable. Accuracy is ±1′ against NOVAS; a pada is 200′ wide and a tithi 720′, so a misclassification is only possible within ~1′ of a boundary, which §5.6 flags rather than hides.
+`A.Ecliptic()` converts a J2000 mean-equator vector to the **true ecliptic of date**, the apparent-longitude convention Swiss Ephemeris uses by default (RESEARCH verification item 1), so the two lanes are directly comparable. Accuracy is ±1′ against NOVAS; a pada is 200′ wide and a tithi 720′, so a misclassification is only possible within ~1′ of a boundary, which §5.6 flags rather than hides.
 
 Sidereal longitude is one subtraction: `lonSidereal = norm360(lonTropical − ayanamsa(jdTt, preset))`.
 
@@ -605,7 +605,7 @@ Derived per-graha fields:
 
 ### 5.4 Rahu and Ketu (`nodes.ts`)
 
-astronomy-engine has no node *longitude* function (`SearchMoonNode` returns crossing *times*), so both node types are ours. They differ by up to ~1.7° — enough to change a sign — so the choice is a preset and is printed in the colophon.
+astronomy-engine has no node *longitude* function (`SearchMoonNode` returns crossing *times*), so both node types are ours. They differ by up to ~1.7°, enough to change a sign, so the choice is a preset and is printed in the colophon.
 
 ```ts
 /** Mean lunar node, Meeus 47.7. T = Julian centuries TT from J2000. */
@@ -637,7 +637,7 @@ function eclipticVector(t: AstroTime) {
 }
 ```
 
-Ketu is always `norm360(rahu + 180)`. Both nodes carry `speed = −0.0529539` deg/day (mean) or the finite difference of `trueNode` (true), and both are always drawn retrograde. The default is **true node** (JHora/Drik convention — RESEARCH open question 2 keeps this on the verify list; having the preset makes the answer cheap either way).
+Ketu is always `norm360(rahu + 180)`. Both nodes carry `speed = −0.0529539` deg/day (mean) or the finite difference of `trueNode` (true), and both are always drawn retrograde. The default is **true node** (JHora/Drik convention, RESEARCH open question 2 keeps this on the verify list; having the preset makes the answer cheap either way).
 
 ### 5.5 Lagna and MC (`lagna.ts`)
 
@@ -678,7 +678,7 @@ The sanity check that belongs in the test file: Bengaluru sunrise that morning i
 
 > *Consistency note (resolved 2026-09-08):* older DESIGN §9.4/§9.5 mocks engraved a Scorpio ascendant. The engine's Lagna for that birth moment is **Meena 15°39′25″**, and DESIGN and `design/preview.html` now both engrave `LAGNA ♓ MEENA`. An earlier hand-typed sidereal figure was 18″ high; from the RAMC 277.8081° and ε 23.438851° above, the ascendant is 9.4371° tropical, and both the closed-form ascendant equation and a brute-force search for the rising ecliptic degree agree on it. IMPLEMENTATION-PROMPT §0.1 keeps the register of superseded numbers.
 
-Houses are **whole-sign** — the only system a Rāśi chart shows. `bhava-chalit` (Sripati: trisect the ASC→IC→DSC→MC arcs) is computed alongside for house-strength yogas when the preset asks for it, and is shown as a table, never as the chart.
+Houses are **whole-sign**, the only system a Rāśi chart shows. `bhava-chalit` (Sripati: trisect the ASC→IC→DSC→MC arcs) is computed alongside for house-strength yogas when the preset asks for it, and is shown as a table, never as the chart.
 
 ### 5.6 Nakshatra, pada and the boundary badge (`nakshatra.ts`)
 
@@ -711,7 +711,7 @@ export function boundaryFlag(lonSid: Deg): BoundaryFlag | null {
 }
 ```
 
-The footnote sheet then does the thing no other astrology app does: it re-runs the classification under the **other two ayanamsa presets** and says so — *"within 1′42″ of Anurādhā/Jyeṣṭhā; the Drik preset would read Jyeṣṭhā"* (DESIGN §9.5 — that string is the **synthetic** fixture `λ_sid = 226.6383°`; no graha in the reference chart is inside 2′ of an edge). That is a three-line helper (`classifyUnder(preset)` × 3) and it is the entire "no black box" thesis in one badge.
+The footnote sheet then does the thing no other astrology app does: it re-runs the classification under the **other two ayanamsa presets** and says so, *"within 1′42″ of Anurādhā/Jyeṣṭhā; the Drik preset would read Jyeṣṭhā"* (DESIGN §9.5, that string is the **synthetic** fixture `λ_sid = 226.6383°`; no graha in the reference chart is inside 2′ of an edge). That is a three-line helper (`classifyUnder(preset)` × 3) and it is the entire "no black box" thesis in one badge.
 
 **Worked example.** Sun at `λ_sid = 329.4811°` (Kumbha 29°28′52″):
 
@@ -723,7 +723,7 @@ The footnote sheet then does the thing no other astrology app does: it re-runs t
 | lord | `LORDS[24 % 9] = LORDS[6]` = **Jupiter (Gu)** |
 | house (Meena Lagna) | `((10 − 11 + 12) % 12) + 1` = **12** |
 | boundary | 31′08″ from the Kumbha/Meena edge → **no asterisk** |
-| provenance | `<oracle: swetest -p0 -b14.3.1994 -ut1:55 -sid1>` — assert it against `cast(referenceChart)` (TESTING E-3), never against this printed literal |
+| provenance | `<oracle: swetest -p0 -b14.3.1994 -ut1:55 -sid1>`, assert it against `cast(referenceChart)` (TESTING E-3), never against this printed literal |
 
 > *Consistency note (resolved 2026-09-08):* DESIGN §9.5's ledger mock used to put a vermilion `*` on this Sun row. At 31′08″ from the edge the engine emits none, and the mock no longer draws one.
 
@@ -766,14 +766,14 @@ function trimsamsa(s: SignIdx, d: number, odd: boolean): SignIdx {
 
 | Varga | Part index | Sign | Cross-check |
 |---|---|---|---|
-| D1 Rāśi | — | Kumbha (10) | — |
+| D1 Rāśi | - | Kumbha (10) | - |
 | D2 Horā | 1 | Karka (3) | odd sign, second half → Moon's horā |
 | D3 Drekkāṇa | 2 | Tulā (6) | `(10 + 8) % 12` |
 | D7 Saptāṁśa | 6 | Siṁha (4) | odd sign → `(10 + 6) % 12` |
 | **D9 Navāṁśa** | 8 | **Mithuna (2)** | fixed sign starts from the 9th (Tulā); Tulā + 8 = Mithuna ✔ |
 | D10 Daśāṁśa | 9 | Vṛścika (7) | odd sign → `(10 + 9) % 12` |
 | D12 Dvādaśāṁśa | 11 | Makara (9) | `(10 + 11) % 12` |
-| D30 Triṁśāṁśa | band 25–30 | Tulā (6) | odd sign, Venus's band |
+| D30 Triṁśāṁśa | band 25-30 | Tulā (6) | odd sign, Venus's band |
 | D60 Ṣaṣṭyāṁśa | 58 | Dhanu (8) | `(10 + 58) % 12` |
 
 The D9 row is the one that proves the closed form: the "movable from itself / fixed from the 9th / dual from the 5th" rule is *implied* by `floor(λ / 3.3333) % 12`, and the test asserts both derivations agree for 4,320 sample longitudes (every 5′).
@@ -836,9 +836,9 @@ function antars(md: GrahaId, mdStart: number, day: number): DashaNode[] {
 | **antardaśā at birth** | **Ketu**, running 1993-06-01 → **1994-05-29 ≈ 22:26 IST** |
 | pratyantar at birth | **Śani** inside the Ketu antardaśā (0.157014 yr), 1994-02-10 → 1994-04-08 |
 
-So the ribbon opens on **Budha – Ketu – Śani** with the brass clip 25 days from a fold. The unit test asserts every level sums exactly to its parent (Σ children = parent, to the millisecond after rounding) and that the tree is continuous with no gaps and no overlaps.
+So the ribbon opens on **Budha - Ketu - Śani** with the brass clip 25 days from a fold. The unit test asserts every level sums exactly to its parent (Σ children = parent, to the millisecond after rounding) and that the tree is continuous with no gaps and no overlaps.
 
-The `dashaYearDays` preset switches 365.25 ↔ 360 and the colophon prints which was used, because the two disagree by ~1.5 % — six months across a 19-year mahādaśā.
+The `dashaYearDays` preset switches 365.25 ↔ 360 and the colophon prints which was used, because the two disagree by ~1.5 %, six months across a 19-year mahādaśā.
 
 ### 5.9 Panchang and the end-time solver (`panchang.ts`)
 
@@ -874,15 +874,15 @@ export function solveCrossing(angleFn: (ms: number) => Deg, target: Deg,
 
 | Aṅga | Index | End instant |
 |---|---|---|
-| Tithi (1–30) | `floor(((λmoon − λsun) mod 360) / 12) + 1`; 1–15 Śukla, 16–30 Kṛṣṇa (15 Pūrṇimā, 30 Amāvasyā) | `A.SearchMoonPhase(12 * index, from, 2)` — astronomy-engine's own root finder |
-| Vāra (0–6) | weekday of the *governing sunrise*, not of the calendar date | next sunrise |
-| Nakṣatra (0–26) | `floor(λmoon_sid / 13.3333)` | `solveCrossing(λmoon_sid, (i + 1) * 13.3333, now, now + 36 h)` |
-| Yoga (1–27) | `floor(((λsun_sid + λmoon_sid) mod 360) / 13.3333) + 1` | `solveCrossing` on the sum, 30 h window |
-| Karaṇa (1–60) | `k = floor(((λmoon − λsun) mod 360) / 6) + 1`; 1 Kiṁstughna, 2–57 cycle Bava…Viṣṭi, 58 Śakuni, 59 Catuṣpāda, 60 Nāga | `A.SearchMoonPhase(6 * k, from, 1)` |
+| Tithi (1-30) | `floor(((λmoon − λsun) mod 360) / 12) + 1`; 1-15 Śukla, 16-30 Kṛṣṇa (15 Pūrṇimā, 30 Amāvasyā) | `A.SearchMoonPhase(12 * index, from, 2)`, astronomy-engine's own root finder |
+| Vāra (0-6) | weekday of the *governing sunrise*, not of the calendar date | next sunrise |
+| Nakṣatra (0-26) | `floor(λmoon_sid / 13.3333)` | `solveCrossing(λmoon_sid, (i + 1) * 13.3333, now, now + 36 h)` |
+| Yoga (1-27) | `floor(((λsun_sid + λmoon_sid) mod 360) / 13.3333) + 1` | `solveCrossing` on the sum, 30 h window |
+| Karaṇa (1-60) | `k = floor(((λmoon − λsun) mod 360) / 6) + 1`; 1 Kiṁstughna, 2-57 cycle Bava…Viṣṭi, 58 Śakuni, 59 Catuṣpāda, 60 Nāga | `A.SearchMoonPhase(6 * k, from, 1)` |
 
 Bisection converges in ~18 iterations for a 36-hour window at 250 ms tolerance, and each iteration is one `EclipticGeoMoon` call (≈ 20 µs), so a full five-aṅga panchang *with* end times costs well under 5 ms.
 
-**Day divisions** — all fractions of `sunset − sunrise` split into eight parts, with a 1-based slot indexed by weekday (Sunday = 0):
+**Day divisions**, all fractions of `sunset − sunrise` split into eight parts, with a 1-based slot indexed by weekday (Sunday = 0):
 
 ```ts
 const RAHU   = [8, 2, 7, 5, 6, 4, 3];
@@ -895,7 +895,7 @@ const slot = (n: number, rise: number, set: number): [number, number] => {
 // Abhijit = local apparent noon +- (dayLength / 30); by convention it is not observed on Wednesday.
 ```
 
-Māsa is named by the solar sign at the governing Amāvasyā (Amānta) or Pūrṇimā (Pūrṇimānta) — both are printed, because the owner's circle spans both conventions. Adhika māsa (two Amāvasyās inside one solar sign), ṛtu, ayana and the 60-year samvatsara are v1 items, but their fields are in the `Panchang` type from day one so the ledger rows never move.
+Māsa is named by the solar sign at the governing Amāvasyā (Amānta) or Pūrṇimā (Pūrṇimānta), both are printed, because the owner's circle spans both conventions. Adhika māsa (two Amāvasyās inside one solar sign), ṛtu, ayana and the 60-year samvatsara are v1 items, but their fields are in the `Panchang` type from day one so the ledger rows never move.
 
 `moonIllumination` comes from `A.Illumination(A.Body.Moon, t).phase_fraction` and is written straight into `--moon-k`, which drives the tithi fill-light (DESIGN §4.2). The engine literally lights the room.
 
@@ -935,7 +935,7 @@ The starter ten (MVP, RESEARCH §5.10): Gaja-Kesari · Budha-Āditya · Candra-M
 
 Every `because` entry names the chart element that fired it, so tapping the superscript in the reading highlights that graha in the diamond and rises the loupe over it (DESIGN §9.5, "show me").
 
-### 5.11 Guna Milan — Ashtakoota (`ashtakoota.ts`)
+### 5.11 Guna Milan, Ashtakoota (`ashtakoota.ts`)
 
 Eight kootas summing to exactly 36, which is what makes the 36-bead mala honest (DESIGN §8.4).
 
@@ -954,17 +954,17 @@ export function ashtakoota(a: Profile, b: Profile, pa: Patri, pb: Patri): MilanR
 | Koota | Max | Rule as implemented |
 |---|---|---|
 | **Varṇa** | 1 | Sign → Brāhmaṇa (Karka, Vṛścika, Meena), Kṣatriya (Meṣa, Siṁha, Dhanu), Vaiśya (Vṛṣabha, Kanyā, Makara), Śūdra (Mithuna, Tulā, Kumbha), ranked 4..1. `boyRank >= girlRank ? 1 : 0` |
-| **Vaśya** | 2 | Sign → one of five classes (Catuṣpada, Mānava, Jalachara, Vanachara, Keeṭa); `VASHYA[boyClass][girlClass]` ∈ {2, 1, 0.5, 0}. **The one table with real school variation** — re-typed from BPHS into `data/tables/vashya.ts`, and all 25 cells are pinned by the oracle test below before anything is trusted |
+| **Vaśya** | 2 | Sign → one of five classes (Catuṣpada, Mānava, Jalachara, Vanachara, Keeṭa); `VASHYA[boyClass][girlClass]` ∈ {2, 1, 0.5, 0}. **The one table with real school variation**, re-typed from BPHS into `data/tables/vashya.ts`, and all 25 cells are pinned by the oracle test below before anything is trusted |
 | **Tārā** | 3 | `t(from,to) = ((countInclusive(from,to) − 1) % 9) + 1`; tārās 3 (Vipat), 5 (Pratyari), 7 (Vadha) are bad. both good → 3, one good → 1.5, neither → 0 |
-| **Yoni** | 4 | 14 animals by nakshatra; `YONI[a][b]` ∈ {4 same, 3 friendly, 2 neutral, 1 inimical, 0 sworn enemy}. Sworn pairs: horse–buffalo, elephant–lion, sheep–monkey, serpent–mongoose, dog–deer, cat–rat, cow–tiger |
+| **Yoni** | 4 | 14 animals by nakshatra; `YONI[a][b]` ∈ {4 same, 3 friendly, 2 neutral, 1 inimical, 0 sworn enemy}. Sworn pairs: horse-buffalo, elephant-lion, sheep-monkey, serpent-mongoose, dog-deer, cat-rat, cow-tiger |
 | **Graha Maitrī** | 5 | Natural friendship of the two Moon-sign lords, read **both ways**: friend+friend 5, friend+neutral 4, neutral+neutral 3, friend+enemy 1, neutral+enemy 0.5, enemy+enemy 0 |
 | **Gaṇa** | 6 | Deva/Manuṣya/Rākṣasa by nakshatra; matrix (boy × girl) `[[6,6,1],[5,6,0],[1,0,6]]` |
-| **Bhakūṭa** | 7 | Moon-sign distance both ways; 0 when the pair is 2/12, 5/9 or 6/8, else 7. Cancellation when the two sign lords are identical or mutual friends — recorded in `cancellation`, applied only when the setting is on |
+| **Bhakūṭa** | 7 | Moon-sign distance both ways; 0 when the pair is 2/12, 5/9 or 6/8, else 7. Cancellation when the two sign lords are identical or mutual friends, recorded in `cancellation`, applied only when the setting is on |
 | **Nāḍī** | 8 | `nak % 6` → 0 Ādi, 1 Madhya, 2 Antya, 3 Antya, 4 Madhya, 5 Ādi. Different → 8, same → 0 (Nāḍī doṣa). Classical exceptions recorded: same rāśi different nakshatra, same nakshatra different pada, sign lords friends |
 
-Bands: `< 18` not recommended · `18–24` acceptable · `25–32` very good · `33–36` excellent.
+Bands: `< 18` not recommended · `18-24` acceptable · `25-32` very good · `33-36` excellent.
 
-**Worked example** — Rahul (Moon in **Revatī**, idx 26, Mīna) × Priya (Moon in **Rohiṇī**, idx 3, Vṛṣabha):
+**Worked example**, Rahul (Moon in **Revatī**, idx 26, Mīna) × Priya (Moon in **Rohiṇī**, idx 3, Vṛṣabha):
 
 | Koota | Derivation | Score |
 |---|---|---|
@@ -974,19 +974,19 @@ Bands: `< 18` not recommended · `18–24` acceptable · `25–32` very good · 
 | Yoni | Revatī = elephant, Rohiṇī = serpent; not the same, not the sworn pair (the elephant's enemy is the lion) → neutral | **2** / 4 |
 | Graha Maitrī | Mīna's lord Guru vs Vṛṣabha's lord Śukra; Jupiter→Venus **enemy** and Venus→Jupiter neutral → `MAITRI[neutral][enemy]` | **0.5** / 5 |
 | Gaṇa | Revatī = Deva, Rohiṇī = Manuṣya; `GANA[Deva][Manushya]` | **6** / 6 |
-| Bhakūṭa | Mīna (12) ↔ Vṛṣabha (2) is 3/11 — not in {2/12, 5/9, 6/8}, so **brass beads, not lac** | **7** / 7 |
-| Nāḍī | `26 % 6 = 2` Antya vs `3 % 6 = 3` Antya — **same → Nāḍī doṣa** | **0** / 8 |
-| | | **20 / 36 — "acceptable"** |
+| Bhakūṭa | Mīna (12) ↔ Vṛṣabha (2) is 3/11, not in {2/12, 5/9, 6/8}, so **brass beads, not lac** | **7** / 7 |
+| Nāḍī | `26 % 6 = 2` Antya vs `3 % 6 = 3` Antya, **same → Nāḍī doṣa** | **0** / 8 |
+| | | **20 / 36, "acceptable"** |
 
 The pair is a good showcase precisely because it exercises both bead materials: Bhakūṭa is a full brass seven (a 3/11 axis is not a doṣa, whatever the older mala mock implied) while Nāḍī fires the one lac row on the mala.
 
-**The oracle test.** PyJHora ships `all_nak_pad_boy_girl.csv`: every one of the **11,664** nakshatra-pada × nakshatra-pada pairs (108 × 108) with its expected total. That file is data, not AGPL code, so `scripts/import-oracle.mjs` converts it once into `__fixtures__/ashtakoota-oracle.bin` (two bytes per pair, ~23 kB) and `ashtakoota.oracle.test.ts` walks all 11,664 pairs in a single Vitest case. A disagreement in any cell means the Vaśya, Yoni or Gaṇa matrix was re-typed wrong — exactly the failure this test exists to catch, and exactly GOAL success criterion 5.
+**The oracle test.** PyJHora ships `all_nak_pad_boy_girl.csv`: every one of the **11,664** nakshatra-pada × nakshatra-pada pairs (108 × 108) with its expected total. That file is data, not AGPL code, so `scripts/import-oracle.mjs` converts it once into `__fixtures__/ashtakoota-oracle.bin` (two bytes per pair, ~23 kB) and `ashtakoota.oracle.test.ts` walks all 11,664 pairs in a single Vitest case. A disagreement in any cell means the Vaśya, Yoni or Gaṇa matrix was re-typed wrong, exactly the failure this test exists to catch, and exactly GOAL success criterion 5.
 
 **Manglik** (Kuja doṣa) is computed separately from Lagna, Moon and Venus: Mars in houses 1, 2, 4, 7, 8 or 12 from any of the three. Standard cancellations are recorded and displayed: Mars in its own or exaltation sign; Mars in the 2nd in Mithuna or Kanyā; both charts Manglik; Mars aspected by Guru; Śani in a kendra with Mars; and age > 28 by some schools (recorded, never auto-applied).
 
 ### 5.12 Chart geometry (`features/patri/geometry.ts`)
 
-Both charts are data-driven SVG on a `viewBox="0 0 400 400"`, drawn with Motion `pathLength` (DESIGN §7, `ink-draw`) — frame first, then diagonals, then the inner diamond, +60 ms stagger each.
+Both charts are data-driven SVG on a `viewBox="0 0 400 400"`, drawn with Motion `pathLength` (DESIGN §7, `ink-draw`), frame first, then diagonals, then the inner diamond, +60 ms stagger each.
 
 **North Indian (diamond).** The houses are fixed on the page; the *sign numbers* move. Twelve regions, anticlockwise from the top-centre rhombus:
 
@@ -1028,7 +1028,7 @@ The screen-reader twin of every chart is a visually hidden `<table>` of graha / 
 
 ### 5.13 The palm pipeline (`engine/palm/`)
 
-Six stages, each of which degrades to the next-best thing rather than failing. Stages 1–2 are cheap and always run; 3–6 need OpenCV and are only reached when the owner asks for lines.
+Six stages, each of which degrades to the next-best thing rather than failing. Stages 1-2 are cheap and always run; 3-6 need OpenCV and are only reached when the owner asks for lines.
 
 ```
 photo (<= 1600 px)
@@ -1042,7 +1042,7 @@ photo (<= 1600 px)
 
 **[1] Landmarks.** `HandLandmarker.createFromOptions(await FilesetResolver.forVisionTasks('/mediapipe'), { baseOptions: { modelAssetPath: '/models/hand_landmarker.task', delegate: 'GPU' }, numHands: 1, runningMode: 'IMAGE' })`. Reject when `handedness.score < 0.8` or any landmark falls outside `[0,1]`. Palm-versus-back is checked from the handedness label against the thumb's x-position: a right hand shown palm-up puts THUMB_CMC to the *left* of PINKY_MCP in image space; a mismatch means the back of the hand, and the shutter stays disabled with "turn your palm to the camera".
 
-**[2] Hand shape and ratios** — pure geometry on `worldLandmarks` (metres, view-invariant), so this survives any camera angle. This alone is the reading the MVP ships:
+**[2] Hand shape and ratios**, pure geometry on `worldLandmarks` (metres, view-invariant), so this survives any camera angle. This alone is the reading the MVP ships:
 
 ```ts
 const L = dist(w[0], w[9]);                    // palm length: WRIST -> MIDDLE_MCP
@@ -1066,7 +1066,7 @@ cv.warpPerspective(src, dst, H, new cv.Size(512, 512), cv.INTER_LINEAR, cv.BORDE
 
 **[4] Enhancement.** Grayscale → `cv.CLAHE(3.0, [8,8])` → **black-hat** with a 25 px elliptical kernel (`morphologyEx(MORPH_BLACKHAT)`), which isolates dark creases and removes large-scale illumination in one step → Gaussian σ ≈ 1.5. Palm lines are *valleys*, so the black-hat output is already "bright lines on dark" and the ridge filter below needs no inversion.
 
-**[5] Multi-scale Hessian ridge filter** (`ridge.ts`, plain TypedArrays — OpenCV is only needed to get the Mat out):
+**[5] Multi-scale Hessian ridge filter** (`ridge.ts`, plain TypedArrays, OpenCV is only needed to get the Mat out):
 
 ```ts
 /** Frangi-style 2D vesselness for bright ridges. Returns the max response over scales. */
@@ -1151,22 +1151,22 @@ confidence = 0.45 * coverage       // fraction of the template's arc length matc
            + 0.20 * contrast       // mean black-hat response along the path, normalised
 ```
 
-Below **0.6** the line renders dashed and faint with a haldi note, and the stylus appears automatically (DESIGN §8.5) — the honest failure mode that turns the hard CV problem into a craft. A traced path sets `source: 'traced'`, `confidence: 1`, and the reading recomputes live from the traced geometry, so the rule layer never knows the difference.
+Below **0.6** the line renders dashed and faint with a haldi note, and the stylus appears automatically (DESIGN §8.5), the honest failure mode that turns the hard CV problem into a craft. A traced path sets `source: 'traced'`, `confidence: 1`, and the reading recomputes live from the traced geometry, so the rule layer never knows the difference.
 
-**[7] Rules.** `palm/rules.ts` has the same shape as `yogas.ts`: predicates over `PalmReading` with Samudrika Shastra citations. Length is normalised by palm length, curvature is the mean turning angle per unit length, breaks are gaps > 8 px in the pre-thinning mask, depth is the mean black-hat response along the path. Every emitted sentence prints its measurement — *"Tradition says a deep, long heart line (0.92 of palm width, depth 0.61) speaks of steadiness in affection.¹"* — because a number the reader can check is the difference between an instrument and a fortune cookie.
+**[7] Rules.** `palm/rules.ts` has the same shape as `yogas.ts`: predicates over `PalmReading` with Samudrika Shastra citations. Length is normalised by palm length, curvature is the mean turning angle per unit length, breaks are gaps > 8 px in the pre-thinning mask, depth is the mean black-hat response along the path. Every emitted sentence prints its measurement, *"Tradition says a deep, long heart line (0.92 of palm width, depth 0.61) speaks of steadiness in affection.¹"*, because a number the reader can check is the difference between an instrument and a fortune cookie.
 
-The whole of [3]–[6] runs in `palm.worker.ts` with the OpenCV module instantiated inside the worker, so the desk never drops a frame; only the final `PalmReading` and a 512 × 512 `ImageBitmap` are transferred back.
+The whole of [3]-[6] runs in `palm.worker.ts` with the OpenCV module instantiated inside the worker, so the desk never drops a frame; only the final `PalmReading` and a 512 × 512 `ImageBitmap` are transferred back.
 
 ### 5.14 The sky (`engine/sky/`)
 
 Two renderers over one model, so the cheap one is never a downgrade in correctness.
 
-- **Star data**: `scripts/build-stars.mjs` converts BSC5 (public domain) into `src/data/bsc5.bin` — `Float32Array` triples of RA (rad), Dec (rad), magnitude, filtered to mag ≤ 6.0 (~9,100 stars, ~110 kB).
+- **Star data**: `scripts/build-stars.mjs` converts BSC5 (public domain) into `src/data/bsc5.bin`, `Float32Array` triples of RA (rad), Dec (rad), magnitude, filtered to mag ≤ 6.0 (~9,100 stars, ~110 kB).
 - **Projection**: `altAz(ra, dec, lst, lat)` with `lst = GAST + lon`; a standard spherical rotation at ~40 ns per star, so reprojecting all 9,100 costs under 1 ms and can run every scrub frame.
 - **Parapet strip** (2D, always available; on Home and the leaf-entry screen): a 44 px SVG band showing the horizon at the leaf's place and time, with the Sun and Moon at their real alt/az, the naked-eye planets as brass discs, a gradient keyed to the Sun's altitude (day / civil dusk / night), and the Lagna's sign in the engraved strip. Turning the hour drum re-solves the Lagna and repaints at 30 fps with no tween (DESIGN §7, `sky-scrub`); each frame is one `SiderealTime` call plus the `lagna()` arithmetic.
 - **Rooftop dome** (3D, lazy chunk, ~180 kB gz): R3F with `frameloop="demand"`, DPR capped at 1.5, stars as a single `Points` with per-vertex size/alpha, the sidereal zodiac ring as a brass torus with 27 nakshatra ticks, planets as billboards, and the Lagna as a beam at the eastern horizon. `webglcontextlost`, `prefers-reduced-motion` or no WebGL → the **painted sky**: a d3-geo stereographic SVG of the same data, ink dots on indigo. Both export the same 1080 × 1920 poster.
 
-### 5.15 Composing a reading (`reading.ts`) — deterministic, no LLM
+### 5.15 Composing a reading (`reading.ts`), deterministic, no LLM
 
 ```ts
 export function compose(hits: Hit[], seed: string): Sentence[] {
@@ -1182,7 +1182,7 @@ export function compose(hits: Hit[], seed: string): Sentence[] {
 }
 ```
 
-Three properties make this trustworthy. The seed is derived from the chart, so **the same chart always reads the same**. Every sentence opens with "Tradition says…" / "परंपरा कहती है…" and closes with a superscript citation. And the template set contains no health, death, fertility, wealth or legal vocabulary — a Vitest case greps the whole `TEMPLATES` table against a banned-word list and fails the build if one appears (GOAL §6). The standing disclaimer is rendered by the `Colophon` component, not by a template, so it cannot be omitted by accident.
+Three properties make this trustworthy. The seed is derived from the chart, so **the same chart always reads the same**. Every sentence opens with "Tradition says…" / "परंपरा कहती है…" and closes with a superscript citation. And the template set contains no health, death, fertility, wealth or legal vocabulary, a Vitest case greps the whole `TEMPLATES` table against a banned-word list and fails the build if one appears (GOAL §6). The standing disclaimer is rendered by the `Colophon` component, not by a template, so it cannot be omitted by accident.
 
 ### 5.16 Encrypted export and import (`data/crypto.ts`)
 
@@ -1206,7 +1206,7 @@ export async function seal(plain: Blob, passphrase: string): Promise<Blob> {
 }
 ```
 
-The plaintext is `dexie-export-import`'s streaming JSON with palm Blobs base64'd inline. Import reads the header, derives the key, and fails with a lac note on `OperationError` (wrong passphrase) — never with a stack trace. Round-trip equality (export → wipe → import → byte-identical `patris` after recompute) is GOAL success criterion 6 and an e2e test.
+The plaintext is `dexie-export-import`'s streaming JSON with palm Blobs base64'd inline. Import reads the header, derives the key, and fails with a lac note on `OperationError` (wrong passphrase), never with a stack trace. Round-trip equality (export → wipe → import → byte-identical `patris` after recompute) is GOAL success criterion 6 and an e2e test.
 
 ---
 
@@ -1221,7 +1221,7 @@ Three layers, and nothing crosses them sideways.
 | **Ephemeral UI** | active profile id, open drawer, loupe target and position, drum drag state, varga page, theme override, sound/haptics, undo of the last Burn | Zustand store `src/state/ui.ts`, split into four slices | components via selector hooks |
 
 ```ts
-// src/state/ui.ts — one store, four slices, no derived data
+// src/state/ui.ts, one store, four slices, no derived data
 export const useUi = create<UiState>()((set) => ({
   activeProfileId: null,
   loupe: { target: null, x: 0, y: 0, mode: 'chart' },
@@ -1248,7 +1248,7 @@ The app must work in airplane mode from the first launch after install (GOAL §9
 |---|---|---|---|
 | **Precache** (install time) | app shell, `tokens.css`, the three subset fonts, `grain.svg`, `seal-edge.svg`, the sound sprite, `geonames-in.json.gz`, `bsc5.bin`, PWA icons | `precacheAndRoute` from the generated manifest | ≈ 2.6 MB |
 | **Warm on first visit** | `/models/hand_landmarker.task`, `/mediapipe/*.wasm`, the OpenCV chunk, the R3F sky chunk | `CacheFirst`, dedicated cache names, `expiration: { maxEntries: 12 }` | ≈ 18 MB |
-| **Never cached** | the two geocoding APIs | `NetworkOnly` | — |
+| **Never cached** | the two geocoding APIs | `NetworkOnly` | - |
 
 ```ts
 // vite.config.ts (excerpt)
@@ -1276,7 +1276,7 @@ VitePWA({
 
 Sub-path hosting is handled once: `base: process.env.VITE_BASE_PATH ?? '/'`, and the PWA scope follows `base` automatically. `start_url: './#/'` is relative so the same manifest works at `/jyoti/` on Pages and at `/` inside the APK.
 
-The **Hast** and **Rooftop** screens each show a one-line note the first time they are opened offline and their chunk is not yet cached ("the loupe is still in the drawer — open this screen once with a connection"). Everything else — the entire engine, the gazetteer, the panchang, matching — is offline from the first paint. `navigator.storage.persist()` is requested after the first leaf is sealed, so the browser does not evict a friend's chart under storage pressure.
+The **Hast** and **Rooftop** screens each show a one-line note the first time they are opened offline and their chunk is not yet cached ("the loupe is still in the drawer, open this screen once with a connection"). Everything else, the entire engine, the gazetteer, the panchang, matching, is offline from the first paint. `navigator.storage.persist()` is requested after the first leaf is sealed, so the browser does not evict a friend's chart under storage pressure.
 
 Inside Capacitor the service worker is **not** registered (`registerSW` is skipped when `Capacitor.isNativePlatform()`); the APK already carries the whole `dist/` on disk, and a second cache layer inside the WebView is pure risk.
 
@@ -1284,7 +1284,7 @@ Inside Capacitor the service worker is **not** registered (`registerSW` is skipp
 
 ## 8. Android integration points
 
-Capacitor 8 wrapping the same `dist/`. **No custom native code** — every capability is a first-party plugin, which is why the `android/` folder is generated once, committed, and then only touched for the manifest and icon entries below.
+Capacitor 8 wrapping the same `dist/`. **No custom native code**, every capability is a first-party plugin, which is why the `android/` folder is generated once, committed, and then only touched for the manifest and icon entries below.
 
 **`capacitor.config.ts`**
 
@@ -1310,7 +1310,7 @@ export default config;
 | Plugin | Used by | Notes |
 |---|---|---|
 | `@capacitor/camera` | Hast capture (DESIGN §9.7) | `getPhoto({ resultType: Uri, quality: 90, width: 1600, source: Prompt })`. `Uri` (not base64) keeps a 4 MB JPEG off the JS heap; the canvas downscales before any CV runs |
-| `@capacitor/filesystem` + `/share` | wax-envelope export | Write to `Directory.Cache`, then `Share.share({ files: [uri] })` into Drive/Files. Import is a plain `<input type="file">` — the system picker needs no permission |
+| `@capacitor/filesystem` + `/share` | wax-envelope export | Write to `Directory.Cache`, then `Share.share({ files: [uri] })` into Drive/Files. Import is a plain `<input type="file">`, the system picker needs no permission |
 | `@capacitor/haptics` | drum detents, tilak, beads, seal, burn | `selectionChanged` for detents, `impact` for seal/tilak/burn (DESIGN §12); every call no-ops on a device with no vibrator |
 | `@capacitor/preferences` | theme + `calmDesk` before first paint | Read synchronously-ish in the boot script so the desk never flashes the wrong wood |
 | `@capacitor/status-bar` + `/splash-screen` | edge-to-edge, teak splash with the diya | Style `Dark` on the night desk, `Light` on the morning terrace, switched by the same effect that sets `data-theme` |
@@ -1342,7 +1342,7 @@ android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|sma
 
 ## 9. Third-party APIs
 
-There are exactly two, both optional, both keyless, both reached only when the owner taps the "search online ⌑" stamp — which itself appears only after a bundled-gazetteer search returns nothing. `settings.onlineLookupAllowed` starts `false` and is asked for once, in plain language.
+There are exactly two, both optional, both keyless, both reached only when the owner taps the "search online ⌑" stamp, which itself appears only after a bundled-gazetteer search returns nothing. `settings.onlineLookupAllowed` starts `false` and is asked for once, in plain language.
 
 ### 9.1 Open-Meteo Geocoding (first choice)
 
@@ -1360,7 +1360,7 @@ No key, no headers required. `access-control-allow-origin: *` verified live (RES
 }] }
 ```
 
-Mapped straight onto `Place` (`geonameId` from `id`, `source: 'open-meteo'`). Limits: 600/min, 5,000/h, 10,000/day, free tier **non-commercial** — a personal app searching a handful of birthplaces will never see them. Data is CC BY 4.0 and is credited in the Colophon.
+Mapped straight onto `Place` (`geonameId` from `id`, `source: 'open-meteo'`). Limits: 600/min, 5,000/h, 10,000/day, free tier **non-commercial**, a personal app searching a handful of birthplaces will never see them. Data is CC BY 4.0 and is credited in the Colophon.
 
 ### 9.2 Nominatim (second choice, on submit only)
 
@@ -1369,7 +1369,7 @@ GET https://nominatim.openstreetmap.org/search?q=Madurai&format=jsonv2&limit=5&a
 Referer: https://<owner>.github.io/jyoti/
 ```
 
-The OSM usage policy is strict and the app obeys it literally: **≤ 1 request per second** (a token bucket in `places.ts` with a 1,100 ms minimum gap), an identifying `Referer` (the browser sets it; `User-Agent` is not settable from a page, which is why Nominatim is second and rare), **never autocomplete** — it fires only on an explicit submit, never per keystroke — and ODbL attribution in the Colophon. `lat`/`lon` come back as strings and are parsed; there is no timezone field, so `tz-lookup` supplies the zone.
+The OSM usage policy is strict and the app obeys it literally: **≤ 1 request per second** (a token bucket in `places.ts` with a 1,100 ms minimum gap), an identifying `Referer` (the browser sets it; `User-Agent` is not settable from a page, which is why Nominatim is second and rare), **never autocomplete**, it fires only on an explicit submit, never per keystroke, and ODbL attribution in the Colophon. `lat`/`lon` come back as strings and are parsed; there is no timezone field, so `tz-lookup` supplies the zone.
 
 ### 9.3 Failure and caching
 
@@ -1393,7 +1393,7 @@ export async function searchOnline(q: string, signal: AbortSignal): Promise<Plac
 }
 ```
 
-Every online result is written to `db.places`, so a place looked up once is offline forever. On total failure the row shows a lac note — "not found; you can type the coordinates" — and a manual lat/lon entry appears. **A birth place is never a blocker**: the manual path always exists.
+Every online result is written to `db.places`, so a place looked up once is offline forever. On total failure the row shows a lac note, "not found; you can type the coordinates", and a manual lat/lon entry appears. **A birth place is never a blocker**: the manual path always exists.
 
 **A CSP `connect-src` allow-list of exactly these two origins** ships in `index.html`, so a supply-chain accident cannot exfiltrate a birth chart:
 
@@ -1410,8 +1410,8 @@ frame-ancestors 'none'; base-uri 'none'
 
 Vyom holds other people's birth times and photographs of their hands. Both are personal data; the hands are biometrics. The design is therefore "nothing leaves, and the owner can prove it".
 
-1. **No accounts, no sync, no server, no key.** There is no backend to breach. GOAL success criterion 6 is a Playwright test that records the network log through a full session — leaf → cast → palm → milan → export — and **fails if any request appears** other than an explicitly tapped place search.
-2. **Palm photographs never leave the device.** They are Dexie Blobs, processed in a worker, rendered from `blob:` URLs (or `_capacitor_file_` inside the APK), and destroyed by **Burn** — a 600 ms hold that deletes the profile, its patris, palms, readings, milans and blobs in one transaction. There is no trash, no tombstone, no undo after the char completes.
+1. **No accounts, no sync, no server, no key.** There is no backend to breach. GOAL success criterion 6 is a Playwright test that records the network log through a full session, leaf → cast → palm → milan → export, and **fails if any request appears** other than an explicitly tapped place search.
+2. **Palm photographs never leave the device.** They are Dexie Blobs, processed in a worker, rendered from `blob:` URLs (or `_capacitor_file_` inside the APK), and destroyed by **Burn**, a 600 ms hold that deletes the profile, its patris, palms, readings, milans and blobs in one transaction. There is no trash, no tombstone, no undo after the char completes.
 3. **Export is encrypted, always.** AES-GCM-256 with a PBKDF2-SHA256/600k-iteration key (§5.16). There is no "export unencrypted" option; a passphrase is mandatory, and the sheet says plainly that a forgotten passphrase means a lost file.
 4. **The CSP allow-list** (§9.3) is the second line: even a compromised dependency has nowhere to send anything.
 5. **No third-party origin at runtime.** Fonts are self-hosted (never a Google Fonts `<link>` in a production build), the MediaPipe model and wasm are self-hosted, OpenCV is bundled. `design/preview.html` may hot-link Google Fonts because it never ships (D1).
@@ -1427,12 +1427,12 @@ Enforced by a CI size gate (`pages.yml` fails the build when the initial bundle 
 
 | Budget | Target | Enforced by |
 |---|---|---|
-| Initial JS (gz) | **≤ 350 kB** (GOAL 7) — shell + engine + Dexie + Motion + router | `size-limit` step in `pages.yml` |
+| Initial JS (gz) | **≤ 350 kB** (GOAL 7), shell + engine + Dexie + Motion + router | `size-limit` step in `pages.yml` |
 | Initial CSS (gz) | ≤ 30 kB | same |
 | Fonts (woff2, subset) | ≤ 260 kB total for three families (DESIGN §5) | `subset-fonts.sh` output check |
 | Gazetteer | ≤ 1.8 MB gz, decoded lazily into minisearch on the entry screen | `build-gazetteer.mjs` asserts the size |
 | Lazy chunk: sky (three + R3F + drei) | ≤ 200 kB gz | manual chunk in `rollupOptions.output` |
-| Lazy chunk: OpenCV | ~8 MB wasm, `CacheFirst`, Hast screen only | never in the entry graph — a Vitest import-graph test asserts it |
+| Lazy chunk: OpenCV | ~8 MB wasm, `CacheFirst`, Hast screen only | never in the entry graph, a Vitest import-graph test asserts it |
 | **Full cast** (9 grahas, Lagna, D1+D9, nakshatra/pada, MD/AD, panchang, 10 yogas) | **< 100 ms** on a 2022 mid-range Android WebView (GOAL 1) | `computeMs` is recorded in every `Patri` and asserted in a bench test with a 60 ms CI budget |
 | Ink-draw of the North chart | ≤ 1.5 s (GOAL 1) | `--dur-draw` math, Playwright animation timing |
 | Palm: photo → landmarks → element | < 3 s (GOAL 4) | worker timing log, on-device checklist |
@@ -1466,20 +1466,20 @@ export class EngineError extends Error {
 
 | Failure | What the owner sees | What the code does |
 |---|---|---|
-| Invalid date on the drums (31 Feb) | the day drum refuses the detent with a dull tick — the value is never accepted | validated before `resolveBirthMoment`, so `TIME_INVALID` is unreachable from the UI |
+| Invalid date on the drums (31 Feb) | the day drum refuses the detent with a dull tick, the value is never accepted | validated before `resolveBirthMoment`, so `TIME_INVALID` is unreachable from the UI |
 | Ambiguous / non-existent local time | haldi note under the strip: "this clock time did not exist here; the offset drum resolves it" | Luxon's `isValid` false → offer the override drum |
 | Place not in the bundle | ruled row "not in the bundle" plus the "search online ⌑" stamp; manual lat/lon always available | no throw |
-| Place search fails or is rate-limited | lac note "the wire is quiet — type the coordinates" | `NetError`, cached results still served |
+| Place search fails or is rate-limited | lac note "the wire is quiet, type the coordinates" | `NetError`, cached results still served |
 | Engine throws during a cast | the lac seal **cracks** in `--danger` with the reason and a "copy details" affordance | error boundary around the Patri route; the previous cached Patri stays on screen |
 | MediaPipe fails to load or no hand found | shutter stays disabled with "no hand in frame"; on load failure, straight to the stylus | `hast` route degrades to trace mode; the geometry reading is skipped, lines are still readable |
-| OpenCV fails to load | the landmark reading (element, ratios) still renders; lines offer trace mode | stage [2] is independent of stages [3]–[6] by design |
-| Line confidence < 0.6 | dashed faint ink + haldi "trace to confirm" + `notification Warning` once | not an error state at all — the documented honest path |
+| OpenCV fails to load | the landmark reading (element, ratios) still renders; lines offer trace mode | stage [2] is independent of stages [3]-[6] by design |
+| Line confidence < 0.6 | dashed faint ink + haldi "trace to confirm" + `notification Warning` once | not an error state at all, the documented honest path |
 | WebGL lost / absent | painted sky, silently, with a one-line footnote | `webglcontextlost` listener swaps the component |
-| IndexedDB quota exceeded | lac toast "the drawer is full — burn a print or export" with the current usage | `navigator.storage.estimate()` shown in the Drawer |
-| Service worker update available | a paper tab at the top of the desk: "a newer desk is ready — reload" | `registerType: 'prompt'`; never auto-reloads mid-cast |
+| IndexedDB quota exceeded | lac toast "the drawer is full, burn a print or export" with the current usage | `navigator.storage.estimate()` shown in the Drawer |
+| Service worker update available | a paper tab at the top of the desk: "a newer desk is ready, reload" | `registerType: 'prompt'`; never auto-reloads mid-cast |
 | Import with a wrong passphrase | lac note "this seal does not match that passphrase" | catch `OperationError` specifically; three failures add a 2 s delay |
 
-A dev-only assertion layer (`import.meta.env.DEV`) checks engine invariants on every cast — longitudes in `[0,360)`, dasha children summing to their parent, koota scores within their maxima, exactly 12 house assignments — and throws `ORACLE_MISMATCH` loudly in development while being stripped from the production bundle.
+A dev-only assertion layer (`import.meta.env.DEV`) checks engine invariants on every cast, longitudes in `[0,360)`, dasha children summing to their parent, koota scores within their maxima, exactly 12 house assignments, and throws `ORACLE_MISMATCH` loudly in development while being stripped from the production bundle.
 
 ---
 
@@ -1487,4 +1487,4 @@ A dev-only assertion layer (`import.meta.env.DEV`) checks engine invariants on e
 
 There is no analytics, no telemetry, no crash reporting, no session recording, no A/B framework, no feature-flag service, no "anonymous usage statistics", and no first-party event log that could become one. `package.json` contains no analytics dependency, and the CSP `connect-src` allow-list (§9.3) makes adding one a visible, deliberate change rather than an accident.
 
-The only numbers the app records about itself are `Patri.computeMs` and the palm worker's stage timings, and both are written into the local record they describe and printed in the colophon — for the owner's eyes, on the owner's device, and never transmitted.
+The only numbers the app records about itself are `Patri.computeMs` and the palm worker's stage timings, and both are written into the local record they describe and printed in the colophon, for the owner's eyes, on the owner's device, and never transmitted.

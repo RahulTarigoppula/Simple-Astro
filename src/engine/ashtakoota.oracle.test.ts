@@ -1,16 +1,16 @@
-// GOAL success criterion 5 — the PyJHora oracle. Walks all 11 664 nakshatra-pada pairs of
+// GOAL success criterion 5, the PyJHora oracle. Walks all 11 664 nakshatra-pada pairs of
 // all_nak_pad_boy_girl.csv (imported to ashtakoota-oracle.bin by scripts/import-oracle.mjs) and
 // compares every koota.
 //
 // Agreement contract:
-//   • Varṇa, Yoni, Graha Maitrī, Gaṇa, Nāḍī — identical on every pair.
-//   • Vaśya — the 5×5 table is identical on every pair once PyJHora's own class assignment is used;
+//   • Varṇa, Yoni, Graha Maitrī, Gaṇa, Nāḍī, identical on every pair.
+//   • Vaśya, the 5×5 table is identical on every pair once PyJHora's own class assignment is used;
 //     Chowki's class assignment differs only in Dhanu/Makara (split at 15°, not by pada number).
-//   • Tārā — PyJHora's column equals exactly 3 − Chowki's (it scores the unkind tārās; see ashtakoota.ts).
-//   • Bhakūṭa — identical except PyJHora's Karka × Kumbha cell (7 where every 6/8 axis is 0).
+//   • Tārā, PyJHora's column equals exactly 3 − Chowki's (it scores the unkind tārās; see ashtakoota.ts).
+//   • Bhakūṭa, identical except PyJHora's Karka × Kumbha cell (7 where every 6/8 axis is 0).
 // With those three documented PyJHora defects modelled, the TOTAL agrees on 11 664 / 11 664 pairs.
 // Any other disagreement fails, listing the first ten by nakshatra-pada name.
-// Every call here uses school "pyjhora" — the North-Indian common tables are tested in ashtakoota.test.ts.
+// Every call here uses school "pyjhora", the North-Indian common tables are tested in ashtakoota.test.ts.
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { VASHYA_PYJHORA as VASHYA, type VashyaClass, vashyaClass } from "../data/tables/koota";
@@ -60,7 +60,7 @@ const moonOfPada = (idx: number): MoonPlacement => {
 
 const label = (m: MoonPlacement): string => `${NAKSHATRA_NAMES[m.nak] ?? m.nak} ${m.pada}`;
 
-/** PyJHora's Vaśya class: Dhanu and Makara split by pada number (1–2 | 3–4), whatever the nakshatra. */
+/** PyJHora's Vaśya class: Dhanu and Makara split by pada number (1-2 | 3-4), whatever the nakshatra. */
 function pyjhoraVashyaClass(m: MoonPlacement): VashyaClass {
   if (m.sign === 8) return m.pada <= 2 ? "manava" : "chatushpada";
   if (m.sign === 9) return m.pada <= 2 ? "chatushpada" : "jalachara";

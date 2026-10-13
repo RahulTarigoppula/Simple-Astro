@@ -1,4 +1,4 @@
-// Stage [6a]: Zhang–Suen thinning, exactly as §6.13 (ximgproc.thinning is not in the default
+// Stage [6a]: Zhang-Suen thinning, exactly as §6.13 (ximgproc.thinning is not in the default
 // OpenCV.js build). Operates in place on a 0/1 mask and returns it.
 
 /** Thin `bin` (0/1, row-major) in place; returns the mask and the number of full iterations. */

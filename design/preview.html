@@ -72,7 +72,7 @@
 :root {
   color-scheme: dark;
 
-  /* colour — Night desk (default) */
+  /* colour, Night desk (default) */
   --bg: #1A110B;          --bg-elevated: #1D2748;
   --surface: #F4EAD3;     --surface-2: #EAD9A9;
   --ink: #1B1410;         --ink-muted: #5A483A;     --ink-faint: #9A8A72;
@@ -110,7 +110,7 @@
   /* radius */
   --radius-sm: 3px; --radius-md: 6px; --radius-lg: 14px; --radius-xl: 28px; --radius-full: 9999px;
 
-  /* elevation — one lamp, bottom-right */
+  /* elevation, one lamp, bottom-right */
   --lamp-x: 1; --lamp-y: 1;
   --flicker: 0px;
   --shadow-alpha: 0.45;
@@ -133,7 +133,7 @@
   --studio: #0C0805;
   --grain-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23g)'/%3E%3C/svg%3E"); }
 
-/* Morning terrace — auto by sun altitude, or diya snuffed */
+/* Morning terrace, auto by sun altitude, or diya snuffed */
 :root[data-theme="day"] {
   color-scheme: light; --bg: #6E4A2E; --bg-elevated: #C9C1AE; --ledge: #5E3F27;
   --shadow-alpha: 0.22; --grain-opacity: 0.10; --vignette-far: 0.08; }
@@ -191,7 +191,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .screen.is-entering { animation: object-open var(--dur-base) var(--ease-in-out) both; }
 @keyframes object-open { from { transform: translate(var(--ox, 0px), var(--oy, 0px)) scale(var(--os, .82)); opacity: 0; } to   { transform: none; opacity: 1; } }
 
-/* The Ledge — five miniature objects, 56 px targets (§9 global) */
+/* The Ledge, five miniature objects, 56 px targets (§9 global) */
 .ledge { flex: none; height: var(--ledge-height); background: var(--ledge); display: flex; align-items: center; justify-content: space-around; padding: 0 var(--space-2) env(safe-area-inset-bottom, 0px);
    border-top: 1px solid rgba(255,235,200,.10); position: relative; z-index: 7; box-shadow: 0 -1px 0 rgba(0,0,0,.5) inset; }
 .ledge button { min-width: 56px; min-height: 56px; display: grid; place-items: center; gap: 3px; border-radius: var(--radius-md); color: var(--surface); transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out); }
@@ -249,7 +249,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .engraved b { font-variation-settings: "wdth" 87, "wght" 800; font-weight: 400; }
 .engraved .sep { opacity: .45; }
 
-/* digit-set (§7.3) — numerals set, never fade */
+/* digit-set (§7.3), numerals set, never fade */
 .setting > i { font-style: normal; color: var(--ink-faint); }
 .setting.is-set > i { color: inherit; animation: digit-set 120ms var(--ease-out) both; animation-delay: var(--d, 0ms); }
 .setting.is-set > i.mut { color: var(--ink-muted); animation-name: digit-set-mut; }
@@ -271,7 +271,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .fold-in li.is-now .mono { color: var(--accent-text); }
 .ledger tbody tr { cursor: pointer; }
 
-/* toast — the lac note */
+/* toast, the lac note */
 .toast { position: absolute; left: 50%; bottom: calc(var(--ledge-height) + 12px); z-index: 9; transform: translate(-50%, 12px); opacity: 0; pointer-events: none; background: var(--paper); color: var(--ink); border-left: 4px solid var(--accent);
    padding: 10px 14px; border-radius: var(--radius-sm); box-shadow: var(--shadow-2); font-size: var(--text-sm); max-width: 86%; line-height: 1.4; transition: transform var(--dur-base) var(--ease-out), opacity var(--dur-base) var(--ease-out); }
 .toast.is-on { transform: translate(-50%, 0); opacity: 1; }
@@ -461,7 +461,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .confbar.is-low i { background: var(--haldi); }
 .confbar.is-good i { background: var(--tulsi); }
 
-/* --- 8b · GUNA MILAN — the 36-bead mala (§9.9) ---------------------------- */
+/* --- 8b · GUNA MILAN, the 36-bead mala (§9.9) ---------------------------- */
 .milansheet { margin: var(--space-3) auto; width: calc(100% - var(--space-6)); max-width: 560px; border-radius: var(--radius-md); padding-bottom: var(--space-8); }
 .pair { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--space-2); padding: var(--space-4) var(--paper-margin) 0; }
 .pair__scroll { background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 8px 6px; text-align: center; box-shadow: var(--shadow-1); }
@@ -538,7 +538,7 @@ the Ledge becomes the left desk edge (§9 global)
 <main class="stage">
 <div class="device" id="device">
 
-  <!-- device status bar (Android edge-to-edge, teak behind it — §14) -->
+  <!-- device status bar (Android edge-to-edge, teak behind it, §14) -->
   <div class="status" aria-hidden="true">
     <span class="status__t" id="statusTime">14:52</span>
     <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1" opacity=".4"/></svg>
@@ -548,7 +548,7 @@ the Ledge becomes the left desk edge (§9 global)
 
   <div class="screens" id="screens">
 
-  <!-- ══════════════ 1 · THE CHOWKI (home) — §9.1 ══════════════ -->
+  <!-- ══════════════ 1 · THE CHOWKI (home), §9.1 ══════════════ -->
   <section class="screen chowki is-active" id="scr-chowki" role="tabpanel" aria-labelledby="tab-chowki" data-screen="chowki">
     <div class="sky" id="skyHome" aria-hidden="true"></div>
     <div class="greet">
@@ -660,7 +660,7 @@ the Ledge becomes the left desk edge (§9 global)
     </div>
   </section>
 
-  <!-- ══════════════ 2 · JANAM PATRI — §9.5 ══════════════ -->
+  <!-- ══════════════ 2 · JANAM PATRI, §9.5 ══════════════ -->
   <section class="screen patri" id="scr-patri" role="tabpanel" aria-labelledby="tab-patri" data-screen="patri">
     <div class="roller roller--top" id="rollTop" aria-hidden="true">
       <div class="roller__body"><div class="roller__curl" id="curlTop"></div></div>
@@ -751,7 +751,7 @@ the Ledge becomes the left desk edge (§9 global)
     </div>
   </section>
 
-  <!-- ══════════════ 3 · WRITING THE LEAF — §9.4 ══════════════ -->
+  <!-- ══════════════ 3 · WRITING THE LEAF, §9.4 ══════════════ -->
   <section class="screen leafscreen" id="scr-leaf" role="tabpanel" aria-labelledby="tab-leaf" data-screen="leaf">
     <div class="sky" id="skyLeaf" aria-hidden="true"></div>
     <div class="paper leafsheet">
@@ -793,7 +793,7 @@ the Ledge becomes the left desk edge (§9 global)
     </div>
   </section>
 
-  <!-- ══════════════ 4 · HAST REKHA — §9.8 ══════════════ -->
+  <!-- ══════════════ 4 · HAST REKHA, §9.8 ══════════════ -->
   <section class="screen hast" id="scr-hast" role="tabpanel" aria-labelledby="tab-hast" data-screen="hast">
     <div class="paper hastsheet">
       <div class="band"><h2><span lang="hi" class="dev">हस्त रेखा</span> · Right hand</h2><span class="meta" id="hastMeta">no print</span></div>
@@ -850,7 +850,7 @@ the Ledge becomes the left desk edge (§9 global)
   </section>
 
 
-  <!-- ══════ 5 · GUNA MILAN — §9.9 ══════ -->
+  <!-- ══════ 5 · GUNA MILAN, §9.9 ══════ -->
   <section class="screen milan" id="scr-milan" role="tabpanel" aria-labelledby="tab-milan" data-screen="milan">
     <div class="scrollport">
       <div class="paper milansheet">
@@ -871,7 +871,7 @@ the Ledge becomes the left desk edge (§9 global)
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <!-- The Ledge — five objects (§9 global) -->
+  <!-- The Ledge, five objects (§9 global) -->
   <nav class="ledge" aria-label="The Ledge">
     <button data-go="patri" aria-label="Patri"><span class="obj" aria-hidden="true"><svg width="26" height="18" viewBox="0 0 26 18"><rect x="3" y="3" width="20" height="12" rx="2" fill="#F4EAD3"/><rect x="0" y="1" width="4" height="16" rx="2" fill="#C9A24A"/><rect x="22" y="1" width="4" height="16" rx="2" fill="#C9A24A"/></svg></span><span>Patri</span></button>
     <button data-go="chowki" aria-label="The desk"><span class="obj" aria-hidden="true"><svg width="24" height="20" viewBox="0 0 24 20"><rect x="1" y="6" width="22" height="4" rx="1.5" fill="#C9A24A"/><path d="M4 10v8M20 10v8" stroke="#C9A24A" stroke-width="2.4" stroke-linecap="round"/><rect x="6" y="1" width="12" height="5" rx="1" fill="#F4EAD3"/></svg></span><span>Desk</span></button>
@@ -962,7 +962,7 @@ function julianDay(y, m, d, hUT) {
   const A = Math.floor(y / 100), B = 2 - A + Math.floor(A / 4);
   return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + B - 1524.5 + hUT / 24;
 }
-/* ΔT (Espenak–Meeus). Positions are computed in TT, sidereal time in UT — a
+/* ΔT (Espenak-Meeus). Positions are computed in TT, sidereal time in UT, a
    60-second slip is 13″ of Moon, which is 13× the arcsecond this app claims. */
 function deltaTsec(jd) {
   const t = (jd - 2451545) / 365.25;                       // ≈ years from 2000.0
@@ -970,7 +970,7 @@ function deltaTsec(jd) {
   return 62.92 + 0.32217 * t + 0.005589 * t * t;
 }
 const ttT = jd => (jd + deltaTsec(jd) / 86400 - 2451545) / 36525;
-/* Nutation, Meeus ch.22 abridged — Δψ enters the apparent longitudes and the
+/* Nutation, Meeus ch.22 abridged, Δψ enters the apparent longitudes and the
    ayanāṃśa, Δε the true obliquity. */
 const nutArgs = T => [
   norm(125.04452 - 1934.136261 * T + 0.0020708 * T * T + T * T * T / 450000) * D2R,
@@ -1012,7 +1012,7 @@ function geo(name, T) {
   const x = p[0] - e[0], y = p[1] - e[1], z = p[2] - e[2];
   return { lon: norm(Math.atan2(y, x) * R2D), lat: Math.atan2(z, Math.hypot(x, y)) * R2D };
 }
-/* Sun — Meeus ch.25, apparent geocentric longitude. (Standish's mean elements
+/* Sun, Meeus ch.25, apparent geocentric longitude. (Standish's mean elements
    are ~5′ out here, which would show in the ledger's arcseconds.) */
 function sunLon(T) {
   const L0 = norm(280.46646 + 36000.76983 * T + 0.0003032 * T * T);
@@ -1022,7 +1022,7 @@ function sunLon(T) {
           + 0.000289 * Math.sin(3 * M * D2R);
   return norm(L0 + C - 0.00569 - 0.00478 * Math.sin((125.04 - 1934.136 * T) * D2R));
 }
-/* Moon — Meeus ch.47, the full 60-term ΣL table [coef, D, M, M′, F]. */
+/* Moon, Meeus ch.47, the full 60-term ΣL table [coef, D, M, M′, F]. */
 const MOON_TERMS = [[6288774,0,0,1,0],[1274027,2,0,-1,0],[658314,2,0,0,0],[213618,0,0,2,0],[-185116,0,1,0,0],[-114332,0,0,0,2],[58793,2,0,-2,0],[57066,2,-1,-1,0],[53322,2,0,1,0],[45758,2,-1,0,0],[-40923,0,1,-1,0],[-34720,1,0,0,0],[-30383,0,1,1,0],[15327,2,0,0,-2],[-12528,0,0,1,2],[10980,0,0,1,-2],[10675,4,0,-1,0],[10034,0,0,3,0],[8548,4,0,-2,0],[-7888,2,1,-1,0],[-6766,2,1,0,0],[-5163,1,0,-1,0],[4987,1,1,0,0],[4036,2,-1,1,0],[3994,2,0,2,0],[3861,4,0,0,0],[3665,2,0,-3,0],[-2689,0,1,-2,0],[-2602,2,0,-1,2],[2390,2,-1,-2,0],[-2348,1,0,1,0],[2236,2,-2,0,0],[-2120,0,1,2,0],[-2069,0,2,0,0],[2048,2,-2,-1,0],[-1773,2,0,1,-2],[-1595,2,0,0,2],[1215,4,-1,-1,0],[-1110,0,0,2,2],[-892,3,0,-1,0],[-810,2,1,1,0],[759,4,-1,-2,0],[-713,0,2,-1,0],[-700,2,2,-1,0],[691,2,1,-2,0],[596,2,-1,0,-2],[549,4,0,1,0],[537,0,0,4,0],[520,4,-1,0,0],[-487,1,0,-2,0],[-399,2,1,0,-2],[-381,0,0,2,-2],[351,1,1,1,0],[-340,3,0,-2,0],[330,4,0,-3,0],[327,2,-1,2,0],[-323,0,2,1,0],[299,1,1,-1,0],[294,2,0,3,0]];
 function moonLon(T) {
   const Lp = norm(218.3164477 + 481267.88123421 * T - 0.0015786 * T * T + T ** 3 / 538841 - T ** 4 / 65194000);
@@ -1041,7 +1041,7 @@ function moonLon(T) {
   s += 3958 * Math.sin(A1) + 1962 * Math.sin(Lp * D2R - F) + 318 * Math.sin(A2);
   return norm(Lp + s / 1e6 + nutLon(T));                 // apparent λ
 }
-/* Lahiri presets — DESIGN.md §9.10 / RESEARCH.md §5.4.
+/* Lahiri presets, DESIGN.md §9.10 / RESEARCH.md §5.4.
    'se-true' = SE nutation-inclusive; 'drik' = Drik-compatible mean (+24.3″, no Δψ). */
 function ayanamsa(T, preset) {
   const pA = (5028.796195 * T + 1.1054348 * T * T) / 3600;
@@ -1137,7 +1137,7 @@ function cast(birth) {
     karana: (() => { const k = Math.floor(elong / 6) + 1; return k === 1 ? "Kiṃstughna" : k >= 58 ? ["Śakuni","Catuṣpada","Nāga"][k - 58] : KARANA[(k - 2) % 7]; })(),
     illum: (1 - Math.cos(elong * D2R)) / 2
   };
-  /* Viṃśottarī (§5.8) — balance of the Moon's nakṣatra lord, 365.25-day years */
+  /* Viṃśottarī (§5.8), balance of the Moon's nakṣatra lord, 365.25-day years */
   const dashas = []; let idx = LORD.indexOf(moon.lord);
   let start = jd, bal = LYRS[moon.lord] * (1 - moon.frac);
   for (let i = 0; i < 9; i++) {
@@ -1157,7 +1157,7 @@ const jdToYMD = jd => {
 const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const fmtJD = jd => { const t = jdToYMD(jd); return t.d + " " + MON[t.mo - 1] + " " + t.y; };
 
-/* yoga detection — only what this chart actually shows */
+/* yoga detection, only what this chart actually shows */
 function yogasOf(c) {
   const out = [], by = {}; c.bodies.forEach(b => by[b.name] = b);
   const kendra = h => h === 1 || h === 4 || h === 7 || h === 10;
@@ -1303,7 +1303,7 @@ function renderPatri() {
       <td class="pd">${x.lord}</td></tr>`;
   }).join("");
 
-  /* the honest boundary note — nearest cusp anywhere in the chart */
+  /* the honest boundary note, nearest cusp anywhere in the chart */
   const near = c.bodies.slice().sort((a, z) => a.cusp - z.cusp)[0];
   const other = cast(Object.assign({}, b, { preset: b.preset === "drik" ? "se-true" : "drik" }));
   const alt = other.bodies.find(x => x.name === near.name);
@@ -1314,7 +1314,7 @@ function renderPatri() {
   buildChart($("#chartD9"), c, { d9: true });
   $("#d9lagna").textContent = SIGN[c.lagna.d9];
 
-  /* dasha ribbon — brass clip on the mahādaśā running now */
+  /* dasha ribbon, brass clip on the mahādaśā running now */
   const nowJD = julianDay(NOW.y, NOW.mo, NOW.d, 12 - NOW.tz);
   $("#ribbon").innerHTML = c.dashas.map((d, i) => {
     const isNow = nowJD >= d.from && nowJD < d.to;
@@ -1768,7 +1768,7 @@ function drawPalm() {
   const grd = g.createRadialGradient(180, 250, 30, 190, 280, 300);
   grd.addColorStop(0, "#D8B08C"); grd.addColorStop(.55, "#BC8F6E"); grd.addColorStop(1, "#7E5540");
   g.save(); g.clip(hand); g.fillStyle = grd; g.fillRect(0, 0, W, H);
-  /* mounts — soft lighter blobs under the fingers and the thumb ball */
+  /* mounts, soft lighter blobs under the fingers and the thumb ball */
   [[130, 215, 46], [195, 205, 48], [258, 210, 46], [318, 230, 40], [140, 330, 74]].forEach(m => {
     const b = g.createRadialGradient(m[0], m[1], 2, m[0], m[1], m[2]);
     b.addColorStop(0, "rgba(255,225,196,.30)"); b.addColorStop(1, "rgba(255,225,196,0)");
@@ -1786,7 +1786,7 @@ function drawPalm() {
     g.fillStyle = `rgba(${r() > .5 ? "255,236,214" : "60,38,26"},${(r() * .10).toFixed(3)})`;
     g.fillRect(40 + r() * 320, 60 + r() * 400, 1.2, 1.2);
   }
-  /* the three great lines are IN the photograph — the overlay only finds them */
+  /* the three great lines are IN the photograph, the overlay only finds them */
   const paths = [PALM.heart, PALM.head, PALM.life];
   paths.forEach((d, i) => {
     const p = new Path2D(d);
@@ -1916,7 +1916,7 @@ function palmUp() {
 }
 frame.addEventListener("pointerup", palmUp);
 frame.addEventListener("pointercancel", palmUp);
-/* burn — the edge chars while you hold; release early and it cools */
+/* burn, the edge chars while you hold; release early and it cools */
 const burn = $("#burnBtn"), burnEdge = $("#burnEdge");
 (function () {
   let raf = 0, t0 = 0;

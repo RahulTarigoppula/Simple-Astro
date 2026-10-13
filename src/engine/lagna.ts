@@ -31,7 +31,7 @@ export function ascMcFromRamc(ramc: Deg, eps: Deg, lat: number): { asc: Deg; mc:
 /**
  * Lagna and MC at an instant for a place (lat +N, lon +E), sidereal under ayanāṃśa `ay`.
  * GAST comes from astronomy-engine (ERA-based, IAU 2000B equation of the equinoxes); the true
- * obliquity is the IAU 2006 mean obliquity plus the IAU 2000B Δε — the same frame the planet
+ * obliquity is the IAU 2006 mean obliquity plus the IAU 2000B Δε, the same frame the planet
  * longitudes are rotated into, so the Lagna and the grahas share one ecliptic.
  */
 export function lagna(t: AstroTime, lat: number, lon: number, ay: Deg, eph: Ephemeris = astronomyEngineEphemeris): LagnaResult {

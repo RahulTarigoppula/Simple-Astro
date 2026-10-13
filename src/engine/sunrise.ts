@@ -1,5 +1,5 @@
 // Sunrise, sunset and the Hindu day (§6.9). The day runs sunrise → sunrise at the leaf's place.
-// Two conventions: 'upper-limb-refracted' (the Sun's top edge on a refracted horizon — what
+// Two conventions: 'upper-limb-refracted' (the Sun's top edge on a refracted horizon, what
 // almanacs print) and 'disc-centre' (the geometric centre at altitude 0, no refraction).
 import * as A from "astronomy-engine";
 import { astroTime, astroTimeToMs } from "./ephemeris";
@@ -56,7 +56,7 @@ export interface HinduDay {
 /**
  * The Hindu day containing `atMs`: an instant before today's sunrise belongs to the previous day.
  * At polar latitudes where the Sun neither rises nor sets, the day degrades to local apparent noon
- * ± 6 h — never NaN — and says so in `polar`.
+ * ± 6 h, never NaN, and says so in `polar`.
  */
 export function hinduDay(obs: A.Observer, atMs: number, mode: SunriseMode): HinduDay {
   const rise = sunEvent(obs, 1, atMs, -1.5, mode);

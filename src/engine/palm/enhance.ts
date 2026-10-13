@@ -1,4 +1,4 @@
-// Stage [4]: enhancement — grey → CLAHE(3.0, 8×8) → black-hat (25 px ellipse) → Gaussian σ 1.5.
+// Stage [4]: enhancement, grey → CLAHE(3.0, 8×8) → black-hat (25 px ellipse) → Gaussian σ 1.5.
 // Palm lines are valleys, so the black-hat output is already "bright lines on dark".
 //
 // This is the pure-TS path: the worker uses OpenCV for the same three steps when it loads, and
@@ -8,7 +8,7 @@
 import { gaussianBlur, type ImageLike } from "./image";
 import { PRINT_SIZE } from "./rectify";
 
-/** Rec.601 luma, rounded to 8 bits — the input CLAHE expects. */
+/** Rec.601 luma, rounded to 8 bits, the input CLAHE expects. */
 export function luma8(img: ImageLike): Uint8Array {
   const { data, width, height } = img;
   const out = new Uint8Array(width * height);
@@ -246,7 +246,7 @@ export function otsu(grey: Uint8Array): number {
 }
 
 /**
- * Pigment mask: pixels whose chroma (R − B)/luma stands well above the palm's own median — henna,
+ * Pigment mask: pixels whose chroma (R − B)/luma stands well above the palm's own median, henna,
  * alta, ink. Illumination-invariant (a shadow scales R, B and luma together). Dilated 3 px.
  */
 export function pigmentMask(img: ImageLike, region: Uint8Array): Uint8Array {

@@ -33,7 +33,7 @@ export function isLeapYear(y: number): boolean {
   return (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
 }
 
-/** Days in month `m` (1–12) of year `y`; 0 for an out-of-range month. */
+/** Days in month `m` (1-12) of year `y`; 0 for an out-of-range month. */
 export function daysInMonth(y: number, m: number): number {
   if (!Number.isInteger(m) || m < 1 || m > 12) return 0;
   if (m === 2) return isLeapYear(y) ? 29 : 28;
@@ -53,7 +53,7 @@ export function jdUtFromUtcMs(utcMs: number): Jd {
   return utcMs / MS_PER_DAY + JD_UNIX_EPOCH;
 }
 
-/** JD (TT): astronomy-engine's own ΔT model (Espenak–Meeus) carried in `AstroTime.tt`. */
+/** JD (TT): astronomy-engine's own ΔT model (Espenak-Meeus) carried in `AstroTime.tt`. */
 export function jdTtFromUtcMs(utcMs: number): Jd {
   return MakeTime(utcMs / MS_PER_DAY + JD_UNIX_EPOCH - J2000).tt + J2000;
 }
@@ -113,8 +113,8 @@ export function formatOffset(offsetMin: number): string {
  * - Otherwise the zone (`zoneOverride`, else tz-lookup at the place) is resolved through Luxon,
  *   which reads the runtime's IANA data.
  * - Impossible dates, unknown zones and non-existent (DST-gap) times throw `TIME_INVALID`;
- *   a fold (repeated hour) throws `TIME_AMBIGUOUS` — the engine never guesses, the offset
- *   drum resolves it. Years outside 1600–2400 throw `EPHEMERIS_RANGE`.
+ *   a fold (repeated hour) throws `TIME_AMBIGUOUS`, the engine never guesses, the offset
+ *   drum resolves it. Years outside 1600-2400 throw `EPHEMERIS_RANGE`.
  */
 export function resolveBirthMoment(input: BirthInput): BirthMoment {
   const { localY: y, localMo: mo, localD: d, localH: h, localMi: mi } = input;

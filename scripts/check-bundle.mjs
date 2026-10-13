@@ -7,7 +7,7 @@ import { gzipSync } from "node:zlib";
 
 const DIST = "dist";
 if (!existsSync(DIST)) {
-  console.error("check-bundle: dist/ does not exist — run the build first");
+  console.error("check-bundle: dist/ does not exist, run the build first");
   process.exit(1);
 }
 const files = [];

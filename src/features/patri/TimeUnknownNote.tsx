@@ -25,7 +25,7 @@ function moonAtLocal(profile: Profile, preset: EnginePreset, tries: ReadonlyArra
       });
       return moonTransitAt(m.utcMs, preset);
     } catch {
-      // that clock time did not exist (a clock change at the day's edge) — try the next one
+      // that clock time did not exist (a clock change at the day's edge), try the next one
     }
   }
   return null;

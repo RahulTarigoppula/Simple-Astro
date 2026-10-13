@@ -16,7 +16,7 @@ export function meanNode(jdTt: Jd): Deg {
 }
 
 /**
- * True (osculating) ascending node — what Swiss Ephemeris calls SE_TRUE_NODE. The Moon's geocentric
+ * True (osculating) ascending node, what Swiss Ephemeris calls SE_TRUE_NODE. The Moon's geocentric
  * position r and velocity v are rotated into the true ecliptic of date; h = r × v is the orbital
  * angular momentum and the ascending node lies along n = ẑ × h = (−h_y, h_x, 0).
  */

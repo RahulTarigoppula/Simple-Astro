@@ -1,6 +1,6 @@
 // The desk's sounds, synthesised on the fly with Web Audio. Every sound is original (no samples,
 // nothing to license, zero bytes shipped). Master gain 0.5, muted from the Drawer, unlocked on the
-// first genuine gesture (both touchstart and pointerdown — the Android WebView needs a real touch).
+// first genuine gesture (both touchstart and pointerdown, the Android WebView needs a real touch).
 import { mulberry32 } from "../engine/math";
 
 export type SoundId =

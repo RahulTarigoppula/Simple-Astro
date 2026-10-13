@@ -220,7 +220,9 @@
   .journey__kicker,
   .journey__title,
   .journey__line,
-  .journey__cta {
+  .journey__cta,
+  .journey__sig,
+  .journey__made {
     animation: none;
   }
 }
@@ -295,10 +297,10 @@
 }
 .journey__sig {
   margin-top: 14px;
-  animation-delay: 2.6s;
+  animation-delay: 1s;
 }
 .journey__cta {
-  animation-delay: 3.2s;
+  animation-delay: 1.8s;
 }
 .journey__quote {
   border-left-width: 2px;
@@ -319,7 +321,7 @@
   background: rgba(3, 4, 11, 0.55);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  animation: jr-rise 900ms var(--ease-out) 2.4s both;
+  animation: jr-rise 900ms var(--ease-out) 1.3s both;
 }
 .journey__made-h {
   margin: 0;
@@ -408,7 +410,6 @@
 .journey__howto .journey__cta {
   animation-delay: 0.8s;
 }
-
-.journey__howto .journey__cta {
-  animation-delay: 0.8s;
+.journey__made-p b {
+  color: var(--accent-2);
 }

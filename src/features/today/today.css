@@ -1,4 +1,4 @@
-/* Today's leaf — the brass dial and the Moon on the indigo cloth, the ledger on paper. */
+/* Today's leaf, the brass dial and the Moon on the indigo cloth, the ledger on paper. */
 
 .today__desk {
   /* Tithi weather: the cloth takes the paged day's Moon, not the room's. */
@@ -403,7 +403,7 @@
   padding-left: var(--space-2);
   padding-right: var(--space-2);
 }
-/* The brass "now" clip, as on the daśā ribbon — pinned over the row's left edge. */
+/* The brass "now" clip, as on the daśā ribbon, pinned over the row's left edge. */
 .today-periods li.is-now::before {
   content: "";
   position: absolute;

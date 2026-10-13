@@ -1,5 +1,5 @@
 // Aṣṭakavarga: the Sarvāṣṭakavarga drawn on the Rāśi-chart geometry (numbers in place of grahas),
-// the Bhinnāṣṭakavarga matrix (rows grahas, columns signs from Meṣa) and 2–3 cited readings.
+// the Bhinnāṣṭakavarga matrix (rows grahas, columns signs from Meṣa) and 2-3 cited readings.
 import { useId, useMemo, useRef } from "react";
 import { TurmericBand } from "../../../components/ui/TurmericBand";
 import { useInkDraw } from "../../../components/ui/useInkDraw";

@@ -1,5 +1,5 @@
 // Golden-chart suite (§10.3): 50 charts, oracle = Swiss Ephemeris (pyswisseph, Moshier, SE_SIDM_LAHIRI),
-// computed OUTSIDE the repo — only the numbers live in __fixtures__/golden-charts.json (see oracle-notes.md).
+// computed OUTSIDE the repo, only the numbers live in __fixtures__/golden-charts.json (see oracle-notes.md).
 // Tolerance: 60″ on every graha, Rāhu/Ketu (matching node mode) and the Lagna, under preset se-true.
 import { afterAll, describe, expect, it } from "vitest";
 import golden from "./__fixtures__/golden-charts.json";
@@ -54,8 +54,8 @@ interface GoldenChart {
 }
 
 const CHARTS = (golden as unknown as { charts: GoldenChart[] }).charts;
-const TOL = 60; // arcsec — the ±1′ engine claim
-const AYANAMSA_TOL = 2; // arcsec — §6.2 says ±1″ on the SE columns; 2″ leaves room for the short nutation series
+const TOL = 60; // arcsec, the ±1′ engine claim
+const AYANAMSA_TOL = 2; // arcsec, §6.2 says ±1″ on the SE columns; 2″ leaves room for the short nutation series
 const NOW_MS = Date.UTC(2026, 8, 8, 14, 40, 0); // fixed; the engine never reads the clock
 const PLANETS = ["SU", "MO", "MA", "ME", "JU", "VE", "SA"] as const;
 

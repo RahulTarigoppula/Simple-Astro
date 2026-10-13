@@ -66,7 +66,7 @@ export interface KalaSarpaCheck {
 }
 
 /**
- * Are all seven grahas on one side of the Rāhu–Ketu axis? A graha within 1° of either node sits
+ * Are all seven grahas on one side of the Rāhu-Ketu axis? A graha within 1° of either node sits
  * on the axis: it is not counted as hemmed in, so the yoga does not fire, and the check carries a
  * "near boundary" note saying so.
  */
@@ -137,7 +137,7 @@ export const budhaAditya: YogaRule = {
       { grahaId: "ME", sign: p.g.ME.sign, note: `Budha in ${signName(p.g.ME.sign)}, ${sep.toFixed(1)}° from Sūrya` },
     ];
     // Budha is seldom more than 28° from Sūrya, so the pairing is common; combustion (within 14°,
-    // 12° when retrograde) weakens it — though some authors exempt Budha from combustion altogether.
+    // 12° when retrograde) weakens it, though some authors exempt Budha from combustion altogether.
     if (p.g.ME.combust) {
       because.push({
         grahaId: "ME",

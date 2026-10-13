@@ -1,5 +1,5 @@
 // Plain-English explanations for every traditional term the app shows. Written for someone who
-// has never met Jyotiṣa — or doesn't believe in it: the astronomy is stated as fact, the meanings
+// has never met Jyotiṣa, or doesn't believe in it: the astronomy is stated as fact, the meanings
 // as what the tradition says.
 
 export type GlossaryGroup = "basics" | "day" | "chart" | "time" | "match" | "palm" | "settings";

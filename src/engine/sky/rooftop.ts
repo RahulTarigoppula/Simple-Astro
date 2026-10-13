@@ -1,14 +1,14 @@
 // The Rooftop model (§4.6, §6.14): everything the painted sky and the dome draw for one instant at
-// one place — one model, two renderers, so the cheap renderer is never a downgrade in correctness.
+// one place, one model, two renderers, so the cheap renderer is never a downgrade in correctness.
 //
 // Frames: astronomy-engine gives geocentric J2000 (EQJ) vectors; we rotate them to the true
 // equator and equinox of date (precession + nutation) and then to the local horizon with the
-// apparent sidereal time (GAST + east longitude) — the same RAMC the Lagna uses. Sidereal
+// apparent sidereal time (GAST + east longitude), the same RAMC the Lagna uses. Sidereal
 // longitudes are tropical apparent longitudes on the true ecliptic of date minus the ayanāṃśa
 // preset, exactly as in the Patri. Positions are geometric (no refraction, ≤ 0.6° at the horizon);
 // the Moon is topocentric (parallax up to ~1°), the planets' parallax is negligible.
 //
-// Cost: seven GeoVector calls, one node, one Lagna, a few rotations — ≈ 0.3–0.6 ms, so a scrub
+// Cost: seven GeoVector calls, one node, one Lagna, a few rotations, ≈ 0.3-0.6 ms, so a scrub
 // frame can recompute it with no tween.
 import * as A from "astronomy-engine";
 import { ayanamsa } from "../ayanamsa";

@@ -1,4 +1,4 @@
-// Choghaḍiyā and Horā as ruled lists — day and night — on the leaf's clock. The running period
+// Choghaḍiyā and Horā as ruled lists, day and night, on the leaf's clock. The running period
 // wears the brass "now" clip and says "now" in words; quality is a word plus a mark, never colour.
 
 import { TurmericBand } from "../../components/ui/TurmericBand";
@@ -19,7 +19,7 @@ export function QualityMark({ q }: { q: MuhurtaQuality }) {
   );
 }
 
-/** "21:14–22:44", with "+1" once the period has crossed into the next civil day. */
+/** "21:14-22:44", with "+1" once the period has crossed into the next civil day. */
 export function spanLabel(clock: ZoneClock, a: number, b: number, dayMs: number): string {
   const dd = clock.dayNumber(b - 1) - clock.dayNumber(dayMs);
   return `${clock.hm(a)}-${clock.hm(b)}${dd > 0 ? ` +${dd}` : ""}`;

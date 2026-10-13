@@ -1,4 +1,4 @@
-/* The guide — plain-English onboarding and glossary */
+/* The guide, plain-English onboarding and glossary */
 .guide {
   padding: env(safe-area-inset-top, 0px) 0 var(--space-8);
 }
@@ -189,7 +189,7 @@
   line-height: 1;
 }
 .guide-item[open] summary::after {
-  content: "–";
+  content: "−";
 }
 .guide-item__term {
   font-weight: 600;

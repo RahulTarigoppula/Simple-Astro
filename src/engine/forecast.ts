@@ -1,4 +1,4 @@
-// Period forecasts — day, week, month, quarter, year — the classical way: gochara (transits counted
+// Period forecasts, day, week, month, quarter, year, the classical way: gochara (transits counted
 // from the natal Moon, Phaladīpikā ch. 26), Tārā-bala and Candra-bala for days, and the running
 // Viṃśottarī periods. Every line says which graha, which house and whether tradition calls it
 // favourable; nothing here is invented beyond that table.

@@ -1,4 +1,4 @@
-// Devanagari digits (०–९) for ledger cells when the Drawer asks for them. Engraved brass (drums,
+// Devanagari digits (०-९) for ledger cells when the Drawer asks for them. Engraved brass (drums,
 // strips) stays Latin by convention, so callers opt in per cell.
 const DEV = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"];
 

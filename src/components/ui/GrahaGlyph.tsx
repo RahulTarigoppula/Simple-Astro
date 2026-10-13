@@ -50,7 +50,7 @@ const PATHS: Record<GrahaId, React.ReactNode> = {
       <circle cx="17.2" cy="14" r="1.1" />
     </>
   ),
-  // Ketu: the headless tail — a comet's banner
+  // Ketu: the headless tail, a comet's banner
   KE: (
     <>
       <circle cx="21.5" cy="10.5" r="3" />

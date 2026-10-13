@@ -1,4 +1,4 @@
-// Hast Rekha — the loupe desk and the reading (§4.8, §3.7 E). The rectified print lies on the desk;
+// Hast Rekha, the loupe desk and the reading (§4.8, §3.7 E). The rectified print lies on the desk;
 // detected lines draw in ink from the wrist outward with a/b/c callouts; confidence is ink darkness
 // AND a number; below 0.6 the line is faint and the stylus is offered; Burn chars the print away.
 import { useLiveQuery } from "dexie-react-hooks";

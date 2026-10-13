@@ -21,7 +21,7 @@ export const TITHI_DAY_CITATION: Citation = CITE.muhurtaTithiDay;
 
 const HOUR = 3_600_000;
 
-/** Tithi indices (1..30) that begin and end strictly between two sunrises — kṣaya tithis that never
+/** Tithi indices (1..30) that begin and end strictly between two sunrises, kṣaya tithis that never
  *  touch a sunrise. `a` is the tithi at the first sunrise, `b` at the second. */
 export function skippedTithis(a: number, b: number): number[] {
   const steps = (((b - a) % 30) + 30) % 30;
@@ -64,7 +64,7 @@ export function sankrantisBetween(t0: number, t1: number, ap: AyanamsaPreset): A
 }
 
 /**
- * The month leaf. `month` is 1–12. Each date's sunrise is the first after local midnight in
+ * The month leaf. `month` is 1-12. Each date's sunrise is the first after local midnight in
  * `place.zone`; where the Sun does not rise, the polar day (local noon − 6 h) stands in.
  */
 export function monthCalendar(year: number, month: number, place: CalendarPlace, preset: EnginePreset): MonthCalendar {

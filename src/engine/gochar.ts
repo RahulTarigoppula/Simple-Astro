@@ -1,4 +1,4 @@
-// Gochara — transits read against the natal chart (Phaladīpikā ch. 26), Śani's Sāḍe-sātī and its
+// Gochara, transits read against the natal chart (Phaladīpikā ch. 26), Śani's Sāḍe-sātī and its
 // shorter cousins, the day's Tārā-bala and Candra-bala, and the running daśā. Pure: every function
 // takes explicit instants; nothing here reads the clock.
 import { TARA_NAMES, TARA_UNKIND } from "../data/tables/koota";
@@ -61,7 +61,7 @@ function toTransit(id: GrahaId, r: { lon: Deg; speed: number }, ay: Deg, ayRate:
   };
 }
 
-/** The Moon alone at `atMs` — identical to `transitsAt(atMs, preset).MO`, without the other eight. */
+/** The Moon alone at `atMs`, identical to `transitsAt(atMs, preset).MO`, without the other eight. */
 export function moonTransitAt(atMs: number, preset: EnginePreset, eph: Ephemeris = astronomyEngineEphemeris): TransitGraha {
   const t = astroTime(atMs);
   const jdTt = t.tt + 2451545.0;
@@ -91,7 +91,7 @@ export const GOCHAR_FAVOURABLE: Record<GrahaId, readonly number[]> = {
 /**
  * Vedha (obstruction) pairs: favourable house → the house which, when occupied by another graha,
  * cancels it (Phaladīpikā ch. 26). Given for the seven planets only; the nodes neither give nor
- * receive vedha in this table, and Sūrya–Śani and Candra–Budha never obstruct one another.
+ * receive vedha in this table, and Sūrya-Śani and Candra-Budha never obstruct one another.
  */
 export const VEDHA: Partial<Record<GrahaId, Readonly<Record<number, number>>>> = {
   SU: { 3: 9, 6: 12, 10: 4, 11: 5 },
@@ -198,7 +198,7 @@ export interface SaturnSpell {
   endMs: number;
   startClipped: boolean;
   endClipped: boolean;
-  /** Raw sign intervals in time order — a retrograde re-entry shows as a repeated phase. */
+  /** Raw sign intervals in time order, a retrograde re-entry shows as a repeated phase. */
   intervals: SaturnInterval[];
   /** Per phase, its intervals merged where they touch. */
   phases: Partial<Record<SaturnPhase, Array<[number, number]>>>;

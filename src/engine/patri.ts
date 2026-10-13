@@ -1,5 +1,5 @@
 // The cast (§6.17): a pure function of (profile, preset) that assembles the whole Janam Patri.
-// No clock is read here — `computedAt` is passed in, and `computeMs` uses the monotonic
+// No clock is read here, `computedAt` is passed in, and `computeMs` uses the monotonic
 // performance counter, which measures duration, not wall-clock time.
 import { dignityOf } from "../data/tables/dignity";
 import { ayanamsa, ayanamsaRateDegPerDay } from "./ayanamsa";
@@ -153,7 +153,7 @@ export function castCore(profile: Profile, preset: EnginePreset, eph: Ephemeris 
   return core;
 }
 
-/** The full Patri. `nowForComputedAt` is stamped verbatim — the engine never reads the clock. */
+/** The full Patri. `nowForComputedAt` is stamped verbatim, the engine never reads the clock. */
 export function computePatri(profile: Profile, preset: EnginePreset, nowForComputedAt: number): Patri {
   const t0 = performance.now();
   const core = castCore(profile, preset);
@@ -164,7 +164,7 @@ export function computePatri(profile: Profile, preset: EnginePreset, nowForCompu
   return patri;
 }
 
-/** Lazily add a divisional chart (D2, D3, D7, D10, D12, D30, D60) — returns a new Patri. */
+/** Lazily add a divisional chart (D2, D3, D7, D10, D12, D30, D60), returns a new Patri. */
 export function addVarga(patri: Patri, n: VargaNumber): Patri {
   if (patri.vargas[n]) return patri;
   return { ...patri, vargas: { ...patri.vargas, [n]: vargaChart(patri, n) } };

@@ -1,4 +1,4 @@
-// Devanagari beside the Latin for the day ledger — names only, no rules. Indexed like the Latin
+// Devanagari beside the Latin for the day ledger, names only, no rules. Indexed like the Latin
 // tables in data/tables/names.ts.
 import { KARANA_FIXED, KARANA_MOVABLE, MASA_NAMES, RITU_NAMES, TITHI_DEV } from "../../data/tables/names";
 import type { Panchang } from "../../engine/types";

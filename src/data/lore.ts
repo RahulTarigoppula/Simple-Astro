@@ -1,5 +1,5 @@
 // The mythology and traditional associations of the nine grahas, twelve rāśis and twenty-seven
-// nakṣatras — what the tradition says, in plain English. Associations vary between texts and regions;
+// nakṣatras, what the tradition says, in plain English. Associations vary between texts and regions;
 // these are the most widely printed ones.
 import type { GrahaId } from "../engine/types";
 

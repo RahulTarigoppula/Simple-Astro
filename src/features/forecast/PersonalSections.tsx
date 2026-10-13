@@ -1,5 +1,5 @@
 // The personal half of a forecast: life areas, natal contacts, transit strength, the day's guide and
-// day-by-day notes — all read from the person's own chart.
+// day-by-day notes, all read from the person's own chart.
 import { InfoDot } from "../../components/ui/Explain";
 import { GrahaGlyph } from "../../components/ui/GrahaGlyph";
 import { GRAHA_LORE } from "../../data/lore";
@@ -12,7 +12,7 @@ const fmt = (ms: number, zone: string, o: Intl.DateTimeFormatOptions) =>
 const hm = (ms: number, zone: string) => fmt(ms, zone, { hour: "2-digit", minute: "2-digit", hour12: false });
 const toneOf = (s: number) => (s >= 0.35 ? "bright" : s >= 0 ? "steady" : s >= -0.35 ? "mixed" : "testing");
 const WORD = { bright: "Strong", steady: "Good", mixed: "Mixed", testing: "Go gently" } as const;
-/** Line icons for the life areas (24-grid, currentColor) — the app's own icon language, not emoji. */
+/** Line icons for the life areas (24-grid, currentColor), the app's own icon language, not emoji. */
 const AREA_PATH: Record<AreaReading["id"], string> = {
   career: "M4 8h16v11H4zM9 8V5.5h6V8M4 13h16",
   money:

@@ -11,7 +11,7 @@ export function useSettings(): Settings {
   return useSettingsLoaded() ?? DEFAULT_SETTINGS;
 }
 
-/** undefined until IndexedDB has answered — use it where a default would be a wrong answer. */
+/** undefined until IndexedDB has answered, use it where a default would be a wrong answer. */
 export function useSettingsLoaded(): Settings | undefined {
   const row = useLiveQuery(async () => (await db.settings.get("app")) ?? null, []);
   if (row === undefined) return undefined;

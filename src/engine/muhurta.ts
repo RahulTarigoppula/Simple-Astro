@@ -96,7 +96,7 @@ export function horas(sunriseMs: number, sunsetMs: number, nextSunriseMs: number
 
 const MIN = 60_000;
 
-/** Brahma-muhūrta: the 29th of the night's thirty muhūrtas — 96 to 48 minutes before sunrise, on
+/** Brahma-muhūrta: the 29th of the night's thirty muhūrtas, 96 to 48 minutes before sunrise, on
  *  the 48-minute muhūrta. */
 export function brahmaMuhurta(sunriseMs: number): [number, number] {
   return [sunriseMs - 96 * MIN, sunriseMs - 48 * MIN];

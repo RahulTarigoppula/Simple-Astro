@@ -1,4 +1,4 @@
-// Forecasts for a day, week, month, quarter or year — read the classical way (gochara from the natal
+// Forecasts for a day, week, month, quarter or year, read the classical way (gochara from the natal
 // Moon, Tārā/Candra-bala, the running daśā) and explained in plain English.
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";

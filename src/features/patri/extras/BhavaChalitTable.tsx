@@ -1,5 +1,5 @@
-// Bhāva Chalit (Śrīpati): the twelve bhāvas as start–madhya–end sidereal degrees, and the grahas
-// whose bhāva differs from their whole-sign house. A table only — the Rāśi chart stays whole-sign.
+// Bhāva Chalit (Śrīpati): the twelve bhāvas as start-madhya-end sidereal degrees, and the grahas
+// whose bhāva differs from their whole-sign house. A table only, the Rāśi chart stays whole-sign.
 import { useId, useMemo } from "react";
 import { TurmericBand } from "../../../components/ui/TurmericBand";
 import { GRAHA_ABBR_DEV, GRAHA_NAMES, ORDINAL, SIGN_NAMES } from "../../../data/tables/names";

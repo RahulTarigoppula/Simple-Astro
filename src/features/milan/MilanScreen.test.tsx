@@ -90,7 +90,7 @@ describe("MilanScreen", () => {
     expect(await screen.findByText(BAND_LABEL[want.band])).toBeInTheDocument();
     expect(screen.getByText(`${fmtPts(want.total)} of 36 points: ${BAND_LABEL[want.band]}.`)).toBeInTheDocument();
 
-    // The lac rows are the engine's doṣa rows, labelled as such — colour is never the only signal.
+    // The lac rows are the engine's doṣa rows, labelled as such, colour is never the only signal.
     const doshaRows = want.kootas.filter((k) => k.dosha);
     for (const k of doshaRows) expect(screen.getByRole("img", { name: new RegExp(`^${k.name}: .*a doṣa$`) })).toBeInTheDocument();
     expect(screen.getAllByText(/^Tradition says:/)).toHaveLength(doshaRows.length);
@@ -186,7 +186,7 @@ describe("MilanScreen, porutham, compare and summary", () => {
     fireEvent.click(row);
     const dlg = await screen.findByRole("dialog");
     expect(within(dlg).getByText(/^Tradition weighs the constitution/)).toBeInTheDocument();
-    // Revatī × Rohiṇī: both Antya, different signs, Guru and Śukra not friends — no exception holds.
+    // Revatī × Rohiṇī: both Antya, different signs, Guru and Śukra not friends, no exception holds.
     expect(within(dlg).getByText("None of the classical exceptions holds for this pair.")).toBeInTheDocument();
   });
 

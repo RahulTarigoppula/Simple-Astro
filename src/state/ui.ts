@@ -1,4 +1,4 @@
-// Ephemeral UI state only — no derived data, nothing persisted. One store, four slices.
+// Ephemeral UI state only, no derived data, nothing persisted. One store, four slices.
 import { create } from "zustand";
 import type { GrahaId } from "../engine/types";
 

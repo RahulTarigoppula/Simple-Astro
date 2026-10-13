@@ -1,8 +1,8 @@
 // The intro, in three acts.
-//   I   · Scale   — the universe narrows to one pale blue dot.
-//   II  · Wonder  — life on that dot, and the people who looked up.
-//   III · Rahul   — his own words, quoted (only tidied for grammar), one thought per frame.
-// Act I–II facts are as published (sources in the comments). Act III is never paraphrased.
+//   I   · Scale  , the universe narrows to one pale blue dot.
+//   II  · Wonder , life on that dot, and the people who looked up.
+//   III · Rahul  , his own words, quoted (only tidied for grammar), one thought per frame.
+// Act I-II facts are as published (sources in the comments). Act III is never paraphrased.
 import type { SceneId } from "./scenes";
 
 export interface Beat {

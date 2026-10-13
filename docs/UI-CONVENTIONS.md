@@ -34,4 +34,4 @@
   number). `aria-hidden="true"` + `data-decorative="true"` on decorative material.
 - **Voice:** headings bilingual, Devanagari first. Readings start "Tradition says…" with a citation.
   Never health, death, fertility, wealth, money, legal, remedies, gemstones, poojas.
-- **Determinism:** no `Math.random` anywhere — use `mulberry32` from `src/engine/math.ts`.
+- **Determinism:** no `Math.random` anywhere, use `mulberry32` from `src/engine/math.ts`.

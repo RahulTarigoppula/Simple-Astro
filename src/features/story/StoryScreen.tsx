@@ -1,5 +1,5 @@
-// Roots: the history of Jyotiṣa, palmistry and numerology — through the
-// gods, the ṛṣis, the Greeks and the astronomers to the epilogue — played as full-screen stories.
+// Roots: the history of Jyotiṣa, palmistry and numerology, through the
+// gods, the ṛṣis, the Greeks and the astronomers to the epilogue, played as full-screen stories.
 import { useMemo, useState } from "react";
 import { Screen } from "../../components/ui/Screen";
 import { StoryPlayer } from "../../components/ui/StoryPlayer";

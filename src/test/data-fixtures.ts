@@ -46,7 +46,7 @@ export function makeProfile(id = "p-1", over: Partial<Profile> = {}): Profile {
   };
 }
 
-/** A structurally minimal Patri — the data layer never looks inside it. */
+/** A structurally minimal Patri, the data layer never looks inside it. */
 export function fakePatri(profile: Profile, preset: EnginePreset = DEFAULT_PRESET, nowMs = Date.now()): Patri {
   const partial = {
     profileId: profile.id,

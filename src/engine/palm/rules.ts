@@ -1,4 +1,4 @@
-// Stage [7]: rules — predicates over a PalmReading with Sāmudrika Śāstra citations, the same shape
+// Stage [7]: rules, predicates over a PalmReading with Sāmudrika Śāstra citations, the same shape
 // as yogas.ts. Sentences come from reading.ts (`palmSentence`): each opens "Tradition says", prints
 // its own measurement, and carries a citation. Low confidence changes the wording, never the claim.
 // Both framings (dominant/non-dominant and classical right/left) are recorded with the reading.
@@ -245,7 +245,7 @@ export function composeReading(a: ComposeArgs): PalmReading | null {
   };
 }
 
-/** Replace (or add) one line and recompute the hits — the stylus path. Pure, synchronous. */
+/** Replace (or add) one line and recompute the hits, the stylus path. Pure, synchronous. */
 export function withLineReplaced(reading: PalmReading, line: PalmLine, computedAt: number): PalmReading {
   const order: PalmLineId[] = ["heart", "head", "life", "fate"];
   const lines = [...reading.lines.filter((l) => l.id !== line.id), line].sort((x, y) => order.indexOf(x.id) - order.indexOf(y.id));

@@ -1,4 +1,4 @@
-// The parapet strip: the real horizon at a place and instant — Sun, Moon (with phase) and the five
+// The parapet strip: the real horizon at a place and instant, Sun, Moon (with phase) and the five
 // naked-eye grahas at their true altitude/azimuth over a rooftop parapet. Recomputed every frame a
 // drum turns, with no tween (sky-scrub).
 import * as A from "astronomy-engine";

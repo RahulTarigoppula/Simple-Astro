@@ -174,10 +174,10 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
           </h2>
           <ol className="journey__steps">
             <li>
-              <b>Add yourself.</b> Your name, birth date, time and place. It takes about a minute.
+              <b>Add yourself.</b> Your name, birth date, time and place of birth. It takes about a minute.
             </li>
             <li>
-              <b>Read your day.</b> Home shows what today looks like for you. Forecast goes from a day up to a year.
+              <b>Tap a card.</b> Your life in simple words, Partner Compatibility, your forecast and more. All in plain words first.
             </li>
             <li>
               <b>Tap ⓘ on any word</b> you don't know. It explains it in simple words.
@@ -211,8 +211,11 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
           {last ? (
             <>
               <section className="journey__made" aria-label="How Vyom was made">
-                <p className="journey__made-h">Made by Rahul (RT)</p>
-                <p className="journey__made-p">Almost 18 weeks of extensive planning, development, data gathering and cleaning.</p>
+                <p className="journey__made-h">Vyom 1.0 · Made by Rahul (RT)</p>
+                <p className="journey__made-p">
+                  <b>252 hours</b> of work and dedication: 18 weeks, 7 days a week, 2 hours a day. Planning, development, data gathering and
+                  cleaning.
+                </p>
                 <ul className="journey__made-n">
                   <li>
                     <b>82,505</b> places

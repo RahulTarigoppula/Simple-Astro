@@ -1,5 +1,5 @@
 // A person's "cosmic profile" across traditions: the Western (tropical) Sun sign, the Chinese zodiac
-// year, and numerology numbers — each labelled with the tradition it comes from.
+// year, and numerology numbers, each labelled with the tradition it comes from.
 import * as A from "astronomy-engine";
 import { astroTime } from "./ephemeris";
 
@@ -72,7 +72,7 @@ export function birthNumbers(y: number, m: number, d: number): { root: number; d
   return { root: digitalRoot(d), destiny: digitalRoot(digitSum(`${y}${m}${d}`)) };
 }
 
-/** Chaldean letter values (no 9 — the number held sacred), as used in Indian name numerology. */
+/** Chaldean letter values (no 9, the number held sacred), as used in Indian name numerology. */
 const CHALDEAN: Record<string, number> = {
   A: 1,
   I: 1,

@@ -1,4 +1,4 @@
-// Stage [2]: hand shape and ratios — pure geometry on MediaPipe's worldLandmarks (metres,
+// Stage [2]: hand shape and ratios, pure geometry on MediaPipe's worldLandmarks (metres,
 // view-invariant), so it survives any camera angle and any scale. This alone is a reading.
 import { CITE } from "../citations";
 import type { Citation, Landmark, PalmElement } from "../types";
@@ -18,7 +18,7 @@ export function angleBetween(u: Vec3, v: Vec3): number {
   return (Math.acos(Math.max(-1, Math.min(1, c))) * 180) / Math.PI;
 }
 
-/** Thresholds are inclusive (`>=`): exactly 0.90 / 0.80 is square / long — asserted in tests. */
+/** Thresholds are inclusive (`>=`): exactly 0.90 / 0.80 is square / long, asserted in tests. */
 export const SQUARE_MIN = 0.9;
 export const LONG_FINGERS_MIN = 0.8;
 
@@ -50,18 +50,18 @@ export interface HandGeometry {
 
 const bandWL = (v: number): string => (v >= SQUARE_MIN - EPS ? "square palm" : "oblong palm");
 const bandFL = (v: number): string => (v >= LONG_FINGERS_MIN - EPS ? "long fingers" : "short fingers");
-/** 2D:4D. Within ±3 % the two fingers read as even — no sentence is claimed for "even". */
+/** 2D:4D. Within ±3 % the two fingers read as even, no sentence is claimed for "even". */
 export const INDEX_LONG_MIN = 1.0;
 export const RING_LONG_MAX = 0.97;
 const bandIR = (v: number): string => (v >= INDEX_LONG_MIN ? "index longer" : v < RING_LONG_MAX ? "ring longer" : "about even");
-/** Thumb spread against the palm axis. 35–45° is the unremarkable middle. */
+/** Thumb spread against the palm axis. 35-45° is the unremarkable middle. */
 export const THUMB_FLEXIBLE_MIN = 45;
 export const THUMB_FIRM_MAX = 35;
 const bandTA = (v: number): string => (v >= THUMB_FLEXIBLE_MIN ? "wide spread" : v < THUMB_FIRM_MAX ? "close-held" : "moderate");
 
 /**
  * Element and ratios from the 21 world landmarks. Returns null (never NaN) when the hand is
- * degenerate — the caller shows "no hand in frame" rather than a reading of nothing.
+ * degenerate, the caller shows "no hand in frame" rather than a reading of nothing.
  */
 export function handGeometry(w: readonly Landmark[]): HandGeometry | null {
   const p = (i: number): Landmark | undefined => w[i];

@@ -1,5 +1,5 @@
 // OpenCV.js implementations of the three OpenCV-shaped pipeline steps (warp, enhance, closing).
-// `cv` is passed in — this module never loads OpenCV itself, so it is testable in Node and the
+// `cv` is passed in, this module never loads OpenCV itself, so it is testable in Node and the
 // worker decides when (and whether) the 10 MB module is paid for.
 //
 // Every cv.Mat (and the CLAHE object) is created through `track` and released in a `finally`

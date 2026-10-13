@@ -186,7 +186,7 @@ describe("calendar helpers", () => {
 
 describe("TT", () => {
   it("jdTt − jdUt is astronomy-engine's ΔT: ≈ 60.1 s in 1994, monotonic 1955-2030", () => {
-    // Real ΔT is not monotonic before ~1950 (it fell slightly through the 1930s–40s), so the
+    // Real ΔT is not monotonic before ~1950 (it fell slightly through the 1930s-40s), so the
     // monotonicity claim of TESTING T-7 is asserted over the modern span only.
     const ms = Date.UTC(1994, 2, 14, 1, 55);
     const dt = (jdTtFromUtcMs(ms) - jdUtFromUtcMs(ms)) * 86400;

@@ -24,7 +24,7 @@ export const devDigits = (n: number): string =>
     .map((c) => DIGITS[Number(c)] ?? c)
     .join("");
 
-/** "शु ५", "कृ ११", "पू", "अ" — the tithi at sunrise, short. */
+/** "शु ५", "कृ ११", "पू", "अ", the tithi at sunrise, short. */
 /** "5↑", "11↓", "Full", "New": the tithi at sunrise, in plain words. */
 export function tithiPlain(index: number): string {
   if (index === 15) return "Full";

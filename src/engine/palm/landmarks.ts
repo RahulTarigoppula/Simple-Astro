@@ -35,7 +35,7 @@ export type GateReason = "uncertain-hand" | "landmark-off-frame" | "palm-not-fac
 export type GateResult = { ok: true } | { ok: false; reason: GateReason };
 export type Hand = "right" | "left";
 
-/** Owner-facing copy for each refusal — plain, never an error code. */
+/** Owner-facing copy for each refusal, plain, never an error code. */
 export const GATE_COPY: Record<GateReason, string> = {
   "uncertain-hand": "no hand in frame",
   "landmark-off-frame": "fill the frame, but keep the whole hand inside it",
@@ -82,7 +82,7 @@ export function palmOrientation(lm: readonly Landmark[]): number {
  * Palm (not back) toward the camera for the given hand. Mirrored for a left hand.
  * `hand` is MediaPipe's *raw* handedness label, which assumes a mirrored (selfie) image. Using the
  * raw label makes the test independent of mirroring: it asks "do the classifier and the geometry
- * agree?" — the back of a hand is the one view where they cannot.
+ * agree?", the back of a hand is the one view where they cannot.
  */
 export function isPalmFacing(lm: readonly Landmark[], hand: Hand): boolean {
   const s = palmOrientation(lm);

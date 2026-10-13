@@ -1,7 +1,7 @@
 // The sky model (§6.14): alt/az of the Sun, Moon and the five naked-eye planets at a place and
 // instant, plus the rising sidereal sign. Built to be re-evaluated every scrub frame (< 1 ms):
-// one VSOP evaluation per body (heliocentric differences, no light-time iteration — at most
-// ~0.5′ for Mars, invisible on a 44 px strip), one Moon series, one precession–nutation matrix,
+// one VSOP evaluation per body (heliocentric differences, no light-time iteration, at most
+// ~0.5′ for Mars, invisible on a 44 px strip), one Moon series, one precession-nutation matrix,
 // one sidereal-time call and the Lagna arithmetic. Altitudes are geometric (no refraction);
 // the Moon is topocentric, everything else geocentric.
 import * as A from "astronomy-engine";
@@ -105,7 +105,7 @@ export function skySnapshot(utcMs: number, lat: number, lon: number, preset: Eng
   const moonTopo: V3 = [moonD[0] - obs.x, moonD[1] - obs.y, moonD[2] - obs.z];
   const moonAltAz = altAz(raOf(moonTopo), decOf(moonTopo), lstDeg, lat);
 
-  // Illuminated fraction from the phase angle at the Moon (Earth–Moon–Sun).
+  // Illuminated fraction from the phase angle at the Moon (Earth-Moon-Sun).
   const toSun: V3 = [sunJ[0] - moonJ[0], sunJ[1] - moonJ[1], sunJ[2] - moonJ[2]];
   const toEarth: V3 = [-moonJ[0], -moonJ[1], -moonJ[2]];
   const dot = toSun[0] * toEarth[0] + toSun[1] * toEarth[1] + toSun[2] * toEarth[2];

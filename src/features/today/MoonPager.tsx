@@ -1,5 +1,5 @@
-// The Moon as it really is that day — the terminator is an ellipse whose half-width is
-// |1 − 2k| of the radius — and the pager that ages it: drag the disc sideways or press ‹ ›.
+// The Moon as it really is that day, the terminator is an ellipse whose half-width is
+// |1 − 2k| of the radius, and the pager that ages it: drag the disc sideways or press ‹ ›.
 // Each day crossed is a detent: one brass tick and a selectionChanged.
 import { animate, motion, useMotionValue } from "motion/react";
 import { useId, useRef } from "react";

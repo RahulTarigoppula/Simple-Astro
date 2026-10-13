@@ -1,5 +1,5 @@
 // The painted sky as data: every mark the SVG (and the 1080×1920 poster) draws, in scene units
-// (horizon radius SKY_R, centre 0,0, East at the bottom). Pure — no DOM — and cheap enough to
+// (horizon radius SKY_R, centre 0,0, East at the bottom). Pure, no DOM, and cheap enough to
 // rebuild on every scrub frame: one matrix over the star vectors, string building for the dots
 // above the horizon, and d3-geo for a few clipped great circles.
 import { geoCircle, geoPath } from "d3-geo";
@@ -151,7 +151,7 @@ export function buildScene(sky: RooftopSky, stars: StarCatalog | null): PaintedS
   const daylight = Math.max(0, Math.min(1, (sky.sunAlt + 12) / 12));
   const starFade = 1 - 0.55 * daylight;
 
-  // Stars — the dots are shared by the poster; the SVG uses one path per magnitude class.
+  // Stars, the dots are shared by the poster; the SVG uses one path per magnitude class.
   const layers: StarLayer[] = [];
   let dots: StarDots = { n: 0, x: new Float32Array(0), y: new Float32Array(0), r: new Float32Array(0), o: new Float32Array(0) };
   if (stars) {

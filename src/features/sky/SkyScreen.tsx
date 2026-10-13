@@ -1,4 +1,4 @@
-// Rooftop sky — #/patri/:id/sky (§4.6). Full-bleed, no Ledge. The painted sky renders first and is
+// Rooftop sky, #/patri/:id/sky (§4.6). Full-bleed, no Ledge. The painted sky renders first and is
 // always correct; the 3D dome (lazy chunk) crossfades over it once its first frame is drawn. No
 // WebGL, a lost context or reduced motion → the painted sky only, silently, with a one-line note.
 // The ScrubRing turns time ±12 h around the birth moment; every frame recomputes the real sky.

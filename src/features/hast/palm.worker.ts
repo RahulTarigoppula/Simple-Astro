@@ -1,6 +1,6 @@
-// Stages [3]–[6] off the main thread (§6.13). OpenCV.js is instantiated INSIDE this worker by a
+// Stages [3]-[6] off the main thread (§6.13). OpenCV.js is instantiated INSIDE this worker by a
 // dynamic import (its own lazy chunk, never in the entry graph) and kept warm between runs. If it
-// fails to load — or a cv step throws — the same pipeline runs on the pure-TS ops: slower, honest,
+// fails to load, or a cv step throws, the same pipeline runs on the pure-TS ops: slower, honest,
 // and the reading is never blocked. Only the lines, the homography and the 512 × 512 RGBA print
 // are transferred back.
 import { asCv, type CvLike, makeCvOps } from "../../engine/palm/cv-ops";

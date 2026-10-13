@@ -56,7 +56,7 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
     return () => ro.disconnect();
   }, []);
 
-  // Tilak haptic: impact Medium when the dab lands — once per ink-draw.
+  // Tilak haptic: impact Medium when the dab lands, once per ink-draw.
   // biome-ignore lint/correctness/useExhaustiveDependencies: inkKey identifies a new drawing
   useEffect(() => {
     if (skipInk) return;

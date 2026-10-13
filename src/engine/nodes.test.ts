@@ -5,7 +5,7 @@ import { signedDelta } from "./math";
 import { ketuOf, MEAN_NODE_SPEED, meanNode, trueNode, trueNodeSpeed } from "./nodes";
 
 const MS = (jd: number): number => (jd - 2440587.5) * 86_400_000;
-// 500 dates evenly spaced over 1900–2030 (deterministic).
+// 500 dates evenly spaced over 1900-2030 (deterministic).
 const DATES = Array.from({ length: 500 }, (_, i) => 2415020.5 + (i * (2462502.5 - 2415020.5)) / 499);
 
 describe("mean node (Meeus 47.7)", () => {
@@ -38,7 +38,7 @@ describe("true (osculating) node", () => {
       if (prev !== 0 && Math.sign(d) !== Math.sign(prev)) flips++;
       prev = d;
     }
-    // The periodic terms of (true − mean) — 1.4979° sin 2(D−F) plus ~0.15° sin M and smaller —
+    // The periodic terms of (true − mean), 1.4979° sin 2(D−F) plus ~0.15° sin M and smaller,
     // reach ≈ 1.9° when they align (this sample peaks at 1.93°). §6.4's 1.8° (and SE's 1.74° over
     // the 50 golden charts) are smaller samples of the same oscillation, so the bound is 2°.
     expect(maxDiff).toBeLessThan(2);

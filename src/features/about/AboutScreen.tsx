@@ -5,7 +5,8 @@ import { Screen } from "../../components/ui/Screen";
 import "./about.css";
 
 const NUMBERS: Array<[string, string]> = [
-  ["18", "weeks of work"],
+  ["252", "hours of work and dedication"],
+  ["18", "weeks, 7 days a week, 2 hours a day"],
   ["82,505", "places, offline"],
   ["9,096", "real stars"],
   ["50", "charts checked against Swiss Ephemeris"],
@@ -128,12 +129,15 @@ export default function AboutScreen() {
     <Screen className="about-screen" label="About Vyom">
       <article className="about">
         <header className="about-hero">
-          <p className="about-kicker">About Vyom · व्योम</p>
+          <p className="about-kicker">About Vyom 1.0 · व्योम</p>
           <h1>How Vyom was made</h1>
           <blockquote className="about-quote">
             <p>It took almost 18 weeks of extensive planning, development, data gathering and cleaning. This is the result: Vyom.</p>
             <footer>Rahul (RT), who made Vyom</footer>
           </blockquote>
+          <p className="about-hours">
+            <b>18 weeks × 7 days × 2 hours = 252 hours</b> of work and dedication.
+          </p>
         </header>
 
         <ul className="about-numbers" aria-label="Vyom in numbers">

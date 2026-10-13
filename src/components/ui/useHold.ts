@@ -32,7 +32,7 @@ export function useHold({ ms = 600, disabled = false, onProgress, onFire, onCanc
   const start = useCallback(() => {
     if (disabled || active.current) return;
     active.current = true;
-    // Release anywhere ends the hold — some touch stacks never deliver pointerup to the button.
+    // Release anywhere ends the hold, some touch stacks never deliver pointerup to the button.
     const release = () => {
       window.removeEventListener("pointerup", release, true);
       window.removeEventListener("pointercancel", release, true);

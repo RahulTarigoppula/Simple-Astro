@@ -4,7 +4,7 @@ Repo: `C:\Work\Personal_Projects\02-jyoti-astrology-palmistry` (Windows; Bash = 
 `docs/UI-CONVENTIONS.md` (UI) and the relevant sections of `docs/IMPLEMENTATION-PROMPT.md` first.
 
 - **Engine purity:** `src/engine/**` imports nothing from React/DOM/Dexie/Zustand/Capacitor, never reads
-  the clock (`Date.now`, argless `new Date()`) or `Math.random` — take explicit instants; use
+  the clock (`Date.now`, argless `new Date()`) or `Math.random`, take explicit instants; use
   `mulberry32` from `src/engine/math.ts`. Every classical rule carries a `Citation` and has a positive
   and a negative test. Types live in `src/engine/types.ts` (you may ADD optional fields/types; never
   rename).
@@ -22,8 +22,8 @@ Repo: `C:\Work\Personal_Projects\02-jyoti-astrology-palmistry` (Windows; Bash = 
 - **Data:** read via `src/app/hooks.ts`; write only via `src/data/repo.ts`. Times shown to the person are
   formatted in the relevant place's IANA zone (`Intl.DateTimeFormat` with `timeZone`), never the device zone.
 - **Tests:** `npx vitest run --project engine <files>` (node) / `--project dom <files>` (jsdom,
-  `*.test.tsx`; jsdom lacks `Element.prototype.animate` — stub it in the test). Type-check:
+  `*.test.tsx`; jsdom lacks `Element.prototype.animate`, stub it in the test). Type-check:
   `npx tsc -b` (must stay clean). Lint: `npx biome check --write <your files>` then `npx biome check <your files>` clean.
 - **Never:** `npm install`/edit `package.json`, `git commit`, touch files you were not given, add network
   calls, add analytics. In Git Bash prefix anything with `/jyoti/` by `MSYS_NO_PATHCONV=1`.
-- **Final message:** files, exported API, test counts, deviations — under 500 words.
+- **Final message:** files, exported API, test counts, deviations, under 500 words.

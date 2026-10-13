@@ -1,5 +1,5 @@
 // The painted sky (§4.6): a d3-geo stereographic chart of the real sky, centred on the zenith and
-// seen from below — ink and paper dots on indigo block-print cloth, the sidereal zodiac as a brass
+// seen from below, ink and paper dots on indigo block-print cloth, the sidereal zodiac as a brass
 // band, grahas as brass discs, the Moon in its phase, the Lagna in sindoor, a rooftop parapet.
 // Always available; it is the dome's fallback and the poster's source, never a downgrade.
 import { memo, useId } from "react";

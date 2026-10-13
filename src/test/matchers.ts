@@ -1,4 +1,4 @@
-// Custom matcher: toBeCloseToArcsec(expectedDeg, arcsecTolerance) — prints the difference in d°m′s″.
+// Custom matcher: toBeCloseToArcsec(expectedDeg, arcsecTolerance), prints the difference in d°m′s″.
 import { expect } from "vitest";
 
 function fmt(deg: number): string {

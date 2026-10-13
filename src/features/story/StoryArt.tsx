@@ -2,7 +2,7 @@
 import type { StoryArt as Art } from "../../data/story";
 import "./story.css";
 
-// A fixed, hand-placed scatter of background stars (deterministic — no randomness at render).
+// A fixed, hand-placed scatter of background stars (deterministic, no randomness at render).
 const STARS: Array<[number, number, number]> = [
   [12, 14, 0.9],
   [34, 70, 0.6],

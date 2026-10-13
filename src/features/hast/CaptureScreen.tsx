@@ -1,4 +1,4 @@
-// Hast Rekha — capture (§4.7): live camera with a chalk hand outline, sharpness and exposure
+// Hast Rekha, capture (§4.7): live camera with a chalk hand outline, sharpness and exposure
 // gauges, a shutter enabled only for a palm-facing hand in focus, and the gallery as a fallback.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router";
@@ -68,7 +68,7 @@ export default function CaptureScreen() {
     if (profile && !params.get("hand")) setHand(profile.handedness);
   }, [profile, params]);
 
-  // MediaPipe (self-hosted wasm + model) — warm it as soon as the screen opens.
+  // MediaPipe (self-hosted wasm + model), warm it as soon as the screen opens.
   useEffect(() => {
     let live = true;
     loadHandLandmarker()

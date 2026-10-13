@@ -1,6 +1,6 @@
 // The ephemeris interface and its one shipped implementation, astronomy-engine (MIT) (§6.3).
-// Longitudes are apparent, geocentric, on the true ecliptic and equinox of date — the convention
-// Swiss Ephemeris uses by default — so the two lanes are directly comparable.
+// Longitudes are apparent, geocentric, on the true ecliptic and equinox of date, the convention
+// Swiss Ephemeris uses by default, so the two lanes are directly comparable.
 import * as A from "astronomy-engine";
 import { JD_UNIX_EPOCH, MS_PER_DAY, signedDelta } from "./math";
 import type { Deg, GrahaId } from "./types";

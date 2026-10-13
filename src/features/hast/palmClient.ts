@@ -1,6 +1,6 @@
 // The main-thread side of the palm worker. One worker per session, created on first use (so the
 // OpenCV chunk is only fetched when lines are actually requested) and kept warm afterwards.
-// If a worker cannot be created or dies, the pure-TS pipeline runs here instead — slower, but the
+// If a worker cannot be created or dies, the pure-TS pipeline runs here instead, slower, but the
 // reading is never blocked.
 import type { Landmark, PalmLine } from "../../engine/types";
 import type { PalmJob, PalmWorkerMessage } from "./palm.worker";
@@ -123,7 +123,7 @@ export async function extractLines(
   return onMainThread(image, landmarks, hand);
 }
 
-/** Start the worker (and its OpenCV load) ahead of need — e.g. once a hand is in frame. */
+/** Start the worker (and its OpenCV load) ahead of need, e.g. once a hand is in frame. */
 export function warmPalmWorker(): void {
   getWorker();
 }

@@ -44,7 +44,7 @@ describe("bsc5.bin", () => {
   });
 
   it("puts Sirius, Polaris and Betelgeuse where they belong", () => {
-    // Sirius: 06h45m08.9s −16°42′58″, V −1.46 — the brightest star, first in the file.
+    // Sirius: 06h45m08.9s −16°42′58″, V −1.46, the brightest star, first in the file.
     expect(raHours(0)).toBeCloseTo(6 + 45 / 60 + 8.9 / 3600, 2);
     expect(decDeg(0)).toBeCloseTo(-16.716, 1);
     expect(stars.mag[0]).toBeCloseTo(-1.46, 1);

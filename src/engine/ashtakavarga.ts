@@ -62,14 +62,14 @@ export function ashtakavarga(core: PatriCore): Ashtakavarga {
   return { bav, sav, byHouse, lagnaSign };
 }
 
-/** Bindus in graha g's own BAV for a sign — the gochar (transit) lookup. */
+/** Bindus in graha g's own BAV for a sign, the gochar (transit) lookup. */
 export function binduFor(av: Ashtakavarga, graha: AvGraha, sign: number): number {
   return av.bav[graha][((sign % 12) + 12) % 12] ?? 0;
 }
 
 /**
  * Trikoṇa-śodhana (BPHS ch. 67): in each trinal group (signs s, s+4, s+8) the least count is taken
- * from all three — so a zero leaves the group unchanged and three equal counts all become zero.
+ * from all three, so a zero leaves the group unchanged and three equal counts all become zero.
  */
 export function trikonaShodhana(row: readonly number[]): number[] {
   const out = row.slice(0, 12);
@@ -168,7 +168,7 @@ export function smoothSigns(av: Ashtakavarga, graha: AvGraha): SignIdx[] {
   return out;
 }
 
-/** The 2–3 sentences the section prints: the SAV readings plus Śani's smoother transit signs. */
+/** The 2-3 sentences the section prints: the SAV readings plus Śani's smoother transit signs. */
 export function ashtakavargaReadings(av: Ashtakavarga): AvReading[] {
   const out = savReadings(av.byHouse);
   const sa = smoothSigns(av, "SA");

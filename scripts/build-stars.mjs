@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Builds src/data/bsc5.bin — the naked-eye star field for the Rooftop sky (§3.8, §6.14).
+// Builds src/data/bsc5.bin, the naked-eye star field for the Rooftop sky (§3.8, §6.14).
 //
 // Source: the Yale Bright Star Catalogue, 5th Revised Edition (Hoffleit & Warren 1991), CDS
 // catalogue V/50 (https://cdsarc.cds.unistra.fr/ftp/V/50/catalog.gz). The BSC5 is a US
@@ -26,7 +26,7 @@
 //   offset 12  u16[N]   RA  quantised: q = round(ra / 2π · 65536) mod 65536     (ra in [0, 2π))
 //   ...        u16[N]   Dec quantised: q = round((dec + π/2) / π · 65535)        (dec in [−π/2, π/2])
 //   ...        u8[N]    Vmag quantised: q = round((V + 2) · 20)                   (V in [−2, 10.75])
-// Resolution: RA 0.33′, Dec 0.16′, magnitude 0.05 — finer than any pixel the app draws.
+// Resolution: RA 0.33′, Dec 0.16′, magnitude 0.05, finer than any pixel the app draws.
 // 5 bytes per star → 45 492 B for 9 096 stars (budget ≤ 60 kB).
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -120,7 +120,7 @@ if (bin.length > BUDGET_BYTES) throw new Error(`bsc5.bin is ${bin.length} B, ove
 
 // Sanity: Sirius (HR 2491) must be the brightest and sit near RA 6h45m, Dec −16°43′.
 const sirius = stars[0];
-if (sirius?.hr !== 2491) throw new Error("Sirius is not the brightest star — parse error");
+if (sirius?.hr !== 2491) throw new Error("Sirius is not the brightest star, parse error");
 
 writeFileSync(OUT, bin);
 console.log(

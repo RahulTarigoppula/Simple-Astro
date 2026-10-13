@@ -1,4 +1,4 @@
-// Loads the bundled star catalogue once (a same-origin, precached asset — never the network).
+// Loads the bundled star catalogue once (a same-origin, precached asset, never the network).
 import starsUrl from "../../data/bsc5.bin?url";
 import { decodeStars, type StarCatalog } from "../../engine/sky/stars";
 

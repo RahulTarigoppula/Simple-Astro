@@ -1,7 +1,7 @@
 // Image shapes and the small set of separable filters every palm stage shares. Plain TypedArrays:
 // nothing here touches the DOM, so the whole pipeline runs (and is tested) in Node.
 
-/** RGBA, 8 bits per channel, row-major — the shape of a DOM ImageData, without the DOM. */
+/** RGBA, 8 bits per channel, row-major, the shape of a DOM ImageData, without the DOM. */
 export interface ImageLike {
   data: Uint8ClampedArray | Uint8Array;
   width: number;
@@ -149,7 +149,7 @@ export function gaussianBlur(img: Float32Array, w: number, h: number, sigma: num
   return convolveSeparable(img, w, h, k, k);
 }
 
-/** Box blur of odd size n (border replicated) — used by tests and the quality checks. */
+/** Box blur of odd size n (border replicated), used by tests and the quality checks. */
 export function boxBlur(img: Float32Array, w: number, h: number, n: number): Float32Array {
   const k = new Float32Array(n).fill(1 / n);
   return convolveSeparable(img, w, h, k, k);

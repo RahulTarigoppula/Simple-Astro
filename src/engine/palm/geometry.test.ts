@@ -37,7 +37,7 @@ describe("hand shape and ratios (§6.13 [2])", () => {
     [0.94, 0.7, "earth"],
     [0.94, 0.86, "air"],
     [0.84, 0.86, "water"],
-    [0.9, 0.8, "air"], // exactly on both thresholds: >= — a `>` implementation fails this row
+    [0.9, 0.8, "air"], // exactly on both thresholds: >=, a `>` implementation fails this row
   ] as const)("W/L %s + F/L %s → %s", (wl, fl, el) => {
     expect(elementOf(wl, fl)).toBe(el);
     const g = handGeometry(worldWith(wl, fl));

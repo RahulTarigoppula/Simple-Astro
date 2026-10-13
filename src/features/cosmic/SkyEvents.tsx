@@ -1,5 +1,5 @@
 // "Coming up in the sky": Moon phases, Ekādaśī, eclipses (seen here or not), saṅkrāntis, sign changes
-// and retrograde stations for the weeks ahead — each in one plain line.
+// and retrograde stations for the weeks ahead, each in one plain line.
 import { useMemo } from "react";
 import { Link } from "react-router";
 import { InfoDot } from "../../components/ui/Explain";

@@ -40,8 +40,8 @@ export const OWN_SIGNS: Record<GrahaId, readonly SignIdx[]> = {
 };
 
 /**
- * Mūlatrikoṇa ranges [sign, fromDeg, toDeg) — BPHS 3: Sun Siṃha 0–20, Moon Vṛṣabha 3–30,
- * Mars Meṣa 0–12, Mercury Kanyā 15–20, Jupiter Dhanu 0–10, Venus Tulā 0–15, Saturn Kumbha 0–20.
+ * Mūlatrikoṇa ranges [sign, fromDeg, toDeg), BPHS 3: Sun Siṃha 0-20, Moon Vṛṣabha 3-30,
+ * Mars Meṣa 0-12, Mercury Kanyā 15-20, Jupiter Dhanu 0-10, Venus Tulā 0-15, Saturn Kumbha 0-20.
  * Nodes: Rāhu Mithuna, Ketu Dhanu (whole sign; contested).
  */
 export const MOOLATRIKONA: Record<GrahaId, readonly [SignIdx, number, number]> = {
@@ -92,8 +92,8 @@ export function naturalRelation(a: GrahaId, b: GrahaId): Relation | "self" {
  * Dignity of graha `id` at sidereal longitude `lonSid`. Precedence, as BPHS orders the states:
  * exaltation sign → debilitation sign → mūlatrikoṇa range → own sign → the natural relation to
  * the sign's lord. Where a sign carries two states (Moon in Vṛṣabha, Mercury in Kanyā) the degree
- * decides: Moon is exalted 0–3° and mūlatrikoṇa 3–30°; Mercury exalted 0–15°, mūlatrikoṇa 15–20°,
- * own 20–30°.
+ * decides: Moon is exalted 0-3° and mūlatrikoṇa 3-30°; Mercury exalted 0-15°, mūlatrikoṇa 15-20°,
+ * own 20-30°.
  */
 export function dignityOf(id: GrahaId, lonSid: number): Dignity {
   const sign = Math.floor((((lonSid % 360) + 360) % 360) / 30) as SignIdx;

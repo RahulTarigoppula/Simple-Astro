@@ -1,4 +1,4 @@
-// The wax envelope — encrypted export / import (IMPLEMENTATION-PROMPT §5, §6.16).
+// The wax envelope, encrypted export / import (IMPLEMENTATION-PROMPT §5, §6.16).
 //
 //   <one line of JSON header>\n<AES-GCM-256 ciphertext>
 //
@@ -7,7 +7,7 @@
 // header edited to slip past the version checks fails authentication like a wrong key.
 //
 // Plaintext: a JSON document of every table, Blobs base64'd inline. Deviation from §5:
-// dexie-export-import is not used — it reads Blobs with FileReader/FileReaderSync (absent in
+// dexie-export-import is not used, it reads Blobs with FileReader/FileReaderSync (absent in
 // Node and in some worker contexts) and its typeson layer is opaque to tests. This codec is
 // small, deterministic and restores every table byte-identically (see crypto.test.ts).
 
@@ -38,7 +38,7 @@ export interface EnvelopeHeader {
 
 export type ImportErrorCode = "NOT_AN_ENVELOPE" | "NEWER_FORMAT" | "BAD_PASSPHRASE" | "CORRUPT" | "EMPTY_PASSPHRASE";
 
-/** Shown as a lac note — never a stack trace. */
+/** Shown as a lac note, never a stack trace. */
 export class ImportError extends Error {
   readonly code: ImportErrorCode;
   constructor(code: ImportErrorCode, detail?: string) {
@@ -304,7 +304,7 @@ export interface ImportSummary {
   counts: Record<TableName, number>;
 }
 
-/** Restore every table from decrypted plaintext: clear, then add — one rw transaction. */
+/** Restore every table from decrypted plaintext: clear, then add, one rw transaction. */
 export async function importPlaintext(text: string): Promise<Record<TableName, number>> {
   let doc: unknown;
   try {

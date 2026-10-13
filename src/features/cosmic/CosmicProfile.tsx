@@ -1,5 +1,5 @@
 // A person at a glance, across traditions: Lagna, Moon sign, Janma nakṣatra (deity and symbol), Sun
-// sign (sidereal and Western), the Chinese year, and numerology — each card opens its lore.
+// sign (sidereal and Western), the Chinese year, and numerology, each card opens its lore.
 import { useMemo } from "react";
 import { Link } from "react-router";
 import { GrahaGlyph } from "../../components/ui/GrahaGlyph";

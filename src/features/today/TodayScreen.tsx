@@ -1,4 +1,4 @@
-// Today's leaf (§4.2): the pañcāṅga at the active leaf's birthplace — never GPS — computed on the
+// Today's leaf (§4.2): the pañcāṅga at the active leaf's birthplace, never GPS, computed on the
 // device. The brass dial and the Moon sit on the indigo cloth; the ledger is ruled paper.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";

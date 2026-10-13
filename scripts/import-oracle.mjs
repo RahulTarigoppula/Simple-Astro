@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// Convert PyJHora's Aṣṭakūṭa table (all_nak_pad_boy_girl.csv — DATA, not code) into the compact
+// Convert PyJHora's Aṣṭakūṭa table (all_nak_pad_boy_girl.csv, DATA, not code) into the compact
 // fixture src/engine/__fixtures__/ashtakoota-oracle.bin. PyJHora is AGPL: it is never a dependency and
 // none of its code is copied; only the numbers in its CSV are committed, as this binary.
 //
 // Usage (the CSV lives OUTSIDE the repo, in a throwaway folder):
 //   node scripts/import-oracle.mjs [path/to/all_nak_pad_boy_girl.csv]
-// Source: https://github.com/naturalstupid/PyJHora — src/jhora/data/all_nak_pad_boy_girl.csv
+// Source: https://github.com/naturalstupid/PyJHora, src/jhora/data/all_nak_pad_boy_girl.csv
 //
 // CSV row (no header): boyNak(1..27), boyPada(1..4), girlNak, girlPada,
 //   varna, vashya, gana, tara, yoni, maitri, bhakoot, nadi, total, mahendra, vedha, rajju, sthree
@@ -17,11 +17,11 @@
 //     index = boyPadaIdx * 108 + girlPadaIdx,   padaIdx = (nak − 1) * 4 + (pada − 1)   (0..107)
 //   each record packs the eight koota scores (the total is their sum):
 //     bit  0      varna    0 | 1
-//     bits 1–2    vashya   code → [0, 0.5, 1, 2]
-//     bits 3–4    tara     code → [0, 1.5, 3]
-//     bits 5–7    yoni     0..4
-//     bits 8–10   maitri   code → [0, 0.5, 1, 3, 4, 5]
-//     bits 11–12  gana     code → [0, 1, 5, 6]
+//     bits 1-2    vashya   code → [0, 0.5, 1, 2]
+//     bits 3-4    tara     code → [0, 1.5, 3]
+//     bits 5-7    yoni     0..4
+//     bits 8-10   maitri   code → [0, 0.5, 1, 3, 4, 5]
+//     bits 11-12  gana     code → [0, 1, 5, 6]
 //     bit  13     bhakoot  0 → 0, 1 → 7
 //     bit  14     nadi     0 → 0, 1 → 8
 //     bit  15     reserved, 0

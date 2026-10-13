@@ -1,4 +1,4 @@
-// Divisional charts (§6.7): one dispatcher, nine Parāśarī rules (BPHS ch. 6–7).
+// Divisional charts (§6.7): one dispatcher, nine Parāśarī rules (BPHS ch. 6-7).
 import { EngineError } from "./errors";
 import { norm360 } from "./math";
 import { padaIndexOf } from "./nakshatra";

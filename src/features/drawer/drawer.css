@@ -273,7 +273,7 @@
   color: var(--ink-muted);
 }
 .settings-more[open] summary::after {
-  content: "–";
+  content: "−";
 }
 .settings-more__hint {
   font-family: var(--font-body);

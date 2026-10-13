@@ -1,5 +1,5 @@
 // Domain types for Vyom. Angles are degrees, always normalised to [0, 360).
-// Times are UTC epoch milliseconds plus the resolved zone — never local strings.
+// Times are UTC epoch milliseconds plus the resolved zone, never local strings.
 
 // ─── identity & storage ──────────────────────────────────────────────────────
 export type ProfileId = string; // crypto.randomUUID()
@@ -27,7 +27,7 @@ export interface BirthMoment {
   place: Place;
   zone: string; // IANA, e.g. "Asia/Kolkata" (from tz-lookup, editable)
   offsetOverrideMin?: number; // e.g. 291 for Bombay Time +04:51; wins over the tzdb
-  utcMs: number; // resolved instant — the single source of truth
+  utcMs: number; // resolved instant, the single source of truth
   offsetMin: number; // the offset actually used, minutes east of UTC
   jdUt: Jd; // utcMs -> JD_UT
   offsetSource: "tzdb" | "override";
@@ -102,7 +102,7 @@ export interface Graha {
 export interface BoundaryFlag {
   kind: "sign" | "nakshatra" | "pada";
   arcminutesTo: number; // distance to the nearest edge, in arcminutes
-  otherSide: string; // "Jyeṣṭhā" — what the neighbouring classification would read
+  otherSide: string; // "Jyeṣṭhā", what the neighbouring classification would read
 }
 
 export type VargaNumber = 1 | 2 | 3 | 7 | 9 | 10 | 12 | 30 | 60;
@@ -214,7 +214,7 @@ export interface KootaResult {
   max: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
   score: number; // may be 0.5 / 1.5
   dosha: boolean;
-  because: string; // "Nadi: both Madhya" — shown under the bead group
+  because: string; // "Nadi: both Madhya", shown under the bead group
   cancellation?: { applied: boolean; rule: string; citation: Citation };
   citation: Citation;
 }
@@ -260,7 +260,7 @@ export interface HandCapture {
   originalBlobKey: string; // key into the blobs table
   rectifiedBlobKey: string; // 512x512 canonical print
   landmarks: Landmark[]; // 21, in the ORIGINAL image frame
-  worldLandmarks: Landmark[]; // 21, metres, view-invariant — the ratios use these
+  worldLandmarks: Landmark[]; // 21, metres, view-invariant, the ratios use these
   handednessScore: number; // MediaPipe confidence; reject < 0.8
   homography: number[]; // 9 numbers, row-major 3x3, original -> canonical
   quality: { sharpness: number; exposure: number }; // Laplacian variance; luma-histogram score
@@ -302,7 +302,7 @@ export interface Settings {
   haptics: boolean;
   calmDesk: boolean;
   activeProfileId: ProfileId | null;
-  onlineLookupAllowed: boolean; // default false — the "search online" stamp asks once
+  onlineLookupAllowed: boolean; // default false, the "search online" stamp asks once
   handFraming: "dominant" | "classical"; // both framings are offered for the palm
   bhakootCancellation: boolean; // apply the classical Bhakūṭa cancellation in Milan
   ashtakootaSchool: AshtakootaSchool; // which Aṣṭakūṭa tables Milan uses where schools differ

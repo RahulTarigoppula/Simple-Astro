@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0 (2026-10-14)
+
+Vyom 1.0. **18 weeks × 7 days × 2 hours = 252 hours** of work and dedication by Rahul (RT): planning, building, gathering and cleaning data, and checking every chart.
+
+- The intro's last slide, Home and About now say it, with the numbers: 252 hours, 82,505 places, 9,096 real stars, 50 charts checked against Swiss Ephemeris, 708 tests.
+- Settings shows version 1.0.0.
+- Everything from 0.11 to 0.13 is in: Your life in simple words, Partner Compatibility with Signs of marriage, the plain Home with how to use, how it was made and your privacy, and automatic updates that never touch saved data.
+
 ## 0.13.0 (2026-10-14)
 
 ### Partner Compatibility, a top feature
@@ -70,14 +78,14 @@
 - Explore: chips to start the wheel at your birth star, Moon sign and rising sign; a Surprise me button; off-topic cards removed; no orphan fact box.
 - Forecast: the low tone reads Quiet instead of Testing; hour chips in the body font.
 
-## 0.7.0 — 2026-10-14
+## 0.7.0, 2026-10-14
 
 Simpler everywhere.
 - **Settings** is one plain page with a visible ✕: Look & feel (theme, chart style, sound, intro), Your data (backup and restore). Everything technical folds under Advanced; credits fold under About.
 - **Compatibility**: a one-line verdict in plain English with the flagged factors and a karma note; Mars doṣa instead of "Manglik / bhaṅga noted"; the South Indian Porutham check folds away and says "agrees / doesn't".
 - **Palm**: titled "Palm reading", with one line on what you'll get.
 
-## 0.6.3 — 2026-10-14
+## 0.6.3, 2026-10-14
 
 Review pass on the rest of the app.
 - Chart: the birth chart comes first; the profile moves below it; the leftover scroll "rollers" (glowing bars at the top and bottom) are gone.
@@ -85,11 +93,11 @@ Review pass on the rest of the app.
 - Settings: Display first; the technical ayanāṃśa section follows as "Accuracy"; "Colophon" is now "About Vyom".
 - Plainer copy: Back instead of "⇩ home", "no photo yet", "Open the camera", no stray dot in the forecast hint, no "New" badge in the Guide.
 
-## 0.6.2 — 2026-10-14
+## 0.6.2, 2026-10-14
 
-- The intro, re-cut as one continuous story: the universe narrows to the pale blue dot, life and the people who looked up, then Rahul's own words — one thought per frame, large, quoted and signed. No act labels, no extra trivia; scenes carry over between frames instead of restarting, and the dawn breaks as he says "then I understood".
+- The intro, re-cut as one continuous story: the universe narrows to the pale blue dot, life and the people who looked up, then Rahul's own words, one thought per frame, large, quoted and signed. No act labels, no extra trivia; scenes carry over between frames instead of restarting, and the dawn breaks as he says "then I understood".
 
-## 0.6.1 — 2026-10-14
+## 0.6.1, 2026-10-14
 
 ### The maker's story, in his own words
 - The intro's last three scenes now quote Rahul's own words, tidied only for grammar and signed. Nothing is paraphrased or added. Removed lines that were never his: "the Mahābhārata in full… the commentaries", "gods as people who chose", "turned them into questions", "do the planets decide our lives", the weather-forecast line, and an earlier claim about reading books on Jyotiṣa.
@@ -98,17 +106,17 @@ Review pass on the rest of the app.
 
 ### Fact fixes
 - The Moon is "he" in the myth of the 27 nakṣatras (the epilogue said "her").
-- Sāmudrika Śāstra: replaced an unsupported "legend" with what is commonly stated — traditionally credited to a sage named Samudra.
+- Sāmudrika Śāstra: replaced an unsupported "legend" with what is commonly stated, traditionally credited to a sage named Samudra.
 - Red sanders: "grows wild almost nowhere but the hills of Andhra Pradesh" (it also reaches small border areas).
 - The epilogue is no longer labelled "From the maker".
 
-## 0.6.0 — 2026-10-14
+## 0.6.0, 2026-10-14
 
 ### The Journey
-- Vyom now opens with a **two-minute cinematic journey**, drawn live on canvas: the observable universe (93 billion light-years), the Milky Way and "you are here", the Solar System, the pale blue dot, a forest of three trillion trees, Neelakurinji blooming once in twelve years under Jupiter's arc, star-stuff looking up at the Seven Sages — then **a summer night on a terrace**, a grandparent telling the Rāmāyaṇa by a diya, **the question** ("is any of it real?"), and the answer: **karma, not fate**. It plays once per visit, can be skipped, replayed from Home or Roots, and turned off in Settings. No music; respects reduced motion.
+- Vyom now opens with a **two-minute cinematic journey**, drawn live on canvas: the observable universe (93 billion light-years), the Milky Way and "you are here", the Solar System, the pale blue dot, a forest of three trillion trees, Neelakurinji blooming once in twelve years under Jupiter's arc, star-stuff looking up at the Seven Sages, then **a summer night on a terrace**, a grandparent telling the Rāmāyaṇa by a diya, **the question** ("is any of it real?"), and the answer: **karma, not fate**. It plays once per visit, can be skipped, replayed from Home or Roots, and turned off in Settings. No music; respects reduced motion.
 
 ### The maker's story
-- The Prologue now tells it in full: childhood with the Rāmāyaṇa and Mahābhārata; Amish Tripathi's Shiva and Ram books; countless books and audiobooks on the Mahābhārata and the Vedas; the question "are the doṣas true?"; and the answer — predictions are possibilities, karma is ours. Every forecast ends with the same note.
+- The Prologue now tells it in full: childhood with the Rāmāyaṇa and Mahābhārata; Amish Tripathi's Shiva and Ram books; countless books and audiobooks on the Mahābhārata and the Vedas; the question "are the doṣas true?"; and the answer, predictions are possibilities, karma is ours. Every forecast ends with the same note.
 
 ### Forecasts, personal
 - **Your guide for today**: good for / go easy on, best hours (benefic horās outside Rāhu Kāla), the day's colour.
@@ -119,24 +127,24 @@ Review pass on the rest of the app.
 
 ### A calmer, plainer app
 - Home rebuilt around one hierarchy: greeting and a sentence about tonight's Moon, the live wheel, today for you, three doors, what's coming up in the sky, the story invitation, then everything else.
-- People is a clear list of cards (forecast, compare, ⋯) — no more bundle and thread.
+- People is a clear list of cards (forecast, compare, ⋯), no more bundle and thread.
 - Plain words everywhere: person instead of leaf, save instead of seal, delete instead of burn, encrypted backup instead of wax envelope, Settings instead of drawer.
 - Roots is one experience: Start the story, chapter rings and a table of contents.
 - Custom line icons replace emoji in forecasts.
 
-## 0.5.0 — 2026-10-13
+## 0.5.0, 2026-10-13
 
 ### Explore, reimagined
 - **The Sky Wheel**: one interactive wheel of the 27 nakṣatras, 12 rāśis and the nine grahas where they are right now. Drag to turn it, tap anything to bring it to the top; keyboard: ← → along a ring, ↑ ↓ between rings, Enter to play.
 - **Story panel** beside the wheel: the **real stars** of that slice of the zodiac (Yale Bright Star Catalogue, turned to sidereal ecliptic coordinates), the myth, the meaning, facts, where it is now and where it sits in your chart.
-- **Story mode**: a full-screen player with progress bars, tap or arrow keys to move, hold to pause, and line art that draws itself — for every graha, rāśi and nakṣatra, and for Roots.
+- **Story mode**: a full-screen player with progress bars, tap or arrow keys to move, hold to pause, and line art that draws itself, for every graha, rāśi and nakṣatra, and for Roots.
 
 ### Roots, with a beginning and an end
-- A **Prologue** in the maker's own words — why a software engineer who works on AI, curious after years of reading, built Vyom: facts first, stories second, fear never.
+- A **Prologue** in the maker's own words, why a software engineer who works on AI, curious after years of reading, built Vyom: facts first, stories second, fear never.
 - An **Epilogue** that brings the story back to the reader.
 - Chapters as **story rings**; "Start the story" plays all 18 cards. "A note from the maker" also appears on Home and in the Guide.
 
-## 0.4.0 — 2026-10-13
+## 0.4.0, 2026-10-13
 
 Chart engine unchanged; no chart moves. Saved people and settings carry over (storage keys are unchanged).
 
@@ -156,7 +164,7 @@ Chart engine unchanged; no chart moves. Saved people and settings carry over (st
 - People open untied by default with plain labels; cards are solid so the delete tray never shows through.
 - The forecast month calendar lines up with weekdays; the profile reflows in narrow columns.
 
-## 0.3.0 — 2026-10-13
+## 0.3.0, 2026-10-13
 
 Engine unchanged; no chart moves.
 
@@ -168,14 +176,14 @@ Engine unchanged; no chart moves.
 ### Plain English
 - An **ⓘ** beside every traditional term opens a simple explanation, an in-depth one, and how Chowki calculates it.
 - **Guide** (#/guide): what's real astronomy and what's tradition, how to use the app, privacy, and a searchable glossary of 50+ terms.
-- **Roots** (#/story): 16 story cards — the Navagraha, the Moon's 27 wives, Rāhu's eclipse, Dhruva, the Saptarṣi, Vedāṅga Jyotiṣa, Parāśara, the Yavanajātaka, Āryabhaṭa, Varāhamihira and zero, Jantar Mantar, palmistry, numerology, and the 1955 calendar reform — ending with the person's **root and destiny numbers**.
+- **Roots** (#/story): 16 story cards, the Navagraha, the Moon's 27 wives, Rāhu's eclipse, Dhruva, the Saptarṣi, Vedāṅga Jyotiṣa, Parāśara, the Yavanajātaka, Āryabhaṭa, Varāhamihira and zero, Jantar Mantar, palmistry, numerology, and the 1955 calendar reform, ending with the person's **root and destiny numbers**.
 - English names beside Sanskrit everywhere: planets and signs in the chart table, simple labels on every Today row and Guna Milan factor, English labels on the zodiac wheel.
 
 ### Fixes
 - The CSP hash for the theme bootstrap is now computed at build time.
 - Tests no longer depend on the time of day or a fast CI runner.
 
-## 0.2.0 — 2026-10-12
+## 0.2.0, 2026-10-12
 
 Engine defaults unchanged (`ENGINE_EPOCH = 1`); no existing chart moves.
 
@@ -191,7 +199,7 @@ Engine defaults unchanged (`ENGINE_EPOCH = 1`); no existing chart moves.
   Ekādaśī / Pūrṇimā / Amāvasyā / saṅkrānti marks, keyboard grid), Brahma-muhūrta and Godhūli.
 - **Guna Milan**: the **Daśa Porutham** thread (Rajju and Vedha weighed heaviest), both charts side by
   side on desktop, "what the tradition weighs" and exception notes per koota, and Copy summary.
-- **Aṣṭakūṭa school** in the Drawer: North Indian (common) — now the default — or PyJHora · saravali; they
+- **Aṣṭakūṭa school** in the Drawer: North Indian (common), now the default, or PyJHora · saravali; they
   differ in Varṇa of earth/air signs, the Vaśya table and Yoni Aśva × Mṛga, and Milan names the school.
 - **Birth time unknown**: a leaf can be cast for local noon; the patri says what still holds and whether
   the Moon changed nakṣatra that day.
@@ -205,7 +213,7 @@ Engine defaults unchanged (`ENGINE_EPOCH = 1`); no existing chart moves.
   overflow check on every route at phone width).
 
 
-## 0.1.0 — 2026-10-06 (first build; not yet tagged)
+## 0.1.0, 2026-10-06 (first build; not yet tagged)
 
 **Engine defaults:** ayanāṃśa Lahiri SE-true · true node · 365.25-day daśā year · upper-limb sunrise
 with refraction · whole-sign houses. `ENGINE_EPOCH = 1`.

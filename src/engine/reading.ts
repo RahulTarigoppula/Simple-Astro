@@ -3,7 +3,7 @@
 //
 // Content care (§2.3.6): every template begins "Tradition says", speaks of temperament and
 // inclination only, and carries a citation. No template mentions health, death, fertility, wealth,
-// legal matters, dates of events, remedies, gemstones or rituals — reading.test.ts scans the whole
+// legal matters, dates of events, remedies, gemstones or rituals, reading.test.ts scans the whole
 // TEMPLATES table against src/test/banned-words.ts.
 import { CITE } from "./citations";
 import { hashString, mulberry32 } from "./math";
@@ -34,7 +34,7 @@ export const MAX_SENTENCES = 12;
 export const OPENING = "Tradition says";
 
 // ─── templates ───────────────────────────────────────────────────────────────
-// Placeholders are {name}. A missing value throws — never a silent "{name}" on screen.
+// Placeholders are {name}. A missing value throws, never a silent "{name}" on screen.
 
 export const TEMPLATES: Readonly<Record<string, readonly string[]>> = {
   // yogas
@@ -310,7 +310,7 @@ export function renderTemplate(key: string, values: TemplateValues, seed: string
 
 /**
  * The composer. Sorts by weight (desc) then id, keeps MAX_SENTENCES, and draws one PRNG value per
- * sentence in that order — the same hits and seed always give byte-identical sentences.
+ * sentence in that order, the same hits and seed always give byte-identical sentences.
  * `seed` = profileId + presetHash + rule-set version.
  */
 export function compose(hits: readonly Hit[], seed: string): Sentence[] {

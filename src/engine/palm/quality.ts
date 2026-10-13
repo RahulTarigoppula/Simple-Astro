@@ -2,7 +2,7 @@
 // for exposure. Runs live on a 512 px downscale (≤ 15 ms for a 1600 × 1200 frame).
 import { type GreyImage, greyDownscale, type ImageLike, type Roi } from "./image";
 
-/** The gauge threshold — an 8 px checkerboard scores ≥ 900, the same image 9×9-blurred ≤ 60. */
+/** The gauge threshold, an 8 px checkerboard scores ≥ 900, the same image 9×9-blurred ≤ 60. */
 export const SHARPNESS_MIN = 120;
 /** The long side quality is measured at. */
 export const QUALITY_SIDE = 512;
@@ -33,7 +33,7 @@ function roiBounds(w: number, h: number, roi: Roi | undefined): [number, number,
 }
 
 /**
- * Variance of the mean second difference, (∂²x + ∂²y) / 2 — the 4-neighbour Laplacian halved — over
+ * Variance of the mean second difference, (∂²x + ∂²y) / 2, the 4-neighbour Laplacian halved, over
  * the interior of the ROI. Halving is what puts the §6.13 calibration points on either side of the
  * 120 gauge: an 8 px checkerboard ≈ 10 000, the same image 9×9 box-blurred ≈ 42 (the unhalved
  * Laplacian gives ≈ 166 for the blurred one, which would read as sharp).
@@ -88,7 +88,7 @@ export function exposureOf(g: GreyImage, roi?: Roi): Exposure {
   const clippedLow = lo / n;
   const clippedHigh = hi / n;
   // Comfortable band for a palm: median 100..205 (auto-exposure puts a frame-filling palm near
-  // 110–170 whatever the skin tone). Outside it, or with heavy clipping, say so.
+  // 110-170 whatever the skin tone). Outside it, or with heavy clipping, say so.
   const label: ExposureLabel = median < 100 || clippedLow > 0.3 ? "low" : median > 205 || clippedHigh > 0.2 ? "high" : "ok";
   const centre = 135;
   const spread = 95; // distance from the centre at which the score reaches 0
@@ -124,7 +124,7 @@ export const exposurePips = (score: number): number => Math.max(0, Math.min(5, M
 
 /**
  * The palm ROI from landmarks (normalised): the box of the wrist and the four finger MCPs, shrunk
- * 10 % on each side so it holds skin only — the background must not vote on exposure.
+ * 10 % on each side so it holds skin only, the background must not vote on exposure.
  */
 export function palmRoi(lm: ReadonlyArray<{ x: number; y: number }>): Roi | undefined {
   const idx = [0, 5, 9, 13, 17];

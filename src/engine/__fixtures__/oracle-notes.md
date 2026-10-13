@@ -1,4 +1,4 @@
-# Oracle notes — `golden-charts.json`
+# Oracle notes, `golden-charts.json`
 
 Generated 2026-10-06. The oracle is Swiss Ephemeris, which is AGPL-3.0. It ran **only** in a throwaway
 folder outside this repository (`%TEMP%\claude\swe-oracle\`, not a git working tree). No code, script or
@@ -10,12 +10,12 @@ package that imports it is committed here. Only the numbers it produced are comm
 |---|---|
 | Python | 3.14.7 (venv in the scratch folder) |
 | Binding | PyPI `pyswisseph` **2.10.3.2** → Swiss Ephemeris C library **2.10.03** (`swe.version`) |
-| Ephemeris | **`SEFLG_MOSEPH`** (Moshier analytic theory) on every call. No `.se1` files were installed. Moshier is accurate to about 1″ for planets and a few arcseconds for the Moon over 1900–2030. A `SEFLG_SWIEPH` call without data files falls back to Moshier on its own, so the flag was set explicitly. The returned `iflag` was checked: 260 = MOSEPH + SPEED. |
+| Ephemeris | **`SEFLG_MOSEPH`** (Moshier analytic theory) on every call. No `.se1` files were installed. Moshier is accurate to about 1″ for planets and a few arcseconds for the Moon over 1900-2030. A `SEFLG_SWIEPH` call without data files falls back to Moshier on its own, so the flag was set explicitly. The returned `iflag` was checked: 260 = MOSEPH + SPEED. |
 | Sidereal mode | `swe.set_sid_mode(SE_SIDM_LAHIRI)` with default t0/ayan_t0 |
 | ΔT | Swiss Ephemeris' own `swe_deltat` (stored per chart as `expected.deltaTSec`) |
 | Offsets | Python `zoneinfo` + PyPI `tzdata` 2026.5, apart from the hand-coded rules below |
 
-## How each number was produced (in prose — no script is committed)
+## How each number was produced (in prose, no script is committed)
 
 For each chart:
 
@@ -67,7 +67,7 @@ For each chart:
 |---|---|
 | Decade bands | 10 charts in each band |
 | Reference chart | **g01** (Rahul, 1994-03-14 01:55Z) |
-| Six war-time IST charts (+06:30) | g12–g17 |
+| Six war-time IST charts (+06:30) | g12-g17 |
 | The gap between the spells | g18 (+05:30) |
 | Pre-1906 MMT | g02, g03 |
 | Latitudes | −45.03° (Queenstown) to +64.15° (Reykjavík g10, g40), plus Oslo g20 and Stockholm g46 |
@@ -77,7 +77,7 @@ For each chart:
 
 **Tzdb discrepancy to know about.** tzdb starts India's first war spell on **1941-10-01**, while the brief starts it on 1942-01-01. The war-time charts sit inside the window both definitions agree on, so they are unaffected. Any chart between 1941-10-01 and 1941-12-31, such as TZ-5's "one day before", depends on which definition is used.
 
-## V-2 — is SE Lahiri at 2000-01-01 0h UT equal to 23°51′11″ with nutation?
+## V-2, is SE Lahiri at 2000-01-01 0h UT equal to 23°51′11″ with nutation?
 
 **Yes.**
 
@@ -87,7 +87,7 @@ For each chart:
 
 `swetest -sid1` is the same library, so this is the swetest value. The doc's 23°51′11.3″ is 0.23″ low, which passes the ≤1″ criterion. JHora/PyJHora was not run. PyJHora computes through pyswisseph with Lahiri, so it inherits this value; that has not been checked against a JHora install.
 
-## V-3 — true vs mean node, reference chart
+## V-3, true vs mean node, reference chart
 
 | Node | Tropical | Sidereal (se-true) | Rāśi | Nakshatra · pada | Speed |
 |---|---|---|---|---|---|
@@ -120,7 +120,7 @@ Under the shipped default (true node), the reference chart reads:
 
 The jdUt, ayanāṃśa (23.780212°, +0.2″), Moon, Lagna, MC and tithi all hold.
 
-**Mars, Mercury and Venus are 5–6′ off.** This comes from the Keplerian mean-element method used for §0.1a. They would fail a 60″ golden test.
+**Mars, Mercury and Venus are 5-6′ off.** This comes from the Keplerian mean-element method used for §0.1a. They would fail a 60″ golden test.
 
 Their nakshatra and pada assignments do not change, but **the Graha Yuddha claim does**: Maṅgala and Śani are **5′11″ apart**, not 23″. That is still under 1°, so it is still a yuddha classically.
 
@@ -143,7 +143,7 @@ Use these SE values, not the §0.1a table, for `reference-chart.json`.
 
 The SE mean rate is 5028.797″ per century, which passes.
 
-## Pre-check of the §6.2–§6.5 formulas (astronomy-engine 2.1.19 vs this fixture)
+## Pre-check of the §6.2-§6.5 formulas (astronomy-engine 2.1.19 vs this fixture)
 
 The doc's own algorithms were run through astronomy-engine 2.1.19 from `node_modules` against all 50 charts, as a scratch script outside the repo. The maximum |Δ| for each quantity:
 

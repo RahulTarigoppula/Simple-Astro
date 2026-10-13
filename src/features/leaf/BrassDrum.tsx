@@ -211,7 +211,7 @@ export function BrassDrum({
         const d = drag.current;
         drag.current = null;
         if (!d) return;
-        // A tap (no travel) opens typed entry — the keyboard fallback.
+        // A tap (no travel) opens typed entry, the keyboard fallback.
         if (Math.abs(vel.current) < 0.01 && Math.abs(pos.current - Math.round(pos.current)) < 0.05 && e.pointerType !== "mouse") {
           settle(pos.current);
           return;

@@ -1,4 +1,4 @@
-// Guna Milan — Aṣṭakūṭa (IMPLEMENTATION-PROMPT §6.11). Eight kootas summing to 36, from the two
+// Guna Milan, Aṣṭakūṭa (IMPLEMENTATION-PROMPT §6.11). Eight kootas summing to 36, from the two
 // Moons' nakshatra, pada and sign. Tables: src/data/tables/koota.ts (school named per table).
 //
 // Sides are positional: `a` is read in the vara (boy) column of the classical tables and `b` in the
@@ -10,11 +10,11 @@
 // Oracle status (see ashtakoota.oracle.test.ts, run with school "pyjhora"): Varṇa, Vaśya table, Yoni,
 // Graha Maitrī, Gaṇa and Nāḍī agree with PyJHora's all_nak_pad_boy_girl.csv cell for cell. Three PyJHora defects are NOT
 // reproduced, each modelled exactly in the oracle test:
-//   1. Tārā — PyJHora awards 1.5 per direction whose tārā IS Vipat/Pratyari/Vadha (inverted), so its
+//   1. Tārā, PyJHora awards 1.5 per direction whose tārā IS Vipat/Pratyari/Vadha (inverted), so its
 //      Tārā equals 3 − the classical score. Vyom awards points for the kind tārās.
-//   2. Bhakūṭa — PyJHora scores Karka (a) × Kumbha (b) as 7; it is a 6/8 axis (doṣa, 0) like every
+//   2. Bhakūṭa, PyJHora scores Karka (a) × Kumbha (b) as 7; it is a 6/8 axis (doṣa, 0) like every
 //      other 6/8 pair, including its own mirror Kumbha × Karka.
-//   3. Vaśya class — PyJHora splits Dhanu and Makara by pada number (1–2 vs 3–4 in every nakshatra)
+//   3. Vaśya class, PyJHora splits Dhanu and Makara by pada number (1-2 vs 3-4 in every nakshatra)
 //      instead of at 15°; Vyom uses the Moon's degree (or the pada's midpoint when only the pada is
 //      known).
 import {
@@ -151,7 +151,7 @@ export function kootas(a: MoonPlacement, b: MoonPlacement, opts: AshtakootaOptio
   const cb = vashyaClass(b.sign, b.deg ?? padaMidDeg(b.nak, b.pada));
   const vashya = mk("vashya", VASHYA[school][ca][cb], `Vaśya: ${VASHYA_LABEL[ca]} and ${VASHYA_LABEL[cb]}`);
 
-  // 3 Tārā — counted both ways; tārās 3, 5 and 7 are unkind. 1.5 for each kind direction.
+  // 3 Tārā, counted both ways; tārās 3, 5 and 7 are unkind. 1.5 for each kind direction.
   const tAB = taraOf(a.nak, b.nak);
   const tBA = taraOf(b.nak, a.nak);
   const kind = (t: number): boolean => !TARA_UNKIND.includes(t);
@@ -175,7 +175,7 @@ export function kootas(a: MoonPlacement, b: MoonPlacement, opts: AshtakootaOptio
       : `Yoni: ${YONI_LABEL[ya]} and ${YONI_LABEL[yb]}, ${rel === "sworn" ? "sworn rivals" : rel}`,
   );
 
-  // 5 Graha Maitrī — the Moon-sign lords, read both ways
+  // 5 Graha Maitrī, the Moon-sign lords, read both ways
   const la = signLord(a.sign);
   const lb = signLord(b.sign);
   const mp = maitriPoints(la, lb);
@@ -198,7 +198,7 @@ export function kootas(a: MoonPlacement, b: MoonPlacement, opts: AshtakootaOptio
     ganaScore === 0,
   );
 
-  // 7 Bhakūṭa — the Moon signs' distance, both ways
+  // 7 Bhakūṭa, the Moon signs' distance, both ways
   const dAB = houseFrom(a.sign, b.sign);
   const dBA = houseFrom(b.sign, a.sign);
   const axis = `${Math.min(dAB, dBA)}/${Math.max(dAB, dBA)}`;

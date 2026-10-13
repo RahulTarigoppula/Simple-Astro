@@ -110,7 +110,7 @@ describe("each porutham, positive and negative", () => {
 
   it("Yoni", () => {
     expect(pass("yoni", moon(ASHVINI), moon(ASHVINI))).toBe(true); // horse, horse
-    expect(pass("yoni", moon(ASHVINI), moon(HASTA))).toBe(false); // horse, buffalo — sworn
+    expect(pass("yoni", moon(ASHVINI), moon(HASTA))).toBe(false); // horse, buffalo, sworn
   });
 
   it("Rāśi", () => {

@@ -78,7 +78,7 @@ export const CONTRAST_REF = 80;
 /**
  * Mean ridge vesselness along a path that counts as a crisp crease. Vesselness is built from
  * second derivatives, so it falls when a print is soft even after CLAHE has restored contrast.
- * Confidence is multiplied by √(min(1, v̄ / CLARITY_REF)) — a deliberate addition to the §6.13
+ * Confidence is multiplied by √(min(1, v̄ / CLARITY_REF)), a deliberate addition to the §6.13
  * formula: a line found in a blurred photo is in the right place but is not *seen*, and must not
  * read as certain. A crisp print scores clarity 1 and the §6.13 formula is unchanged.
  */
@@ -234,8 +234,8 @@ export function coverage(path: readonly Pt[], t: Template): number {
 // ─── components → segments ───────────────────────────────────────────────────
 
 /**
- * A simple curve of the skeleton between junctions (or free ends). Creases cross and join — the
- * head and life lines often share their start — so the skeleton is cut at its junctions and the
+ * A simple curve of the skeleton between junctions (or free ends). Creases cross and join, the
+ * head and life lines often share their start, so the skeleton is cut at its junctions and the
  * labeller reassembles lines from these pieces.
  */
 export interface Component {
@@ -492,7 +492,7 @@ function orient(path: Pt[], t: Template): Pt[] {
 /**
  * Chain fragments for one label: the anchor plus any further components that also sit on this
  * template, do not overlap the anchor along it, and are each a plausible piece of the line. A
- * broken line is still one line — its breaks are counted, and coverage rises only as far as real
+ * broken line is still one line, its breaks are counted, and coverage rises only as far as real
  * pixels reach.
  */
 function chainFor(anchor: Component, pool: readonly Component[], used: Set<Component>, t: Template): Component[] {
@@ -626,7 +626,7 @@ export function toPalmLine(c: Candidate): PalmLine {
   };
 }
 
-/** A traced path (canonical frame) becomes a line with confidence 1 — the rule layer cannot tell. */
+/** A traced path (canonical frame) becomes a line with confidence 1, the rule layer cannot tell. */
 export function tracedLine(id: PalmLineId, raw: readonly Pt[], depth = 1): PalmLine {
   const t = TEMPLATES[id];
   const path = orient(resample(raw, PATH_POINTS), t);

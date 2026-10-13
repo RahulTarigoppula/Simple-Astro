@@ -1,5 +1,5 @@
 // Stage [1]: MediaPipe HandLandmarker (IMAGE mode, one hand), lazily loaded from our own origin.
-// Paths are built from import.meta.env.BASE_URL — a bare "/models/…" 404s on a sub-path host.
+// Paths are built from import.meta.env.BASE_URL, a bare "/models/…" 404s on a sub-path host.
 // GPU delegate first, CPU on failure; one cached singleton; the module itself is a dynamic import
 // so the 300 kB loader never touches the entry chunk.
 import type { HandLandmarker } from "@mediapipe/tasks-vision";
@@ -56,7 +56,7 @@ export type DetectResult =
       worldLandmarks: Landmark[];
       /**
        * MediaPipe's RAW handedness label. MediaPipe assumes a mirrored (selfie) image, so for a
-       * rear-camera or gallery photo the physical hand is the opposite — see `physicalHand`.
+       * rear-camera or gallery photo the physical hand is the opposite, see `physicalHand`.
        * Pass THIS value to gateHand(): its palm-vs-back test is defined on the raw label.
        */
       handedness: "right" | "left";

@@ -67,13 +67,13 @@ export function dms(x: number): [number, number, number] {
   return [sign * d, m, s];
 }
 
-/** `23°46′48″` — degrees, minutes, seconds, zero-padded. */
+/** `23°46′48″`, degrees, minutes, seconds, zero-padded. */
 export function formatDms(x: number): string {
   const [d, m, s] = dms(x);
   return `${d}°${String(m).padStart(2, "0")}′${String(s).padStart(2, "0")}″`;
 }
 
-/** `1′42″` — an arcminute distance as minutes and seconds. */
+/** `1′42″`, an arcminute distance as minutes and seconds. */
 export function formatArcmin(arcmin: number): string {
   const total = Math.round(arcmin * 60);
   const m = Math.floor(total / 60);

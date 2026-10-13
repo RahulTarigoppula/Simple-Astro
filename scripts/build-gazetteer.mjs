@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Builds src/data/geonames-in.json.gz — the offline birthplace gazetteer.
+// Builds src/data/geonames-in.json.gz, the offline birthplace gazetteer.
 //
 // Sources (GeoNames, CC BY 4.0, https://download.geonames.org/export/dump/):
 //   cities15000.zip                      world populated places >= 15 000
@@ -28,7 +28,7 @@ const BASE = "https://download.geonames.org/export/dump/";
 const REFRESH = process.argv.includes("--refresh");
 
 /** Hard budget from IMPLEMENTATION-PROMPT §7.4. */
-const BUDGET_BYTES = 1_800_000; // decimal MB — the stricter reading
+const BUDGET_BYTES = 1_800_000; // decimal MB, the stricter reading
 /** Leave a little headroom below the budget when filling with optional rows. */
 const FILL_TARGET = BUDGET_BYTES - 24 * 1024;
 
@@ -42,7 +42,7 @@ const MAX_ALTS = 3;
 
 /**
  * Places that must be present whatever their population, with extra search aliases.
- * 1253530 = Vaithīsvarankoil (Vaitheeswaran Koil), Nagapattinam district, Tamil Nadu —
+ * 1253530 = Vaithīsvarankoil (Vaitheeswaran Koil), Nagapattinam district, Tamil Nadu,
  * a temple town famous for its nadi astrologers.
  */
 const WHITELIST = new Map([[1253530, ["Vaitheeswaran Koil", "Vaitheeswarankoil"]]]);
@@ -183,7 +183,7 @@ async function main() {
       const text = raw.normalize("NFD").replace(/\p{M}/gu, "").trim();
       if (!isLatin(text)) continue;
       let score = lang === "en" ? 3 : lang === "" ? 2 : 1;
-      if (c[7] === "1") score += 2; // isHistoric — Bombay, Madras, Calcutta
+      if (c[7] === "1") score += 2; // isHistoric, Bombay, Madras, Calcutta
       if (c[6] === "1") score += 1; // isColloquial
       let m = altScores.get(id);
       if (!m) {
@@ -246,7 +246,7 @@ async function main() {
       if (WHITELIST.has(id) || pop > 0 || ADMIN_SEAT.test(c[7] ?? "")) consider(c, 0, 0);
       else if (c[6] === "P" && c[3]) optional.push(c);
     }
-    // Unpopulated villages: rank by how many alternate spellings GeoNames carries —
+    // Unpopulated villages: rank by how many alternate spellings GeoNames carries,
     // a cheap proxy for "somebody wrote this place down more than once".
     for (const c of optional) consider(c, 1, (c[3].match(/,/g)?.length ?? 0) + 1);
   }

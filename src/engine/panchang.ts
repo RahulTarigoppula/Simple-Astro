@@ -25,7 +25,7 @@ const HOUR_MS = 3_600_000;
 // ─── pure-angle helpers (no ephemeris) ──────────────────────────────────────
 
 export interface TithiInfo {
-  /** 1..30: 1–15 Śukla, 16–30 Kṛṣṇa; 15 Pūrṇimā, 30 Amāvasyā. */
+  /** 1..30: 1-15 Śukla, 16-30 Kṛṣṇa; 15 Pūrṇimā, 30 Amāvasyā. */
   index: number;
   paksha: "shukla" | "krishna";
   /** "Śukla Dvitīyā", "Pūrṇimā", "Amāvasyā". */
@@ -48,7 +48,7 @@ export interface KaranaInfo {
   name: string;
 }
 
-/** k = floor(elong / 6) + 1; 1 Kiṃstughna, 2–57 cycle Bava…Viṣṭi ((k − 2) mod 7), 58 Śakuni,
+/** k = floor(elong / 6) + 1; 1 Kiṃstughna, 2-57 cycle Bava…Viṣṭi ((k − 2) mod 7), 58 Śakuni,
  *  59 Catuṣpāda, 60 Nāga. */
 export function karanaOf(elongation: Deg): KaranaInfo {
   const index = Math.min(60, Math.floor((norm360(elongation) * 60) / 360) + 1);
@@ -75,7 +75,7 @@ export function yogaOf(sunSid: Deg, moonSid: Deg): YogaInfo {
  *  Sun in Mīna (11) at Amāvasyā → Caitra. */
 export const masaIndexFromSunSign = (sunSign: number): number => (sunSign + 1) % 12;
 
-/** Ṛtu by lunar month: Caitra–Vaiśākha Vasanta, …, Māgha–Phālguna Śiśira. */
+/** Ṛtu by lunar month: Caitra-Vaiśākha Vasanta, …, Māgha-Phālguna Śiśira. */
 export const rituOfMasa = (masaIndex: number): string => RITU_NAMES[Math.floor((((masaIndex % 12) + 12) % 12) / 2)] ?? "";
 
 // ─── the solver ─────────────────────────────────────────────────────────────
@@ -84,7 +84,7 @@ export const rituOfMasa = (masaIndex: number): string => RITU_NAMES[Math.floor((
  * Generic monotone crossing solver: find t in [t0, t1] where angleFn(t) reaches `target`, measured
  * as a signed difference in (−180, 180] so the 360 → 0 wrap never breaks the bracket. Uses the
  * Illinois variant of false position (bracketed, so it cannot escape) and stops when the bracket
- * — or the linearised distance to the root — is under `tolMs`. Typically 4–7 evaluations where
+ *, or the linearised distance to the root, is under `tolMs`. Typically 4-7 evaluations where
  * plain bisection would need ~19. If [t0, t1] does not bracket the target the window is extended
  * forward (doubling, up to 64×) before giving up and returning the far end.
  */
@@ -163,7 +163,7 @@ const yogaSumAt =
     return norm360(l.sunTrop + l.moonTrop - 2 * l.ay);
   };
 
-/** Raw aṅga indices at an instant (no end times) — for PA-1 style checks and the day ledger. */
+/** Raw aṅga indices at an instant (no end times), for PA-1 style checks and the day ledger. */
 export function angasAt(ms: number, preset: AyanamsaPreset) {
   const l = lonsAt(ms, preset);
   const elong = norm360(l.moonTrop - l.sunTrop);

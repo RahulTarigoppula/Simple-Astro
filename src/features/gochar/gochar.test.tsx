@@ -108,7 +108,7 @@ describe("GocharSection", () => {
 
 describe("Śani stepped back by retrogression", () => {
   const birth = REFERENCE_PROFILE.birth.utcMs;
-  const at = Date.UTC(2022, 8, 1); // Sep 2022: Śani back in Makara for a while, inside the 2022–30 spell
+  const at = Date.UTC(2022, 8, 1); // Sep 2022: Śani back in Makara for a while, inside the 2022-30 spell
   it("names the return sign and date instead of a broken phase", () => {
     const ss = sadeSati(patri, birth - 3 * YEAR, birth + 92 * YEAR);
     const running = ss.spells.find((s) => s.kind === "sade-sati" && at >= s.startMs && at < s.endMs);

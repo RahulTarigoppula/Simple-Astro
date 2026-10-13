@@ -4,7 +4,7 @@
 // of date (precession + nutation, from astronomy-engine) so they share one frame with GAST.
 //
 // Hot path: `projectStars` / `horizonVectors` are one 3×3 matrix per star (plus asin/atan2 for
-// alt/az) over pre-computed unit vectors — ~9 100 stars in well under a millisecond.
+// alt/az) over pre-computed unit vectors, ~9 100 stars in well under a millisecond.
 
 /** Row-major 3×3 rotation matrix. */
 export type Mat3 = readonly [number, number, number, number, number, number, number, number, number];
@@ -142,7 +142,7 @@ export function horizonVectors(
 }
 
 export interface ProjectedStars {
-  /** Altitude, degrees (geometric — no refraction). */
+  /** Altitude, degrees (geometric, no refraction). */
   alt: Float32Array;
   /** Azimuth, degrees [0, 360), from North through East. */
   az: Float32Array;
@@ -173,7 +173,7 @@ export function projectStars(
   return out;
 }
 
-/** One body: altitude/azimuth (degrees) from RA/Dec (radians, of date) — the same rotation as above. */
+/** One body: altitude/azimuth (degrees) from RA/Dec (radians, of date), the same rotation as above. */
 export function altAzOfRadec(raRad: number, decRad: number, lstDeg: number, latDeg: number): { alt: number; az: number } {
   const [m0, m1, m2, m3, m4, m5, m6, m7, m8] = equatorialToHorizon(lstDeg, latDeg);
   const cd = Math.cos(decRad);

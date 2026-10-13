@@ -77,7 +77,7 @@ export default function PatriScreen() {
   const settings = useSettings();
   const loadedSettings = useSettingsLoaded();
   // The preset this scroll was cast under: taken once the stored settings have loaded, then kept
-  // until the seal is held — a later Drawer change shows the haldi "recompute" tab instead.
+  // until the seal is held, a later Drawer change shows the haldi "recompute" tab instead.
   const [rendered, setRendered] = useState<EnginePreset | null>(null);
   useEffect(() => {
     if (loadedSettings && !rendered) setRendered(loadedSettings.preset);

@@ -1,8 +1,8 @@
 {
   "name": "jyoti",
   "private": true,
-  "version": "0.13.0",
-  "description": "Chowki — a private, offline Jyotisha and palmistry desk",
+  "version": "1.0.0",
+  "description": "Vyom: private, offline Indian astrology and palmistry",
   "license": "MIT",
   "type": "module",
   "scripts": {

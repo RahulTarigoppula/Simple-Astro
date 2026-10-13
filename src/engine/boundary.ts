@@ -102,8 +102,8 @@ export interface BoundaryNote {
 }
 
 /**
- * The footnote sheet: distance to the nearest edge, both sides named in zodiac order, and — only
- * when another preset genuinely flips the classification — which preset and what it would read.
+ * The footnote sheet: distance to the nearest edge, both sides named in zodiac order, and, only
+ * when another preset genuinely flips the classification, which preset and what it would read.
  * Returns null when the body is farther than `CROSS_PRESET_ARCSEC` from any edge.
  */
 export function boundaryNote(lonTropical: Deg, jdTt: Jd, active: AyanamsaPreset): BoundaryNote | null {

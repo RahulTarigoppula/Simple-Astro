@@ -128,7 +128,7 @@ describe("the birth pañcāṅga of the reference chart", () => {
     const nm = A.SearchMoonPhase(24, astroTime(BIRTH), 2);
     expect(nm).not.toBeNull();
     // SearchMoonPhase measures Moon − Sun with the Sun's geometric (non-aberrated) longitude, so it
-    // runs ~20.5″ of elongation (≈ 40–50 s) away from the apparent elongation the tithi index uses.
+    // runs ~20.5″ of elongation (≈ 40-50 s) away from the apparent elongation the tithi index uses.
     // The engine solves on the apparent elongation so the end instant and the index always agree.
     const dt = astroTimeToMs(nm as A.AstroTime) - p.tithi.endMs;
     expect(Math.abs(dt)).toBeLessThan(60_000);

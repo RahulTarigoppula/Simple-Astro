@@ -1,4 +1,4 @@
-/* Rooftop sky — #/patri/:id/sky. Full-bleed neel cloth, a painted chart of the real sky, an
+/* Rooftop sky, #/patri/:id/sky. Full-bleed neel cloth, a painted chart of the real sky, an
    engraved brass strip and a brass scrub ring. Colours only from tokens. */
 
 .rooftop {
@@ -237,7 +237,7 @@
   color: color-mix(in oklch, var(--surface), transparent 20%);
 }
 
-/* ScrubRing — a knurled brass ring; the sindoor notch at the top is the index */
+/* ScrubRing, a knurled brass ring; the sindoor notch at the top is the index */
 .scrub {
   position: relative;
   flex: none;
