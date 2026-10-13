@@ -141,7 +141,7 @@ describe("MilanScreen", () => {
     await upsertProfile(REFERENCE_PROFILE);
     await upsertProfile(PRIYA);
     const { router } = renderAt("/milan");
-    fireEvent.click(await screen.findByRole("button", { name: /^Compare .* with/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /^Check .* with/ }));
     await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/milan\/[^/]+\/[^/]+$/));
   });
 });

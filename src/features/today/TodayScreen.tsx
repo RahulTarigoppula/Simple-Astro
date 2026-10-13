@@ -21,6 +21,7 @@ import { type EnginePreset, type Panchang, PRESET_HASH, type Profile, type Sunri
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
 import { useUi } from "../../state/ui";
+import { SkyEvents } from "../cosmic/SkyEvents";
 import { BrassDial } from "./BrassDial";
 import { ayanaDev, ayanaLatin, karanaDev, masaDev, rituDev, tithiDev, yogaDev } from "./dev";
 import { MonthGrid, type Ymd } from "./MonthGrid";
@@ -746,6 +747,19 @@ export default function TodayScreen() {
               </div>
             </>
           )}
+
+          {place ? (
+            <div className="today-events">
+              <SkyEvents
+                nowMs={tickMs}
+                place={{ lat: place.lat, lon: place.lon, name: place.name.split(",")[0] ?? place.name }}
+                zone={place.zone}
+                preset={preset}
+                days={40}
+                limit={4}
+              />
+            </div>
+          ) : null}
 
           <Colophon
             rows={[

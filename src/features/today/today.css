@@ -613,3 +613,7 @@
 .today__mine {
   padding: var(--space-3) var(--paper-margin) 0;
 }
+
+.today-events {
+  margin: var(--space-5) var(--paper-margin, 0) 0;
+}

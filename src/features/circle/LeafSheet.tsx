@@ -92,7 +92,7 @@ export function LeafSheet(props: LeafSheetProps) {
       {mode === "milan" ? (
         <div className="leafsheet__pick">
           <p className="p p--muted">
-            First person: <b>{name}</b>. Choose the second person to compare.
+            First person: <b>{name}</b>. Choose their partner.
           </p>
           {others.length === 0 ? (
             <p className="p">There is no one else saved yet. Add another person first.</p>

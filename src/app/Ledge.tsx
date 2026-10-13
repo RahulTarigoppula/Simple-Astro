@@ -1,6 +1,6 @@
 import { NavLink } from "react-router";
-import { IconChart, IconCircle, IconForecast, IconSky, IconToday } from "../features/chowki/icons";
-import { useActiveProfile } from "./hooks";
+import { IconChart, IconCircle, IconForecast, IconMilan, IconToday } from "../features/chowki/icons";
+import { useActiveProfile, useProfiles } from "./hooks";
 import { rememberOrigin } from "./origin";
 
 function IconHome() {
@@ -22,9 +22,12 @@ function IconHome() {
   );
 }
 
-/** The navigation bar: Home · Chart · Forecast · Today · Explore · People. */
+/** The navigation bar: Home · Chart · Partner · Forecast · Today · People. */
 export function Ledge() {
   const active = useActiveProfile();
+  const profiles = useProfiles();
+  const second = profiles?.find((p) => p.id !== active?.id);
+  const matchTo = active && second ? `/milan/${active.id}/${second.id}` : "/milan";
   const patriTo = active ? `/patri/${active.id}` : "/leaf/new";
   const forecastTo = active ? `/forecast/${active.id}` : "/forecast";
   const item = (to: string, label: string, name: string, icon: React.ReactNode, end = false) => (
@@ -39,11 +42,11 @@ export function Ledge() {
   );
   return (
     <nav className="ledge" aria-label="Main navigation">
-      {item("/", "Home", "Home: the sky now", <IconHome />, true)}
+      {item("/", "Home", "Home", <IconHome />, true)}
       {item(patriTo, "Chart", active ? `Birth chart of ${active.name}` : "Add a person", <IconChart />)}
+      {item(matchTo, "Partner", "Partner Compatibility", <IconMilan />)}
       {item(forecastTo, "Forecast", "Forecast, day to year", <IconForecast />)}
       {item("/today", "Today", "Today's almanac", <IconToday />)}
-      {item("/explore", "Explore", "Explore gods, signs and stars", <IconSky />)}
       {item("/circle", "People", "Your saved people", <IconCircle />)}
     </nav>
   );

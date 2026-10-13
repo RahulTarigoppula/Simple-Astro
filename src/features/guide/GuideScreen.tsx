@@ -41,10 +41,10 @@ const STEPS: Array<{ title: string; body: string; to: string; cta: string }> = [
     cta: "Explore",
   },
   {
-    title: "Compare two people, or read a palm",
-    body: "Bond shows how two people fit: understanding, companionship, trust, closeness and family, with a score out of 100 from the traditional 36-point Guna Milan. The palm reader photographs your hand and describes its lines, on your device only.",
+    title: "Partner Compatibility, or read a palm",
+    body: "Partner Compatibility shows how two people fit: understanding, companionship, trust, closeness and family, with a score out of 100 from the traditional 36-point Guna Milan. The palm reader photographs your hand and describes its lines, on your device only.",
     to: "/milan",
-    cta: "Bond",
+    cta: "Partner Compatibility",
   },
 ];
 

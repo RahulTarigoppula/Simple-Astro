@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.13.0 (2026-10-14)
+
+### Partner Compatibility, a top feature
+- Now called **Partner Compatibility** everywhere, with its own place in the main bar (Partner) and a big card on Home.
+- New **Signs of marriage** checklist: minds that click, an easy everyday life, trust that grows, natural closeness, no worry for health and children, and Manglik in balance.
+
+### A simpler Home
+- Home now shows only what Vyom can do, each in a few plain words, then **How to use** in three steps.
+- **How Vyom was made**: about 18 weeks of work by Rahul (RT), with the numbers.
+- **Your data stays yours**: no sign up, no login, everything worked out on this device, nobody can see anyone else's people, delete everything any time.
+- "Coming up in the sky" moved to the Today screen.
+- Cards glow and catch a slow sweep of light; How to use has numbered steps.
+
 ## 0.12.0 (2026-10-14)
 
 ### Bond and marriage

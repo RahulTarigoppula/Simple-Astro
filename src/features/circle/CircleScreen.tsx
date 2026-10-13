@@ -94,7 +94,7 @@ export default function CircleScreen() {
         <header className="people-head">
           <p className="people-kicker">People · लोग</p>
           <h1>Your people</h1>
-          <p className="people-lede">Tap a person for their birth chart. ⋯ to compare, edit, back up or delete.</p>
+          <p className="people-lede">Tap a person for their birth chart. ⋯ for partner compatibility, edit, back up or delete.</p>
         </header>
 
         <ul className="people-list" aria-label="People">
@@ -134,7 +134,7 @@ export default function CircleScreen() {
                     Forecast
                   </Link>
                   <Link to={other(p) ? `/milan/${p.id}/${other(p)?.id}` : "/milan"} className="person__chip">
-                    Compare
+                    Partner
                   </Link>
                   <button
                     type="button"

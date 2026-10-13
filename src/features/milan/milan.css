@@ -776,3 +776,56 @@
 .milan-tech > summary {
   margin: var(--space-4) var(--paper-margin) 0;
 }
+.bond__signs {
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: rgba(9, 11, 30, 0.45);
+}
+.bond__signs-h {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--ink);
+}
+.bond__signs-h span {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--accent-2);
+}
+.bond__signs ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+.bond__signs li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--ink);
+}
+.bond__signs li > span[aria-hidden] {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 12px;
+  flex: none;
+}
+.bond__signs li.is-ok > span[aria-hidden] {
+  color: var(--bg);
+  background: var(--success);
+}
+.bond__signs li.is-no {
+  color: var(--ink-muted);
+}
+.bond__signs li.is-no > span[aria-hidden] {
+  border: 1px dashed var(--border-strong);
+  color: var(--ink-muted);
+}

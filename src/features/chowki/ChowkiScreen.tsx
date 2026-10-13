@@ -1,29 +1,20 @@
 // Home: the live sky wheel, today's pañcāṅga at a glance, the person's day, and the doors to
 // every instrument — an astral dashboard rather than a desk.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { rememberOrigin } from "../../app/origin";
-import { InfoDot } from "../../components/ui/Explain";
 import { Screen } from "../../components/ui/Screen";
-import { NAKSHATRA_LORE } from "../../data/lore";
-import { NAKSHATRA_NAMES } from "../../data/tables/names";
-import { computePanchang } from "../../engine/panchang";
-import type { Panchang } from "../../engine/types";
 import { play } from "../../platform/sound";
-import { SkyEvents } from "../cosmic/SkyEvents";
-import { TodayForYou } from "../cosmic/TodayForYou";
 import {
   IconArrow,
   IconChart,
   IconCircle,
   IconDrawer,
   IconForecast,
-  IconGuide,
   IconMilan,
   IconNumbers,
   IconPalm,
-  IconPlus,
   IconSky,
   IconStory,
   IconToday,
@@ -31,25 +22,6 @@ import {
 import { ZodiacOrbit } from "./ZodiacOrbit";
 import "./chowki.css";
 import "./home.css";
-
-const ORD = [
-  "",
-  "first",
-  "second",
-  "third",
-  "fourth",
-  "fifth",
-  "sixth",
-  "seventh",
-  "eighth",
-  "ninth",
-  "tenth",
-  "eleventh",
-  "twelfth",
-  "thirteenth",
-  "fourteenth",
-  "fifteenth",
-];
 
 const BENGALURU = { lat: 12.9716, lon: 77.5946, zone: "Asia/Kolkata" };
 
@@ -116,30 +88,12 @@ export default function ChowkiScreen() {
   const zone = active?.birth.zone ?? BENGALURU.zone;
   const placeName = active?.birth.place.name ?? "Bengaluru";
 
-  const p = useMemo<Panchang | null>(() => {
-    try {
-      return computePanchang(now, { lat, lon }, settings.preset);
-    } catch {
-      return null;
-    }
-  }, [now, lat, lon, settings.preset]);
-
   const empty = profiles !== undefined && profiles.length === 0;
   const h = hourIn(now, zone);
   const salutation = h < 5 ? "A quiet night" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
   const second = profiles?.find((x) => x.id !== active?.id);
   const strengthOk = active && activePatri && activePatri.profileId === active.id;
-
-  const waxing = p ? p.tithi.paksha === "shukla" : true;
-  const dayOf = p ? ((p.tithi.index - 1) % 15) + 1 : 1;
-  const nakLore = p ? NAKSHATRA_LORE[p.nakshatra.index] : undefined;
-  const skyLine = p
-    ? p.tithi.index === 15
-      ? `Full Moon tonight, in ${NAKSHATRA_NAMES[p.nakshatra.index]}, “${nakLore?.meaning}”.`
-      : p.tithi.index === 30
-        ? `New Moon. The sky is dark, and the Moon rests beside the Sun.`
-        : `The Moon walks through ${NAKSHATRA_NAMES[p.nakshatra.index]} (“${nakLore?.meaning}”) on the ${ORD[dayOf] ?? dayOf} day of the ${waxing ? "waxing" : "waning"} Moon.`
-    : "";
+  const matchTo = active && second ? `/milan/${active.id}/${second.id}` : "/milan";
 
   return (
     <Screen className="chowki" label="Vyom home">
@@ -175,28 +129,11 @@ export default function ChowkiScreen() {
               </>
             )}
           </h1>
-          {skyLine ? <p className="home-line">{skyLine}</p> : null}
-          {p ? (
-            <ul className="home-chips" aria-label="Today's almanac">
-              <li>
-                <span className="k">Lunar day</span>
-                <span className="v">{p.tithi.name}</span>
-                <InfoDot id="tithi" />
-              </li>
-              <li>
-                <span className="k">Moon's star</span>
-                <span className="v">{NAKSHATRA_NAMES[p.nakshatra.index]}</span>
-                <InfoDot id="nakshatra" />
-              </li>
-              <li className="is-caution">
-                <span className="k">Rāhu Kāla</span>
-                <span className="v mono">
-                  {hhmm(p.rahuKaal[0], zone)}-{hhmm(p.rahuKaal[1], zone)}
-                </span>
-                <InfoDot id="rahu-kala" />
-              </li>
-            </ul>
-          ) : null}
+          <p className="home-line">
+            {empty
+              ? "Start with your name, birth date, time and place of birth. It takes about a minute."
+              : "Here is everything Vyom can do. Tap any card to start."}
+          </p>
           {empty ? (
             <div className="home-cta-row">
               <Link to="/leaf/new" className="stamp home-cta">
@@ -218,85 +155,103 @@ export default function ChowkiScreen() {
             lon={lon}
             natalMoonSign={strengthOk ? activePatri.grahas.MO.sign : undefined}
           />
-          <span className="home-legend" aria-hidden="true">
-            <span>
-              <i className="lg lg--asc" /> rising here
-            </span>
-            {strengthOk ? (
-              <span>
-                <i className="lg lg--natal" /> your Moon sign
-              </span>
-            ) : null}
-            <span>
-              <i className="lg lg--planet" /> planets now
-            </span>
-          </span>
         </Link>
       </section>
 
-      {strengthOk && active ? (
-        <div className="home-stack">
-          <TodayForYou profile={active} patri={activePatri} nowMs={now} preset={settings.preset} />
-        </div>
-      ) : null}
-
-      <nav className="home-primary" aria-label="Start here">
-        {strengthOk ? (
-          <Link to="/story" className="home-big home-big--gold">
-            <IconStory size={26} />
-            <span className="home-big__t">Roots</span>
-            <span className="home-big__s">Gods, sages and stars: the story</span>
-          </Link>
-        ) : (
-          <Link to="/forecast" className="home-big home-big--gold">
-            <IconForecast size={26} />
-            <span className="home-big__t">Your forecast</span>
-            <span className="home-big__s">Day to year, read from the sky</span>
-          </Link>
-        )}
-        {active ? (
-          <Link to={`/patri/${active.id}`} className="home-big home-big--violet">
-            <IconChart size={26} />
-            <span className="home-big__t">Birth chart</span>
-            <span className="home-big__s">{active.name}'s life in simple words</span>
-          </Link>
-        ) : (
-          <Link to="/leaf/new" className="home-big home-big--violet">
-            <IconPlus size={26} />
-            <span className="home-big__t">Add a person</span>
-            <span className="home-big__s">Birth date, time and place</span>
-          </Link>
-        )}
-        <Link to={active && second ? `/milan/${active.id}/${second.id}` : "/milan"} className="home-big home-big--rose">
+      <h2 className="home-sec">What you can do</h2>
+      <nav className="home-primary" aria-label="Main features">
+        <Link to={active ? `/patri/${active.id}` : "/leaf/new"} className="home-big home-big--violet">
+          <IconChart size={26} />
+          <span className="home-big__t">Your life, in simple words</span>
+          <span className="home-big__s">Who you are, your plus and minus points, and what is ahead</span>
+        </Link>
+        <Link to={matchTo} className="home-big home-big--rose">
           <IconMilan size={26} />
-          <span className="home-big__t">Bond and marriage</span>
-          <span className="home-big__s">Trust, companionship and a score for two people</span>
+          <span className="home-big__t">Partner Compatibility</span>
+          <span className="home-big__s">Signs of marriage: trust, companionship and a score for two people</span>
+        </Link>
+        <Link to={active ? `/forecast/${active.id}` : "/forecast"} className="home-big home-big--gold">
+          <IconForecast size={26} />
+          <span className="home-big__t">Your forecast</span>
+          <span className="home-big__s">Your day, week, month and year</span>
         </Link>
       </nav>
-
-      <div className="home-stack">
-        <SkyEvents nowMs={now} place={{ lat, lon, name: placeName }} zone={zone} preset={settings.preset} days={40} limit={4} />
-      </div>
-
-      <h2 className="home-sec">More in Vyom</h2>
       <nav className="home-tiles" aria-label="More">
-        <Tile to="/today" title="Today's almanac" dev="पंचांग" sub="Good and bad times" icon={<IconToday />} tone="gold" />
-        <Tile to="/explore" title="Explore the sky" dev="आकाश" sub="Planets, signs, stars, myths" icon={<IconSky />} tone="cyan" />
+        <Tile to="/today" title="Today" dev="पंचांग" sub="Good and bad times today" icon={<IconToday />} tone="gold" />
         <Tile
           to={active ? `/hast/${active.id}` : "/leaf/new"}
           title="Palm reading"
           dev="हस्त रेखा"
-          sub="Read on this device"
+          sub="A photo of your hand, read on this phone"
           icon={<IconPalm />}
           tone="rose"
         />
-        <Tile to="/explore/numbers" title="Numerology" dev="अंक" sub="Your numbers" icon={<IconNumbers />} tone="violet" />
-        <Tile to="/circle" title="People" dev="लोग" sub={`${profiles?.length ?? 0} saved`} icon={<IconCircle />} tone="cyan" />
-        <Tile to="/guide" title="Guide" dev="मार्गदर्शिका" sub="Every word explained" icon={<IconGuide />} tone="violet" />
+        <Tile to="/explore/numbers" title="Numbers" dev="अंक" sub="What your birth date says" icon={<IconNumbers />} tone="violet" />
+        <Tile to="/explore" title="Explore the sky" dev="आकाश" sub="Planets, signs, stars and stories" icon={<IconSky />} tone="cyan" />
+        <Tile to="/story" title="Roots" dev="कथा" sub="How Indian astrology began" icon={<IconStory />} tone="gold" />
+        <Tile
+          to="/circle"
+          title="People"
+          dev="लोग"
+          sub={profiles?.length ? `${profiles.length} saved` : "Everyone you add"}
+          icon={<IconCircle />}
+          tone="cyan"
+        />
       </nav>
 
+      <section className="home-how" aria-labelledby="home-how-h">
+        <h2 id="home-how-h" className="home-sec">
+          How to use
+        </h2>
+        <ol>
+          <li>
+            <b>Add a person.</b> Name, birth date, time and place of birth.
+          </li>
+          <li>
+            <b>Tap a card above.</b> Everything starts in simple words. “Full detail” shows the astrology behind it.
+          </li>
+          <li>
+            <b>Tap ⓘ</b> on any word you don't know. <Link to="/guide">Read the guide</Link>
+          </li>
+        </ol>
+      </section>
+
+      <section className="home-trust" aria-label="How Vyom was made and your privacy">
+        <div className="home-card home-card--made">
+          <h2 className="home-card__h">How Vyom was made</h2>
+          <p>
+            Rahul (RT) spent almost 18 weeks planning, building, gathering and cleaning the data. Every chart is worked out from real
+            astronomy and checked against the professional standard.
+          </p>
+          <ul className="home-card__n">
+            <li>
+              <b>82,505</b> places
+            </li>
+            <li>
+              <b>9,096</b> real stars
+            </li>
+            <li>
+              <b>50</b> charts checked
+            </li>
+            <li>
+              <b>708</b> tests
+            </li>
+          </ul>
+          <Link to="/about">Sources, methods and checks</Link>
+        </div>
+        <div className="home-card home-card--private">
+          <h2 className="home-card__h">Your data stays yours</h2>
+          <ul className="home-card__list">
+            <li>No sign up and no login.</li>
+            <li>Everything is worked out on this device. Birth details and palm photos never leave it.</li>
+            <li>Nobody else can see your people, and you can't see anyone else's. There is no server holding them.</li>
+            <li>Delete everything any time in Settings.</li>
+          </ul>
+        </div>
+      </section>
+
       <p className="home-foot">
-        Computed on this device · nothing leaves it · karma, not fate · <Link to="/about">How Vyom was made</Link>
+        Made by Rahul (RT) · <Link to="/about">How Vyom was made</Link>
       </p>
     </Screen>
   );

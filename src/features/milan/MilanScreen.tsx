@@ -228,14 +228,14 @@ function Picker({
         </p>
       ) : others.length === 0 ? (
         <p className="p">
-          Only one person is saved. A Milan needs two.{" "}
+          Only one person is saved. Add their partner too.{" "}
           <Link className="linkish" to="/leaf/new">
             Add a second person
           </Link>
         </p>
       ) : (
         <>
-          <p className="p p--muted">Drag a person onto the dotted scroll, or tap them.</p>
+          <p className="p p--muted">Tap the second person, or drag them onto the dotted card.</p>
           <ul className="milan-pick">
             {others.map((p) => (
               <li key={p.id}>
@@ -256,7 +256,7 @@ function Picker({
                     if ("clientX" in pe && inDrop(pe.clientX, pe.clientY)) onPick(p);
                   }}
                   onClick={() => onPick(p)}
-                  aria-label={`Compare ${p.name} with ${first?.name ?? "the first person"} as the second person`}
+                  aria-label={`Check ${p.name} with ${first?.name ?? "the first person"} as the second person`}
                 >
                   <span className="leaf__hole" aria-hidden="true" />
                   {p.name}
@@ -358,9 +358,9 @@ function MilanScreen() {
   };
 
   return (
-    <Screen className="milan" scroll label="Guna Milan: the 36-bead mala">
+    <Screen className="milan" scroll label="Partner Compatibility">
       <article className="paper paper--cut sheet-col milan__sheet" aria-labelledby="milan-h">
-        <TurmericBand id="milan-h" level={1} dev="गुण मिलान" title="Milan · compatibility" meta="aṣṭakūṭa" explain="guna-milan" />
+        <TurmericBand id="milan-h" level={1} dev="गुण मिलान" title="Partner Compatibility" meta="aṣṭakūṭa" explain="guna-milan" />
 
         {loading ? null : picking ? (
           <>

@@ -32,7 +32,17 @@ export interface BondReading {
   workOn: BondPart[];
   tip: string;
   manglik: string;
+  /** The traditional signs of a lasting marriage, each present or not. */
+  signs: Array<{ label: string; ok: boolean }>;
 }
+
+const SIGN_LABEL: Record<BondId, string> = {
+  understanding: "Minds that click",
+  companionship: "An easy everyday life together",
+  trust: "Trust that grows",
+  closeness: "Natural closeness",
+  family: "No worry for health and children",
+};
 
 const GROUPS: Record<BondId, { label: string; kootas: KootaId[]; from: string }> = {
   understanding: { label: "Understanding", kootas: ["maitri", "varna"], from: "Graha Maitrī and Varṇa" },
@@ -84,6 +94,9 @@ const TIPS: Record<BondId, string> = {
 };
 
 const levelOf = (pct: number): BondLevel => (pct >= 75 ? "strong" : pct >= 50 ? "good" : pct >= 25 ? "mixed" : "weak");
+
+const manglikOk = (a: ManglikStatus, b: ManglikStatus): boolean =>
+  (a.present && a.cancellations.length === 0) === (b.present && b.cancellations.length === 0);
 
 function manglikLine(a: ManglikStatus, b: ManglikStatus, an: string, bn: string): string {
   const am = a.present && a.cancellations.length === 0;
@@ -138,5 +151,9 @@ export function bondReading(r: MilanResult, nameA: string, nameB: string): BondR
     workOn,
     tip: weakest ? TIPS[weakest.id] : "",
     manglik: manglikLine(r.manglik.a, r.manglik.b, nameA, nameB),
+    signs: [
+      ...parts.map((p) => ({ label: SIGN_LABEL[p.id], ok: p.score >= 50 })),
+      { label: "Manglik in balance", ok: manglikOk(r.manglik.a, r.manglik.b) },
+    ],
   };
 }

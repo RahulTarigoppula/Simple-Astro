@@ -21,7 +21,7 @@ export function BondCard({ r, pa, pb, patA, patB }: { r: MilanResult; pa: Profil
   return (
     <section className="bond" aria-labelledby="bond-h">
       <div className="bond__top">
-        <svg className="bond__ring" viewBox="0 0 110 110" role="img" aria-label={`Bond score ${b.score} out of 100`}>
+        <svg className="bond__ring" viewBox="0 0 110 110" role="img" aria-label={`Match score ${b.score} out of 100`}>
           <circle cx="55" cy="55" r={R} className="bond__ring-bg" />
           <circle
             cx="55"
@@ -40,7 +40,7 @@ export function BondCard({ r, pa, pb, patA, patB }: { r: MilanResult; pa: Profil
         </svg>
         <div>
           <p className="bond__kicker">
-            {an} <span aria-hidden="true">♥</span> {bn} · Bond
+            {an} <span aria-hidden="true">♥</span> {bn}
           </p>
           <h2 id="bond-h" className="bond__h">
             {b.headline}
@@ -66,30 +66,23 @@ export function BondCard({ r, pa, pb, patA, patB }: { r: MilanResult; pa: Profil
         ))}
       </ul>
 
-      {b.best.length || b.workOn.length ? (
-        <div className="life__pm">
-          {b.best.length ? (
-            <div className="life__plus">
-              <p className="life__k">Strongest together</p>
-              <ul>
-                {b.best.map((p) => (
-                  <li key={p.id}>{p.label}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-          {b.workOn.length ? (
-            <div className="life__minus">
-              <p className="life__k">Work on</p>
-              <ul>
-                {b.workOn.map((p) => (
-                  <li key={p.id}>{p.label}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+      <div className="bond__signs">
+        <h3 className="bond__signs-h">
+          Signs of marriage{" "}
+          <span>
+            {b.signs.filter((x) => x.ok).length} of {b.signs.length}
+          </span>
+        </h3>
+        <ul>
+          {b.signs.map((x) => (
+            <li key={x.label} className={x.ok ? "is-ok" : "is-no"}>
+              <span aria-hidden="true">{x.ok ? "✓" : "·"}</span>
+              {x.label}
+              <span className="vh">{x.ok ? ": present" : ": not strong"}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <dl className="life__dl">
         <div>
