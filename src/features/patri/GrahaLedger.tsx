@@ -1,5 +1,13 @@
 import { digitsFor } from "../../app/digits";
-import { GRAHA_ABBR_DEV, GRAHA_ABBR_LAT, GRAHA_ENGLISH, GRAHA_NAMES, NAKSHATRA_SHORT, SIGN_NAMES } from "../../data/tables/names";
+import {
+  GRAHA_ABBR_DEV,
+  GRAHA_ABBR_LAT,
+  GRAHA_ENGLISH,
+  GRAHA_NAMES,
+  NAKSHATRA_SHORT,
+  SIGN_NAMES,
+  SIGN_WESTERN,
+} from "../../data/tables/names";
 import { dms, formatArcmin } from "../../engine/math";
 import { GRAHA_IDS, type GrahaId, type Patri } from "../../engine/types";
 
@@ -32,11 +40,19 @@ export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false 
       <caption className="vh">Graha positions, sidereal, {patri.preset.ayanamsa}</caption>
       <thead>
         <tr>
-          <th scope="col">Graha</th>
-          <th scope="col">Rāśi</th>
+          <th scope="col">
+            Graha <span className="gloss">planet</span>
+          </th>
+          <th scope="col">
+            Rāśi <span className="gloss">sign</span>
+          </th>
           <th scope="col">Degree</th>
-          <th scope="col">Nakṣatra · pada</th>
-          <th scope="col">Lord</th>
+          <th scope="col">
+            Nakṣatra · pada <span className="gloss">Moon star</span>
+          </th>
+          <th scope="col">
+            Lord <span className="gloss">ruler</span>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -45,9 +61,11 @@ export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false 
             <span lang="hi" className="dev">
               ल
             </span>{" "}
-            Lg
+            Lg <span className="gloss ledger-gloss">Rising sign</span>
           </th>
-          <td>{SIGN_NAMES[L.sign]}</td>
+          <td>
+            {SIGN_NAMES[L.sign]} <span className="gloss ledger-gloss">{SIGN_WESTERN[L.sign]}</span>
+          </td>
           <td>
             <Degree x={L.degInSign} dev={devDigits} />
           </td>
@@ -89,8 +107,11 @@ export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false 
                 </span>{" "}
                 {GRAHA_ABBR_LAT[id]}
                 {g.retrograde ? <span className="retro">℞</span> : null}
+                <span className="gloss ledger-gloss">{GRAHA_ENGLISH[id]}</span>
               </td>
-              <td>{SIGN_NAMES[g.sign]}</td>
+              <td>
+                {SIGN_NAMES[g.sign]} <span className="gloss ledger-gloss">{SIGN_WESTERN[g.sign]}</span>
+              </td>
               <td>
                 <Degree x={g.degInSign} dev={devDigits} />
               </td>

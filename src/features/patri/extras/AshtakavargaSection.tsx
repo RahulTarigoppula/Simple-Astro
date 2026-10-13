@@ -167,7 +167,7 @@ export function AshtakavargaSection({ patri, script, style, skipInk = false }: A
 
   return (
     <section className="av" aria-labelledby={headId}>
-      <TurmericBand id={headId} dev="अष्टकवर्ग" title="Aṣṭakavarga" meta="BPHS ch. 66" />
+      <TurmericBand id={headId} dev="अष्टकवर्ग" title="Aṣṭakavarga · strength points" explain="ashtakavarga" meta="BPHS ch. 66" />
 
       <div className="figure">
         <div className="chart-wrap av-wrap">

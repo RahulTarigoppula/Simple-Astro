@@ -305,3 +305,19 @@ export const ORDINAL = (n: number): string => {
   const v = n % 100;
   return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
 };
+
+/** Western names for the sidereal signs (Meṣa ≈ Aries …), so charts read for anyone. */
+export const SIGN_WESTERN = [
+  "Aries",
+  "Taurus",
+  "Gemini",
+  "Cancer",
+  "Leo",
+  "Virgo",
+  "Libra",
+  "Scorpio",
+  "Sagittarius",
+  "Capricorn",
+  "Aquarius",
+  "Pisces",
+] as const;

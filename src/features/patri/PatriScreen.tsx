@@ -436,7 +436,7 @@ function PatriBody({
 
   return (
     <>
-      <TurmericBand dev="जन्म पंचांग" title="Birth panchang" meta={`sunrise ${hhmmss(pc.sunriseMs, zone)}`} />
+      <TurmericBand dev="जन्म पंचांग" title="Birth almanac" explain="panchang" meta={`sunrise ${hhmmss(pc.sunriseMs, zone)}`} />
       <div className="rows">
         {row(
           "Tithi",
@@ -498,7 +498,12 @@ function PatriBody({
         )}
       </div>
 
-      <TurmericBand dev="राशि चक्र" title="Fig. 1 — D1" meta={style === "north" ? "whole sign · north" : "whole sign · south"} />
+      <TurmericBand
+        dev="राशि चक्र"
+        title="Fig. 1 — D1 birth chart"
+        explain="patri"
+        meta={style === "north" ? "whole sign · north" : "whole sign · south"}
+      />
       <div className="figure">
         <ChartFigure
           patri={patri}
@@ -516,7 +521,7 @@ function PatriBody({
         marks the Lagna in {SIGN_NAMES[patri.lagna.sign]} {formatDms(patri.lagna.degInSign)}.
       </p>
 
-      <TurmericBand dev="ग्रह" title="Grahas" meta={`sidereal · ${PRESET_SHORT[p.ayanamsa]}`} />
+      <TurmericBand dev="ग्रह" title="Grahas · planets" explain="graha" meta={`sidereal · ${PRESET_SHORT[p.ayanamsa]}`} />
       <GrahaLedger
         devDigits={devDigits}
         patri={patri}
@@ -533,7 +538,7 @@ function PatriBody({
         </p>
       ) : null}
 
-      <TurmericBand dev="वर्ग" title={`Fig. 2 — D${varga}`} meta={VARGA_NAMES[varga]} plain level={3} />
+      <TurmericBand dev="वर्ग" title={`Fig. 2 — D${varga}`} explain="varga" meta={VARGA_NAMES[varga]} plain level={3} />
       <div className="varga-pager" role="tablist" aria-label="Divisional charts">
         {PAGER.map((v) => (
           <button
@@ -577,7 +582,7 @@ function PatriBody({
         </>
       ) : null}
 
-      <TurmericBand dev="दशा" title="Viṃśottarī" meta={`${p.dashaYearDays} d year`} />
+      <TurmericBand dev="दशा" title="Viṃśottarī daśā · life chapters" explain="dasha" meta={`${p.dashaYearDays} d year`} />
       <DashaRibbon tree={patri.dasha} nowMs={nowMs} zone={zone} yearDays={p.dashaYearDays} />
       <table className="ledger print-only" aria-hidden="true">
         <tbody>
@@ -593,7 +598,12 @@ function PatriBody({
         </tbody>
       </table>
 
-      <TurmericBand dev="योग" title="Yogas" meta={`${patri.yogas.filter((y) => y.strength !== "cancelled").length} formed`} />
+      <TurmericBand
+        dev="योग"
+        title="Yogas · planet patterns"
+        explain="yoga-chart"
+        meta={`${patri.yogas.filter((y) => y.strength !== "cancelled").length} formed`}
+      />
       {patri.yogas.length === 0 ? <p className="p p--muted">No classical yoga in the rule set fires for this chart.</p> : null}
       {patri.yogas.map((y, yi) => (
         <section key={y.id} className={`yoga${y.strength === "cancelled" ? " is-cancelled" : ""}`} aria-label={y.name}>

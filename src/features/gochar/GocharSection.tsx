@@ -139,7 +139,7 @@ export function GocharSection({ patri, nowMs, zone }: GocharSectionProps) {
 
   return (
     <section className="gochar" aria-labelledby="gochar-h">
-      <TurmericBand id="gochar-h" dev="गोचर" title="Transits now" meta={fmtDate(nowMs, zone)} />
+      <TurmericBand id="gochar-h" dev="गोचर" title="Transits now" explain="gochar" meta={fmtDate(nowMs, zone)} />
 
       <table className="ledger gochar__ledger">
         <caption>

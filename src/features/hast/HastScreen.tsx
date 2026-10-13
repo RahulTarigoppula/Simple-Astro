@@ -248,6 +248,7 @@ export default function HastScreen() {
           title={`${hand === "right" ? "Right" : "Left"} hand`}
           meta={capture ? (reading ? `${lines.length} lines` : "landmarks only") : "no print"}
           level={1}
+          explain="hast-rekha"
         />
         <div className="hast-hand" role="radiogroup" aria-label="Which hand">
           <span style={{ flex: 1, fontSize: "var(--text-sm)", color: "var(--ink-muted)" }}>{profile?.name}</span>

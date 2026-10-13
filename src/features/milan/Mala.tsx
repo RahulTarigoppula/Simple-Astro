@@ -4,6 +4,7 @@
 import { motion, useAnimate } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DigitSet } from "../../components/ui/DigitSet";
+import { glossary } from "../../data/glossary";
 import type { KootaResult, MilanResult } from "../../engine/types";
 import { THREAD } from "../../motion/springs";
 import { haptics } from "../../platform/haptics";
@@ -25,6 +26,18 @@ const SLOT = 20; // 15 px bead + 5 px gap
 const KNOT_PAD = 14; // the knot sits in the brow's left padding
 const BUDGET_MS = 2900; // bead slides; + knot + stamp keeps the whole tally ≤ 3.5 s
 const STEP_MS = 90;
+
+/** The glossary entry that explains each kūṭa in plain English. */
+const KOOTA_GLOSS: Record<KootaResult["id"], string> = {
+  varna: "varna",
+  vashya: "vashya",
+  tara: "tara",
+  yoni: "yoni",
+  maitri: "graha-maitri",
+  gana: "gana",
+  bhakoot: "bhakuta",
+  nadi: "nadi",
+};
 
 export function beadsOf(k: KootaResult): Array<Omit<Bead, "seq">> {
   const score = Math.max(0, Math.min(k.max, k.score));
@@ -226,6 +239,7 @@ export function Mala({ result, onOpen }: MalaProps) {
                   <span lang="sa" className="kname__dev">
                     {k.nameDev}
                   </span>
+                  <span className="gloss kname__plain">{glossary(KOOTA_GLOSS[k.id])?.plain}</span>
                 </span>
                 <span
                   className="brow"

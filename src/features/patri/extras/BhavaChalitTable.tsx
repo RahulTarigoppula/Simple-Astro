@@ -60,7 +60,7 @@ export function BhavaChalitTable({ patri }: BhavaChalitTableProps) {
 
   return (
     <section className="bc" aria-labelledby={headId}>
-      <TurmericBand id={headId} dev="भाव चलित" title="Bhāva Chalit" meta="Śrīpati · sidereal" />
+      <TurmericBand id={headId} dev="भाव चलित" title="Bhāva Chalit · houses" explain="bhava" meta="Śrīpati · sidereal" />
       {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard-reachable (WCAG 2.1.1) */}
       <div className="av-scroll" role="region" aria-label="Bhāva Chalit cusps" tabIndex={0}>
         <table className="ledger bc-table">

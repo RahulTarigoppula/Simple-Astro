@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { useProfile, useSettings } from "../../app/hooks";
 import { DigitSet } from "../../components/ui/DigitSet";
+import { InfoDot } from "../../components/ui/Explain";
 import { HoldStamp } from "../../components/ui/HoldStamp";
 import { Screen } from "../../components/ui/Screen";
 import { Sheet } from "../../components/ui/Sheet";
@@ -456,17 +457,17 @@ export default function LeafScreen() {
 
         <div className="radio-row leaf-override" role="radiogroup" aria-label="Clock offset">
           <span className="v">
-            Offset
+            Clock offset <InfoDot id="timezone" />
             <span className="help">
               {pre1955India
-                ? "Before 1955 some Indian births used Bombay Time (+04:51), which is not in the tzdb."
-                : "The tzdb resolves historical offsets; override only when you know better."}
+                ? "Before 1955 some Indian births used Bombay Time (+04:51). Leave on automatic unless you know the clock used."
+                : "Worked out automatically from the time-zone database (tzdb). Leave it unless you know better."}
             </span>
           </span>
           <span className="seg">
             {(["none", "bombay", "manual"] as const).map((o) => (
               <button key={o} type="button" role="radio" aria-checked={draft.override === o} onClick={() => set("override", o)}>
-                {o === "none" ? "tzdb" : o === "bombay" ? "Bombay +04:51" : "manual"}
+                {o === "none" ? "automatic" : o === "bombay" ? "Bombay +04:51" : "manual"}
               </button>
             ))}
           </span>
@@ -497,10 +498,10 @@ export default function LeafScreen() {
 
         <div className="toggle-row">
           <span className="v">
-            Birth time unknown
+            Birth time unknown <InfoDot id="unknown-time" />
             <span className="help">
-              Cast for local noon. The Moon's sign and the panchang stay meaningful; the Lagna, houses and daśā dates do not, and the patri
-              will say so.
+              We'll use noon. The Moon sign and almanac stay useful; the rising sign, houses and life-chapter dates won't be reliable, and
+              the chart will say so.
             </span>
           </span>
           <button
@@ -519,7 +520,7 @@ export default function LeafScreen() {
         <div className="radio-row" role="radiogroup" aria-label="Dominant hand">
           <span className="v">
             Dominant hand
-            <span className="help">Frames the palm reading; the classical right/left reading is offered beside it.</span>
+            <span className="help">The hand you write with. Used only for the palm reading.</span>
           </span>
           <span className="seg">
             {(["right", "left"] as const).map((h) => (
@@ -531,7 +532,9 @@ export default function LeafScreen() {
         </div>
 
         <div className="field" style={{ borderBottom: 0 }}>
-          <span className="k">Ayanāṃśa</span>
+          <span className="k">
+            Ayanāṃśa <InfoDot id="ayanamsha" />
+          </span>
           <span className="v" style={{ flex: 1, fontSize: "var(--text-sm)" }}>
             Lahiri (
             {settings.preset.ayanamsa === "se-true" ? "SE-true" : settings.preset.ayanamsa === "se-mean" ? "SE-mean" : "Drik-compatible"}) ·

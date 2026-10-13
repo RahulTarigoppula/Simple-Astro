@@ -9,6 +9,7 @@ import { Colophon, DISCLAIMER } from "../../components/ui/Colophon";
 import { Screen } from "../../components/ui/Screen";
 import { Sheet } from "../../components/ui/Sheet";
 import { TurmericBand } from "../../components/ui/TurmericBand";
+import { glossary } from "../../data/glossary";
 import { NAKSHATRA_DEV, NAKSHATRA_NAMES, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
 import { milan } from "../../engine/ashtakoota";
 import { AYANAMSA_LABEL } from "../../engine/ayanamsa";
@@ -352,7 +353,7 @@ function MilanScreen() {
   return (
     <Screen className="milan" scroll label="Guna Milan — the 36-bead mala">
       <article className="paper paper--cut sheet-col milan__sheet" aria-labelledby="milan-h">
-        <TurmericBand id="milan-h" level={1} dev="गुण मिलान" title="Milan" meta="aṣṭakūṭa" />
+        <TurmericBand id="milan-h" level={1} dev="गुण मिलान" title="Milan · compatibility" meta="aṣṭakūṭa" explain="guna-milan" />
 
         {loading ? null : picking ? (
           <>
@@ -534,6 +535,17 @@ function MoonLine({ who, p, m }: { who: string; p: Profile; m: MoonFacts | null 
   );
 }
 
+const KOOTA_PLAIN: Record<KootaResult["id"], string> = {
+  varna: "varna",
+  vashya: "vashya",
+  tara: "tara",
+  yoni: "yoni",
+  maitri: "graha-maitri",
+  gana: "gana",
+  bhakoot: "bhakuta",
+  nadi: "nadi",
+};
+
 function KootaSheet({
   k,
   all,
@@ -564,6 +576,10 @@ function KootaSheet({
         </span>
       </h2>
       <p className="p">{RULE_TEXT[k.id]}</p>
+      <p className="p kootasheet__plain">
+        <strong>In plain English: </strong>
+        {glossary(KOOTA_PLAIN[k.id])?.short} {glossary(KOOTA_PLAIN[k.id])?.long}
+      </p>
       <dl className="kootasheet__dl">
         <MoonLine who="First leaf" p={pa} m={ma} />
         <MoonLine who="Second leaf" p={pb} m={mb} />

@@ -10,6 +10,7 @@ import { Screen } from "../../components/ui/Screen";
 import { Sheet } from "../../components/ui/Sheet";
 import { TurmericBand } from "../../components/ui/TurmericBand";
 import { useInkDraw } from "../../components/ui/useInkDraw";
+import { glossary } from "../../data/glossary";
 import { NAKSHATRA_DEV, NAKSHATRA_NAMES, VARA_DEV, VARA_NAMES } from "../../data/tables/names";
 import { AYANAMSA_LABEL } from "../../engine/ayanamsa";
 import type { CalendarPlace } from "../../engine/calendar";
@@ -19,6 +20,7 @@ import { angasAt, computePanchang } from "../../engine/panchang";
 import { type EnginePreset, type Panchang, PRESET_HASH, type Profile, type SunriseMode } from "../../engine/types";
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
+import { useUi } from "../../state/ui";
 import { DailyStrengthCard } from "../gochar";
 import { BrassDial } from "./BrassDial";
 import { ayanaDev, ayanaLatin, karanaDev, masaDev, rituDev, tithiDev, yogaDev } from "./dev";
@@ -90,6 +92,8 @@ interface Foot {
   dev?: string;
   lines: Array<[string, string]>;
   note?: string;
+  /** Glossary entry for the plain-English explanation. */
+  explain?: string;
 }
 
 interface RowSpec {
@@ -405,13 +409,38 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): RowSp
   return [...rows, ...kala.map((r) => ({ ...r, id: `kala-${r.id}` })), ...masa.map((r) => ({ ...r, id: `masa-${r.id}` }))];
 }
 
+/** Plain-English label and glossary entry for each row, for readers new to the pañcāṅga. */
+const PLAIN: Record<string, [string, string]> = {
+  tithi: ["lunar day", "tithi"],
+  vara: ["weekday (sunrise to sunrise)", "vara"],
+  nakshatra: ["Moon's star", "nakshatra"],
+  yoga: ["Sun + Moon combination", "yoga-panchang"],
+  karana: ["half lunar day", "karana"],
+  sun: ["daylight here", ""],
+  moon: ["Moon above the horizon", ""],
+  rahu: ["avoid starting new things", "rahu-kala"],
+  yama: ["also avoided", "rahu-kala"],
+  gulika: ["also avoided", "rahu-kala"],
+  abhijit: ["good midday window", "muhurta"],
+  brahma: ["pre-dawn hour for prayer and study", "muhurta"],
+  godhuli: ["dusk, good for weddings", "muhurta"],
+  masa: ["Hindu lunar month", "panchang"],
+  ritu: ["season · half-year", "panchang"],
+  illum: ["how full the Moon is", ""],
+};
+
 function Rows({ rows, onOpen }: { rows: RowSpec[]; onOpen: (r: RowSpec) => void }) {
   return (
     <ul className="rows today-rows">
       {rows.map((r) => (
         <li key={r.id}>
           <button type="button" className="row row--button" onClick={() => onOpen(r)} aria-haspopup="dialog">
-            <span className="k">{r.k}</span>
+            <span className="k">
+              {r.k}
+              {PLAIN[r.id.replace(/^(kala|masa)-/, "")] ? (
+                <span className="gloss today-gloss">{PLAIN[r.id.replace(/^(kala|masa)-/, "")]?.[0]}</span>
+              ) : null}
+            </span>
             <span className="v">{r.v}</span>
             {r.end ? <span className="end">{r.end}</span> : null}
           </button>
@@ -493,6 +522,7 @@ export default function TodayScreen() {
   const tickMs = useNowMs(30_000);
   const [offset, setOffset] = useState(0);
   const [foot, setFoot] = useState<Foot | null>(null);
+  const setExplain = useUi((s) => s.setExplain);
   const [tabSel, setTab] = useState<Tab>("day");
   const wide = useWide();
   const tab: Tab = wide && tabSel === "month" ? "day" : tabSel;
@@ -611,6 +641,11 @@ export default function TodayScreen() {
       />
     ) : null;
 
+  const openFoot = (r: RowSpec) => {
+    const ex = PLAIN[r.id.replace(/^(kala|masa)-/, "")]?.[1];
+    setFoot(ex ? { ...r.foot, explain: ex } : r.foot);
+  };
+
   return (
     <Screen className="today" scroll label="Today's leaf — the pañcāṅga">
       <div className="today__desk" style={style}>
@@ -646,7 +681,14 @@ export default function TodayScreen() {
         </div>
 
         <article className="paper paper--cut sheet-col today__sheet" aria-labelledby="today-h">
-          <TurmericBand id="today-h" level={1} dev={head.dev} title={head.title} meta={p ? clock.dateShort(p.sunriseMs) : undefined} />
+          <TurmericBand
+            id="today-h"
+            level={1}
+            dev={head.dev}
+            title={head.title}
+            explain="panchang"
+            meta={p ? clock.dateShort(p.sunriseMs) : undefined}
+          />
           {active && activePatri && activePatri.profileId === active.id ? (
             <div className="today__mine">
               <DailyStrengthCard patri={activePatri} nowMs={tickMs} zone={active.birth.zone} />
@@ -695,11 +737,11 @@ export default function TodayScreen() {
                         is taken as local noon ± 6 hours.
                       </div>
                     ) : null}
-                    <Rows rows={angas} onOpen={(r) => setFoot(r.foot)} />
-                    <TurmericBand plain level={2} dev="काल" title="Kāla" meta={clock.zone} />
-                    <Rows rows={kala} onOpen={(r) => setFoot(r.foot)} />
+                    <Rows rows={angas} onOpen={openFoot} />
+                    <TurmericBand plain level={2} dev="काल" title="Kāla · times of day" meta={clock.zone} />
+                    <Rows rows={kala} onOpen={openFoot} />
                     <div className="today__gap" aria-hidden="true" />
-                    <Rows rows={masa} onOpen={(r) => setFoot(r.foot)} />
+                    <Rows rows={masa} onOpen={openFoot} />
                   </>
                 ) : tab === "chog" ? (
                   <ChoghadiyaPanel day={periods.chog.day} night={periods.chog.night} clock={clock} dayMs={p.sunriseMs} nowMs={nowMs} />
@@ -747,6 +789,25 @@ export default function TodayScreen() {
               ))}
             </dl>
             {foot.note ? <p className="p p--muted">{foot.note}</p> : null}
+            {foot.explain && glossary(foot.explain) ? (
+              <div className="footnote__plain">
+                <p>
+                  <strong>In plain English: </strong>
+                  {glossary(foot.explain)?.short}
+                </p>
+                <button
+                  type="button"
+                  className="linkish"
+                  onClick={() => {
+                    const ex = foot.explain ?? null;
+                    setFoot(null);
+                    setExplain(ex);
+                  }}
+                >
+                  Tell me more
+                </button>
+              </div>
+            ) : null}
             <p className="footnote__close">
               <button type="button" className="linkish" onClick={() => setFoot(null)}>
                 Close

@@ -302,9 +302,16 @@ export default function DrawerScreen() {
       <div className="drawer-box">
         <span className="drawer-knob" aria-hidden="true" />
         <div className="paper">
-          <TurmericBand dev="दराज़" title="The drawer" meta={`Chowki ${__APP_VERSION__}`} level={1} />
+          <TurmericBand dev="दराज़" title="Settings" meta={`Chowki ${__APP_VERSION__}`} level={1} />
+          <p className="p drawer-guide">
+            The defaults are right for almost everyone. Unsure what a word means?{" "}
+            <Link to="/guide" className="linkish">
+              Read the plain-English guide
+            </Link>
+            .
+          </p>
 
-          <TurmericBand title="Ayanāṃśa" meta={active ? `at ${active.name}'s birth` : "today"} plain level={2} />
+          <TurmericBand title="Ayanāṃśa" explain="ayanamsha" meta={active ? `at ${active.name}'s birth` : "today"} plain level={2} />
           <DialSegment jdTt={jdTt} value={settings.preset.ayanamsa} onChange={(p) => setPreset({ ayanamsa: p })} />
           <p className="p p--muted">
             Three Lahiri numbers exist and differ by up to 41″: Swiss Ephemeris with nutation, without it, and the value Drik Panchang

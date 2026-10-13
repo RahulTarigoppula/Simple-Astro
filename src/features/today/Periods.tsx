@@ -103,7 +103,7 @@ export function ChoghadiyaPanel({ day, night, clock, dayMs, nowMs }: PanelProps 
     }));
   return (
     <section aria-labelledby="chog-h">
-      <TurmericBand id="chog-h" plain level={2} dev="चौघड़िया" title="Choghaḍiyā" meta={clock.zone} />
+      <TurmericBand id="chog-h" plain level={2} dev="चौघड़िया" title="Choghaḍiyā" explain="choghadiya" meta={clock.zone} />
       <Sub dev="दिन" title="Day" meta="sunrise → sunset, eighths" />
       <PeriodList label="Day choghaḍiyā" items={items(day)} />
       <Sub dev="रात्रि" title="Night" meta="sunset → sunrise, eighths" />
@@ -133,7 +133,7 @@ export function HoraPanel({ day, night, clock, dayMs, nowMs }: PanelProps & { da
     }));
   return (
     <section aria-labelledby="hora-h">
-      <TurmericBand id="hora-h" plain level={2} dev="होरा" title="Horā" meta={clock.zone} />
+      <TurmericBand id="hora-h" plain level={2} dev="होरा" title="Horā · planetary hours" explain="hora" meta={clock.zone} />
       <Sub dev="दिन" title="Day" meta="sunrise → sunset, twelfths" />
       <PeriodList label="Day horās" items={items(day)} />
       <Sub dev="रात्रि" title="Night" meta="sunset → sunrise, twelfths" />
