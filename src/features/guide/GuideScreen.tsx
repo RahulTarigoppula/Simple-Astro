@@ -22,10 +22,22 @@ const STEPS: Array<{ title: string; body: string; to: string; cta: string }> = [
     cta: "Your circle",
   },
   {
+    title: "See your forecast",
+    body: "A plain-English outlook for the day, week, month, quarter and year — which planets are working for you and which ask for patience — plus your life chapter (daśā).",
+    to: "/forecast",
+    cta: "Forecast",
+  },
+  {
     title: "Check today",
     body: "The Hindu almanac for any day and place: lunar day, Moon's star, sunrise, and the time slots tradition calls good or bad.",
     to: "/today",
     cta: "Today",
+  },
+  {
+    title: "Explore the myths",
+    body: "Every planet, sign and star has a story — the Moon's 27 wives, the demon behind eclipses, the boy who became the Pole Star. Explore them, or read the 16-card history of astrology.",
+    to: "/explore",
+    cta: "Explore",
   },
   {
     title: "Compare two people, or read a palm",

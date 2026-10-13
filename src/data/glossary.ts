@@ -358,7 +358,16 @@ export const GLOSSARY: GlossaryEntry[] = [
     group: "time",
   },
 
-  // ── match ───────────────────────────────────────────────────────────────
+  {
+    id: "forecast",
+    term: "Forecast",
+    dev: "भविष्य",
+    plain: "day-to-year outlook",
+    short: "A traditional outlook for a day, week, month, quarter or year, built from where the planets are compared with your birth Moon.",
+    long: "Each planet's current sign is counted as a house from your Moon sign and checked against the classical table of favourable houses (Phaladīpikā ch. 26) — Jupiter in the 9th is welcome, Saturn in the 8th is not, and so on. Slow planets (Jupiter, Saturn, Rāhu) weigh most for long periods; the fast Moon and its daily star (Tārā-bala) set the tone of single days. The running daśā chapter is shown beside it. The result is labelled Bright, Steady, Mixed or Testing/Quiet. It describes what the tradition says about the sky, not what will happen.",
+    how: "Positions are computed for every day of the period; 'best day' is simply the day with the most favourable combination.",
+    group: "time",
+  }, // ── match ───────────────────────────────────────────────────────────────
   {
     id: "guna-milan",
     term: "Guna Milan",
