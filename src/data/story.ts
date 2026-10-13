@@ -48,11 +48,25 @@ export const STORY: StoryChapter[] = [
         dev: "व्योम",
         art: "maker",
         body: [
-          "Hi, I'm Rahul. I've always believed that God exists — and honestly, that was about the extent of my belief. Horoscopes, lucky stones, auspicious hours: I never knew which parts were knowledge and which were just fear passed down.",
-          "So I started reading. Old books on Jyotiṣa, astronomy, the myths behind the stars. The more I read, the more curious I got — because underneath the superstition there was real astronomy, real mathematics, and some of the most beautiful stories ever told about the sky.",
-          "I'm a software engineer who specialises in AI. Building is how I understand things. So I built Vyom: to make all of this simple, to separate the facts from the fear, and to share what I've learned — honestly.",
+          "Hi, I'm Rahul. Like almost everyone in India, I grew up with the great stories — the Rāmāyaṇa and the Mahābhārata, heard long before I could read them. The love and the belief were always there; that was about the extent of it.",
+          "Then I read Amish Tripathi's Shiva Trilogy and his Ram Chandra series. They showed me the old stories from a new angle — gods as people who chose, struggled and grew. I wanted more, so I went on to countless books and audiobooks: the Mahābhārata in full, the Vedas, the commentaries.",
+          "Somewhere along the way my curiosity asked a blunt question: is astrology real? Are the doṣas and their predictions true?",
         ],
         fact: "Vyom (व्योम) is Sanskrit for the sky — the open space where every one of these stories begins.",
+      },
+      {
+        id: "karma",
+        era: "What I found",
+        kind: "personal",
+        title: "Karma, not fate",
+        dev: "कर्म",
+        art: "sky",
+        body: [
+          "The answer I came to: astrology's predictions behave like predictions. They describe things that could happen — the way a weather forecast does — not things that must.",
+          "We humans are good at exactly this: we learn, we foresee, and we better ourselves. Read that way, the old science is a mirror for reflection, not a sentence passed on us. Our karma — our own actions — is the only thing that is truly ours.",
+          "I'm a software engineer who specialises in AI; building is how I understand things. So I built Vyom: to make all of this simple, to separate the facts from the fear, and to share what I learned.",
+        ],
+        fact: "The Gītā says it in one line (2.47): your right is to the action alone, never to its fruits.",
       },
       {
         id: "promise",
