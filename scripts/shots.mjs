@@ -59,6 +59,20 @@ for (const [tag, viewport] of [
       if (!more) break;
     }
   }
+  for (const tab of ["Week", "Month", "Year"]) {
+    await page.goto(`${base}#/forecast/${id}`);
+    await page.waitForTimeout(1200);
+    await page.getByRole("tab", { name: tab }).click();
+    await page.waitForTimeout(2500);
+    for (let i = 0; i < 3; i++) {
+      await page.evaluate((k) => {
+        const s = document.querySelector(".forecast");
+        if (s) s.scrollTop = k * s.clientHeight * 0.9;
+      }, i);
+      await page.waitForTimeout(200);
+      await page.screenshot({ path: `${out}/${tag}-fc-${tab}-${i}.png` });
+    }
+  }
   await page.goto(`${base}#/today`);
   await page.waitForTimeout(1500);
   await page.getByRole("button", { name: /^Tithi/ }).click();

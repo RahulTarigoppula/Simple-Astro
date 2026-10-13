@@ -5,7 +5,22 @@ import { sealReferenceLeaf } from "./helpers";
 test("no serious or critical axe violations on the main screens", async ({ page }) => {
   test.setTimeout(120_000);
   const id = await sealReferenceLeaf(page);
-  const routes = ["#/", `#/patri/${id}`, "#/leaf/new", "#/today", "#/circle", "#/drawer", `#/milan/${id}/${id}`, `#/hast/${id}`];
+  const routes = [
+    "#/",
+    `#/patri/${id}`,
+    "#/leaf/new",
+    "#/today",
+    "#/circle",
+    "#/drawer",
+    `#/milan/${id}/${id}`,
+    `#/hast/${id}`,
+    "#/guide",
+    "#/story",
+    "#/explore",
+    "#/explore/graha/MO",
+    "#/explore/numbers",
+    `#/forecast/${id}`,
+  ];
   const report: string[] = [];
   for (const r of routes) {
     await page.goto(r);
