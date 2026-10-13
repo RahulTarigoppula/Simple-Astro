@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.0 — 2026-10-13
+
+### Explore, reimagined
+- **The Sky Wheel**: one interactive wheel of the 27 nakṣatras, 12 rāśis and the nine grahas where they are right now. Drag to turn it, tap anything to bring it to the top; keyboard: ← → along a ring, ↑ ↓ between rings, Enter to play.
+- **Story panel** beside the wheel: the **real stars** of that slice of the zodiac (Yale Bright Star Catalogue, turned to sidereal ecliptic coordinates), the myth, the meaning, facts, where it is now and where it sits in your chart.
+- **Story mode**: a full-screen player with progress bars, tap or arrow keys to move, hold to pause, and line art that draws itself — for every graha, rāśi and nakṣatra, and for Roots.
+
+### Roots, with a beginning and an end
+- A **Prologue** in the maker's own words — why a software engineer who works on AI, curious after years of reading, built Vyom: facts first, stories second, fear never.
+- An **Epilogue** that brings the story back to the reader.
+- Chapters as **story rings**; "Start the story" plays all 18 cards. "A note from the maker" also appears on Home and in the Guide.
+
 ## 0.4.0 — 2026-10-13
 
 Chart engine unchanged; no chart moves. Saved people and settings carry over (storage keys are unchanged).

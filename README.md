@@ -3,10 +3,11 @@
 *Vyom (व्योम) — Sanskrit for "the sky". Indian astrology under a live sky, explained in plain English, with the myths behind every star.*
 
 **Codename:** Jyoti (project 02 of 8) · **Repo:** [Simple-Astro](https://github.com/RahulTarigoppula/Simple-Astro) · **App / brand:** Vyom (व्योम) · **Live:** https://rahultarigoppula.github.io/Simple-Astro/
-**Status: v0.4.0 (2026-10-13), live at https://rahultarigoppula.github.io/Simple-Astro/** — install it from the browser menu ("Install app") and it works offline. The Android APK is built by CI from a `v*` tag once the signing secrets exist (see [docs/HANDOFF.md](docs/HANDOFF.md)). What changed is in [CHANGELOG.md](CHANGELOG.md); what was measured is in [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
+**Status: v0.5.0 (2026-10-13), live at https://rahultarigoppula.github.io/Simple-Astro/** — install it from the browser menu ("Install app") and it works offline. The Android APK is built by CI from a `v*` tag once the signing secrets exist (see [docs/HANDOFF.md](docs/HANDOFF.md)). What changed is in [CHANGELOG.md](CHANGELOG.md); what was measured is in [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
 
 ## Summary
 
+- **0.5.0:** **Explore** is an interactive **Sky Wheel** — drag it, tap any planet, sign or star for its real stars, myth and meaning, or play it as a full-screen **story**; **Roots** opens with the maker's own prologue on why Vyom exists.
 - **0.4.0:** renamed to **Vyom**; **Forecasts** for the day, week, month, quarter and year (gochara from the Moon, Tārā/Candra-bala, daśā); **Explore**, the myths and meanings of the 9 grahas, 12 rāśis and 27 nakṣatras, numerology and the Chinese zodiac; a **cosmic profile** per person; **Coming up in the sky** with Moon phases, Ekādaśī, eclipses (visible here or not), sign changes and retrogrades; Navagraha medallions.
 - **Astral design (0.3.0):** deep-space glass UI, a live sidereal zodiac wheel on Home, and plain-English help everywhere — an ⓘ beside every term, a Guide with the full glossary, and **Roots**, 16 story cards on the gods, sages, Greeks and astronomers behind Jyotiṣa, palmistry and numerology.
 - A private, offline Jyotisha desk: write a "leaf" (name, birth date, time, place) and it casts a full Janam Patri — nine grahas in sidereal longitude, Lagna, Rāśi (D1) and Navāṁśa (D9) drawn in ink, nakshatra/pada, the Vimshottari dasha tree, birth panchang, and yogas cited to BPHS chapter and verse.

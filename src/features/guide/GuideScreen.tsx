@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { Screen } from "../../components/ui/Screen";
 import { GLOSSARY, type GlossaryGroup, GROUP_TITLES } from "../../data/glossary";
+import "../story/roots.css";
 import "./guide.css";
 
 const GROUPS = Object.keys(GROUP_TITLES) as GlossaryGroup[];
@@ -74,6 +75,19 @@ export default function GuideScreen() {
           born — and shows what the old tradition says about it. You don't need to know anything, or believe anything, to use it.
         </p>
       </header>
+
+      <Link to="/story" className="maker maker--link">
+        <span className="maker__av" aria-hidden="true">
+          R
+        </span>
+        <span className="maker__text">
+          <span className="maker__k">A note from the maker</span>
+          <span className="maker__t">
+            Why a software engineer who works on AI built an astrology app — to keep the facts, drop the fear.
+          </span>
+          <span className="maker__s">Read the prologue in Roots →</span>
+        </span>
+      </Link>
 
       <Link to="/story" className="guide-story">
         <span className="guide-story__k">New · Roots</span>

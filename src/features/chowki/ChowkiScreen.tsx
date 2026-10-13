@@ -30,6 +30,7 @@ import {
   IconToday,
 } from "./icons";
 import { ZodiacOrbit } from "./ZodiacOrbit";
+import "../story/roots.css";
 import "./chowki.css";
 
 const BENGALURU = { lat: 12.9716, lon: 77.5946, zone: "Asia/Kolkata" };
@@ -292,6 +293,17 @@ export default function ChowkiScreen() {
         <Tile to="/guide" title="Guide" dev="मार्गदर्शिका" sub="Every word explained" icon={<IconGuide />} tone="violet" />
         <Tile to="/drawer" title="Settings" dev="दराज़" sub="Accuracy, backup" icon={<IconDrawer />} tone="violet" />
       </nav>
+      <Link to="/story" className="maker maker--link home-maker">
+        <span className="maker__av" aria-hidden="true">
+          R
+        </span>
+        <span className="maker__text">
+          <span className="maker__k">Why Vyom exists</span>
+          <span className="maker__t">"I believed God exists — that was the extent of it. Then I started reading…"</span>
+          <span className="maker__s">A note from the maker · play the story →</span>
+        </span>
+      </Link>
+
       <p className="home-foot">
         New to all this?{" "}
         <Link to="/guide" className="linkish">
