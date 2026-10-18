@@ -12,7 +12,7 @@ const GROUPS = Object.keys(GROUP_TITLES) as GlossaryGroup[];
 const STEPS: Array<{ title: string; body: string; to: string; cta: string }> = [
   {
     title: "Save a person",
-    body: "Enter a name, birth date, birth time and birth place. If you don't know the time, switch on \"Birth time unknown\". You'll still get most of it.",
+    body: 'Enter a name, the day, month and year of birth, the time on a 12-hour clock with am or pm, and the birth place picked from the list. Look at "Check before you save" (Moon sign, birth star, rising sign) before you save. If you don\'t know the time, switch on "Time of birth not known". You\'ll still get most of it.',
     to: "/leaf/new",
     cta: "Add a person",
   },
@@ -131,8 +131,9 @@ export default function GuideScreen() {
         <h2 id="g-private">Your privacy</h2>
         <p>
           Everything is calculated on this device. Birth details and palm photos are stored only here, never uploaded. Vyomaphala uses the
-          internet for only two things: the optional place search (just the town name), and anonymous counts of which screens are opened (no
-          names, no birth details, no cookies, and you can turn it off). You can back up or delete everything from Settings.
+          internet for only two things: the optional place search (just the town name), and anonymous counts of which screens are opened and
+          which buttons are tapped (no names, no birth details, no cookies, and you can turn it off). You can back up or delete everything
+          from Settings.
         </p>
       </section>
 

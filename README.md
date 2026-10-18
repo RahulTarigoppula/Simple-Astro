@@ -17,7 +17,7 @@
 - Every number shows its work: ayanamsa preset (SE-true / SE-mean / Drik-compatible), resolved IANA zone and historical UTC offset, Julian Day, and a vermilion asterisk whenever a body sits within 2′ of a sign, pada or tithi boundary.
 - Lay two leaves side by side and Guna Milan counts out on a real 36-bead mala; photograph a palm and MediaPipe finds 21 landmarks, OpenCV rectifies the print and traces heart/head/life lines, with a stylus fallback when the camera is unsure.
 - Vite 8 + React 19 + TypeScript, Tailwind v4 tokens, Motion 13, Dexie 4, Zustand 5; the same `dist/` ships as an installable PWA on GitHub Pages and as a Capacitor 8 Android APK built and signed by GitHub Actions.
-- Free, offline, no accounts, no analytics, no LLM in the core path; birth data and palm photos never leave the device unless the owner exports an AES-GCM-encrypted envelope.
+- Free, offline, no accounts, no LLM in the core path; the only counting is an optional anonymous screen and button count through GoatCounter (no cookies, no ids, off in Settings, off unless the build sets a code); birth data and palm photos never leave the device unless the owner exports an AES-GCM-encrypted envelope.
 
 ## Documents
 
@@ -98,8 +98,9 @@ Runtime services (optional, user-initiated, no key, no account):
 |---|---|---|
 | Open-Meteo Geocoding API | Data CC BY 4.0; free tier non-commercial; ≤ 600/min, 5,000/h, 10,000/day | Only when the owner taps "search online" for a place missing from the bundle |
 | Nominatim (OpenStreetMap) | ODbL data; ≤ 1 req/s, identifying User-Agent/Referer, **no autocomplete**, attribution required | Second fallback, on submit only, never per keystroke |
+| GoatCounter (optional) | Anonymous counts; no cookies | Only when the build sets `VITE_GOATCOUNTER`: the screen name or button name, nothing else; honours Do Not Track; off in Settings |
 
-No other network request exists. No analytics, no telemetry, no accounts, no crash reporting.
+No other network request exists. No accounts, no crash reporting, no identifiers of any kind.
 
 ## Disclaimer
 

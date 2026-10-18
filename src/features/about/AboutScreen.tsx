@@ -10,7 +10,7 @@ const NUMBERS: Array<[string, string]> = [
   ["82,505", "places, offline"],
   ["9,096", "real stars"],
   ["50", "charts checked against Swiss Ephemeris"],
-  ["710", "automated tests"],
+  ["714", "automated tests"],
   ["0", "bytes of your data uploaded"],
 ];
 
@@ -33,7 +33,7 @@ const SOURCES: Source[] = [
     name: "GeoNames",
     by: "GeoNames.org",
     licence: "CC BY 4.0",
-    used: "The offline birthplace search: towns and cities across India, Nepal, Sri Lanka, Pakistan and Bangladesh, with old names like Bombay and Madras.",
+    used: "The offline birthplace search: towns and cities across India, Nepal, Sri Lanka, Pakistan and Bangladesh, plus the world's larger cities, with old names like Bombay and Madras.",
     cleaned:
       "Kept only populated places and administrative seats, ranked the rest by how many alternate names they have, rounded coordinates to 4 decimals (about 11 metres), kept at most three alternate names each, and packed it as compressed columns. 82,505 places in 1.8 MB, searched in under 10 ms.",
   },
@@ -43,7 +43,7 @@ const SOURCES: Source[] = [
     licence: "Public domain",
     used: "The real stars in the birth sky and behind every sign and nakṣatra in Explore.",
     cleaned:
-      "Reduced to position and brightness, sorted brightest first and packed into 45 KB. 9,096 stars, 5,080 of them visible to the eye.",
+      "Reduced to position and brightness, sorted brightest first and packed into 45 KB. 9,096 stars, 5,080 of them brighter than magnitude 6.",
   },
   {
     name: "tz-lookup",
@@ -111,16 +111,16 @@ const ALGORITHMS: Array<[string, string]> = [
     "Palm lines",
     "21 hand points, then a flattened 512-pixel print, contrast evened out (CLAHE), creases lifted (black-hat), ridges found (Hessian) and thinned to lines (Zhang-Suen).",
   ],
-  ["Chinese zodiac", "The year turns at the first new moon after 21 January in China Standard Time, found from the real Moon."],
+  ["Chinese zodiac", "The year turns at the first new moon on or after 21 January in China Standard Time, found from the real Moon."],
   ["Numerology", "Root and destiny numbers from the birth date; name numbers by the Chaldean letter values."],
 ];
 
 const CHECKS: string[] = [
   "50 birth charts compared with Swiss Ephemeris, the professional standard: within 20 arc-seconds (the Moon within 4, the rising sign within 0.3).",
-  "Almanac names and end times compared with Drik Panchang for 6 days in 3 cities: names exact, times within 2 minutes.",
+  "Almanac names and end times compared with Drik Panchang on 6 days across 3 cities (Bengaluru, Chennai, New Delhi): names exact, times within 2 minutes.",
   "Guna Milan compared with PyJHora on all 11,664 possible pairings.",
   "Every published table checked by hand against the classical texts.",
-  "710 automated tests and 22 browser tests run on every change, on a phone-sized and a desktop screen.",
+  "714 automated tests and 22 browser tests run on every change, on a phone-sized and a desktop screen.",
   "A privacy test watches every network request in a full session and fails if any of your data leaves.",
 ];
 

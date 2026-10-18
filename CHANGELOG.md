@@ -24,6 +24,7 @@
 - The place index stays loaded between visits (it took seconds to rebuild on a phone).
 - "Last backed up" is stamped only after the file was really saved.
 - Dates still print on an older device that does not know a newer time-zone name.
+- Settings shows version 1.2.0; 714 automated tests and 22 browser tests.
 - Telugu and Tamil readers now see their own sign and star names in the planet ledger, the birth almanac, the Partner Compatibility screen and the time-unknown note, not only on the first card.
 - The birth chart is called "Birth chart" beside Janam Patri; the People menu says "Partner Compatibility with…"; the clock on Home is 12-hour; the Nāḍī line talks about family, not health; today's star shows its English word; buttons meet the 44 px touch size.
 

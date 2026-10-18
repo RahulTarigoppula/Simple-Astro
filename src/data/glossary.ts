@@ -176,7 +176,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     id: "rahu-kala",
     term: "Rāhu Kāla",
     dev: "राहु काल",
-    plain: "inauspicious 90 minutes",
+    plain: "an inauspicious eighth of the day",
     short: "About an eighth of the daylight hours that tradition says to avoid for starting anything new.",
     long: "Daylight (sunrise to sunset) is cut into eight equal parts; one of them, fixed by weekday, is Rāhu Kāla. Many people in South India won't sign papers, travel or begin work in it. It is not \"bad luck\" in any measurable sense. It's a widely followed custom, useful to know if you work with people who observe it. Yamagaṇḍa and Gulika Kāla are two similar periods.",
     how: "Uses the actual sunrise and sunset at the chosen place, so it shifts through the year.",
@@ -345,7 +345,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "तारा बल",
     plain: "today's star strength for you",
     short: "How today's nakṣatra relates to your birth nakṣatra, in nine repeating types.",
-    long: 'Count from your birth nakṣatra to today\'s and take the remainder after dividing by 9: Janma, Sampat (wealth), Vipat (danger), Kṣema (well-being), Pratyak (obstacle), Sādhana (achievement), Naidhana (worst), Mitra (friend), Ati-mitra (best friend). A quick daily "weather" check in the tradition.',
+    long: 'Count from your birth nakṣatra to today\'s and take the remainder after dividing by 9: Janma, Sampat (wealth), Vipat (danger), Kṣema (well-being), Pratyari (obstacle), Sādhaka (achievement), Vadha (worst), Mitra (friend), Ati-mitra (best friend). A quick daily "weather" check in the tradition.',
     group: "time",
   },
   {
@@ -364,7 +364,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "भविष्य",
     plain: "day-to-year outlook",
     short: "A traditional outlook for a day, week, month, quarter or year, built from where the planets are compared with your birth Moon.",
-    long: "Each planet's current sign is counted as a house from your Moon sign and checked against the classical table of favourable houses (Phaladīpikā ch. 26). Jupiter in the 9th is welcome, Saturn in the 8th is not, and so on. Slow planets (Jupiter, Saturn, Rāhu) weigh most for long periods; the fast Moon and its daily star (Tārā-bala) set the tone of single days. The running daśā chapter is shown beside it. The result is labelled Bright, Steady, Mixed or Testing/Quiet. It describes what the tradition says about the sky, not what will happen.",
+    long: "Each planet's current sign is counted as a house from your Moon sign and checked against the classical table of favourable houses (Phaladīpikā ch. 26). Jupiter in the 9th is welcome, Saturn in the 8th is not, and so on. Slow planets (Jupiter, Saturn, Rāhu) weigh most for long periods; the fast Moon and its daily star (Tārā-bala) set the tone of single days. The running daśā chapter is shown beside it. The result is labelled Bright, Steady, Mixed or Quiet. It describes what the tradition says about the sky, not what will happen.",
     how: "Positions are computed for every day of the period; 'best day' is simply the day with the most favourable combination.",
     group: "time",
   }, // ── match ───────────────────────────────────────────────────────────────
@@ -401,7 +401,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "तारा",
     plain: "birth-star harmony",
     short: "Counts from one person's birth nakṣatra to the other's to judge fortune together; up to 3 points.",
-    long: "Uses the same nine-fold count as daily Tārā bala, checked in both directions: from the bride's star to the groom's and back. Counts that land on the unlucky types (Vipat, Pratyak, Naidhana) lose points; a pair that is favourable both ways gets the full 3.",
+    long: "Uses the same nine-fold count as daily Tārā bala, checked in both directions: from the bride's star to the groom's and back. Counts that land on the unlucky types (Vipat, Pratyari, Vadha) lose points; a pair that is favourable both ways gets the full 3.",
     group: "match",
   },
   {
@@ -446,7 +446,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     dev: "नाड़ी",
     plain: "the heaviest match factor",
     short: "Each nakṣatra is one of three Nāḍīs; the same Nāḍī for both gives 0 out of 8.",
-    long: 'The heaviest factor. Tradition links it to health of children; some modern readers loosely compare it to genetic diversity, but there\'s no scientific evidence for that. "Nāḍī doṣa" (same Nāḍī) also has classical exceptions.',
+    long: 'The heaviest factor. Tradition links it to the family line; some modern readers loosely compare it to genetic diversity, but there\'s no scientific evidence for that. "Nāḍī doṣa" (same Nāḍī) also has classical exceptions.',
     group: "match",
   },
   {

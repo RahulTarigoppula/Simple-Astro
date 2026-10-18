@@ -115,7 +115,7 @@ export const NAK_TRAITS: readonly Traits[] = [
   },
   {
     plain: "Determined and truthful. You carry heavy things others can't.",
-    plus: ["Strong-willed", "Truthful", "Healthy"],
+    plus: ["Strong-willed", "Truthful", "Strong"],
     minus: ["Can go to extremes"],
   },
   {
@@ -273,7 +273,7 @@ export const NUMBER_TRAITS: Readonly<Record<number, { word: string } & Traits>> 
 
 /** What a life chapter (Viṃśottarī mahādaśā) of each graha is traditionally about, in plain words. */
 export const CHAPTER_PLAIN: Readonly<Record<GrahaId, string>> = {
-  SU: "a chapter about standing on your own feet: recognition, authority, your father and your health.",
+  SU: "a chapter about standing on your own feet: recognition, authority, your father and your own strength.",
   MO: "a chapter about the heart: home, mother, feelings, the public and peace of mind.",
   MA: "a chapter of energy and effort: courage, property, siblings and getting things done.",
   ME: "a chapter of learning and trade: study, business, writing, friends and clever work.",
