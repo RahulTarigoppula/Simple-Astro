@@ -10,7 +10,8 @@ import { Screen } from "../../components/ui/Screen";
 import { Sheet } from "../../components/ui/Sheet";
 import { TurmericBand } from "../../components/ui/TurmericBand";
 import { glossary } from "../../data/glossary";
-import { NAKSHATRA_DEV, NAKSHATRA_NAMES, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
+import { nakBoth, rashiBoth } from "../../data/regional";
+import { NAKSHATRA_DEV, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
 import { milan } from "../../engine/ashtakoota";
 import { AYANAMSA_LABEL } from "../../engine/ayanamsa";
 import { MANGLIK_CANCELLATIONS, MANGLIK_REF_LABEL } from "../../engine/manglik";
@@ -102,7 +103,7 @@ function LeafChart({
           <span lang="hi" className="dev">
             {NAKSHATRA_DEV[m.nak]}
           </span>{" "}
-          {NAKSHATRA_NAMES[m.nak]} pada {m.pada} · {SIGN_NAMES[m.sign]}
+          {nakBoth(m.nak, profile.tradition)} pada {m.pada} · {rashiBoth(m.sign, profile.tradition)}
         </span>
         <span className={`milan-chart__mk${manglik?.present ? " is-present" : ""}`}>{manglik ? manglikLabel(manglik) : "-"}</span>
       </figcaption>
@@ -163,7 +164,7 @@ function ScrollFace({
       )}
       {moon ? (
         <span className="mscroll__lat">
-          {NAKSHATRA_NAMES[moon.nak]} {moon.pada} · {SIGN_NAMES[moon.sign]}
+          {nakBoth(moon.nak, profile.tradition)} {moon.pada} · {rashiBoth(moon.sign, profile.tradition)}
         </span>
       ) : null}
       {manglik ? <ManglikMarks m={manglik} onOpen={onManglik} /> : null}
@@ -561,11 +562,11 @@ function MoonLine({ who, p, m }: { who: string; p: Profile; m: MoonFacts | null 
             <span lang="hi" className="dev">
               {NAKSHATRA_DEV[m.nak]}
             </span>{" "}
-            {NAKSHATRA_NAMES[m.nak]} pada {m.pada} · Moon in{" "}
+            {nakBoth(m.nak, p.tradition)} pada {m.pada} · Moon in{" "}
             <span lang="hi" className="dev">
               {SIGN_DEV[m.sign]}
             </span>{" "}
-            {SIGN_NAMES[m.sign]}
+            {rashiBoth(m.sign, p.tradition)}
           </>
         ) : (
           "-"

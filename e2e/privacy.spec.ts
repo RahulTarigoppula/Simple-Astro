@@ -3,6 +3,7 @@ import { hold } from "./helpers";
 
 // P-1 Zero leakage: a full session issues no request to any origin but our own.
 test("zero leakage across a full session", async ({ page, baseURL }) => {
+  test.setTimeout(150_000); // eight screens, two of them heavy, on the phone profile
   const own = new URL(baseURL ?? "http://localhost:4173/").origin;
   const foreign: string[] = [];
   page.on("request", (r) => {

@@ -41,7 +41,7 @@ import { GrahaLedger } from "./GrahaLedger";
 import { KundliChart } from "./KundliChart";
 import { TimeUnknownNote } from "./TimeUnknownNote";
 import "./patri.css";
-import { chartStyleFor } from "../../data/regional";
+import { chartStyleFor, nakBoth, rashiBoth, type Tradition } from "../../data/regional";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const PAGER: VargaNumber[] = [9, 2, 3, 7, 10, 12, 30, 60];
@@ -366,6 +366,7 @@ export default function PatriScreen() {
                   profileId={profile?.id ?? ""}
                   devDigits={settings.devanagariDigits}
                   name={profile?.name ?? ""}
+                  tradition={profile?.tradition}
                 />
               ) : (
                 <div className="figure" aria-busy="true">
@@ -438,6 +439,7 @@ interface BodyProps {
   profileId: string;
   devDigits: boolean;
   name: string;
+  tradition?: Tradition | undefined;
 }
 
 function PatriBody({
@@ -458,6 +460,7 @@ function PatriBody({
   profileId,
   devDigits,
   name,
+  tradition,
 }: BodyProps) {
   const pc = patri.birthPanchang;
   const p = patri.preset;
@@ -493,7 +496,7 @@ function PatriBody({
         {row(
           "Nakṣatra",
           <>
-            {NAKSHATRA_NAMES[pc.nakshatra.index]} ·{" "}
+            {nakBoth(pc.nakshatra.index, tradition)} ·{" "}
             <span lang="hi" className="dev">
               {NAKSHATRA_DEV[pc.nakshatra.index]}
             </span>
@@ -522,7 +525,7 @@ function PatriBody({
         {row(
           "Candra",
           <>
-            {SIGN_NAMES[moon.sign]} ·{" "}
+            {rashiBoth(moon.sign, tradition)} ·{" "}
             <span lang="hi" className="dev">
               {SIGN_DEV[moon.sign]}
             </span>
@@ -560,6 +563,7 @@ function PatriBody({
       <TurmericBand dev="ग्रह" title="Grahas · planets" explain="graha" meta={`sidereal · ${PRESET_SHORT[p.ayanamsa]}`} />
       <GrahaLedger
         devDigits={devDigits}
+        tradition={tradition}
         patri={patri}
         lit={lit}
         onRead={(g) => setLit(g)}

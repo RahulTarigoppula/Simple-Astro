@@ -1,7 +1,7 @@
 // For a leaf without a clock time: say what can and cannot be trusted, and whether the Moon moved
 // between the two ends of that local day.
 import { useMemo } from "react";
-import { NAKSHATRA_NAMES, SIGN_NAMES } from "../../data/tables/names";
+import { nakBoth, rashiBoth, type Tradition } from "../../data/regional";
 import { moonTransitAt, type TransitGraha } from "../../engine/gochar";
 import { resolveBirthMoment } from "../../engine/time";
 import type { EnginePreset, Patri, Profile } from "../../engine/types";
@@ -46,14 +46,16 @@ export function moonAcrossDay(profile: Profile, preset: EnginePreset): { dawn: M
 }
 
 /** The sentence about the Moon for a time-unknown leaf. Exported for tests. */
-export function moonDaySentence(dawn: Moon | null, dusk: Moon | null, noon: Moon): string {
+export function moonDaySentence(dawn: Moon | null, dusk: Moon | null, noon: Moon, tradition?: Tradition): string {
+  const star = (i: number) => nakBoth(i, tradition);
+  const sign = (s: number) => rashiBoth(s, tradition);
   if (!dawn || !dusk) {
-    return `The Moon was in ${NAKSHATRA_NAMES[noon.nakshatra]} (${SIGN_NAMES[noon.sign]}) at noon; whether it stayed there all day could not be checked, as a clock change falls at the day's edge.`;
+    return `The Moon was in ${star(noon.nakshatra)} (${sign(noon.sign)}) at noon; whether it stayed there all day could not be checked, as a clock change falls at the day's edge.`;
   }
   if (dawn.sign !== dusk.sign || dawn.nakshatra !== dusk.nakshatra) {
-    return `The Moon moved that day from ${NAKSHATRA_NAMES[dawn.nakshatra]} in ${SIGN_NAMES[dawn.sign]} to ${NAKSHATRA_NAMES[dusk.nakshatra]} in ${SIGN_NAMES[dusk.sign]}, so even its nakṣatra is uncertain.`;
+    return `The Moon moved that day from ${star(dawn.nakshatra)} in ${sign(dawn.sign)} to ${star(dusk.nakshatra)} in ${sign(dusk.sign)}, so even its nakṣatra is uncertain.`;
   }
-  return `The Moon stayed in ${NAKSHATRA_NAMES[noon.nakshatra]} (${SIGN_NAMES[noon.sign]}) all day, so the Moon sign, nakṣatra and Guna Milan hold.`;
+  return `The Moon stayed in ${star(noon.nakshatra)} (${sign(noon.sign)}) all day, so the Moon sign, nakṣatra and Partner Compatibility hold.`;
 }
 
 export function TimeUnknownNote({ profile, patri }: { profile: Profile; patri: Patri }) {
@@ -63,7 +65,7 @@ export function TimeUnknownNote({ profile, patri }: { profile: Profile; patri: P
       <span aria-hidden="true">⚑</span>
       <span>
         Birth time unknown, so the chart is cast for local noon. The Lagna, houses, Navāṃśa and daśā dates are not reliable.{" "}
-        {moonDaySentence(dawn, dusk, patri.grahas.MO)}
+        {moonDaySentence(dawn, dusk, patri.grahas.MO, profile.tradition)}
       </span>
     </p>
   );

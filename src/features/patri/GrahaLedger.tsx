@@ -1,4 +1,5 @@
 import { digitsFor } from "../../app/digits";
+import { nakName, rashiName, type Tradition } from "../../data/regional";
 import {
   GRAHA_ABBR_DEV,
   GRAHA_ABBR_LAT,
@@ -30,11 +31,16 @@ interface GrahaLedgerProps {
   onRead: (g: GrahaId) => void;
   onBoundary: (g: GrahaId | "LAGNA") => void;
   devDigits?: boolean;
+  /** The person's tradition: Telugu and Tamil readers see their own sign and star names. */
+  tradition?: Tradition | undefined;
 }
 
 /** The graha ledger: tabular degrees, ′ ″ muted, ℞, and the vermilion asterisk ONLY within 2′ of an edge. */
-export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false }: GrahaLedgerProps) {
+export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false, tradition }: GrahaLedgerProps) {
   const L = patri.lagna;
+  const regional = tradition !== undefined && tradition !== "north";
+  const sign = (s: number) => (regional ? rashiName(s, tradition) : SIGN_NAMES[s]);
+  const star = (i: number) => (regional ? nakName(i, tradition) : NAKSHATRA_SHORT[i]);
   return (
     <table className="ledger ledger--grahas">
       <caption className="vh">Graha positions, sidereal, {patri.preset.ayanamsa}</caption>
@@ -64,13 +70,13 @@ export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false 
             Lg <span className="gloss ledger-gloss">Rising sign</span>
           </th>
           <td>
-            {SIGN_NAMES[L.sign]} <span className="gloss ledger-gloss">{SIGN_WESTERN[L.sign]}</span>
+            {sign(L.sign)} <span className="gloss ledger-gloss">{SIGN_WESTERN[L.sign]}</span>
           </td>
           <td>
             <Degree x={L.degInSign} dev={devDigits} />
           </td>
           <td>
-            {NAKSHATRA_SHORT[L.nakshatra]} <span className="pd">{L.pada}</span>
+            {star(L.nakshatra)} <span className="pd">{L.pada}</span>
             {L.boundary ? (
               <button
                 type="button"
@@ -110,13 +116,13 @@ export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false 
                 <span className="gloss ledger-gloss">{GRAHA_ENGLISH[id]}</span>
               </td>
               <td>
-                {SIGN_NAMES[g.sign]} <span className="gloss ledger-gloss">{SIGN_WESTERN[g.sign]}</span>
+                {sign(g.sign)} <span className="gloss ledger-gloss">{SIGN_WESTERN[g.sign]}</span>
               </td>
               <td>
                 <Degree x={g.degInSign} dev={devDigits} />
               </td>
               <td>
-                {NAKSHATRA_SHORT[g.nakshatra]} <span className="pd">{g.pada}</span>
+                {star(g.nakshatra)} <span className="pd">{g.pada}</span>
                 {g.boundary ? (
                   <button
                     type="button"
