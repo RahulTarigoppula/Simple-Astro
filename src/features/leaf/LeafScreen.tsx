@@ -1,3 +1,8 @@
+// Add or edit a person. Four things are asked, in plain words: name, date of birth, time of birth
+// (12-hour clock, am/pm chosen by hand) and place of birth (searched, never assumed). Before anything is
+// saved, "Check before you save" reads the Moon sign, birth star and rising sign back, so a wrong
+// am/pm, day or town is caught here and not on the chart. The engraved strip below it is the
+// contract with reality: zone, offset, Julian Day and Lagna.
 import * as A from "astronomy-engine";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
@@ -10,34 +15,36 @@ import { Sheet } from "../../components/ui/Sheet";
 import { TurmericBand } from "../../components/ui/TurmericBand";
 import { loadGazetteer, NetError, searchOnline, searchPlaces, unloadGazetteer } from "../../data/places";
 import { saveSettings, upsertProfile } from "../../data/repo";
-import { SIGN_ENGRAVED, SIGN_MARK } from "../../data/tables/names";
+import { SIGN_ENGRAVED, SIGN_MARK, SIGN_WESTERN } from "../../data/tables/names";
 import { ayanamsa } from "../../engine/ayanamsa";
 import { EngineError } from "../../engine/errors";
 import { lagna } from "../../engine/lagna";
+import { signOf } from "../../engine/nakshatra";
+import { angasAt } from "../../engine/panchang";
 import { REFERENCE_PROFILE } from "../../engine/patri";
-import { checkLocalTime, daysInMonth, formatOffset, jdTtFromUtcMs, resolveBirthMoment } from "../../engine/time";
+import { checkLocalTime, formatOffset, jdTtFromUtcMs, resolveBirthMoment } from "../../engine/time";
 import type { BirthMoment, Place, Profile } from "../../engine/types";
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
 import { toast } from "../../state/ui";
 import { ParapetSky } from "../chowki/ParapetSky";
-import { BrassDrum } from "./BrassDrum";
+import { BirthFields, missingText } from "./BirthFields";
 import "./leaf.css";
-import { TRADITION_LABEL, type Tradition } from "../../data/regional";
+import { nakBoth, rashiBoth, TRADITION_LABEL, type Tradition } from "../../data/regional";
 import { countEvent } from "../../platform/stats";
 
-const BENGALURU: Place = { name: "Bengaluru", admin1: "Karnataka", country: "IN", lat: 12.9716, lon: 77.5946, source: "manual" };
+/** The sky strip needs a horizon before a place is chosen; nothing else uses this. */
+const SKY_FALLBACK: Place = { name: "Bengaluru", admin1: "Karnataka", country: "IN", lat: 12.9716, lon: 77.5946, source: "manual" };
 const BOMBAY_TIME = 291; // +04:51, not in the IANA database
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 interface Draft {
   name: string;
-  y: number;
-  mo: number;
-  d: number;
-  h: number;
+  y: number; // 0 = unset
+  mo: number; // 0 = unset
+  d: number; // 0 = unset
+  h: number; // -1 = unset
   mi: number;
-  place: Place;
+  place: Place | null;
   override: "none" | "bombay" | "manual";
   manualOffsetMin: number;
   handedness: "right" | "left";
@@ -64,16 +71,16 @@ function draftFromProfile(p: Profile): Draft {
   };
 }
 
+/** Nothing is assumed: the date, the hour and the place all start empty. */
 function freshDraft(): Draft {
-  const now = new Date();
   return {
     name: "",
-    y: now.getFullYear(),
-    mo: now.getMonth() + 1,
-    d: now.getDate(),
-    h: now.getHours(),
-    mi: now.getMinutes(),
-    place: BENGALURU,
+    y: 0,
+    mo: 0,
+    d: 0,
+    h: -1,
+    mi: 0,
+    place: null,
     override: "none",
     manualOffsetMin: 330,
     handedness: "right",
@@ -93,7 +100,6 @@ export default function LeafScreen() {
   const navigate = useNavigate();
   const [draft, setDraft] = useState<Draft>(freshDraft);
   const [loadedFrom, setLoadedFrom] = useState<string | null>(null);
-  const [scrubH, setScrubH] = useState<number | null>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Place[]>([]);
   const [gazReady, setGazReady] = useState(false);
@@ -102,7 +108,7 @@ export default function LeafScreen() {
   const abort = useRef<AbortController | null>(null);
   const lastSign = useRef(-1);
 
-  // Edit mode: load the leaf once.
+  // Edit mode: load the person once.
   useEffect(() => {
     if (editing && loadedFrom !== editing.id) {
       setDraft(draftFromProfile(editing));
@@ -129,15 +135,19 @@ export default function LeafScreen() {
   }, [query, gazReady]);
 
   const set = useCallback(<K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v })), []);
+  const patch = useCallback((p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p })), []);
 
   const offsetOverrideMin = draft.override === "bombay" ? BOMBAY_TIME : draft.override === "manual" ? draft.manualOffsetMin : undefined;
 
-  // With the clock time unknown the leaf is cast for 12:00 local; every reading of the drums uses this.
+  // With the clock time unknown the chart is cast for 12:00 local.
   const effH = draft.timeUnknown ? 12 : draft.h;
   const effMi = draft.timeUnknown ? 0 : draft.mi;
+  const missing = missingText({ y: draft.y, mo: draft.mo, d: draft.d, h: draft.h, mi: draft.mi }, draft.timeUnknown);
 
   // Resolve the written moment: the engraved strip is the contract with reality.
-  const resolved = useMemo((): { m: BirthMoment | null; err: EngineError | null; status: string } => {
+  const resolved = useMemo((): { m: BirthMoment | null; err: EngineError | null } => {
+    if (missing) return { m: null, err: new EngineError("TIME_INVALID", missing) };
+    if (!draft.place) return { m: null, err: new EngineError("PLACE_MISSING", "Choose the place of birth.") };
     try {
       const m = resolveBirthMoment({
         localY: draft.y,
@@ -148,26 +158,34 @@ export default function LeafScreen() {
         place: draft.place,
         ...(offsetOverrideMin != null ? { offsetOverrideMin } : {}),
       });
-      return { m, err: null, status: "ok" };
+      return { m, err: null };
     } catch (e) {
-      return { m: null, err: e instanceof EngineError ? e : new EngineError("TIME_INVALID", String(e)), status: "err" };
+      return { m: null, err: e instanceof EngineError ? e : new EngineError("TIME_INVALID", String(e)) };
     }
-  }, [draft.y, draft.mo, draft.d, effH, effMi, draft.place, offsetOverrideMin]);
+  }, [missing, draft.y, draft.mo, draft.d, effH, effMi, draft.place, offsetOverrideMin]);
 
-  // The sky follows the hour drum continuously (sky-scrub); the Lagna re-solves every frame.
-  const skyMs = useMemo(() => {
-    if (!resolved.m) return Date.now();
-    if (scrubH == null || draft.timeUnknown) return resolved.m.utcMs;
-    return resolved.m.utcMs + (scrubH - effH) * 3_600_000;
-  }, [resolved.m, scrubH, effH, draft.timeUnknown]);
+  const skyPlace = draft.place ?? SKY_FALLBACK;
+  const skyMs = resolved.m?.utcMs ?? Date.now();
 
-  const lg = useMemo(() => {
-    if (!resolved.m) return null;
-    const t = A.MakeTime(new Date(skyMs));
-    const ay = ayanamsa(jdTtFromUtcMs(skyMs), settings.preset.ayanamsa);
-    const r = lagna(t, draft.place.lat, draft.place.lon, ay);
-    return Math.floor(r.ascSid / 30);
-  }, [resolved.m, skyMs, draft.place.lat, draft.place.lon, settings.preset.ayanamsa]);
+  // The check card: Moon sign, birth star and rising sign for the moment as written.
+  const check = useMemo(() => {
+    const m = resolved.m;
+    if (!m) return null;
+    try {
+      const a = angasAt(m.utcMs, settings.preset.ayanamsa);
+      const ay = ayanamsa(jdTtFromUtcMs(m.utcMs), settings.preset.ayanamsa);
+      const r = lagna(A.MakeTime(new Date(m.utcMs)), skyPlace.lat, skyPlace.lon, ay);
+      return {
+        moonSign: signOf(a.moonSid),
+        nak: a.nakshatra.index,
+        pada: a.nakshatra.pada,
+        lagnaSign: signOf(r.ascSid),
+      };
+    } catch {
+      return null;
+    }
+  }, [resolved.m, settings.preset.ayanamsa, skyPlace.lat, skyPlace.lon]);
+  const lg = check?.lagnaSign ?? null;
 
   useEffect(() => {
     if (lg == null) return;
@@ -245,11 +263,12 @@ export default function LeafScreen() {
     haptics.selection();
   };
 
-  const pre1955India = draft.y < 1955 && draft.place.country === "IN";
+  const pre1955India = draft.y > 0 && draft.y < 1955 && draft.place?.country === "IN";
   const offSign = draft.manualOffsetMin < 0 ? -1 : 1;
   const offAbs = Math.abs(draft.manualOffsetMin);
   const strip = resolved.m;
   const title = id ? "Edit person" : "Add a person";
+  const whyNot = !resolved.m ? (resolved.err?.detail ?? "Fill in the details above.") : null;
 
   if (id && editing === null) {
     return (
@@ -269,9 +288,13 @@ export default function LeafScreen() {
 
   return (
     <Screen className="leafscreen" label={title}>
-      <ParapetSky utcMs={skyMs} lat={draft.place.lat} lon={draft.place.lon} />
+      <ParapetSky utcMs={skyMs} lat={skyPlace.lat} lon={skyPlace.lon} />
       <div className="paper sheet-col leaf-sheet">
         <TurmericBand dev={id ? "व्यक्ति" : "नया व्यक्ति"} title={title} meta={id ? "editing" : "unsaved"} level={1} />
+        <p className="leaf-lede">
+          Four things: name, date, time and place of birth. The time matters most: a few hours changes the rising sign, and a wrong am/pm
+          can change the Moon sign and birth star.
+        </p>
 
         <div className="field">
           <label htmlFor="leaf-name">Name</label>
@@ -286,82 +309,44 @@ export default function LeafScreen() {
           />
         </div>
 
-        <div className="drums" role="group" aria-label="Birth date and time, local clock at the place">
-          <BrassDrum
-            label="Day"
-            short="day"
-            min={1}
-            max={31}
-            value={draft.d}
-            calm={settings.calmDesk}
-            accept={(v) => v <= daysInMonth(draft.y, draft.mo)}
-            onChange={(v) => set("d", v)}
-          />
-          <BrassDrum
-            label="Month"
-            short="mo"
-            min={1}
-            max={12}
-            value={draft.mo}
-            calm={settings.calmDesk}
-            accept={(v) => draft.d <= daysInMonth(draft.y, v)}
-            onChange={(v) => set("mo", v)}
-            format={(v) => String(v).padStart(2, "0")}
-          />
-          <BrassDrum
-            label="Year"
-            short="year"
-            min={1800}
-            max={2100}
-            value={draft.y}
-            pad={4}
-            flex={1.5}
-            calm={settings.calmDesk}
-            accept={(v) => draft.d <= daysInMonth(v, draft.mo)}
-            onChange={(v) => set("y", v)}
-          />
-          <BrassDrum
-            label="Hour"
-            short="hh"
-            min={0}
-            max={23}
-            value={draft.h}
-            calm={settings.calmDesk}
-            disabled={draft.timeUnknown}
-            onChange={(v) => {
-              set("h", v);
-              setScrubH(null);
+        <BirthFields
+          y={draft.y}
+          mo={draft.mo}
+          d={draft.d}
+          h={draft.h}
+          mi={draft.mi}
+          timeUnknown={draft.timeUnknown}
+          onChange={(p) => patch(p)}
+        />
+
+        <div className="toggle-row leaf-unknown">
+          <span className="v">
+            Time of birth not known <InfoDot id="unknown-time" />
+            <span className="help">
+              Noon is used. The Moon sign and birth star usually still hold; the rising sign, houses and life-chapter dates will not be
+              reliable, and the chart will say so.
+            </span>
+          </span>
+          <button
+            type="button"
+            role="switch"
+            className="switch"
+            aria-checked={draft.timeUnknown}
+            aria-label="Time of birth not known"
+            onClick={() => {
+              set("timeUnknown", !draft.timeUnknown);
+              play("tick");
             }}
-            onScrub={(pos) => setScrubH(pos)}
-          />
-          <BrassDrum
-            label="Minute"
-            short="mm"
-            min={0}
-            max={59}
-            value={draft.mi}
-            calm={settings.calmDesk}
-            disabled={draft.timeUnknown}
-            onChange={(v) => set("mi", v)}
           />
         </div>
-        {draft.timeUnknown ? (
-          <p className="note-haldi" role="status">
-            <span aria-hidden="true">⚑</span>
-            <span>Clock time unknown. The hour and minute drums are set aside and the chart is cast for 12:00 local.</span>
-          </p>
-        ) : null}
-        <p className="vh" aria-live="polite">
-          {`${draft.d} ${MONTHS[draft.mo - 1] ?? ""} ${draft.y}, ${String(effH).padStart(2, "0")}:${String(effMi).padStart(2, "0")}${draft.timeUnknown ? " (time unknown, cast for noon)" : ""}`}
-        </p>
 
-        <div className="field leaf-place">
+        <div className={`field leaf-place${draft.place ? "" : " is-empty"}`}>
           <label htmlFor="leaf-place">Place of birth</label>
           <input
             id="leaf-place"
             type="search"
             value={query}
-            placeholder="Town or city where they were born…"
+            placeholder={draft.place ? "Search to change the place…" : "Type the town or city…"}
             spellCheck={false}
             autoComplete="off"
             aria-describedby="leaf-place-chosen"
@@ -371,10 +356,16 @@ export default function LeafScreen() {
             }}
           />
           <span className="chosen" id="leaf-place-chosen">
-            <b>{placeLabel(draft.place)}</b>
-            <span className="mono" style={{ fontSize: 10 }}>
-              {latLon(draft.place)}
-            </span>
+            {draft.place ? (
+              <>
+                <b>{placeLabel(draft.place)}</b>
+                <span className="mono" style={{ fontSize: 10 }}>
+                  {latLon(draft.place)}
+                </span>
+              </>
+            ) : (
+              <span className="leaf-place__none">Not chosen yet. Start typing and pick the town from the list.</span>
+            )}
           </span>
         </div>
         {results.length ? (
@@ -405,13 +396,54 @@ export default function LeafScreen() {
         ) : null}
         {manual ? (
           <ManualPlace
-            initial={draft.place}
+            initial={draft.place ?? SKY_FALLBACK}
             onSet={(p) => {
               choosePlace(p);
               setManual(false);
             }}
           />
         ) : null}
+
+        <section className={`leaf-check${check ? "" : " is-waiting"}`} aria-labelledby="leaf-check-h" aria-live="polite">
+          <h2 id="leaf-check-h" className="leaf-check__h">
+            Check before you save
+          </h2>
+          {check ? (
+            <>
+              <dl className="leaf-check__grid">
+                <div>
+                  <dt>Moon sign (rāśi)</dt>
+                  <dd>
+                    {rashiBoth(check.moonSign, draft.tradition)}
+                    <small>{SIGN_WESTERN[check.moonSign]}</small>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Birth star (nakṣatra)</dt>
+                  <dd>
+                    {nakBoth(check.nak, draft.tradition)}
+                    <small>pada {check.pada}</small>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Rising sign (lagna)</dt>
+                  <dd>
+                    {draft.timeUnknown ? "needs the time" : rashiBoth(check.lagnaSign, draft.tradition)}
+                    {draft.timeUnknown ? null : <small>{SIGN_WESTERN[check.lagnaSign]}</small>}
+                  </dd>
+                </div>
+              </dl>
+              <p className="leaf-check__p">
+                If this is not what the family knows, the usual culprits are am/pm, the day, or the town. Fix them above and watch this
+                change.
+              </p>
+            </>
+          ) : (
+            <p className="leaf-check__p">
+              {whyNot} Your Moon sign, birth star and rising sign appear here as soon as they can be worked out.
+            </p>
+          )}
+        </section>
 
         <div className="leaf-strip-wrap">
           <div className="engraved leaf-strip" role="status" aria-label="Resolved zone, offset, Julian Day and Lagna">
@@ -436,23 +468,21 @@ export default function LeafScreen() {
                 </span>
               </>
             ) : (
-              <span>
-                {resolved.err?.code === "TIME_AMBIGUOUS" || resolved.err?.code === "TIME_INVALID" ? "THE CLOCK NEEDS THE OFFSET DRUM" : "-"}
-              </span>
+              <span>{resolved.err?.code === "TIME_AMBIGUOUS" ? "THE CLOCK NEEDS THE OFFSET" : "WAITING FOR THE DETAILS"}</span>
             )}
           </div>
         </div>
 
-        {localStatus === "nonexistent" || resolved.err?.code === "TIME_INVALID" ? (
+        {localStatus === "nonexistent" || (resolved.err?.code === "TIME_INVALID" && !missing) ? (
           <p className="note-haldi" role="status">
             <span aria-hidden="true">⚑</span>
-            <span>This clock time did not exist here; the offset drum resolves it.</span>
+            <span>This clock time did not exist here (a clock change skipped it). Set the clock offset under Advanced.</span>
           </p>
         ) : null}
         {resolved.err?.code === "TIME_AMBIGUOUS" ? (
           <p className="note-haldi" role="status">
             <span aria-hidden="true">⚑</span>
-            <span>This clock time happened twice here. Set the offset drum to say which.</span>
+            <span>This clock time happened twice here. Set the clock offset under Advanced to say which.</span>
           </p>
         ) : null}
         {draft.override !== "none" ? (
@@ -461,71 +491,6 @@ export default function LeafScreen() {
             <span>A manual offset is in force; the tzdb is set aside and the colophon will say "(manual)".</span>
           </p>
         ) : null}
-
-        <details className="leaf-adv" open={draft.override !== "none"}>
-          <summary>Advanced: clock offset (rarely needed)</summary>
-          <div className="radio-row leaf-override" role="radiogroup" aria-label="Clock offset">
-            <span className="v">
-              Clock offset <InfoDot id="timezone" />
-              <span className="help">
-                {pre1955India
-                  ? "Before 1955 some Indian births used Bombay Time (+04:51). Leave on automatic unless you know the clock used."
-                  : "Worked out automatically from the time-zone database (tzdb). Leave it unless you know better."}
-              </span>
-            </span>
-            <span className="seg">
-              {(["none", "bombay", "manual"] as const).map((o) => (
-                <button key={o} type="button" role="radio" aria-checked={draft.override === o} onClick={() => set("override", o)}>
-                  {o === "none" ? "automatic" : o === "bombay" ? "Bombay +04:51" : "manual"}
-                </button>
-              ))}
-            </span>
-          </div>
-          {draft.override === "manual" ? (
-            <div className="leaf-override">
-              <div className="drums" role="group" aria-label="Manual UTC offset">
-                <BrassDrum
-                  label="Offset hours"
-                  short="± hh"
-                  min={-12}
-                  max={14}
-                  value={offSign * Math.floor(offAbs / 60)}
-                  format={(v) => `${v < 0 ? "−" : "+"}${String(Math.abs(v)).padStart(2, "0")}`}
-                  onChange={(v) => set("manualOffsetMin", (v < 0 ? -1 : 1) * (Math.abs(v) * 60 + (offAbs % 60)))}
-                />
-                <BrassDrum
-                  label="Offset minutes"
-                  short="mm"
-                  min={0}
-                  max={59}
-                  value={offAbs % 60}
-                  onChange={(m) => set("manualOffsetMin", offSign * (Math.floor(offAbs / 60) * 60 + m))}
-                />
-              </div>
-            </div>
-          ) : null}
-        </details>
-
-        <div className="toggle-row">
-          <span className="v">
-            Birth time unknown <InfoDot id="unknown-time" />
-            <span className="help">
-              We'll use noon. The Moon sign and almanac stay useful; the rising sign, houses and life-chapter dates won't be reliable, and
-              the chart will say so.
-            </span>
-          </span>
-          <button
-            type="button"
-            role="switch"
-            className="switch"
-            aria-checked={draft.timeUnknown}
-            aria-label="Birth time unknown"
-            onClick={() => {
-              set("timeUnknown", !draft.timeUnknown);
-              play("tick");
-            }}
-          />
-        </div>
 
         <div className="radio-row leaf-trad" role="radiogroup" aria-label="How do you read your chart?">
           <span className="v">
@@ -558,19 +523,75 @@ export default function LeafScreen() {
           </span>
         </div>
 
-        <div className="field" style={{ borderBottom: 0 }}>
-          <span className="k">
-            Ayanāṃśa <InfoDot id="ayanamsha" />
-          </span>
-          <span className="v" style={{ flex: 1, fontSize: "var(--text-sm)" }}>
-            Lahiri (
-            {settings.preset.ayanamsa === "se-true" ? "SE-true" : settings.preset.ayanamsa === "se-mean" ? "SE-mean" : "Drik-compatible"}) ·
-            node: {settings.preset.node}
-          </span>
-          <Link className="linkish" to="/drawer">
-            change
-          </Link>
-        </div>
+        <details className="leaf-adv" open={draft.override !== "none"}>
+          <summary>Advanced: clock offset and ayanāṃśa (rarely needed)</summary>
+          <div className="radio-row leaf-override" role="radiogroup" aria-label="Clock offset">
+            <span className="v">
+              Clock offset <InfoDot id="timezone" />
+              <span className="help">
+                {pre1955India
+                  ? "Before 1955 some Indian births used Bombay Time (+04:51). Leave on automatic unless you know the clock used."
+                  : "Worked out automatically from the time-zone database (tzdb). Leave it unless you know better."}
+              </span>
+            </span>
+            <span className="seg">
+              {(["none", "bombay", "manual"] as const).map((o) => (
+                <button key={o} type="button" role="radio" aria-checked={draft.override === o} onClick={() => set("override", o)}>
+                  {o === "none" ? "automatic" : o === "bombay" ? "Bombay +04:51" : "manual"}
+                </button>
+              ))}
+            </span>
+          </div>
+          {draft.override === "manual" ? (
+            <div className="leaf-override bf__fields leaf-offset" role="group" aria-label="Manual UTC offset">
+              <span className="bf__k">UTC offset</span>
+              <select
+                className="bf__select"
+                aria-label="Offset hours"
+                value={offSign * Math.floor(offAbs / 60)}
+                onChange={(e) => {
+                  const v = Number(e.target.value);
+                  set("manualOffsetMin", (v < 0 ? -1 : 1) * (Math.abs(v) * 60 + (offAbs % 60)));
+                }}
+              >
+                {Array.from({ length: 27 }, (_, i) => i - 12).map((v) => (
+                  <option key={v} value={v}>
+                    {v < 0 ? "−" : "+"}
+                    {String(Math.abs(v)).padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+              <span className="bf__colon" aria-hidden="true">
+                :
+              </span>
+              <select
+                className="bf__select"
+                aria-label="Offset minutes"
+                value={offAbs % 60}
+                onChange={(e) => set("manualOffsetMin", offSign * (Math.floor(offAbs / 60) * 60 + Number(e.target.value)))}
+              >
+                {Array.from({ length: 60 }, (_, i) => i).map((m) => (
+                  <option key={m} value={m}>
+                    {String(m).padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
+          <div className="field" style={{ borderBottom: 0 }}>
+            <span className="k">
+              Ayanāṃśa <InfoDot id="ayanamsha" />
+            </span>
+            <span className="v" style={{ flex: 1, fontSize: "var(--text-sm)" }}>
+              Lahiri (
+              {settings.preset.ayanamsa === "se-true" ? "SE-true" : settings.preset.ayanamsa === "se-mean" ? "SE-mean" : "Drik-compatible"})
+              · node: {settings.preset.node}
+            </span>
+            <Link className="linkish" to="/drawer">
+              change
+            </Link>
+          </div>
+        </details>
 
         <div className="sealbtn-wrap">
           <HoldStamp
@@ -581,7 +602,7 @@ export default function LeafScreen() {
             onFire={() => void seal()}
           />
           <p className="p p--muted" style={{ margin: 0 }}>
-            Hold for a breath. Nothing leaves this device.
+            {whyNot ? whyNot : "Hold for a breath. Nothing leaves this device."}
           </p>
           {!id ? (
             <div className="leaf-actions">

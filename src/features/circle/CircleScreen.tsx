@@ -7,6 +7,7 @@ import { Screen } from "../../components/ui/Screen";
 import { Sheet } from "../../components/ui/Sheet";
 import { RASHI_LORE } from "../../data/lore";
 import { burnProfile, saveSettings } from "../../data/repo";
+import { formatClock12 } from "../../engine/time";
 import type { Profile } from "../../engine/types";
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
@@ -23,7 +24,7 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 
 function birthLine(p: Profile): string {
   const b = p.birth;
-  const time = p.timeUnknown ? "time unknown" : `${String(b.localH).padStart(2, "0")}:${String(b.localMi).padStart(2, "0")}`;
+  const time = p.timeUnknown ? "time unknown" : formatClock12(b.localH, b.localMi);
   return `${b.localD} ${MONTHS[b.localMo - 1]} ${b.localY} · ${time} · ${b.place.name.split(",")[0]}`;
 }
 

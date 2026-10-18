@@ -3,10 +3,11 @@
 *Vyom (व्योम) means "the sky" in Sanskrit. Indian astrology under a live sky, explained in plain English, with the myths behind every star.*
 
 **Live:** https://rahultarigoppula.github.io/Simple-Astro/ · **Repo:** [Simple-Astro](https://github.com/RahulTarigoppula/Simple-Astro)
-**Status: v1.0.0 (2026-10-14).** Made by Rahul (RT): **252 hours of work and dedication** (18 weeks × 7 days × 2 hours a day) of planning, building, gathering and cleaning data, and checking every chart. What changed is in [CHANGELOG.md](CHANGELOG.md); what was measured is in [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
+**Status: v1.1.0 (2026-10-18).** Made by Rahul (RT): **252 hours of work and dedication** (18 weeks × 7 days × 2 hours a day) of planning, building, gathering and cleaning data, and checking every chart. What changed is in [CHANGELOG.md](CHANGELOG.md); what was measured is in [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
 
 ## Summary
 
+- **1.1.0:** Add a person is now impossible to get wrong by accident: day, month and year boxes, a **12-hour clock with am/pm** read back in words ("7:25 in the evening"), a **place that must be chosen** (nothing is assumed), and a **Check before you save** card showing the Moon sign, birth star and rising sign before anything is stored. Every birth time prints with am/pm.
 - **1.0.0:** **Your life, in simple words** on every chart (Moon sign, birth star, numbers, plus and minus points, love, work, your life chapter now), with the astrology behind **Full detail (astro tech)**. **Partner Compatibility** with a score out of 100, five plain bars and **Signs of marriage**. A plain Home: what Vyom can do, how to use it, how it was made, and your privacy. North Indian, Telugu or Tamil names per person. Always updates itself without touching saved data.
 - **0.5.0:** **Explore** is an interactive **Sky Wheel**, drag it, tap any planet, sign or star for its real stars, myth and meaning, or play it as a full-screen **story**; **Roots** opens with the maker's own prologue on why Vyom exists.
 - **0.4.0:** renamed to **Vyom**; **Forecasts** for the day, week, month, quarter and year (gochara from the Moon, Tārā/Candra-bala, daśā); **Explore**, the myths and meanings of the 9 grahas, 12 rāśis and 27 nakṣatras, numerology and the Chinese zodiac; a **cosmic profile** per person; **Coming up in the sky** with Moon phases, Ekādaśī, eclipses (visible here or not), sign changes and retrogrades; Navagraha medallions.

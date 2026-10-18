@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.0 (2026-10-18)
+
+### Birth details you cannot get wrong by accident
+Wrong stars and signs almost always came from the entry form, not the maths (the engine still matches Swiss Ephemeris on every golden chart). The brass drums with their 24-hour clock are gone from Add a person.
+
+- **Date of birth** is three plain boxes: day, month by name, year. An impossible day (31 February) is named, never silently clamped.
+- **Time of birth** is a 12-hour clock with **am / pm** chosen by hand, and a sentence that reads it back: "7:25 in the morning (07:25)" or "7:25 in the evening (19:25)".
+- **Place of birth** is never assumed. The form starts empty and cannot be saved until a real town is picked from the list; Bengaluru is no longer filled in for everyone.
+- **Check before you save**: the Moon sign, birth star (with pada) and rising sign appear as soon as the details are complete, in the person's own tradition's names, so a wrong am/pm, day or town is caught here and not on the chart.
+- Every birth time on the chart, the people list and the sky poster now prints the 12-hour way ("7:25 am"), with the 24-hour form beside it on the chart.
+- The manual clock offset under Advanced uses two plain selects instead of drums.
+- Settings shows version 1.1.0; 710 automated tests.
+
 ## 1.0.0 (2026-10-14)
 
 Vyom 1.0. **18 weeks × 7 days × 2 hours = 252 hours** of work and dedication by Rahul (RT): planning, building, gathering and cleaning data, and checking every chart.

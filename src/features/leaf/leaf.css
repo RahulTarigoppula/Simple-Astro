@@ -106,3 +106,198 @@
   font-size: var(--text-sm);
   font-weight: 600;
 }
+
+/* ── Plain-words birth fields ─────────────────────────────────────────── */
+.leaf-lede {
+  margin: 0;
+  padding: var(--space-2) var(--paper-margin) var(--space-3);
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+.bf {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-3) var(--paper-margin) var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+.bf__row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  min-height: 52px;
+}
+.bf__row.is-off {
+  opacity: 0.45;
+}
+.bf__k {
+  flex: none;
+  width: 7em;
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+}
+.bf__fields {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.bf__num,
+.bf__select {
+  min-height: 46px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: rgba(10, 14, 39, 0.55);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.bf__select {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  text-align: left;
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 28px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-muted) 50%), linear-gradient(135deg, var(--ink-muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 15px) 55%,
+    calc(100% - 10px) 55%;
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+}
+.bf__select--month {
+  min-width: 8.5em;
+}
+.bf__select option {
+  color: var(--ink);
+  background: var(--surface-solid);
+}
+.bf__num::placeholder {
+  color: var(--ink-faint);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+}
+.bf__num:focus,
+.bf__select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.28);
+}
+.bf__num:disabled,
+.bf__select:disabled {
+  opacity: 0.6;
+}
+.bf__colon {
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+}
+.bf__ampm button[disabled] {
+  opacity: 0.5;
+}
+.bf__read {
+  margin: 4px 0 6px;
+  padding-left: calc(7em + var(--space-3));
+  color: var(--ink);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+.bf__read b {
+  font-weight: 600;
+  color: var(--accent-text);
+}
+.bf__read.is-missing {
+  color: var(--warning-text);
+}
+.leaf-unknown .v {
+  flex: 1 1 14em;
+}
+.leaf-place.is-empty .chosen {
+  color: var(--warning-text);
+}
+.leaf-place__none {
+  font-size: var(--text-sm);
+}
+.leaf-offset {
+  padding: 4px var(--paper-margin) 12px;
+}
+.leaf-offset .bf__k {
+  width: auto;
+}
+
+/* "Check before you save": the three facts a family knows about a person */
+.leaf-check {
+  margin: var(--space-4) var(--paper-margin) 0;
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(245, 196, 107, 0.4);
+  background: radial-gradient(360px 140px at 0% 0%, rgba(245, 196, 107, 0.14), transparent 70%), rgba(14, 17, 46, 0.7);
+}
+.leaf-check.is-waiting {
+  border-color: var(--border);
+  background: rgba(14, 17, 46, 0.5);
+}
+.leaf-check__h {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--accent-2);
+}
+.leaf-check.is-waiting .leaf-check__h {
+  color: var(--ink-muted);
+}
+.leaf-check__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+.leaf-check__grid > div {
+  min-width: 0;
+}
+.leaf-check__grid dt {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+}
+.leaf-check__grid dd {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  line-height: 1.15;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+}
+.leaf-check__grid dd small {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--ink-muted);
+  margin-top: 2px;
+}
+.leaf-check__p {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+@media (max-width: 420px) {
+  .bf__k {
+    width: 100%;
+  }
+  .bf__read {
+    padding-left: 0;
+  }
+}

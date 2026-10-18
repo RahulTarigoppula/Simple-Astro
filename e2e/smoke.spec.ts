@@ -36,19 +36,23 @@ test("sealing casts the Patri with the golden numbers", async ({ page }) => {
   await expect(page.getByText(/Based on classical Jyotisha/)).toBeVisible();
 });
 
-test("brass drums are spinbuttons and refuse 31 February", async ({ page }) => {
+test("birth fields read the time back in plain words and refuse 31 February", async ({ page }) => {
   await page.goto("#/leaf/new");
+  // Nothing is assumed: the form starts empty and says what is missing.
+  await expect(page.getByTestId("birth-readback")).toContainText("Fill in the date of birth");
+  await expect(page.getByRole("button", { name: /hold to save/i })).toBeDisabled();
   await page.getByRole("button", { name: /fill in an example/i }).click();
-  const month = page.getByRole("spinbutton", { name: "Month" });
-  const day = page.getByRole("spinbutton", { name: "Day" });
-  await month.focus();
-  await page.keyboard.press("ArrowDown"); // March → February
-  await expect(month).toHaveAttribute("aria-valuenow", "2");
-  await day.focus();
-  await page.keyboard.press("End"); // ask for the 31st
-  await expect(day).toHaveAttribute("aria-valuenow", "14"); // refused, not clamped to 28
-  await page.keyboard.press("PageUp"); // 14 → 24 is a real date
-  await expect(day).toHaveAttribute("aria-valuenow", "24");
+  await expect(page.getByTestId("birth-readback")).toContainText("14 March 1994, 7:25 in the morning (07:25)");
+  // pm is a different sky: the check card changes with it.
+  await page.getByRole("radio", { name: "pm", exact: true }).click();
+  await expect(page.getByTestId("birth-readback")).toContainText("7:25 in the evening (19:25)");
+  await page.getByRole("radio", { name: "am", exact: true }).click();
+  await expect(page.locator(".leaf-check")).toContainText("Revatī");
+  // An impossible day is named, not clamped.
+  await page.getByRole("combobox", { name: "Month" }).selectOption("2");
+  await page.getByRole("textbox", { name: "Day" }).fill("31");
+  await expect(page.getByTestId("birth-readback")).toContainText("February 1994 has only 28 days");
+  await expect(page.getByRole("button", { name: /hold to save/i })).toBeDisabled();
 });
 
 test("a short press on the seal saves nothing", async ({ page }) => {

@@ -4,6 +4,7 @@
 import { NAKSHATRA_DEV, NAKSHATRA_NAMES, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
 import { signOf } from "../../engine/nakshatra";
 import { angasAt } from "../../engine/panchang";
+import { formatClock12 } from "../../engine/time";
 import type { AyanamsaPreset, Profile, SignIdx } from "../../engine/types";
 
 export interface LeafMoon {
@@ -44,10 +45,9 @@ export function leafMoon(p: Profile, ayanamsa: AyanamsaPreset): LeafMoon | null 
 }
 
 const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
-const two = (n: number): string => String(n).padStart(2, "0");
-
-/** "14 Mar 1994 · 07:25 · Bengaluru", as written on the leaf, in the birthplace's own clock. */
+/** "14 Mar 1994 · 7:25 am · Bengaluru", as written on the leaf, in the birthplace's own clock. */
 export function birthLine(p: Profile): string {
   const b = p.birth;
-  return `${b.localD} ${MON[b.localMo - 1] ?? ""} ${b.localY} · ${two(b.localH)}:${two(b.localMi)} · ${b.place.name}`;
+  const time = p.timeUnknown ? "time unknown" : formatClock12(b.localH, b.localMi);
+  return `${b.localD} ${MON[b.localMo - 1] ?? ""} ${b.localY} · ${time} · ${b.place.name}`;
 }

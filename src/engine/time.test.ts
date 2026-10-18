@@ -205,3 +205,22 @@ describe("TT", () => {
     expect(d2026).toBeLessThan(80);
   });
 });
+
+describe("the clock in plain words", () => {
+  it("prints 12-hour clock times with am/pm", async () => {
+    const { formatClock12, clockWords } = await import("./time");
+    expect(formatClock12(7, 25)).toBe("7:25 am");
+    expect(formatClock12(0, 5)).toBe("12:05 am");
+    expect(formatClock12(12, 0)).toBe("12:00 pm");
+    expect(formatClock12(19, 25)).toBe("7:25 pm");
+    expect(formatClock12(23, 59)).toBe("11:59 pm");
+  });
+  it("names the part of the day so 7 in the evening never passes as 7 in the morning", async () => {
+    const { clockWords } = await import("./time");
+    expect(clockWords(7, 25)).toBe("7:25 in the morning (07:25)");
+    expect(clockWords(19, 25)).toBe("7:25 in the evening (19:25)");
+    expect(clockWords(14, 0)).toBe("2:00 in the afternoon (14:00)");
+    expect(clockWords(0, 30)).toBe("12:30 at night (00:30)");
+    expect(clockWords(22, 10)).toBe("10:10 at night (22:10)");
+  });
+});

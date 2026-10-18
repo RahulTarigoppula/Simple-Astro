@@ -23,7 +23,7 @@ import {
 import { boundaryNote, PRESET_SHORT } from "../../engine/boundary";
 import { formatDms } from "../../engine/math";
 import { addVarga } from "../../engine/patri";
-import { formatOffset } from "../../engine/time";
+import { formatClock12, formatClock24, formatOffset } from "../../engine/time";
 import { type EnginePreset, type GrahaId, type Patri, PRESET_HASH, type VargaNumber, type YogaHit } from "../../engine/types";
 import { VARGA_NAMES } from "../../engine/vargas";
 import { haptics } from "../../platform/haptics";
@@ -286,7 +286,10 @@ export default function PatriScreen() {
               </h1>
               {b ? (
                 <p className="birthline">
-                  {b.localD} {MONTHS[b.localMo - 1]} {b.localY} · {String(b.localH).padStart(2, "0")}:{String(b.localMi).padStart(2, "0")}{" "}
+                  {b.localD} {MONTHS[b.localMo - 1]} {b.localY} ·{" "}
+                  {profile?.timeUnknown
+                    ? "time unknown (cast for noon)"
+                    : `${formatClock12(b.localH, b.localMi)} (${formatClock24(b.localH, b.localMi)})`}{" "}
                   local · {[b.place.name, b.place.admin1, b.place.country].filter(Boolean).join(", ")}
                 </p>
               ) : null}

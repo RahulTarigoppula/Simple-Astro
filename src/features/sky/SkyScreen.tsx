@@ -13,7 +13,7 @@ import { GRAHA_DEV, GRAHA_NAMES, NAKSHATRA_NAMES, NAKSHATRA_SHORT, SIGN_DEV, SIG
 import { formatDms } from "../../engine/math";
 import { type RooftopSky, rooftopSky } from "../../engine/sky/rooftop";
 import type { StarCatalog } from "../../engine/sky/stars";
-import { formatOffset } from "../../engine/time";
+import { formatClock12, formatOffset } from "../../engine/time";
 import type { AyanamsaPreset, BirthMoment } from "../../engine/types";
 import { haptics } from "../../platform/haptics";
 import { reducedMotion } from "../../platform/native";
@@ -221,7 +221,7 @@ export default function SkyScreen() {
     const st = stripText(at, birth);
     const L = at.lagna;
     const place = [birth.place.name, birth.place.admin1].filter(Boolean).join(", ");
-    const hm = `${String(birth.localH).padStart(2, "0")}:${String(birth.localMi).padStart(2, "0")}`;
+    const hm = formatClock12(birth.localH, birth.localMi);
     return {
       scene: buildScene(at, stars),
       filename: `vyom-sky-${

@@ -175,3 +175,34 @@ export function resolveBirthMoment(input: BirthInput): BirthMoment {
   if (input.offsetOverrideMin != null) out.offsetOverrideMin = input.offsetOverrideMin;
   return out;
 }
+
+// ─── the clock in plain words ───────────────────────────────────────────────
+// Birth times arrive as "7:25" from a family member who means the evening as often as the morning.
+// Every screen that prints a birth time prints it the 12-hour way, with am/pm, so a mistake is
+// visible at a glance; the 24-hour form sits beside it for the almanac-minded.
+
+/** "7:25 am", "12:00 pm", "12:05 am". */
+export function formatClock12(h: number, mi: number): string {
+  const hh = ((h % 12) + 12) % 12 || 12;
+  return `${hh}:${String(mi).padStart(2, "0")} ${h < 12 ? "am" : "pm"}`;
+}
+
+/** "07:25". */
+export function formatClock24(h: number, mi: number): string {
+  return `${String(h).padStart(2, "0")}:${String(mi).padStart(2, "0")}`;
+}
+
+/** The part of the day a 24-hour hour falls in, as people say it. */
+export function partOfDay(h: number): "at night" | "in the morning" | "in the afternoon" | "in the evening" {
+  if (h < 5) return "at night";
+  if (h < 12) return "in the morning";
+  if (h < 17) return "in the afternoon";
+  if (h < 21) return "in the evening";
+  return "at night";
+}
+
+/** "7:25 in the morning (07:25)", the sentence shown under a birth time before it is saved. */
+export function clockWords(h: number, mi: number): string {
+  const hh = ((h % 12) + 12) % 12 || 12;
+  return `${hh}:${String(mi).padStart(2, "0")} ${partOfDay(h)} (${formatClock24(h, mi)})`;
+}
