@@ -13,7 +13,7 @@ import { HoldStamp } from "../../components/ui/HoldStamp";
 import { Screen } from "../../components/ui/Screen";
 import { Sheet } from "../../components/ui/Sheet";
 import { TurmericBand } from "../../components/ui/TurmericBand";
-import { loadGazetteer, NetError, searchOnline, searchPlaces, unloadGazetteer } from "../../data/places";
+import { loadGazetteer, NetError, searchOnline, searchPlaces } from "../../data/places";
 import { saveSettings, upsertProfile } from "../../data/repo";
 import { SIGN_ENGRAVED, SIGN_MARK, SIGN_WESTERN } from "../../data/tables/names";
 import { ayanamsa } from "../../engine/ayanamsa";
@@ -28,7 +28,7 @@ import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
 import { toast } from "../../state/ui";
 import { ParapetSky } from "../chowki/ParapetSky";
-import { BirthFields, missingText } from "./BirthFields";
+import { BirthFields, fieldsOfHour, hourOf, missingText } from "./BirthFields";
 import "./leaf.css";
 import { nakBoth, rashiBoth, TRADITION_LABEL, type Tradition } from "../../data/regional";
 import { countEvent } from "../../platform/stats";
@@ -42,7 +42,8 @@ interface Draft {
   y: number; // 0 = unset
   mo: number; // 0 = unset
   d: number; // 0 = unset
-  h: number; // -1 = unset
+  hour12: number; // 0 = unset
+  ampm: "am" | "pm" | null; // never assumed
   mi: number;
   place: Place | null;
   override: "none" | "bombay" | "manual";
@@ -60,11 +61,11 @@ function draftFromProfile(p: Profile): Draft {
     y: b.localY,
     mo: b.localMo,
     d: b.localD,
-    h: b.localH,
-    mi: b.localMi,
+    ...(p.timeUnknown ? { hour12: 0, ampm: null } : fieldsOfHour(b.localH)),
+    mi: p.timeUnknown ? 0 : b.localMi,
     place: b.place,
     override,
-    manualOffsetMin: b.offsetOverrideMin ?? b.offsetMin,
+    manualOffsetMin: Math.round(b.offsetOverrideMin ?? b.offsetMin),
     handedness: p.handedness,
     timeUnknown: p.timeUnknown === true,
     tradition: p.tradition ?? "north",
@@ -78,7 +79,8 @@ function freshDraft(): Draft {
     y: 0,
     mo: 0,
     d: 0,
-    h: -1,
+    hour12: 0,
+    ampm: null,
     mi: 0,
     place: null,
     override: "none",
@@ -124,7 +126,7 @@ export default function LeafScreen() {
     return () => {
       live = false;
       abort.current?.abort();
-      unloadGazetteer(); // the decoded index is ~13 MB; release it when the editor closes
+      // The decoded index stays resident: rebuilding it on every visit took seconds on a phone.
     };
   }, []);
 
@@ -140,9 +142,9 @@ export default function LeafScreen() {
   const offsetOverrideMin = draft.override === "bombay" ? BOMBAY_TIME : draft.override === "manual" ? draft.manualOffsetMin : undefined;
 
   // With the clock time unknown the chart is cast for 12:00 local.
-  const effH = draft.timeUnknown ? 12 : draft.h;
+  const effH = draft.timeUnknown ? 12 : hourOf(draft);
   const effMi = draft.timeUnknown ? 0 : draft.mi;
-  const missing = missingText({ y: draft.y, mo: draft.mo, d: draft.d, h: draft.h, mi: draft.mi }, draft.timeUnknown);
+  const missing = missingText(draft, draft.timeUnknown);
 
   // Resolve the written moment: the engraved strip is the contract with reality.
   const resolved = useMemo((): { m: BirthMoment | null; err: EngineError | null } => {
@@ -165,7 +167,8 @@ export default function LeafScreen() {
   }, [missing, draft.y, draft.mo, draft.d, effH, effMi, draft.place, offsetOverrideMin]);
 
   const skyPlace = draft.place ?? SKY_FALLBACK;
-  const skyMs = resolved.m?.utcMs ?? Date.now();
+  const [openedAt] = useState(() => Date.now());
+  const skyMs = resolved.m?.utcMs ?? openedAt;
 
   // The check card: Moon sign, birth star and rising sign for the moment as written.
   const check = useMemo(() => {
@@ -201,12 +204,15 @@ export default function LeafScreen() {
     return checkLocalTime(draft.y, draft.mo, draft.d, effH, effMi, resolved.m.zone);
   }, [offsetOverrideMin, resolved.m, draft.y, draft.mo, draft.d, effH, effMi]);
 
+  const saving = useRef(false);
   const seal = async () => {
     if (!resolved.m) {
       play("dull");
       toast(resolved.err ? resolved.err.detail : "These birth details cannot be saved yet.", "danger");
       return;
     }
+    if (saving.current) return;
+    saving.current = true;
     const now = Date.now();
     const name = draft.name.trim() || "Unnamed";
     const profile: Profile = {
@@ -221,7 +227,7 @@ export default function LeafScreen() {
     };
     try {
       await upsertProfile(profile, now);
-      await saveSettings({ activeProfileId: profile.id });
+      await saveSettings({ activeProfileId: profile.id }).catch(() => undefined); // the person is saved either way
       play("thunk");
       haptics.impact("medium");
       toast(`Saved ${name}. Their birth chart is ready.`);
@@ -229,6 +235,8 @@ export default function LeafScreen() {
       navigate(`/patri/${profile.id}`);
     } catch (e) {
       toast(`Could not save: ${e instanceof Error ? e.message : String(e)}`, "danger");
+    } finally {
+      saving.current = false;
     }
   };
 
@@ -313,7 +321,8 @@ export default function LeafScreen() {
           y={draft.y}
           mo={draft.mo}
           d={draft.d}
-          h={draft.h}
+          hour12={draft.hour12}
+          ampm={draft.ampm}
           mi={draft.mi}
           timeUnknown={draft.timeUnknown}
           onChange={(p) => patch(p)}
@@ -387,7 +396,7 @@ export default function LeafScreen() {
               {gazReady ? "Not in the built-in list." : "Loading places…"}
             </span>
             <button type="button" className="online-stamp" disabled={online === "busy"} onClick={() => void goOnline()}>
-              {online === "busy" ? "asking the wire…" : "search online ⌑"}
+              {online === "busy" ? "searching…" : "Search online"}
             </button>
             <button type="button" className="linkish" onClick={() => setManual((m) => !m)}>
               type coordinates
@@ -446,7 +455,7 @@ export default function LeafScreen() {
         </section>
 
         <div className="leaf-strip-wrap">
-          <div className="engraved leaf-strip" role="status" aria-label="Resolved zone, offset, Julian Day and Lagna">
+          <div className="engraved leaf-strip" role="status" aria-label="Time zone, clock offset, Julian Day and rising sign, worked out">
             {strip ? (
               <>
                 <b>{strip.zone.toUpperCase()}</b>
@@ -476,19 +485,21 @@ export default function LeafScreen() {
         {localStatus === "nonexistent" || (resolved.err?.code === "TIME_INVALID" && !missing) ? (
           <p className="note-haldi" role="status">
             <span aria-hidden="true">⚑</span>
-            <span>This clock time did not exist here (a clock change skipped it). Set the clock offset under Advanced.</span>
+            <span>
+              This clock time did not exist here (a clock change skipped it). Open "Advanced: clock offset" below and choose Manual.
+            </span>
           </p>
         ) : null}
         {resolved.err?.code === "TIME_AMBIGUOUS" ? (
           <p className="note-haldi" role="status">
             <span aria-hidden="true">⚑</span>
-            <span>This clock time happened twice here. Set the clock offset under Advanced to say which.</span>
+            <span>This clock time happened twice here. Open "Advanced: clock offset" below, choose Manual and say which.</span>
           </p>
         ) : null}
         {draft.override !== "none" ? (
           <p className="note-haldi">
             <span aria-hidden="true">⚑</span>
-            <span>A manual offset is in force; the tzdb is set aside and the colophon will say "(manual)".</span>
+            <span>You set the clock offset by hand. The chart will show "(manual)" next to the time zone.</span>
           </p>
         ) : null}
 
@@ -517,7 +528,7 @@ export default function LeafScreen() {
           <span className="seg">
             {(["right", "left"] as const).map((h) => (
               <button key={h} type="button" role="radio" aria-checked={draft.handedness === h} onClick={() => set("handedness", h)}>
-                {h}
+                {h === "right" ? "Right" : "Left"}
               </button>
             ))}
           </span>
@@ -537,7 +548,7 @@ export default function LeafScreen() {
             <span className="seg">
               {(["none", "bombay", "manual"] as const).map((o) => (
                 <button key={o} type="button" role="radio" aria-checked={draft.override === o} onClick={() => set("override", o)}>
-                  {o === "none" ? "automatic" : o === "bombay" ? "Bombay +04:51" : "manual"}
+                  {o === "none" ? "Automatic" : o === "bombay" ? "Bombay +04:51" : "Manual"}
                 </button>
               ))}
             </span>
@@ -659,15 +670,15 @@ function ManualPlace({ initial, onSet }: { initial: Place; onSet: (p: Place) => 
   return (
     <div className="leaf-manual" role="group" aria-label="Manual coordinates">
       <label>
-        name
+        Place name
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="village" style={{ fontFamily: "var(--font-body)" }} />
       </label>
       <label>
-        lat °N
+        Latitude (°N)
         <input inputMode="decimal" value={lat} onChange={(e) => setLat(e.target.value)} />
       </label>
       <label>
-        lon °E
+        Longitude (°E)
         <input inputMode="decimal" value={lon} onChange={(e) => setLon(e.target.value)} />
       </label>
       <button
@@ -678,7 +689,7 @@ function ManualPlace({ initial, onSet }: { initial: Place; onSet: (p: Place) => 
           onSet({ name: name.trim() || `${la.toFixed(2)}, ${lo.toFixed(2)}`, country: "", lat: la, lon: lo, source: "manual" })
         }
       >
-        use these
+        Use this place
       </button>
     </div>
   );

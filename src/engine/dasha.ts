@@ -82,15 +82,34 @@ export interface CurrentDasha {
   pd: DashaNode;
 }
 
-/** The running MD/AD/PD at an instant (half-open: a boundary instant belongs to the later one). */
+const shift = (n: DashaNode, by: number): DashaNode => ({
+  ...n,
+  startMs: n.startMs + by,
+  endMs: n.endMs + by,
+  ...(n.children ? { children: n.children.map((c) => shift(c, by)) } : {}),
+});
+
+/**
+ * The running MD/AD/PD at an instant (half-open: a boundary instant belongs to the later one).
+ * The tree holds one 120-year cycle from the nominal start of the birth daśā, which ends before
+ * the 120th birthday by the balance already spent; past its end the same cycle repeats, so the
+ * lookup wraps and returns nodes shifted into the cycle that contains `atMs`.
+ */
 export function currentDasha(tree: readonly DashaNode[], atMs: number): CurrentDasha | null {
-  const md = containing(tree, atMs);
-  if (!md) return null;
-  const ad = containing(md.children, atMs);
-  if (!ad) return null;
-  const pd = containing(pratyantars(md, ad, 365.25), atMs);
-  if (!pd) return null;
-  return { md, ad, pd };
+  const first = tree[0];
+  const last = tree[tree.length - 1];
+  if (!first || !last) return null;
+  const cycle = last.endMs - first.startMs;
+  let by = 0;
+  if (cycle > 0 && atMs >= last.endMs) by = Math.floor((atMs - first.startMs) / cycle) * cycle;
+  const at = atMs - by;
+  const md0 = containing(tree, at);
+  if (!md0) return null;
+  const ad0 = containing(md0.children, at);
+  if (!ad0) return null;
+  const pd0 = containing(pratyantars(md0, ad0, 365.25), at);
+  if (!pd0) return null;
+  return by ? { md: shift(md0, by), ad: shift(ad0, by), pd: shift(pd0, by) } : { md: md0, ad: ad0, pd: pd0 };
 }
 
 /** Years in an interval under a daśā-year convention. */

@@ -118,7 +118,12 @@ describe("invariants (VD-1…VD-5)", () => {
     expect(cur?.ad.lord).toBe(md1.lord);
     expect(cur?.pd.lord).toBe(md1.lord);
     expect(currentDasha(tree, md1.startMs - 1)?.md.lord).toBe((tree[0] as DashaNode).lord);
-    expect(currentDasha(tree, (tree[8] as DashaNode).endMs)).toBeNull();
+    // Past the tree the cycle repeats: the instant that ends the 9th mahādaśā opens the 1st again,
+    // 120 years later, with every node shifted by the whole cycle.
+    const wrapped = currentDasha(tree, (tree[8] as DashaNode).endMs);
+    expect(wrapped?.md.lord).toBe((tree[0] as DashaNode).lord);
+    expect(wrapped?.md.startMs).toBe((tree[8] as DashaNode).endMs);
+    expect((wrapped?.md.endMs ?? 0) - (wrapped?.md.startMs ?? 0)).toBe((tree[0] as DashaNode).endMs - (tree[0] as DashaNode).startMs);
     expect(currentDasha(tree, (tree[0] as DashaNode).startMs - 1)).toBeNull();
   });
 

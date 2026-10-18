@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { sealReferenceLeaf } from "./helpers";
 
 test("no serious or critical axe violations on the main screens", async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000); // fifteen screens, each scanned by axe; slow runners need the room
   const id = await sealReferenceLeaf(page);
   const routes = [
     "#/",

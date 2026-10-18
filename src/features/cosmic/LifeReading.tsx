@@ -10,6 +10,7 @@ import { currentDasha } from "../../engine/dasha";
 import { birthNumbers } from "../../engine/profile";
 import type { GrahaId, Patri, Profile } from "../../engine/types";
 import "./cosmic.css";
+import { safeZone } from "../../engine/time";
 
 const DAYS: Array<[string, GrahaId]> = [
   ["Sunday", "SU"],
@@ -31,7 +32,7 @@ const ordinal = (n: number) => {
   return `${n}${s}`;
 };
 const monthYear = (ms: number, zone: string) =>
-  new Date(ms).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: zone });
+  new Date(ms).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: safeZone(zone) });
 
 function uniq(xs: string[], n: number): string[] {
   const seen = new Set<string>();

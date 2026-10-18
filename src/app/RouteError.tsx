@@ -31,9 +31,16 @@ export function RouteError() {
         </div>
         <p className="p" role="alert">
           {offlineChunk
-            ? "This screen has not been downloaded yet. Open it once with a connection, or use Settings → Prepare for offline."
+            ? "This screen could not be loaded. If you are online, a newer version is probably waiting: reload. If you are offline, open it once with a connection, or use Settings, Prepare for offline."
             : `Reason: ${reason}.`}
         </p>
+        {offlineChunk ? (
+          <p className="p">
+            <button type="button" className="stamp" onClick={() => window.location.reload()}>
+              <span>Reload</span>
+            </button>
+          </p>
+        ) : null}
         <p className="p">
           <Link className="linkish" to="/">
             Back home

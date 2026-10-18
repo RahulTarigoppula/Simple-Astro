@@ -383,7 +383,11 @@ export async function wipeEverything(): Promise<void> {
   });
   clearPatriCache();
   try {
+    // Every flag of ours goes, except the opt-out from anonymous counting: wiping the device must
+    // never switch counting back on.
+    const keepOff = localStorage.getItem("vyom-stats-off");
     for (const k of Object.keys(localStorage)) if (/^(vyom|chowki)/.test(k)) localStorage.removeItem(k);
+    if (keepOff != null) localStorage.setItem("vyom-stats-off", keepOff);
     sessionStorage.clear();
   } catch {
     // storage may be unavailable; the database is already empty

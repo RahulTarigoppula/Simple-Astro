@@ -6,9 +6,10 @@ import { GRAHA_LORE } from "../../data/lore";
 import { type DayRating, HOUSE_AREA, ord } from "../../engine/forecast";
 import type { AreaReading, DayGuide, PersonalReading } from "../../engine/personal";
 import "./personal.css";
+import { safeZone } from "../../engine/time";
 
 const fmt = (ms: number, zone: string, o: Intl.DateTimeFormatOptions) =>
-  new Intl.DateTimeFormat("en-GB", { ...o, timeZone: zone }).format(ms);
+  new Intl.DateTimeFormat("en-GB", { ...o, timeZone: safeZone(zone) }).format(ms);
 const hm = (ms: number, zone: string) => fmt(ms, zone, { hour: "2-digit", minute: "2-digit", hour12: false });
 const toneOf = (s: number) => (s >= 0.35 ? "bright" : s >= 0 ? "steady" : s >= -0.35 ? "mixed" : "testing");
 const WORD = { bright: "Strong", steady: "Good", mixed: "Mixed", testing: "Go gently" } as const;

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { GRAHA_DEV, GRAHA_NAMES } from "../../data/tables/names";
 import { intervalYears, pratyantars } from "../../engine/dasha";
+import { safeZone } from "../../engine/time";
 import type { DashaNode } from "../../engine/types";
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
@@ -10,11 +11,16 @@ import { play } from "../../platform/sound";
 const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 function fmtDate(ms: number, zone: string): string {
-  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: zone, year: "numeric", month: "numeric", day: "numeric" }).formatToParts(ms);
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: safeZone(zone),
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).formatToParts(ms);
   const get = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0);
   return `${get("day")} ${MON[get("month") - 1] ?? ""} ${get("year")}`;
 }
-const yearOf = (ms: number, zone: string) => new Intl.DateTimeFormat("en-GB", { timeZone: zone, year: "numeric" }).format(ms);
+const yearOf = (ms: number, zone: string) => new Intl.DateTimeFormat("en-GB", { timeZone: safeZone(zone), year: "numeric" }).format(ms);
 
 interface DashaRibbonProps {
   tree: DashaNode[];

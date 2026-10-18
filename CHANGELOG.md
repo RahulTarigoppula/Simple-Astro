@@ -6,6 +6,26 @@
 - Vyom alone was shared by too many apps. Vyomaphala is Sanskrit for "the fruit of the sky": vyoma, the heavens, and phala, what they yield, the same phala as in phalita jyotiṣa, the predictive branch of Indian astrology. The compound follows karmaphala, "the fruit of action", a word everyone knows.
 - The name and its meaning appear in the intro, the Guide, About and the README. Internal storage keys are unchanged, so nothing saved is lost.
 
+### Add a person, reviewed again
+- **am or pm is never assumed.** Picking an hour no longer selects "am" by itself; the form says "Was it am or pm? Tap one." until one is tapped.
+- Editing a person whose time of birth is unknown no longer pre-fills noon as a real time.
+- Plainer words everywhere on the form: "Search online", "Automatic / Manual", "Place name, Latitude, Longitude", and the clock-change notes say where the Advanced switch is.
+- One hold saves one person, even if the seal is held twice.
+
+### Fixes found in review
+- **Weekday from the civil calendar.** Vāra, and with it Rāhu Kāla, Yamagaṇḍa, Guḷika and the horā, now follow the time zone of the place; a few islands (Samoa, Kiribati, Tonga) keep a calendar a day ahead of their longitude.
+- **A daśā always runs.** After the first 120-year cycle the lookup wraps into the next, so a centenarian's chart still shows a life chapter.
+- Forecast periods in zones with daylight saving start and end at local midnight on both sides of a clock change.
+- Kaṇṭaka Śani means Saturn in the 4th from the Moon everywhere (the forecast used to also call the 7th and 10th by that name).
+- The app never reloads itself for an update while a person is being added or edited; it waits for the next screen.
+- A stale screen after a new release offers a Reload button instead of claiming it was never downloaded.
+- "Prepare for offline" now also fetches the 3-D sky dome, OpenCV and the second MediaPipe build, so the Sky and Palm screens truly work offline.
+- "Delete everything" no longer switches anonymous counting back on for someone who had turned it off.
+- The place index stays loaded between visits (it took seconds to rebuild on a phone).
+- "Last backed up" is stamped only after the file was really saved.
+- Dates still print on an older device that does not know a newer time-zone name.
+- The birth chart is called "Birth chart" beside Janam Patri; the People menu says "Partner Compatibility with…"; the clock on Home is 12-hour; the Nāḍī line talks about family, not health; today's star shows its English word; buttons meet the 44 px touch size.
+
 ## 1.1.0 (2026-10-18)
 
 ### Birth details you cannot get wrong by accident

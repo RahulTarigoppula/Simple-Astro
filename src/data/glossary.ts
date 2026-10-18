@@ -444,7 +444,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     id: "nadi",
     term: "Nāḍī (8 points)",
     dev: "नाड़ी",
-    plain: "health / genes",
+    plain: "the heaviest match factor",
     short: "Each nakṣatra is one of three Nāḍīs; the same Nāḍī for both gives 0 out of 8.",
     long: 'The heaviest factor. Tradition links it to health of children; some modern readers loosely compare it to genetic diversity, but there\'s no scientific evidence for that. "Nāḍī doṣa" (same Nāḍī) also has classical exceptions.',
     group: "match",

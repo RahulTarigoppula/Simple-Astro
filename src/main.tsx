@@ -24,19 +24,28 @@ if (!isNative()) {
       },
     });
     // The very first install also fires controllerchange (clientsClaim); only a real update should reload.
-    // If someone is typing, wait for the next screen change so a half-filled form is never lost.
-    const hadController = !!navigator.serviceWorker?.controller;
+    // Never reload while a person is being added or edited, or while someone is typing: wait for the
+    // next screen change and check again, so a half-filled form is never lost.
+    let sawController = !!navigator.serviceWorker?.controller;
     let reloaded = false;
+    const busy = () =>
+      /^#\/leaf\//.test(window.location.hash) || !!document.activeElement?.matches("input, textarea, select, [contenteditable]");
     const reload = () => {
       if (reloaded) return;
+      if (busy()) {
+        window.addEventListener("hashchange", reload, { once: true });
+        document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && reload(), { once: true });
+        return;
+      }
       reloaded = true;
       window.location.reload();
     };
     navigator.serviceWorker?.addEventListener("controllerchange", () => {
-      if (!hadController) return;
-      const typing = document.activeElement?.matches("input, textarea, select, [contenteditable]");
-      if (typing) window.addEventListener("hashchange", reload, { once: true });
-      else reload();
+      if (!sawController) {
+        sawController = true; // the first install taking control; nothing to replace yet
+        return;
+      }
+      reload();
     });
   });
 } else {

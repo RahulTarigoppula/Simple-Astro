@@ -41,7 +41,7 @@ const SIGN_LABEL: Record<BondId, string> = {
   companionship: "An easy everyday life together",
   trust: "Trust that grows",
   closeness: "Natural closeness",
-  family: "No worry for health and children",
+  family: "No flag for family life",
 };
 
 const GROUPS: Record<BondId, { label: string; kootas: KootaId[]; from: string }> = {
@@ -49,7 +49,7 @@ const GROUPS: Record<BondId, { label: string; kootas: KootaId[]; from: string }>
   companionship: { label: "Companionship", kootas: ["gana"], from: "Gaṇa" },
   trust: { label: "Trust", kootas: ["bhakoot", "tara"], from: "Bhakūṭa and Tārā" },
   closeness: { label: "Closeness", kootas: ["yoni", "vashya"], from: "Yoni and Vaśya" },
-  family: { label: "Family and health", kootas: ["nadi"], from: "Nāḍī" },
+  family: { label: "Family", kootas: ["nadi"], from: "Nāḍī" },
 };
 
 const LINES: Record<BondId, Record<BondLevel, string>> = {
@@ -78,10 +78,10 @@ const LINES: Record<BondId, Record<BondLevel, string>> = {
     weak: "Physical and emotional closeness needs effort from both sides.",
   },
   family: {
-    strong: "Tradition sees no worry here for health and children.",
-    good: "Tradition sees no worry here for health and children.",
-    mixed: "Tradition flags this for health and children. Many families check further.",
-    weak: "Tradition flags this for health and children (Nāḍī doṣa). Many families check further, and some rules cancel it.",
+    strong: "Tradition raises no flag here.",
+    good: "Tradition raises no flag here.",
+    mixed: "Tradition raises a flag here. It is an old rule, not a prediction; many families check further.",
+    weak: "Tradition raises a flag here (Nāḍī doṣa). It is an old rule, not a prediction, and some rules cancel it.",
   },
 };
 
@@ -90,7 +90,7 @@ const TIPS: Record<BondId, string> = {
   companionship: "Learn how each of you cools down after a fight, and give that space without taking it personally.",
   trust: "Keep small promises and share plans early. Trust is built in little things.",
   closeness: "Make time for each other: small affection every day matters more than grand gestures.",
-  family: "Talk openly about family plans and health. Many astrologers also look at the full charts before deciding.",
+  family: "Talk openly about family plans. Many astrologers also look at the full charts before deciding.",
 };
 
 const levelOf = (pct: number): BondLevel => (pct >= 75 ? "strong" : pct >= 50 ? "good" : pct >= 25 ? "mixed" : "weak");

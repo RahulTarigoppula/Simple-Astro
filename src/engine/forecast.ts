@@ -2,6 +2,7 @@
 // from the natal Moon, Phaladīpikā ch. 26), Tārā-bala and Candra-bala for days, and the running
 // Viṃśottarī periods. Every line says which graha, which house and whether tradition calls it
 // favourable; nothing here is invented beyond that table.
+import { DateTime } from "luxon";
 import { currentDasha } from "./dasha";
 import { type SkyEvent, skyEvents } from "./events";
 import { chandraBala, GOCHAR_FAVOURABLE, moonTransitAt, sadeSati, taraBala, transitsAt } from "./gochar";
@@ -162,8 +163,14 @@ export function periodBounds(period: Period, atMs: number, zone: string): [numbe
   const y = Number(p.year);
   const mo = Number(p.month);
   const d = Number(p.day);
-  const offset = zoneOffsetMs(atMs, zone);
-  const at = (Y: number, M: number, D: number) => Date.UTC(Y, M - 1, D) - offset;
+  // Each boundary is resolved at its own instant in the zone (never with the offset at `atMs`),
+  // so a period that straddles a clock change still starts and ends at local midnight.
+  const at = (Y: number, M: number, D: number): number => {
+    const dt = DateTime.fromObject({ year: Y, month: 1, day: 1 }, { zone })
+      .plus({ months: M - 1, days: D - 1 })
+      .startOf("day");
+    return dt.isValid ? dt.toMillis() : Date.UTC(Y, M - 1, D) - zoneOffsetMs(atMs, zone);
+  };
   switch (period) {
     case "day":
       return [at(y, mo, d), at(y, mo, d + 1)];
@@ -275,7 +282,12 @@ export function forecast(
     steps = [r];
     score = r.score;
   } else if (period === "week" || period === "month") {
-    for (let ms = startMs; ms < endMs - DAY / 2; ms += DAY) steps.push(rateDay(patri, ms, preset));
+    // Walk civil days (a clock change makes one of them 23 or 25 hours).
+    for (let ms = startMs; ms < endMs - DAY / 2; ) {
+      steps.push(rateDay(patri, ms, preset));
+      const next = DateTime.fromMillis(ms, { zone }).plus({ days: 1 }).startOf("day");
+      ms = next.isValid ? next.toMillis() : ms + DAY;
+    }
     const slow = scoreAt(patri, mid, preset, period).score;
     score = 0.5 * slow + 0.5 * (steps.reduce((s, r) => s + r.score, 0) / Math.max(1, steps.length));
   } else {
@@ -292,17 +304,7 @@ export function forecast(
   // Sāḍe Sātī / Kaṇṭaka / Aṣṭama Śani at the period's middle.
   const sh = houses.SA;
   const sadeSatiState: Forecast["sadeSati"] =
-    sh === 12
-      ? "rising"
-      : sh === 1
-        ? "peak"
-        : sh === 2
-          ? "setting"
-          : sh === 4 || sh === 7 || sh === 10
-            ? "kantaka"
-            : sh === 8
-              ? "ashtama"
-              : "none";
+    sh === 12 ? "rising" : sh === 1 ? "peak" : sh === 2 ? "setting" : sh === 4 ? "kantaka" : sh === 8 ? "ashtama" : "none";
   void sadeSati; // the full ribbon lives on the patri; here we only need the phase
 
   const evDays = Math.min(366, Math.ceil((endMs - startMs) / DAY));

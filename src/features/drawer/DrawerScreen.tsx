@@ -9,7 +9,7 @@ import { TurmericBand } from "../../components/ui/TurmericBand";
 import attribution from "../../data/attribution.json";
 import { envelopeFileName, exportEnvelope, ImportError, importEnvelope } from "../../data/crypto";
 import { db } from "../../data/db";
-import { clearPatriCache, type StorageEstimateInfo, saveSettings, storageEstimate, wipeEverything } from "../../data/repo";
+import { clearPatriCache, type StorageEstimateInfo, saveSettings, setMeta, storageEstimate, wipeEverything } from "../../data/repo";
 import { AYANAMSA_PRESETS, ayanamsa } from "../../engine/ayanamsa";
 import { formatDms } from "../../engine/math";
 import { jdTtFromUtcMs } from "../../engine/time";
@@ -249,11 +249,14 @@ export default function DrawerScreen() {
   const jdTt = useMemo(() => jdTtFromUtcMs(active?.birth.utcMs ?? Date.now()), [active]);
   const setPreset = (patch: Partial<EnginePreset>) => {
     clearPatriCache();
-    void saveSettings({ preset: { ...settings.preset, ...patch } }).then(() =>
-      toast("Presets changed. Every saved chart now shows a “recompute” tag.", "warn"),
-    );
+    saveSettings({ preset: { ...settings.preset, ...patch } })
+      .then(() => toast("Settings changed. Open a chart and hold the red seal to work it out again.", "warn"))
+      .catch((e: unknown) => toast(`Could not save the setting: ${e instanceof Error ? e.message : String(e)}`, "danger"));
   };
-  const set = (patch: Partial<Settings>) => void saveSettings(patch);
+  const set = (patch: Partial<Settings>) =>
+    void saveSettings(patch).catch((e: unknown) =>
+      toast(`Could not save the setting: ${e instanceof Error ? e.message : String(e)}`, "danger"),
+    );
 
   const doExport = async () => {
     if (pass.length < 6 || pass !== pass2) return;
@@ -261,6 +264,7 @@ export default function DrawerScreen() {
     try {
       const blob = await exportEnvelope(pass);
       await saveFile(blob, envelopeFileName(), "Vyomaphala encrypted backup");
+      await setMeta("lastExportAt", Date.now());
       play("thunk");
       toast("Encrypted backup saved (AES-GCM). Keep the passphrase safe. It cannot be recovered.");
       setMode("none");
@@ -304,6 +308,8 @@ export default function DrawerScreen() {
       `${base}models/hand_landmarker.task`,
       `${base}mediapipe/vision_wasm_internal.wasm`,
       `${base}mediapipe/vision_wasm_internal.js`,
+      `${base}mediapipe/vision_wasm_nosimd_internal.wasm`,
+      `${base}mediapipe/vision_wasm_nosimd_internal.js`,
     ];
     let bytes = 0;
     setWarm("warming…");
@@ -313,8 +319,12 @@ export default function DrawerScreen() {
         if (r.ok) bytes += (await r.arrayBuffer()).byteLength;
         setWarm(`${(bytes / 1e6).toFixed(1)} MB downloaded…`);
       }
-      // The lazy screens themselves: importing them puts their chunks in the runtime cache.
-      await Promise.allSettled(Object.values(HEAVY_SCREENS).map((load) => load()));
+      // The lazy screens themselves, and the two big modules they load only when used (the 3-D sky
+      // dome and OpenCV): importing them puts their chunks in the runtime cache.
+      // OpenCV is loaded by the palm worker, off the main thread; the worker's own fetch lands it in the cache.
+      await Promise.allSettled([...Object.values(HEAVY_SCREENS).map((load) => load()), import("../sky/SkyDome")]);
+      const { warmPalmWorker } = await import("../hast/palmClient");
+      warmPalmWorker();
       setWarm(`Ready offline: ${(bytes / 1e6).toFixed(1)} MB of models cached.`);
     } catch {
       setWarm("No connection. Try again when you are online.");

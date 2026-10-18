@@ -128,7 +128,7 @@
   padding: 0 16px 14px 82px;
 }
 .person__chip {
-  min-height: 34px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   padding: 0 14px;
@@ -144,8 +144,8 @@
 }
 .person__more {
   margin-left: auto;
-  width: 40px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-full);
   border: 1px solid var(--glass-edge);
   background: transparent;

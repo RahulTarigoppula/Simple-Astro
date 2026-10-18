@@ -1,6 +1,7 @@
-// The ⋯ sheet for one leaf: open, edit, Milan with…, palm, the wax envelope, and Burn (hold).
+// The ⋯ sheet for one leaf: open, edit, Partner Compatibility with…, palm, the wax envelope, and Burn (hold).
 import { useState } from "react";
 import { envelopeFileName, exportEnvelope } from "../../data/crypto";
+import { setMeta } from "../../data/repo";
 import type { Profile } from "../../engine/types";
 import { saveFile } from "../../platform/files";
 import { play } from "../../platform/sound";
@@ -54,7 +55,7 @@ export function LeafSheet(props: LeafSheetProps) {
         <ul className="leafsheet__list">
           <li>
             <button type="button" className="leafsheet__row" onClick={props.onOpen}>
-              Open the Janam Patri
+              Open the birth chart
             </button>
           </li>
           <li>
@@ -64,7 +65,7 @@ export function LeafSheet(props: LeafSheetProps) {
           </li>
           <li>
             <button type="button" className="leafsheet__row" onClick={() => props.setMode("milan")}>
-              Milan with…
+              Partner Compatibility with…
             </button>
           </li>
           <li>
@@ -145,6 +146,7 @@ function ExportForm({ onDone, onBack }: { onDone: () => void; onBack: () => void
     try {
       const blob = await exportEnvelope(pass);
       await saveFile(blob, envelopeFileName(), "Vyomaphala encrypted backup");
+      await setMeta("lastExportAt", Date.now());
       play("thunk");
       toast("Encrypted backup saved (AES-GCM). Keep the passphrase safe. It cannot be recovered.");
       onDone();

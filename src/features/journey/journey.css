@@ -99,7 +99,7 @@
   box-shadow: var(--glow-violet);
 }
 .journey__skip {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 16px;
   border-radius: var(--radius-full);
   border: 1px solid rgba(255, 255, 255, 0.25);

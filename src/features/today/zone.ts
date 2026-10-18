@@ -1,6 +1,8 @@
 // Clock faces for one IANA zone. Every instant is UTC ms; the zone is the PLACE's, never the
 // device's, so a Bengaluru leaf read in Denver still prints Bengaluru's clock.
 
+import { safeZone } from "../../engine/time";
+
 export interface ZoneClock {
   zone: string;
   /** "17:04" */
@@ -20,15 +22,6 @@ export interface ZoneClock {
 }
 
 const cache = new Map<string, ZoneClock>();
-
-function safeZone(zone: string): string {
-  try {
-    new Intl.DateTimeFormat("en-GB", { timeZone: zone });
-    return zone;
-  } catch {
-    return "UTC";
-  }
-}
 
 export function zoneClock(zoneIn: string): ZoneClock {
   const hit = cache.get(zoneIn);

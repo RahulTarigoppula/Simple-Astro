@@ -68,7 +68,7 @@ function isZoneKnown(zone: string): boolean {
  * entries for an ambiguous one (a fall-back fold), one otherwise.
  */
 export function possibleOffsets(y: number, mo: number, d: number, h: number, mi: number, zone: string): number[] {
-  if (!isValidCivil(y, mo, d, h, mi) || !isZoneKnown(zone)) return [];
+  if (!isValidCivil(y, mo, d, h, mi) || y < MIN_YEAR || y > MAX_YEAR || !isZoneKnown(zone)) return [];
   const wallAsUtc = Date.UTC(y, mo - 1, d, h, mi);
   const out: number[] = [];
   // A wall time occurs at offset o iff the zone's offset at (wall − o) is o. Probe the offsets in
@@ -89,7 +89,7 @@ export function possibleOffsets(y: number, mo: number, d: number, h: number, mi:
  * 'nonexistent' (inside a DST gap), 'ambiguous' (inside a DST fold) or 'ok'.
  */
 export function checkLocalTime(y: number, mo: number, d: number, h: number, mi: number, zone: string): LocalTimeStatus {
-  if (!isValidCivil(y, mo, d, h, mi) || !isZoneKnown(zone)) return "invalid";
+  if (!isValidCivil(y, mo, d, h, mi) || y < MIN_YEAR || y > MAX_YEAR || !isZoneKnown(zone)) return "invalid";
   const n = possibleOffsets(y, mo, d, h, mi, zone).length;
   if (n === 0) return "nonexistent";
   return n > 1 ? "ambiguous" : "ok";
@@ -205,4 +205,24 @@ export function partOfDay(h: number): "at night" | "in the morning" | "in the af
 export function clockWords(h: number, mi: number): string {
   const hh = ((h % 12) + 12) % 12 || 12;
   return `${hh}:${String(mi).padStart(2, "0")} ${partOfDay(h)} (${formatClock24(h, mi)})`;
+}
+
+const zoneOk = new Map<string, boolean>();
+/**
+ * The zone itself when this device's calendar data knows it, else "UTC". A backup written on a
+ * newer device can carry a zone name an older WebView has never heard of; the screens must still
+ * open rather than crash on the first date they print.
+ */
+export function safeZone(zone: string): string {
+  let ok = zoneOk.get(zone);
+  if (ok === undefined) {
+    try {
+      new Intl.DateTimeFormat("en-GB", { timeZone: zone });
+      ok = true;
+    } catch {
+      ok = false;
+    }
+    zoneOk.set(zone, ok);
+  }
+  return ok ? zone : "UTC";
 }

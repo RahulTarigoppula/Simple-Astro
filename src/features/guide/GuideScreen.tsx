@@ -20,7 +20,7 @@ const STEPS: Array<{ title: string; body: string; to: string; cta: string }> = [
     title: "Read the birth chart",
     body: "See where the Sun, Moon and planets were at that moment, the life-chapter timeline (daśā), and classical patterns (yogas), each with a plain explanation.",
     to: "/circle",
-    cta: "Your circle",
+    cta: "People",
   },
   {
     title: "See your forecast",

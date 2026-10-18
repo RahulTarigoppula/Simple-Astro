@@ -42,7 +42,7 @@
   margin-top: 12px;
 }
 .fc-people button {
-  min-height: 36px;
+  min-height: 44px;
   padding: 0 14px;
   border-radius: var(--radius-full);
   border: 1px solid var(--glass-edge);
@@ -61,6 +61,12 @@
   align-self: stretch;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
+}
+@media (max-width: 400px) {
+  .fc-tabs button {
+    font-size: 13px;
+    padding: 0 6px;
+  }
 }
 .fc-nav {
   display: grid;

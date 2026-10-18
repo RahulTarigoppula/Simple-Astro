@@ -245,7 +245,11 @@ describe("currentDashaSummary", () => {
     expect(next?.pd.startMs).toBe(d.nextChangeMs);
     expect(next?.pd.lord).not.toBe(d.pd.lord);
   });
-  it("is null outside the 120-year tree", () => {
-    expect(currentDashaSummary(patri, birth + 130 * YEAR)).toBeNull();
+  it("keeps a running daśā past the 120-year tree (the cycle repeats) and is null before birth", () => {
+    const late = currentDashaSummary(patri, birth + 130 * YEAR);
+    expect(late).not.toBeNull();
+    expect(late?.md.startMs).toBeLessThanOrEqual(birth + 130 * YEAR);
+    expect(late?.md.endMs).toBeGreaterThan(birth + 130 * YEAR);
+    expect(currentDashaSummary(patri, birth - 200 * YEAR)).toBeNull();
   });
 });

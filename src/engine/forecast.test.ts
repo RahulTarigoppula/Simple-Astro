@@ -42,3 +42,20 @@ describe("forecast periods", () => {
     expect(forecast(patri, "year", AT, Z, DEFAULT_PRESET, BLR).sadeSati).toBe("peak");
   });
 });
+
+describe("period bounds across a clock change", () => {
+  it("starts and ends at local midnight on both sides of daylight saving (New York, March 2026)", () => {
+    const [s, e] = periodBounds("month", Date.UTC(2026, 2, 20, 12), "America/New_York");
+    expect(s).toBe(Date.UTC(2026, 2, 1, 5)); // 00:00 EST = 05:00Z
+    expect(e).toBe(Date.UTC(2026, 3, 1, 4)); // 00:00 EDT = 04:00Z
+    const [ys, ye] = periodBounds("year", Date.UTC(2026, 6, 15, 12), "America/New_York");
+    expect(ys).toBe(Date.UTC(2026, 0, 1, 5));
+    expect(ye).toBe(Date.UTC(2027, 0, 1, 5));
+  });
+  it("walks the month in civil days, so the day that changes the clock is counted once", () => {
+    const patri = computePatri(REFERENCE_PROFILE, DEFAULT_PRESET, 0);
+    const f = forecast(patri, "month", Date.UTC(2026, 2, 20, 12), "America/New_York", DEFAULT_PRESET, { lat: 40.7, lon: -74 });
+    expect(f.steps).toHaveLength(31);
+    expect(f.steps[8]?.ms).toBe(Date.UTC(2026, 2, 9, 4)); // 9 March 00:00 EDT, the morning after the change
+  });
+});

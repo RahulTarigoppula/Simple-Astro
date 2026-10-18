@@ -27,8 +27,20 @@ export interface BirthFieldValues {
   y: number; // 0 = unset
   mo: number; // 0 = unset
   d: number; // 0 = unset
-  h: number; // -1 = unset, else 0..23
+  hour12: number; // 0 = unset, else 1..12
+  ampm: "am" | "pm" | null; // null until the person taps one; never assumed
   mi: number; // 0..59
+}
+
+/** The 24-hour hour, or -1 until both the hour and am/pm have been chosen. */
+export function hourOf(v: Pick<BirthFieldValues, "hour12" | "ampm">): number {
+  if (v.hour12 < 1 || v.hour12 > 12 || v.ampm === null) return -1;
+  return (v.hour12 % 12) + (v.ampm === "pm" ? 12 : 0);
+}
+
+/** Split a 24-hour hour back into the two fields (editing a saved person). */
+export function fieldsOfHour(h: number): Pick<BirthFieldValues, "hour12" | "ampm"> {
+  return { hour12: h % 12 || 12, ampm: h < 12 ? "am" : "pm" };
 }
 
 interface Props extends BirthFieldValues {
@@ -40,7 +52,7 @@ interface Props extends BirthFieldValues {
 export const dateFilled = (v: Pick<BirthFieldValues, "y" | "mo" | "d">): boolean =>
   v.y > 0 && v.mo > 0 && v.d > 0 && isValidCivil(v.y, v.mo, v.d, 0, 0);
 /** True when the hour has been chosen. */
-export const timeFilled = (v: BirthFieldValues): boolean => v.h >= 0 && v.h <= 23 && v.mi >= 0 && v.mi <= 59;
+export const timeFilled = (v: BirthFieldValues): boolean => hourOf(v) >= 0 && v.mi >= 0 && v.mi <= 59;
 
 /** What is still missing, in one short sentence, or null when the date and time are complete. */
 export function missingText(v: BirthFieldValues, timeUnknown: boolean): string | null {
@@ -49,7 +61,9 @@ export function missingText(v: BirthFieldValues, timeUnknown: boolean): string |
     const n = daysInMonth(v.y, v.mo);
     return n ? `${MONTH_NAMES[v.mo - 1]} ${v.y} has only ${n} days.` : "That date does not exist.";
   }
-  if (!timeUnknown && !timeFilled(v)) return "Pick the hour of birth, and whether it was am or pm.";
+  if (!timeUnknown && !(v.hour12 >= 1)) return "Pick the hour of birth.";
+  if (!timeUnknown && v.ampm === null) return "Was it am or pm? Tap one.";
+  if (!timeUnknown && !timeFilled(v)) return "Pick the time of birth.";
   return null;
 }
 
@@ -112,24 +126,13 @@ function NumberBox({
   );
 }
 
-export function BirthFields({ y, mo, d, h, mi, timeUnknown, onChange }: Props) {
-  const hour12 = h < 0 ? 0 : h % 12 || 12;
-  const pm = h >= 12;
-  const setHour12 = (hh: number) => {
-    if (hh < 1) {
-      onChange({ h: -1 });
-      return;
-    }
-    onChange({ h: (hh % 12) + (pm ? 12 : 0) });
-  };
-  const setPm = (isPm: boolean) => {
-    if (h < 0) return;
-    onChange({ h: (h % 12) + (isPm ? 12 : 0) });
-  };
-  const missing = missingText({ y, mo, d, h, mi }, timeUnknown);
-  const dateOk = dateFilled({ y, mo, d });
+export function BirthFields({ y, mo, d, hour12, ampm, mi, timeUnknown, onChange }: Props) {
+  const v: BirthFieldValues = { y, mo, d, hour12, ampm, mi };
+  const h = hourOf(v);
+  const missing = missingText(v, timeUnknown);
+  const dateOk = dateFilled(v);
   const dateText = dateOk ? `${d} ${MONTH_NAMES[mo - 1]} ${y}` : "";
-  const timeText = timeUnknown ? "time of birth unknown, cast for noon" : timeFilled({ y, mo, d, h, mi }) ? clockWords(h, mi) : "";
+  const timeText = timeUnknown ? "time of birth unknown, cast for noon" : h >= 0 ? clockWords(h, mi) : "";
 
   return (
     <div className="bf">
@@ -184,7 +187,7 @@ export function BirthFields({ y, mo, d, h, mi, timeUnknown, onChange }: Props) {
             aria-label="Hour"
             value={hour12 || ""}
             disabled={timeUnknown}
-            onChange={(e) => setHour12(Number(e.target.value) || 0)}
+            onChange={(e) => onChange({ hour12: Number(e.target.value) || 0 })}
           >
             <option value="" disabled>
               Hour
@@ -213,10 +216,10 @@ export function BirthFields({ y, mo, d, h, mi, timeUnknown, onChange }: Props) {
             ))}
           </select>
           <span className="seg bf__ampm" role="radiogroup" aria-label="am or pm">
-            <button type="button" role="radio" aria-checked={h >= 0 && !pm} disabled={timeUnknown || h < 0} onClick={() => setPm(false)}>
+            <button type="button" role="radio" aria-checked={ampm === "am"} disabled={timeUnknown} onClick={() => onChange({ ampm: "am" })}>
               am
             </button>
-            <button type="button" role="radio" aria-checked={h >= 0 && pm} disabled={timeUnknown || h < 0} onClick={() => setPm(true)}>
+            <button type="button" role="radio" aria-checked={ampm === "pm"} disabled={timeUnknown} onClick={() => onChange({ ampm: "pm" })}>
               pm
             </button>
           </span>

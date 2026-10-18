@@ -8,12 +8,13 @@ import { GRAHA_LORE, RASHI_LORE } from "../../data/lore";
 import { type SkyEvent, skyEvents } from "../../engine/events";
 import type { EnginePreset } from "../../engine/types";
 import "./cosmic.css";
+import { safeZone } from "../../engine/time";
 
 const HOUR = 3_600_000;
 
 function when(ms: number, zone: string, nowMs: number): { day: string; time: string; rel: string } {
-  const d = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: zone }).format(ms);
-  const time = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: zone }).format(ms);
+  const d = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: safeZone(zone) }).format(ms);
+  const time = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: safeZone(zone) }).format(ms);
   const days = Math.round((ms - nowMs) / (24 * HOUR));
   const rel = days <= 0 ? "today" : days === 1 ? "tomorrow" : `in ${days} days`;
   return { day: d, time, rel };

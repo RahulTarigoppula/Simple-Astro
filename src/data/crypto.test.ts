@@ -151,7 +151,7 @@ describe("exportEnvelope / importEnvelope", () => {
     for (const t of TABLE_NAMES) if (t !== "meta") expect(before[t]?.length, t).toBeGreaterThan(0);
 
     const env = await exportEnvelope(PASS);
-    const beforeWithMeta = await dumpAll(); // export stamps meta.lastExportAt
+    const beforeWithMeta = await dumpAll(); // the export itself stamps nothing; the caller does once the file is saved
     await wipe();
     expect(await db.profiles.count()).toBe(0);
 

@@ -212,11 +212,11 @@ function Picker({
             <b>{first.name}</b>
           </div>
         ) : (
-          <div className="pair__scroll pair__scroll--empty mscroll">no one yet</div>
+          <div className="pair__scroll pair__scroll--empty mscroll">No one yet</div>
         )}
         <MauliKnot />
         <div ref={drop} className={`pair__scroll pair__scroll--empty mscroll mscroll--drop${over ? " is-over" : ""}`}>
-          drag a person here
+          Tap a person below
         </div>
       </div>
       {profiles.length === 0 ? (
@@ -702,7 +702,7 @@ function PoruthamSheet({
         </div>
       </dl>
       {p.pass ? null : <p className="note-lac">Tradition says this knot stays open: {p.because}</p>}
-      <p className="p p--muted">Counted from the second person (the kanyā column) to the first, as the tables are read.</p>
+      <p className="p p--muted">Counted from the second person (the second person's column) to the first, as the tables are read.</p>
       <p className="kootasheet__close">
         <button type="button" className="linkish" onClick={onClose}>
           Close

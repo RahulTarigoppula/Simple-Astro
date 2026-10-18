@@ -22,14 +22,15 @@ import {
 import { ZodiacOrbit } from "./ZodiacOrbit";
 import "./chowki.css";
 import "./home.css";
+import { safeZone } from "../../engine/time";
 
 const BENGALURU = { lat: 12.9716, lon: 77.5946, zone: "Asia/Kolkata" };
 
 function hhmm(ms: number, zone: string): string {
-  return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: zone }).format(ms);
+  return new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: safeZone(zone) }).format(ms);
 }
 function hourIn(ms: number, zone: string): number {
-  return Number(new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hour12: false, timeZone: zone }).format(ms)) % 24;
+  return Number(new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hour12: false, timeZone: safeZone(zone) }).format(ms)) % 24;
 }
 
 function useNow(stepMs = 30_000): number {

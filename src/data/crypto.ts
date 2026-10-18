@@ -12,7 +12,7 @@
 // small, deterministic and restores every table byte-identically (see crypto.test.ts).
 
 import { db, SCHEMA_VERSION, TABLE_NAMES, type TableName } from "./db";
-import { clearPatriCache, getSettings, setMeta } from "./repo";
+import { clearPatriCache, getSettings } from "./repo";
 
 export const ENVELOPE_VERSION = 1;
 export const ITERATIONS = 600_000;
@@ -289,9 +289,8 @@ export async function exportEnvelope(passphrase: string): Promise<Blob> {
   if (!passphrase) throw new ImportError("EMPTY_PASSPHRASE");
   const settings = await getSettings();
   const plain = new Blob([await exportPlaintext()], { type: "application/json" });
-  const env = await seal(plain, passphrase, defaultMeta(settings.preset.ayanamsa));
-  await setMeta("lastExportAt", Date.now());
-  return env;
+  // `lastExportAt` is stamped by the caller once the file has really been saved or shared.
+  return seal(plain, passphrase, defaultMeta(settings.preset.ayanamsa));
 }
 
 /** `chowki-2026-10-06.chowki` */

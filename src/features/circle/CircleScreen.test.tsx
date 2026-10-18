@@ -82,7 +82,7 @@ describe("CircleScreen", () => {
     const { router } = renderCircle();
     fireEvent.click(await screen.findByRole("button", { name: "Actions for Rahul" }));
     const dlg = await screen.findByRole("dialog");
-    fireEvent.click(within(dlg).getByRole("button", { name: "Milan with…" }));
+    fireEvent.click(within(dlg).getByRole("button", { name: "Partner Compatibility with…" }));
     fireEvent.click(await within(dlg).findByRole("button", { name: /^Priya/ }));
     await waitFor(() => expect(router.state.location.pathname).toBe(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`));
   });

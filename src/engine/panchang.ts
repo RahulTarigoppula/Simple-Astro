@@ -1,6 +1,8 @@
 // Pañcāṅga and the end-time solver (§6.9). Every aṅga is floor(angle / span); every one also
 // needs an end instant, which is a monotone root find on a cheap longitude function.
+import tzlookup from "@photostructure/tz-lookup";
 import * as A from "astronomy-engine";
+import { DateTime } from "luxon";
 import {
   KARANA_FIXED,
   KARANA_MOVABLE,
@@ -199,6 +201,30 @@ export function localWeekday(ms: number, lon: number): 0 | 1 | 2 | 3 | 4 | 5 | 6
   return ((((days + 4) % 7) + 7) % 7) as 0 | 1 | 2 | 3 | 4 | 5 | 6; // 1970-01-01 was a Thursday
 }
 
+const zoneMemo = new Map<string, string | null>();
+
+/**
+ * Weekday (0 = Sunday) of an instant on the civil calendar in force at the place. A few islands
+ * (Samoa, Kiribati, Tonga) keep a calendar a day ahead of their longitude, so the civil zone wins
+ * and the mean-solar rule is only the fallback where no zone is known.
+ */
+export function civilWeekday(ms: number, lat: number, lon: number): 0 | 1 | 2 | 3 | 4 | 5 | 6 {
+  const key = `${lat.toFixed(2)},${lon.toFixed(2)}`;
+  let zone = zoneMemo.get(key);
+  if (zone === undefined) {
+    try {
+      zone = tzlookup(lat, lon);
+      if (!DateTime.fromMillis(0, { zone }).isValid) zone = null;
+    } catch {
+      zone = null;
+    }
+    if (zoneMemo.size > 256) zoneMemo.clear();
+    zoneMemo.set(key, zone);
+  }
+  if (!zone) return localWeekday(ms, lon);
+  return (DateTime.fromMillis(ms, { zone }).weekday % 7) as 0 | 1 | 2 | 3 | 4 | 5 | 6; // Luxon: Mon 1 … Sun 7
+}
+
 // ─── the pañcāṅga ───────────────────────────────────────────────────────────
 
 /**
@@ -222,7 +248,7 @@ export function computePanchang(atUtcMs: number, place: GeoPoint, preset: Engine
   const nakEnd = solveCrossing(moonSidAt(ap), (now.nakshatra.index + 1) * NAK_SPAN, atUtcMs, atUtcMs + 28 * HOUR_MS);
   const yogaEnd = solveCrossing(yogaSumAt(ap), now.yoga.index * NAK_SPAN, atUtcMs, atUtcMs + 26 * HOUR_MS);
 
-  const varaIdx = localWeekday(day.sunriseMs, place.lon);
+  const varaIdx = civilWeekday(day.sunriseMs, place.lat, place.lon);
   const daylight = day.sunsetMs - day.sunriseMs;
   const noon = day.sunriseMs + daylight / 2;
   const abhijit: [number, number] | null = varaIdx === 3 ? null : [noon - daylight / 30, noon + daylight / 30];

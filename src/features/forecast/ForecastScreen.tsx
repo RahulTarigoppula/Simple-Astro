@@ -17,8 +17,21 @@ import "../cosmic/cosmic.css";
 import { AreasCard, ContactsCard, DayGuideCard, DayNotes, StrengthCard } from "./PersonalSections";
 import "./forecast.css";
 import { rashiBoth } from "../../data/regional";
+import { safeZone } from "../../engine/time";
 import { countEvent } from "../../platform/stats";
 
+/** The nine tārās in a word of English, beside the Sanskrit. */
+const TARA_ENGLISH: Record<string, string> = {
+  Janma: "your own",
+  Sampat: "gain",
+  Vipat: "trouble",
+  Kṣema: "well-being",
+  Pratyari: "obstacle",
+  Sādhaka: "achievement",
+  Vadha: "hardest",
+  Mitra: "friend",
+  "Parama-Mitra": "best friend",
+};
 const PERIODS: Array<{ id: Period; label: string }> = [
   { id: "day", label: "Day" },
   { id: "week", label: "Week" },
@@ -37,7 +50,7 @@ const TONE_HINT = {
 const lore = (id: GrahaId) => GRAHA_LORE.find((g) => g.id === id);
 
 function fmt(ms: number, zone: string, o: Intl.DateTimeFormatOptions): string {
-  return new Intl.DateTimeFormat("en-GB", { ...o, timeZone: zone }).format(ms);
+  return new Intl.DateTimeFormat("en-GB", { ...o, timeZone: safeZone(zone) }).format(ms);
 }
 
 function periodLabel(p: Period, s: number, e: number, zone: string): string {
@@ -56,7 +69,7 @@ function periodLabel(p: Period, s: number, e: number, zone: string): string {
 }
 
 function shift(p: Period, atMs: number, zone: string, dir: 1 | -1): number {
-  const [s, e] = periodBounds(p, atMs, zone);
+  const [s, e] = periodBounds(p, atMs, safeZone(zone));
   return dir === 1 ? e + DAY / 2 : s - DAY / 2;
 }
 
@@ -185,7 +198,7 @@ export default function ForecastScreen() {
   const f = useMemo(() => {
     if (!patri || !profile || patri.profileId !== profile.id) return null;
     try {
-      return forecast(patri, period, atMs, zone, settings.preset, { lat, lon });
+      return forecast(patri, period, atMs, safeZone(zone), settings.preset, { lat, lon });
     } catch {
       return null;
     }
@@ -322,7 +335,8 @@ export default function ForecastScreen() {
                 <GrahaGlyph id="MO" size={44} />
                 <p>
                   The Moon is in your <strong>{ord(f.steps[0].moonHouse)} house</strong> from your Moon sign, the area of{" "}
-                  {HOUSE_AREA[f.steps[0].moonHouse]}. Today's star is <strong>{f.steps[0].tara}</strong> for you (
+                  {HOUSE_AREA[f.steps[0].moonHouse]}. Today's star is <strong>{f.steps[0].tara}</strong>
+                  {TARA_ENGLISH[f.steps[0].tara] ? ` (${TARA_ENGLISH[f.steps[0].tara]})` : ""} for you (
                   {f.steps[0].taraTone === "kind"
                     ? "a kind one"
                     : f.steps[0].taraTone === "unkind"

@@ -236,3 +236,18 @@ describe("the Hindu day", () => {
     expect(times[5]).toBeLessThan(20);
   });
 });
+
+describe("civilWeekday: the calendar in force at the place", () => {
+  it("follows the civil zone where it runs a day ahead of the longitude (Apia, +13)", async () => {
+    const { civilWeekday, localWeekday } = await import("./panchang");
+    const apiaSunrise = Date.UTC(2026, 0, 14, 17, 10); // Thu 15 Jan 2026, 06:10 in Pacific/Apia
+    expect(localWeekday(apiaSunrise, -171.8)).toBe(3); // the mean-solar clock still says Wednesday
+    expect(civilWeekday(apiaSunrise, -13.8, -171.8)).toBe(4); // the island says Thursday
+  });
+  it("agrees with the mean-solar rule in India and falls back to it without coordinates", async () => {
+    const { civilWeekday, localWeekday } = await import("./panchang");
+    const ms = Date.UTC(2026, 9, 18, 0, 30); // 06:00 IST, Sunday 18 Oct 2026
+    expect(civilWeekday(ms, 12.97, 77.59)).toBe(0);
+    expect(civilWeekday(ms, Number.NaN, 77.59)).toBe(localWeekday(ms, 77.59));
+  });
+});

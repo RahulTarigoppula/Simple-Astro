@@ -133,7 +133,7 @@ describe("MilanScreen", () => {
   it("with one leaf, the second scroll is a dotted outline asking for another", async () => {
     await upsertProfile(REFERENCE_PROFILE);
     renderAt("/milan");
-    expect(await screen.findByText("drag a person here")).toBeInTheDocument();
+    expect(await screen.findByText("Tap a person below")).toBeInTheDocument();
     expect(screen.getByText(/Only one person is saved/)).toBeInTheDocument();
   });
 

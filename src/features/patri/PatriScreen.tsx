@@ -23,7 +23,7 @@ import {
 import { boundaryNote, PRESET_SHORT } from "../../engine/boundary";
 import { formatDms } from "../../engine/math";
 import { addVarga } from "../../engine/patri";
-import { formatClock12, formatClock24, formatOffset } from "../../engine/time";
+import { formatClock12, formatClock24, formatOffset, safeZone } from "../../engine/time";
 import { type EnginePreset, type GrahaId, type Patri, PRESET_HASH, type VargaNumber, type YogaHit } from "../../engine/types";
 import { VARGA_NAMES } from "../../engine/vargas";
 import { haptics } from "../../platform/haptics";
@@ -57,11 +57,11 @@ function hhmmss(ms: number, zone: string, secs = false): string {
     minute: "2-digit",
     ...(secs ? { second: "2-digit" } : {}),
     hour12: false,
-    timeZone: zone,
+    timeZone: safeZone(zone),
   }).format(ms);
 }
 function fullDate(ms: number, zone: string): string {
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: zone }).format(ms);
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: safeZone(zone) }).format(ms);
 }
 
 type Foot =
@@ -195,7 +195,7 @@ export default function PatriScreen() {
   const b = profile?.birth;
 
   return (
-    <Screen className="patri" label={profile ? `Janam Patri of ${profile.name}` : "Janam Patri"}>
+    <Screen className="patri" label={profile ? `Birth chart of ${profile.name}` : "Birth chart"}>
       <div className="roller roller--top" aria-hidden="true" data-decorative="true">
         <div className="roller__body" ref={topRoll}>
           <div className="roller__curl" ref={topCurl} />
@@ -236,7 +236,7 @@ export default function PatriScreen() {
               type="button"
               ref={sealBtn}
               className={`seal${error ? " is-cracked" : ""}`}
-              aria-label={stale ? "Presets changed. Hold to recompute this chart" : "Hold to recompute this chart"}
+              aria-label={stale ? "Settings changed. Hold to work this chart out again" : "Hold to work this chart out again"}
               onFocus={() => setPull(96)}
               onBlur={releasePull}
               {...sealHold}
@@ -282,7 +282,7 @@ export default function PatriScreen() {
                 <span lang="hi" className="dev">
                   जन्म पत्री
                 </span>{" "}
-                · {profile?.name ?? ""}
+                · Birth chart · {profile?.name ?? ""}
               </h1>
               {b ? (
                 <p className="birthline">
@@ -314,14 +314,17 @@ export default function PatriScreen() {
               {error ? (
                 <p className="note-lac" role="alert" style={{ margin: "var(--space-3) 0 0" }}>
                   <span aria-hidden="true">⚑</span>
-                  <span>Something went wrong: {error.message}. The last chart stays on screen.</span>
+                  <span>
+                    Something went wrong ({error.message}). Check the birth details with "Edit birth details" below. The last chart stays on
+                    screen.
+                  </span>
                 </p>
               ) : null}
               {profile?.timeUnknown && patri ? <TimeUnknownNote profile={profile} patri={patri} /> : null}
               {stale ? (
                 <p className="note-haldi" style={{ margin: "var(--space-3) 0 0" }}>
                   <span aria-hidden="true">⚑</span>
-                  <span>The presets changed in Settings. Pull down and hold the recompute button to update this chart.</span>
+                  <span>Settings changed. Hold the red seal at the top to work this chart out again.</span>
                 </p>
               ) : null}
             </header>
@@ -676,7 +679,7 @@ function PatriBody({
           Palm (Hast Rekha)
         </Link>
         <Link className="linkish" to="/circle">
-          Guna Milan with another person
+          Partner Compatibility with another person
         </Link>
         <Link className="linkish" to={`/leaf/${profileId}/edit`}>
           Edit birth details

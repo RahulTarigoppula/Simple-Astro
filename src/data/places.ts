@@ -612,12 +612,14 @@ export async function parseGazetteerBytes(bytes: Uint8Array): Promise<GazetteerE
 
 let loaded: Gazetteer | null = null;
 let loading: Promise<Gazetteer> | null = null;
+let generation = 0;
 
 /** Install a gazetteer from the file's bytes (Node tests read the file directly). */
 export async function loadGazetteerFromBytes(bytes: Uint8Array): Promise<Gazetteer> {
+  const gen = generation;
   const { fields, rows } = checkDoc(await decodeBytes(bytes));
   const g = makeGazetteer(buildCompact(rows, fieldIndex(fields)));
-  loaded = g;
+  if (gen === generation) loaded = g; // an unload in the meantime wins
   return g;
 }
 
@@ -641,8 +643,9 @@ export function loadGazetteer(): Promise<Gazetteer> {
   return loading;
 }
 
-/** Release the index once the leaf editor closes; the next load rebuilds it. */
+/** Release the index (tests, memory pressure); the next load rebuilds it. */
 export function unloadGazetteer(): void {
+  generation++;
   loaded = null;
   loading = null;
 }
