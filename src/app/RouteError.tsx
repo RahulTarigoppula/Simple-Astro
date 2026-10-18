@@ -9,7 +9,7 @@ export function RouteError() {
       ? `${err.code.replace(/_/g, " ").toLowerCase()}: ${err.detail}`
       : err instanceof Error
         ? err.message
-        : "Vyom could not open this page";
+        : "Vyomaphala could not open this page";
   const offlineChunk = err instanceof Error && /dynamically imported module|Failed to fetch|Loading chunk/i.test(err.message);
   return (
     <main className="screen screen--scroll" aria-label="Error">

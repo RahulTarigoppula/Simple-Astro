@@ -494,8 +494,8 @@ export default function HastScreen() {
               <p className="p">This print has landmarks but no reading yet. Retake it to read the lines.</p>
             ) : (
               <p className="p p--muted">
-                One photo of your {hand} palm. Vyom traces the heart, head and life lines and tells you what tradition says about each. The
-                photo stays on this device, and one hold deletes it.
+                One photo of your {hand} palm. Vyomaphala traces the heart, head and life lines and tells you what tradition says about
+                each. The photo stays on this device, and one hold deletes it.
               </p>
             )}
 

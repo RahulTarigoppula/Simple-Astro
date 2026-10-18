@@ -375,7 +375,7 @@ export async function requestPersistentStorage(): Promise<boolean> {
   }
 }
 
-/** Erase everything Vyom keeps on this device: every table, the in-memory chart cache, and the few
+/** Erase everything Vyomaphala keeps on this device: every table, the in-memory chart cache, and the few
  *  browser-storage flags (theme, intro seen). Nothing exists anywhere else to erase. */
 export async function wipeEverything(): Promise<void> {
   await db.transaction("rw", db.tables, async () => {

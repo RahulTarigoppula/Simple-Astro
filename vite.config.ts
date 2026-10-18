@@ -60,8 +60,8 @@ export default defineConfig({
             injectRegister: false,
             includeAssets: ["favicon.svg", "grain.svg", "seal-edge.svg", "icon.svg"],
             manifest: {
-              name: "Vyom",
-              short_name: "Vyom",
+              name: "Vyomaphala",
+              short_name: "Vyomaphala",
               description: "Your sky, explained, Indian astrology in plain English, private and offline",
               lang: "en-IN",
               theme_color: "#04050d",

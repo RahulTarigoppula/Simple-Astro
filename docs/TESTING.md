@@ -1,8 +1,8 @@
-# Jyoti / Vyom, Testing Strategy & Test Plan
+# Jyoti / Vyomaphala, Testing Strategy & Test Plan
 
 Written 2026-09-08. Binding inputs: `_shared/DECISIONS.md` (D1 tooling, Vitest + Testing Library + Playwright; D5 licence/data rules; D7 token contract; D9.2 "engine first, UI second"), `docs/RESEARCH.md` (§5 algorithms, §5.4 ayanamsa, §8 risks, §10 open questions, Verification log), `docs/DESIGN.md` (tokens §15, motion §7, screens §9, sound/haptics §12, a11y §13, Android §14, assets §16), `GOAL.md` §5 (the eight measurable success criteria, every budget below traces to one). `docs/ARCHITECTURE.md` and `docs/PLAN.md` are being written in parallel; where a module name here disagrees with ARCHITECTURE.md, ARCHITECTURE.md wins and this file is corrected in the same PR.
 
-Vyom has **no server, no key, no account and (by design) almost no network** (GOAL §9). The test surface is therefore lopsided and this plan is shaped to match it:
+Vyomaphala has **no server, no key, no account and (by design) almost no network** (GOAL §9). The test surface is therefore lopsided and this plan is shaped to match it:
 
 | Where the risk actually lives | Weight |
 |---|---|
@@ -552,7 +552,7 @@ The camera is faked with Chromium's `--use-fake-device-for-media-stream --use-fi
 
 ### 7.1 Offline / PWA (`offline.spec.ts`)
 
-- **OF-1** After first load, `context.setOffline(true)` + reload → the Vyom renders, fonts are Yatra One / Tiro (no fallback flash, compared with `document.fonts.check`), and casting a **new** chart works (the engine and gazetteer are precached).
+- **OF-1** After first load, `context.setOffline(true)` + reload → the Vyomaphala renders, fonts are Yatra One / Tiro (no fallback flash, compared with `document.fonts.check`), and casting a **new** chart works (the engine and gazetteer are precached).
 - **OF-2** Offline, `#/today` computes today's panchang with no network (the whole point of GOAL §5.1's "airplane mode").
 - **OF-3** Offline, the Hast screen shows "sharpening the stylus…" only if OpenCV is not yet cached; after one online visit it works offline. The Drawer's **"Prepare for offline"** action warms the MediaPipe model, the OpenCV chunk and the sky chunk, and a progress line reports bytes; afterwards OF-3 passes on a cold profile with no network.
 - **OF-4** `#/lost` renders the blank-leaf 404 for an unknown hash route.
@@ -561,11 +561,11 @@ The camera is faked with Chromium's `--use-fake-device-for-media-stream --use-fi
 
 ### 7.2 Visual baselines (`e2e/visual/*.spec.ts`)
 
-Seven screens × two themes × two viewports, matching DESIGN §16: Vyom home, Patri drawn, loupe open, writing the leaf (drums + sky strip), mala complete, palm reading, drawer. Baselines are Linux-only (CI-generated), `maxDiffPixelRatio: 0.002`, animations disabled via `animations: "disabled"` plus `page.clock`. Fonts are the built self-hosted woff2, never Google Fonts, so CI and local agree.
+Seven screens × two themes × two viewports, matching DESIGN §16: Vyomaphala home, Patri drawn, loupe open, writing the leaf (drums + sky strip), mala complete, palm reading, drawer. Baselines are Linux-only (CI-generated), `maxDiffPixelRatio: 0.002`, animations disabled via `animations: "disabled"` plus `page.clock`. Fonts are the built self-hosted woff2, never Google Fonts, so CI and local agree.
 
 ### 7.3 Material and token assertions (the part that actually catches drift)
 
-Screenshots catch "it changed"; these catch "it stopped being Vyom".
+Screenshots catch "it changed"; these catch "it stopped being Vyomaphala".
 
 - **VT-1 Paper share.** Sample the home, Patri and Today screenshots on a 4-px grid and classify each pixel by nearest token colour in OKLab. Assert `--surface` + `--surface-2` ≥ **85 %** and ≤ 92 % of the frame; `--bg` (teak) ≤ **8 %** (DESIGN §1, §4).
 - **VT-2 One lamp.** Every element with a `box-shadow` has **negative** x and y offsets (shadows fall up-left, DESIGN §6). Any positive offset fails, naming the selector.
@@ -626,13 +626,13 @@ Automated (`e2e/a11y.spec.ts`, `@axe-core/playwright`, tags `wcag2a wcag2aa wcag
 - **A-8 Reduced motion + "Calm desk".** Both the OS media query and the in-Drawer switch independently disable flicker, rustle and inertia; drums/ribbon/loupe/stylus still follow the finger (VT-8 covers the animation side).
 - **A-9 Zoom and text scaling.** 200 % browser zoom: no horizontal scrollbar, the paper column reflows, rollers stay pinned. System font scale 1.3×: the ledger switches to the stacked two-line row (DESIGN §14) with no clipped degree strings.
 - **A-10 Keyboard modes.** Drums are `spinbutton`s with arrow keys and typed entry; the loupe has a Tab-through-planets mode with Enter to read; the stylus has a keyboard fallback (select a line, arrow keys nudge the active handle by 1 px, Shift+arrows by 10).
-- **A-11 Manual, before each tag.** TalkBack on the phone through Vyom → leaf → Patri → loupe → Hast → Milan; NVDA + Firefox on desktop through the same; one full keyboard-only cast with no mouse.
+- **A-11 Manual, before each tag.** TalkBack on the phone through Vyomaphala → leaf → Patri → loupe → Hast → Milan; NVDA + Firefox on desktop through the same; one full keyboard-only cast with no mouse.
 
 ---
 
 ## 10. Security and privacy checks (blocking)
 
-Vyom holds other people's birth data and hand photographs in a public-repo app. These run on every PR.
+Vyomaphala holds other people's birth data and hand photographs in a public-repo app. These run on every PR.
 
 - **P-0** `scripts/check-no-biometrics.mjs` (§2.4), no real photos, no EXIF, no oversized PNGs in the tree.
 - **P-1 Zero leakage (GOAL §5.6).** `privacy.spec.ts` installs `page.on("request")` with an allow-list of the **own origin only** and walks: home → leaf entry (typing a place name character by character) → cast → Patri → loupe → varga pager → Today → Circle → Hast (capture + trace) → Milan → Rooftop → Drawer. **Zero** off-origin requests. Then it taps "search online ⌑" once and asserts exactly one request to `geocoding-api.open-meteo.com`, and on submit at most one to `nominatim.openstreetmap.org`, never on a keystroke (RESEARCH §3: Nominatim forbids autocomplete).
@@ -672,7 +672,7 @@ From RESEARCH §10 "Open questions" and the Verification log's "Still open" rows
 | V-18 | Pages serves `manifest.webmanifest`, `sw.js` and the `.task` model under `/jyoti/` with correct MIME and the PWA is installable | `curl -I` + DevTools → Application after the first deploy | 200s, installable | Rename the manifest to `manifest.json`; move the model to a Release asset |
 | V-19 | Capacitor 8 + `setup-java@v6` Temurin 21 builds a **signed** APK on `ubuntu-24.04` and it installs on the owner's phone | `workflow_dispatch` run before any tag | `app-release.apk` (not `-unsigned`), installs, opens | The pitfalls in ANDROID-PACKAGING §"Pitfalls" 1-6 are the checklist; nothing here is novel |
 | V-20 | `@capacitor/camera` `resultType: Uri, quality: 90, width: 1600` returns a usable image on Android 14+ **partial photo access**, and `getUserMedia` (for the live gauges) works with only `CAMERA` declared | Debug APK: shutter path and gallery path, granting "Select photos" rather than full access | Both return an image; gauges run live | Capture-only via the camera intent (no live gauges on Android); the web build keeps `getUserMedia` |
-| V-21 | Predictive back (Android 16 default) fires `@capacitor/app`'s `backButton` so "return to Vyom" works | Debug APK: open the Drawer, swipe back; open the loupe, swipe back | Sheet/loupe closes, root back exits | `android:enableOnBackInvokedCallback="false"` on `<application>` (documented temporary opt-out) |
+| V-21 | Predictive back (Android 16 default) fires `@capacitor/app`'s `backButton` so "return to Vyomaphala" works | Debug APK: open the Drawer, swipe back; open the loupe, swipe back | Sheet/loupe closes, root back exits | `android:enableOnBackInvokedCallback="false"` on `<application>` (documented temporary opt-out) |
 | V-22 | Fontsource subsets of Yatra One / Tiro Devanagari Hindi / Martian Mono render Devanagari conjuncts correctly after `pyftsubset` and stay ≤ 260 kB | Build the subsets; render `जन्म पत्री · शुक्ल चतुर्दशी · अनुराधा` in Chrome, Firefox and the WebView; compare with the unsubset face | No broken conjuncts, no tofu, ≤ 260 kB | Keep the full Devanagari coverage (larger) or drop the Devanagari chart-label toggle to Latin-only for v1 |
 | V-23 | Google developer verification: the free limited-distribution account is available for the owner's region | Android Developer Console | Registered before the regional flip | `adb install` (exempt) or the user-side advanced flow, documented in the README |
 
@@ -680,16 +680,16 @@ From RESEARCH §10 "Open questions" and the Verification log's "Still open" rows
 
 ## 12. Manual QA checklist, Android build
 
-Run on the owner's phone with the APK from a `workflow_dispatch` run or the tagged Release. Note **device model, Android version and Android System WebView version** (from `chrome://inspect` or Settings › Apps) at the top of each run. Vyom's risky rows are camera, WebGL and the historical-date engine, there are no notifications in v1, so those rows are intentionally absent.
+Run on the owner's phone with the APK from a `workflow_dispatch` run or the tagged Release. Note **device model, Android version and Android System WebView version** (from `chrome://inspect` or Settings › Apps) at the top of each run. Vyomaphala's risky rows are camera, WebGL and the historical-date engine, there are no notifications in v1, so those rows are intentionally absent.
 
 **Install & identity**
 - [ ] I-1 Sideload from the Releases page in Chrome; "install unknown apps" is asked once; the downloaded `SHA256SUMS.txt` matches.
 - [ ] I-2 Installing a newer tag over the old one keeps every profile and palm photo (no uninstall); the Drawer colophon shows the new `versionName`.
 - [ ] I-3 Adaptive icon: brass diya with a vermilion flame tip on teak `#1A110B`; monochrome layer present on Android 13+; splash is teak with the diya, fading into the desk in ~240 ms with no double splash.
-- [ ] I-4 App name **Vyom**; package id unchanged from the first install.
+- [ ] I-4 App name **Vyomaphala**; package id unchanged from the first install.
 
 **First open & offline**
-- [ ] F-1 First launch with **airplane mode on**: the Vyom renders, fonts are correct, "Write your first leaf" is shown, and a full cast completes (GOAL §5.1).
+- [ ] F-1 First launch with **airplane mode on**: the Vyomaphala renders, fonts are correct, "Write your first leaf" is shown, and a full cast completes (GOAL §5.1).
 - [ ] F-2 No permission prompt appears until the camera is actually used.
 - [ ] F-3 Cast the reference chart on the phone and compare every graha degree with the desktop build, identical to the arcsecond.
 
@@ -707,7 +707,7 @@ Run on the owner's phone with the APK from a `workflow_dispatch` run or the tagg
 
 **Navigation, insets, gestures**
 - [ ] G-1 Edge-to-edge: the parapet strip starts below the status bar; the Ledge sits above the gesture bar; status-bar icons are light on the night desk and dark on the morning terrace.
-- [ ] G-2 Predictive back with the Drawer open shows the drawer sliding, not the app minimising (V-21); back on the Vyom exits.
+- [ ] G-2 Predictive back with the Drawer open shows the drawer sliding, not the app minimising (V-21); back on the Vyomaphala exits.
 - [ ] G-3 Horizontal gestures (varga pager, chart flip, Moon pager) never trigger system back, they start ≥ 24 px from the edges.
 - [ ] G-4 Drum flick: BRASS inertia coasts, detents click, haptics tick once per detent, never a runaway spin.
 - [ ] G-5 Loupe follows the finger 1:1 with no lag; dragging it across the chart snaps planet to planet.

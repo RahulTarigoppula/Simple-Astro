@@ -96,13 +96,13 @@ export default function ChowkiScreen() {
   const matchTo = active && second ? `/milan/${active.id}/${second.id}` : "/milan";
 
   return (
-    <Screen className="chowki" label="Vyom home">
+    <Screen className="chowki" label="Vyomaphala home">
       <header className="home-head">
         <div className="home-brand">
           <span className="home-mark" aria-hidden="true" />
-          <span className="home-name">Vyom</span>
+          <span className="home-name">Vyomaphala</span>
           <span lang="hi" className="home-name-dev">
-            व्योम
+            व्योमफल
           </span>
         </div>
         <div className="home-tools">
@@ -132,7 +132,7 @@ export default function ChowkiScreen() {
           <p className="home-line">
             {empty
               ? "Start with your name, birth date, time and place of birth. It takes about a minute."
-              : "Here is everything Vyom can do. Tap any card to start."}
+              : "Here is everything Vyomaphala can do. Tap any card to start."}
           </p>
           {empty ? (
             <div className="home-cta-row">
@@ -216,9 +216,9 @@ export default function ChowkiScreen() {
         </ol>
       </section>
 
-      <section className="home-trust" aria-label="How Vyom was made and your privacy">
+      <section className="home-trust" aria-label="How Vyomaphala was made and your privacy">
         <div className="home-card home-card--made">
-          <h2 className="home-card__h">How Vyom 1.0 was made</h2>
+          <h2 className="home-card__h">How Vyomaphala was made</h2>
           <p>
             <b>252 hours</b> of work and dedication by Rahul (RT): 18 weeks, 7 days a week, 2 hours a day. Planning, building, gathering and
             cleaning the data. Every chart is worked out from real astronomy and checked against the professional standard.
@@ -251,7 +251,7 @@ export default function ChowkiScreen() {
       </section>
 
       <p className="home-foot">
-        Vyom 1.0 · Made by Rahul (RT) · <Link to="/about">How Vyom was made</Link>
+        Vyomaphala · Made by Rahul (RT) · <Link to="/about">How Vyomaphala was made</Link>
       </p>
     </Screen>
   );

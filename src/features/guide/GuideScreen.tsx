@@ -1,4 +1,4 @@
-// The guide: what Vyom is, how to use it, and every term in plain English, written for someone
+// The guide: what Vyomaphala is, how to use it, and every term in plain English, written for someone
 // who has never met Indian astrology, or doesn't believe in it.
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
@@ -66,13 +66,15 @@ export default function GuideScreen() {
   );
 
   return (
-    <Screen className="guide" scroll label="Guide: Vyom in plain English">
+    <Screen className="guide" scroll label="Guide: Vyomaphala in plain English">
       <header className="guide-hero">
         <p className="guide-kicker">Guide</p>
-        <h1>How Vyom works</h1>
+        <h1>How Vyomaphala works</h1>
         <p className="guide-lede">
-          Vyom is an Indian astrology (Jyotiṣa) app. It works out exactly where the Sun, Moon and planets are (or were, when someone was
-          born) and shows what the old tradition says about it. You don't need to know anything, or believe anything, to use it.
+          Vyomaphala (व्योमफल) is Sanskrit for the fruit of the sky: vyoma, the heavens, and phala, what they yield, the same phala as in
+          phalita jyotiṣa, the predictive side of Indian astrology. It is an Indian astrology (Jyotiṣa) app. It works out exactly where the
+          Sun, Moon and planets are (or were, when someone was born) and shows what the old tradition says about it. You don't need to know
+          anything, or believe anything, to use it.
         </p>
       </header>
 
@@ -96,7 +98,7 @@ export default function GuideScreen() {
             <h3>Tradition, not science</h3>
             <p>
               What those positions are said to mean: personality, good and bad times, compatibility, palm lines. There's no scientific
-              evidence for them. Vyom shows them as a cultural reference and for reflection, never as advice or fate.
+              evidence for them. Vyomaphala shows them as a cultural reference and for reflection, never as advice or fate.
             </p>
           </div>
         </div>
@@ -128,7 +130,7 @@ export default function GuideScreen() {
       <section className="guide-card" aria-labelledby="g-private">
         <h2 id="g-private">Your privacy</h2>
         <p>
-          Everything is calculated on this device. Birth details and palm photos are stored only here, never uploaded. Vyom uses the
+          Everything is calculated on this device. Birth details and palm photos are stored only here, never uploaded. Vyomaphala uses the
           internet for only two things: the optional place search (just the town name), and anonymous counts of which screens are opened (no
           names, no birth details, no cookies, and you can turn it off). You can back up or delete everything from Settings.
         </p>
@@ -168,7 +170,7 @@ export default function GuideScreen() {
                     <p>{g.long}</p>
                     {g.how ? (
                       <p className="guide-item__how">
-                        <strong>How Vyom works it out: </strong>
+                        <strong>How Vyomaphala works it out: </strong>
                         {g.how}
                       </p>
                     ) : null}

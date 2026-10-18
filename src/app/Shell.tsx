@@ -19,7 +19,7 @@ export function Shell() {
   const settings = useSettings();
   const swUpdate = useUi((s) => s.desk.swUpdate);
   const fullBleed = /\/capture$|\/sky$|\/journey$/.test(loc.pathname);
-  // The opening journey plays once per visit when Vyom opens on Home.
+  // The opening journey plays once per visit when Vyomaphala opens on Home.
   const [journey, setJourney] = useState(() => loc.pathname === "/" && shouldPlayJourney());
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export function Shell() {
       <div className="desk__top" aria-hidden="true" />
       {swUpdate ? (
         <button type="button" className="sw-tab paper" onClick={() => swUpdate()}>
-          A newer version of Vyom is ready. Reload
+          A newer version of Vyomaphala is ready. Reload
         </button>
       ) : null}
       <div className="screens">

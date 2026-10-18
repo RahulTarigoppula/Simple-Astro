@@ -353,7 +353,7 @@ function MilanScreen() {
       haptics.selection();
       toast("Summary copied as plain text, with the disclaimer.");
     } catch {
-      toast("This browser would not let Vyom copy. Nothing was sent anywhere.", "warn");
+      toast("This browser would not let Vyomaphala copy. Nothing was sent anywhere.", "warn");
     }
   };
 

@@ -1,4 +1,4 @@
-// About Vyom: how it was made. Every data source, what we did to it, every algorithm, and how it was
+// About Vyomaphala: how it was made. Every data source, what we did to it, every algorithm, and how it was
 // checked. Facts here mirror src/data/attribution.json and docs/VERIFICATION-LOG.md.
 import { Link } from "react-router";
 import { Screen } from "../../components/ui/Screen";
@@ -27,7 +27,7 @@ const SOURCES: Source[] = [
     name: "astronomy-engine",
     by: "Don Cross",
     licence: "MIT",
-    used: "Where the Sun, Moon and planets are at any moment, sidereal time, rise and set times, and the search for new and full moons and eclipses. The whole sky in Vyom comes from here.",
+    used: "Where the Sun, Moon and planets are at any moment, sidereal time, rise and set times, and the search for new and full moons and eclipses. The whole sky in Vyomaphala comes from here.",
   },
   {
     name: "GeoNames",
@@ -73,7 +73,7 @@ const SOURCES: Source[] = [
     name: "Classical texts",
     by: "Parāśara, Mantreśvara, Rāma Daivajña and others",
     licence: "Public domain",
-    used: "The rules themselves: Bṛhat Parāśara Horā Śāstra (houses, yogas, daśā, aṣṭakavarga), Phaladīpikā ch. 26 (transits), Muhūrta Cintāmaṇi (Guna Milan, muhūrta). Every rule Vyom applies names its source on screen.",
+    used: "The rules themselves: Bṛhat Parāśara Horā Śāstra (houses, yogas, daśā, aṣṭakavarga), Phaladīpikā ch. 26 (transits), Muhūrta Cintāmaṇi (Guna Milan, muhūrta). Every rule Vyomaphala applies names its source on screen.",
   },
   {
     name: "Open-Meteo and OpenStreetMap",
@@ -96,7 +96,7 @@ const ALGORITHMS: Array<[string, string]> = [
   ["Life chapters (daśā)", "Viṃśottarī: 120 years shared by nine planets, starting from the Moon's exact degree inside its nakṣatra."],
   [
     "Almanac end times",
-    "Each tithi, nakṣatra, yoga and karaṇa ends at a precise moment. Vyom finds it by searching for when the Sun and Moon cross the boundary, to the second, for your place. Sunrise uses the upper edge of the Sun with refraction, as Drik Panchang does.",
+    "Each tithi, nakṣatra, yoga and karaṇa ends at a precise moment. Vyomaphala finds it by searching for when the Sun and Moon cross the boundary, to the second, for your place. Sunrise uses the upper edge of the Sun with refraction, as Drik Panchang does.",
   ],
   [
     "Forecasts",
@@ -126,21 +126,21 @@ const CHECKS: string[] = [
 
 export default function AboutScreen() {
   return (
-    <Screen className="about-screen" label="About Vyom">
+    <Screen className="about-screen" label="About Vyomaphala">
       <article className="about">
         <header className="about-hero">
-          <p className="about-kicker">About Vyom 1.0 · व्योम</p>
-          <h1>How Vyom was made</h1>
+          <p className="about-kicker">About Vyomaphala · व्योमफल · the fruit of the sky</p>
+          <h1>How Vyomaphala was made</h1>
           <blockquote className="about-quote">
-            <p>It took almost 18 weeks of extensive planning, development, data gathering and cleaning. This is the result: Vyom.</p>
-            <footer>Rahul (RT), who made Vyom</footer>
+            <p>It took almost 18 weeks of extensive planning, development, data gathering and cleaning. This is the result: Vyomaphala.</p>
+            <footer>Rahul (RT), who made Vyomaphala</footer>
           </blockquote>
           <p className="about-hours">
             <b>18 weeks × 7 days × 2 hours = 252 hours</b> of work and dedication.
           </p>
         </header>
 
-        <ul className="about-numbers" aria-label="Vyom in numbers">
+        <ul className="about-numbers" aria-label="Vyomaphala in numbers">
           {NUMBERS.map(([n, l]) => (
             <li key={l}>
               <span className="about-numbers__n">{n}</span>
@@ -196,9 +196,10 @@ export default function AboutScreen() {
         <section className="about-sec about-private" aria-labelledby="ab-priv">
           <h2 id="ab-priv">Your privacy</h2>
           <p className="about-p">
-            Everything is calculated on your device. Birth details and palm photos stay there. There are no accounts. The only thing Vyom
-            counts is anonymous: which screens are opened and which buttons are tapped, through GoatCounter, with no cookies, no names, no
-            birth details and no ids. You can switch even that off in Settings. Backups are encrypted with a passphrase only you know.
+            Everything is calculated on your device. Birth details and palm photos stay there. There are no accounts. The only thing
+            Vyomaphala counts is anonymous: which screens are opened and which buttons are tapped, through GoatCounter, with no cookies, no
+            names, no birth details and no ids. You can switch even that off in Settings. Backups are encrypted with a passphrase only you
+            know.
           </p>
         </section>
 

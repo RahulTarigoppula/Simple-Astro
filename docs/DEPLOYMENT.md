@@ -1,8 +1,8 @@
-# Jyoti / Vyom, Deployment Runbook
+# Jyoti / Vyomaphala, Deployment Runbook
 
 Written 2026-09-08. Follows `_shared/DECISIONS.md` D2 (GitHub Pages, repo `jyoti`), D3 (Capacitor 8, APK signed in GitHub Actions), D5 (licence rules, the reason §8 exists), D6 (repo layout), D9.1 ("Day 1 = live"). Shared assets used here: `_shared/templates/pages.yml`, `_shared/templates/android-release.yml`, `_shared/templates/app-build.gradle.snippet`, `_shared/scripts/make-keystore.sh`. Test references are to `docs/TESTING.md`.
 
-**Vyom has no Cloudflare Worker, no API key, no account and no backend** (D8 row 02: proxy "none"; GOAL §9). §4 says why and what would have to be true to change that.
+**Vyomaphala has no Cloudflare Worker, no API key, no account and no backend** (D8 row 02: proxy "none"; GOAL §9). §4 says why and what would have to be true to change that.
 
 Shell conventions: **PowerShell** for `npm` / `git` / `gh`; **Git Bash** for `make-keystore.sh` and anything needing `openssl`, `base64 -w0` or `sha256sum`.
 
@@ -12,12 +12,12 @@ Shell conventions: **PowerShell** for `npm` / `git` / `gh`; **Git Bash** for `ma
 
 | Item | Value | Notes |
 |---|---|---|
-| GitHub repo | **`jyoti`** (public) | DECISIONS §D2 suggested name. Public = Pages + unlimited Actions minutes. **The *brand* is Vyom; every *identifier* is `jyoti`**, repo, Pages path, `appId`, keystore file, keystore alias script argument. Only user-visible names (`appName`, manifest `name`, colour tokens, cache names, the sound sprite) say "Vyom". Do not "fix" either half later: the URL is baked into the PWA scope and the appId is baked into every installed APK. |
+| GitHub repo | **`jyoti`** (public) | DECISIONS §D2 suggested name. Public = Pages + unlimited Actions minutes. **The *brand* is Vyomaphala; every *identifier* is `jyoti`**, repo, Pages path, `appId`, keystore file, keystore alias script argument. Only user-visible names (`appName`, manifest `name`, colour tokens, cache names, the sound sprite) say "Vyomaphala". Do not "fix" either half later: the URL is baked into the PWA scope and the appId is baked into every installed APK. |
 | Web URL | `https://<owner>.github.io/jyoti/` | `<owner>` = your GitHub username |
 | Vite `base` on Pages | `/jyoti/` | injected as `VITE_BASE_PATH` by `pages.yml` |
 | Vite `base` in the APK | `/` | Capacitor serves from `https://localhost/` |
 | Router | React Router 7, **hash router** (`createHashRouter`) | `#/`, `#/today`, `#/circle`, `#/leaf/new`, `#/leaf/:id/edit`, `#/patri/:id`, `#/patri/:id/sky`, `#/hast/:id`, `#/hast/:id/capture`, `#/milan/:a/:b`, `#/drawer`, `#/lost` |
-| App name | **Vyom** | `capacitor.config.ts` `appName`, manifest `name`; `short_name` = `Vyom` |
+| App name | **Vyomaphala** | `capacitor.config.ts` `appName`, manifest `name`; `short_name` = `Vyomaphala` |
 | Android `appId` / `applicationId` / `namespace` | **`com.rahul.jyoti`** | **Immutable after the first install.** Changing it makes a second, empty app on the phone. Older drafts put the brand name here instead; that spelling is dead, IMPLEMENTATION-PROMPT §0.3 settles it. |
 | Keystore | `jyoti-release.p12`, alias `release`, PKCS12 | from `make-keystore.sh jyoti`; backed up per §12 |
 | Version scheme | git tag `vMAJOR.MINOR.PATCH`; Android `versionCode = github.run_number` | §10 |
@@ -33,7 +33,7 @@ Shell conventions: **PowerShell** for `npm` / `git` / `gh`; **Git Bash** for `ma
 ```powershell
 # from C:\Work\Personal_Projects\02-jyoti-astrology-palmistry  (the app scaffold lives at the repo root, per D6)
 git init -b main
-gh repo create jyoti --public --source . --description "Vyom - a private, offline Jyotisha desk: arcsecond-honest Janam Patri, Guna Milan on a 36-bead mala, and a palm read with a brass loupe" --disable-wiki
+gh repo create jyoti --public --source . --description "Vyomaphala - a private, offline Jyotisha desk: arcsecond-honest Janam Patri, Guna Milan on a 36-bead mala, and a palm read with a brass loupe" --disable-wiki
 git remote -v   # origin -> https://github.com/<owner>/jyoti.git
 ```
 
@@ -91,7 +91,7 @@ const empty = fileURLToPath(new URL("./src/shims/empty.ts", import.meta.url));
 export default defineConfig({
   base,
   define: {
-    __APP_VERSION__: JSON.stringify(pkg.version),   // colophon: "Vyom 0.4.2"
+    __APP_VERSION__: JSON.stringify(pkg.version),   // colophon: "Vyomaphala 0.4.2"
     __ENGINE_BUILD__: JSON.stringify(pkg.dependencies["astronomy-engine"]),
   },
   resolve: {
@@ -112,8 +112,8 @@ export default defineConfig({
       registerType: "prompt",          // never reload mid-cast; the update is a small ink note
       includeAssets: ["favicon.svg", "grain.svg", "seal-edge.svg"],
       manifest: {
-        name: "Vyom",
-        short_name: "Vyom",
+        name: "Vyomaphala",
+        short_name: "Vyomaphala",
         description: "A private, offline Jyotisha desk",
         lang: "en-IN",
         theme_color: "#1A110B",
@@ -176,7 +176,7 @@ npm run build; $env:VITE_BASE_PATH="/jyoti/"; npm run build; npx vite preview --
 
 ### 2.2 Large assets and the precache decision
 
-Vyom carries more bytes than any other app in the portfolio. The sizes (RESEARCH §2-§4, DESIGN §16):
+Vyomaphala carries more bytes than any other app in the portfolio. The sizes (RESEARCH §2-§4, DESIGN §16):
 
 | Asset | Size | Where it lives | Cache policy |
 |---|---|---|---|
@@ -233,7 +233,7 @@ produces `pwa-192x192.png`, `pwa-512x512.png`, `maskable-icon-512x512.png`, `app
    Copy-Item ..\_shared\templates\pages.yml .github\workflows\pages.yml
    ```
 
-   What it does: `ubuntu-24.04`, `setup-node@v7` (Node 22, npm cache), `npm ci`, `npm test -- --run` (Vitest, keep it; delete only until the first test exists), `npm run build` with `VITE_BASE_PATH=/jyoti/`, `cp dist/index.html dist/404.html` (harmless with the hash router), `configure-pages@v5` → `upload-pages-artifact@v4` → `deploy-pages@v4`, `concurrency: pages`. The commented `VITE_API_BASE` line **stays commented**, Vyom has no proxy (§4).
+   What it does: `ubuntu-24.04`, `setup-node@v7` (Node 22, npm cache), `npm ci`, `npm test -- --run` (Vitest, keep it; delete only until the first test exists), `npm run build` with `VITE_BASE_PATH=/jyoti/`, `cp dist/index.html dist/404.html` (harmless with the hash router), `configure-pages@v5` → `upload-pages-artifact@v4` → `deploy-pages@v4`, `concurrency: pages`. The commented `VITE_API_BASE` line **stays commented**, Vyomaphala has no proxy (§4).
 
 3. **Add `ci.yml`** (e2e + privacy, separate from Pages so a flaky gesture never blocks a deploy):
 
@@ -267,7 +267,7 @@ produces `pwa-192x192.png`, `pwa-512x512.png`, `maskable-icon-512x512.png`, `app
 4. **Push.**
 
    ```powershell
-   git add -A; git commit -m "Vyom: scaffold + Pages workflow"; git push -u origin main
+   git add -A; git commit -m "Vyomaphala: scaffold + Pages workflow"; git push -u origin main
    gh run watch
    ```
 
@@ -286,7 +286,7 @@ produces `pwa-192x192.png`, `pwa-512x512.png`, `maskable-icon-512x512.png`, `app
    ```bash
    curl -s -D - -o /dev/null -H "Origin: https://<owner>.github.io" \
      "https://geocoding-api.open-meteo.com/v1/search?name=Madurai&count=5" | grep -i access-control
-   curl -s -D - -o /dev/null -H "Origin: https://<owner>.github.io" -H "User-Agent: Vyom/0.1 (github.com/<owner>/jyoti)" \
+   curl -s -D - -o /dev/null -H "Origin: https://<owner>.github.io" -H "User-Agent: Vyomaphala/0.1 (github.com/<owner>/jyoti)" \
      "https://nominatim.openstreetmap.org/search?q=Madurai&format=jsonv2&limit=5" | grep -i access-control
    ```
 
@@ -300,7 +300,7 @@ Custom domain: not planned. Adding one later makes `VITE_BASE_PATH` `/` and chan
 
 ## 4. Worker / proxy, not needed (and why)
 
-DECISIONS D8 row 02 lists Vyom's proxy as **none**, and GOAL §9 makes "no keys, no card anywhere" a constraint rather than a preference. Every network call in the app is user-initiated, keyless and CORS-open:
+DECISIONS D8 row 02 lists Vyomaphala's proxy as **none**, and GOAL §9 makes "no keys, no card anywhere" a constraint rather than a preference. Every network call in the app is user-initiated, keyless and CORS-open:
 
 | Feature | Endpoint | Key | CORS | When it fires |
 |---|---|---|---|---|
@@ -343,7 +343,7 @@ Runtime settings that live in the app (Dexie `settings` table, Drawer §9.10) an
 
 1. Desktop Chrome/Edge → `https://<owner>.github.io/jyoti/` → DevTools → *Application* → *Manifest*: no warnings, icons resolve, `scope` and `start_url` both `/jyoti/`. *Service workers*: `sw.js` activated with scope `/jyoti/`.
 2. Address-bar install icon → install → the window opens standalone on the night desk with a teak title bar (`theme_color`).
-3. DevTools → *Network* → **Offline** → reload → the Vyom renders, fonts are Yatra One / Tiro (no fallback flash), and a **new** cast completes (engine + gazetteer are precached, TESTING OF-1/OF-2).
+3. DevTools → *Network* → **Offline** → reload → the Vyomaphala renders, fonts are Yatra One / Tiro (no fallback flash), and a **new** cast completes (engine + gazetteer are precached, TESTING OF-1/OF-2).
 4. Still offline, open Hast: it should say it needs the model. Go online, open Drawer → **Prepare for offline**, watch the byte progress, go offline again, and confirm the palm pipeline now runs (TESTING OF-3).
 5. Android Chrome → same URL → menu → *Install app* (Chrome mints a WebAPK). This is the fallback for any phone that cannot sideload; it has no `@capacitor/camera`, so capture falls back to `getUserMedia`/file input, say so in the Drawer copy.
 6. Lighthouse (DevTools) mobile: Performance ≥ 90, installable, a11y ≥ 95 (TESTING §8 runs the same via LHCI).
@@ -355,17 +355,17 @@ Runtime settings that live in the app (Dexie `settings` table, Drawer §9.10) an
 
 No Java, no Android SDK, no Android Studio on the machine, every APK is built by `ubuntu-24.04`, which already has the SDK and JDK 21 (D3, ANDROID-PACKAGING §"GitHub Actions and runner facts").
 
-### 7.1 One-time: add Capacitor and the plugins Vyom actually needs
+### 7.1 One-time: add Capacitor and the plugins Vyomaphala actually needs
 
 ```powershell
 npm i @capacitor/core @capacitor/android @capacitor/app @capacitor/camera @capacitor/filesystem `
       @capacitor/preferences @capacitor/haptics @capacitor/share @capacitor/splash-screen
 npm i -D @capacitor/cli
-npx cap init "Vyom" com.rahul.jyoti --web-dir dist
+npx cap init "Vyomaphala" com.rahul.jyoti --web-dir dist
 npx cap add android        # the "Gradle sync failed" warning is expected without a local SDK - ignore it
 ```
 
-Deliberately **not** installed: `@capacitor/local-notifications` (daily-panchang notifications are a Someday item, GOAL §7, adding the plugin now would add `POST_NOTIFICATIONS`/`SCHEDULE_EXACT_ALARM` to the manifest for nothing), `@capacitor-community/sqlite` (Dexie/IndexedDB works identically in the WebView), any gallery-enumeration plugin (Vyom picks one photo at a time through the system picker, that is Blurvre's problem, not ours), `@capacitor/status-bar` (edge-to-edge is handled by the **System Bars** API in `@capacitor/core` 8.5; add the separate plugin only if V-21 or an inset bug forces it).
+Deliberately **not** installed: `@capacitor/local-notifications` (daily-panchang notifications are a Someday item, GOAL §7, adding the plugin now would add `POST_NOTIFICATIONS`/`SCHEDULE_EXACT_ALARM` to the manifest for nothing), `@capacitor-community/sqlite` (Dexie/IndexedDB works identically in the WebView), any gallery-enumeration plugin (Vyomaphala picks one photo at a time through the system picker, that is Blurvre's problem, not ours), `@capacitor/status-bar` (edge-to-edge is handled by the **System Bars** API in `@capacitor/core` 8.5; add the separate plugin only if V-21 or an inset bug forces it).
 
 `capacitor.config.ts`:
 
@@ -374,7 +374,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "com.rahul.jyoti",
-  appName: "Vyom",
+  appName: "Vyomaphala",
   webDir: "dist",
   android: {
     webContentsDebuggingEnabled: false,   // flipped to true only on a debug branch (§7.8)
@@ -400,9 +400,9 @@ git update-index --chmod=+x android/gradlew
 
 Replace the `android { … }` block in `android/app/build.gradle` with `_shared/templates/app-build.gradle.snippet`, setting **both** `namespace` and `applicationId` to `com.rahul.jyoti`. Keep everything else the generated file has (`apply plugin`, `repositories`, `dependencies`, `apply from: 'capacitor.build.gradle'`, the `google-services` try/catch). Result: `versionCode`/`versionName` come from `-P` properties, and release signing activates only when `ANDROID_KEYSTORE_FILE` is present in the environment.
 
-### 7.3 One-time: Vyom-specific Android files (before the first build)
+### 7.3 One-time: Vyomaphala-specific Android files (before the first build)
 
-`android/app/src/main/AndroidManifest.xml`, Vyom's permission surface is deliberately tiny:
+`android/app/src/main/AndroidManifest.xml`, Vyomaphala's permission surface is deliberately tiny:
 
 ```xml
 <!-- Camera. The @capacitor/camera intent-capture path needs no permission, but the guided-capture
@@ -414,7 +414,7 @@ Replace the `android { … }` block in `android/app/build.gradle` with `_shared/
 <uses-permission android:name="android.permission.VIBRATE" />
 
 <!-- Deliberately absent: every storage/media permission (the system photo picker needs none, and
-     Vyom reads exactly one image at a time), POST_NOTIFICATIONS, SCHEDULE_EXACT_ALARM,
+     Vyomaphala reads exactly one image at a time), POST_NOTIFICATIONS, SCHEDULE_EXACT_ALARM,
      RECEIVE_BOOT_COMPLETED, ACCESS_*_LOCATION (the app never asks for GPS - it uses the active
      profile's birthplace, DESIGN §9.2). INTERNET stays, for the two optional place lookups. -->
 ```
@@ -426,14 +426,14 @@ Resources:
 - `res/values/colors.xml`: `chowki_teak #1A110B`, `chowki_paper #F4EAD3`, `chowki_sindoor #B5301C`, `chowki_brass #C9A24A`, `chowki_ledge #241811`.
 - `res/drawable/splash.xml`: layer-list, `@color/chowki_teak` fill + the centred diya vector from `public/icon.svg`.
 - `res/mipmap-anydpi-v26/ic_launcher.xml` + `ic_launcher_round.xml`: adaptive icon, background `@color/chowki_teak`, foreground the brass diya with the vermilion flame tip (18 % safe padding), `<monochrome>` layer = the diya silhouette. Delete the Capacitor placeholder PNG mipmaps.
-- `res/values/strings.xml`: `app_name = Vyom`, `title_activity_main = Vyom`, `package_name` / `custom_url_scheme = com.rahul.jyoti`.
+- `res/values/strings.xml`: `app_name = Vyomaphala`, `title_activity_main = Vyomaphala`, `package_name` / `custom_url_scheme = com.rahul.jyoti`.
 - `res/values/styles.xml`: `AppTheme.NoActionBarLaunch` with `windowSplashScreenBackground = @color/chowki_teak`.
 - `res/xml/`: no `network_security_config` is needed (all traffic is HTTPS or local).
 
 Edge-to-edge and back behaviour (DESIGN §14):
 
 - Use `SystemBars` from `@capacitor/core` 8.5, `setStyle("dark")` on the night desk (light icons), `"light"` on the morning terrace; the CSS uses `env(safe-area-inset-*)` with the plugin's `--safe-area-inset-*` fallback for WebView < 140.
-- Predictive back is on by default on Android 16 and is mapped to "return to Vyom" through `@capacitor/app`'s `backButton` listener. Only if TESTING V-21 fails, add `android:enableOnBackInvokedCallback="false"` to `<application>` as the documented temporary opt-out.
+- Predictive back is on by default on Android 16 and is mapped to "return to Vyomaphala" through `@capacitor/app`'s `backButton` listener. Only if TESTING V-21 fails, add `android:enableOnBackInvokedCallback="false"` to `<application>` as the documented temporary opt-out.
 - Orientation is `portrait` in the manifest; the Rooftop route calls `ScreenOrientation`-style unlock at runtime (or simply omits the lock, on screens ≥ 600 dp Android 16 ignores it anyway).
 
 Then run `npx cap sync android` once locally (pure file I/O, no Java involved) and commit the result.
@@ -474,7 +474,7 @@ Copy-Item ..\_shared\templates\android-release.yml .github\workflows\android-rel
 
 The template needs no edits: `ubuntu-24.04` (SDK preinstalled), `setup-node@v7` (22), `setup-java@v6` Temurin **21** with the Gradle cache (Capacitor 8 targets Java 21; the runner default is 17, this is the single most common APK-build failure), web build with `VITE_BASE_PATH=/` and `VITE_PLATFORM=android` (so no service worker lands in the WebView), `npx cap sync android`, keystore decoded to `$RUNNER_TEMP/release.p12`, `./gradlew --no-daemon :app:assembleRelease -PversionCode=$GITHUB_RUN_NUMBER -PversionName=<tag minus v>`, then `app-release.apk` → `out/jyoti-<version>.apk` (the copy fails loudly if only `app-release-unsigned.apk` exists), `SHA256SUMS.txt`, a 14-day artifact, and, only on a `v*` tag, a GitHub Release via `softprops/action-gh-release@v3`.
 
-Two Vyom-specific additions after the "Collect output" step:
+Two Vyomaphala-specific additions after the "Collect output" step:
 
 ```yaml
       - name: APK size budget (40 MB - model + CV wasm + fonts + gazetteer)
@@ -494,7 +494,7 @@ Two Vyom-specific additions after the "Collect output" step:
 ### 7.7 First tagged release → sideload
 
 ```powershell
-npm version 0.1.0 --no-git-tag-version      # package.json -> colophon "Vyom 0.1.0"
+npm version 0.1.0 --no-git-tag-version      # package.json -> colophon "Vyomaphala 0.1.0"
 git add package.json package-lock.json; git commit -m "Release 0.1.0"; git push
 git tag v0.1.0; git push origin v0.1.0
 gh run watch
@@ -517,7 +517,7 @@ No AAB, no Play Store upload, no Firebase, no crash reporting, no TWA. The `goog
 
 ## 8. The AGPL "precision mode" lane, a licence change, not a feature flag
 
-RESEARCH §8 risk 1 and DECISIONS D5.1: importing any Swiss Ephemeris WASM build (`@kuntay/swisseph`, `@swisseph/browser`, `swisseph-wasm`, `sweph-wasm`) makes the **whole application** AGPL-3.0, and publishing it on GitHub Pages is distribution. Vyom ships MIT with `astronomy-engine`. Therefore:
+RESEARCH §8 risk 1 and DECISIONS D5.1: importing any Swiss Ephemeris WASM build (`@kuntay/swisseph`, `@swisseph/browser`, `swisseph-wasm`, `sweph-wasm`) makes the **whole application** AGPL-3.0, and publishing it on GitHub Pages is distribution. Vyomaphala ships MIT with `astronomy-engine`. Therefore:
 
 - **The shipped build must contain no Swiss Ephemeris code.** `scripts/check-licences.mjs` fails if any of those package names appears in `package.json` (including devDependencies), and `scripts/check-bundle.mjs` greps `dist/**` for `swisseph`/`swe_`. Both run in `ci.yml` and in the release gate.
 - **The oracles that generate golden fixtures run outside the repo** (TESTING §2.1): `swetest`/JHora/PyJHora live in `C:\Work\_oracles\`, which is not a git working tree. Only their **numbers** are committed. Numbers are facts.

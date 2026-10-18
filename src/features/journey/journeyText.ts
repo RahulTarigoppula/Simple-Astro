@@ -81,7 +81,7 @@ export const BEATS: Beat[] = [
     id: "why",
     scene: "vyom",
     quote:
-      "I'm a software engineer specialising in AI. I developed Vyom to make things simpler, remove the superstition, and present facts and learnings of my own.",
+      "I'm a software engineer specialising in AI. I developed Vyomaphala to make things simpler, remove the superstition, and present facts and learnings of my own.",
     sign: true,
     hold: 14,
   },

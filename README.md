@@ -1,16 +1,17 @@
-# Vyom
+# Vyomaphala
 
-*Vyom (व्योम) means "the sky" in Sanskrit. Indian astrology under a live sky, explained in plain English, with the myths behind every star.*
+*Vyomaphala (व्योमफल) is Sanskrit for "the fruit of the sky": vyoma, the heavens, and phala, what they yield, the same phala as in phalita jyotiṣa, the predictive branch of Indian astrology. Indian astrology under a live sky, explained in plain English, with the myths behind every star.*
 
 **Live:** https://rahultarigoppula.github.io/Simple-Astro/ · **Repo:** [Simple-Astro](https://github.com/RahulTarigoppula/Simple-Astro)
-**Status: v1.1.0 (2026-10-18).** Made by Rahul (RT): **252 hours of work and dedication** (18 weeks × 7 days × 2 hours a day) of planning, building, gathering and cleaning data, and checking every chart. What changed is in [CHANGELOG.md](CHANGELOG.md); what was measured is in [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
+**Status: v1.2.0 (2026-10-18).** Made by Rahul (RT): **252 hours of work and dedication** (18 weeks × 7 days × 2 hours a day) of planning, building, gathering and cleaning data, and checking every chart. What changed is in [CHANGELOG.md](CHANGELOG.md); what was measured is in [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
 
 ## Summary
 
+- **1.2.0:** the app is now **Vyomaphala**, "the fruit of the sky" (vyoma + phala); same engine, same data, nothing saved is lost.
 - **1.1.0:** Add a person is now impossible to get wrong by accident: day, month and year boxes, a **12-hour clock with am/pm** read back in words ("7:25 in the evening"), a **place that must be chosen** (nothing is assumed), and a **Check before you save** card showing the Moon sign, birth star and rising sign before anything is stored. Every birth time prints with am/pm.
-- **1.0.0:** **Your life, in simple words** on every chart (Moon sign, birth star, numbers, plus and minus points, love, work, your life chapter now), with the astrology behind **Full detail (astro tech)**. **Partner Compatibility** with a score out of 100, five plain bars and **Signs of marriage**. A plain Home: what Vyom can do, how to use it, how it was made, and your privacy. North Indian, Telugu or Tamil names per person. Always updates itself without touching saved data.
-- **0.5.0:** **Explore** is an interactive **Sky Wheel**, drag it, tap any planet, sign or star for its real stars, myth and meaning, or play it as a full-screen **story**; **Roots** opens with the maker's own prologue on why Vyom exists.
-- **0.4.0:** renamed to **Vyom**; **Forecasts** for the day, week, month, quarter and year (gochara from the Moon, Tārā/Candra-bala, daśā); **Explore**, the myths and meanings of the 9 grahas, 12 rāśis and 27 nakṣatras, numerology and the Chinese zodiac; a **cosmic profile** per person; **Coming up in the sky** with Moon phases, Ekādaśī, eclipses (visible here or not), sign changes and retrogrades; Navagraha medallions.
+- **1.0.0:** **Your life, in simple words** on every chart (Moon sign, birth star, numbers, plus and minus points, love, work, your life chapter now), with the astrology behind **Full detail (astro tech)**. **Partner Compatibility** with a score out of 100, five plain bars and **Signs of marriage**. A plain Home: what Vyomaphala can do, how to use it, how it was made, and your privacy. North Indian, Telugu or Tamil names per person. Always updates itself without touching saved data.
+- **0.5.0:** **Explore** is an interactive **Sky Wheel**, drag it, tap any planet, sign or star for its real stars, myth and meaning, or play it as a full-screen **story**; **Roots** opens with the maker's own prologue on why Vyomaphala exists.
+- **0.4.0:** renamed to **Vyomaphala**; **Forecasts** for the day, week, month, quarter and year (gochara from the Moon, Tārā/Candra-bala, daśā); **Explore**, the myths and meanings of the 9 grahas, 12 rāśis and 27 nakṣatras, numerology and the Chinese zodiac; a **cosmic profile** per person; **Coming up in the sky** with Moon phases, Ekādaśī, eclipses (visible here or not), sign changes and retrogrades; Navagraha medallions.
 - **Astral design (0.3.0):** deep-space glass UI, a live sidereal zodiac wheel on Home, and plain-English help everywhere, an ⓘ beside every term, a Guide with the full glossary, and **Roots**, 16 story cards on the gods, sages, Greeks and astronomers behind Jyotiṣa, palmistry and numerology.
 - A private, offline Jyotisha desk: write a "leaf" (name, birth date, time, place) and it casts a full Janam Patri, nine grahas in sidereal longitude, Lagna, Rāśi (D1) and Navāṁśa (D9) drawn in ink, nakshatra/pada, the Vimshottari dasha tree, birth panchang, and yogas cited to BPHS chapter and verse.
 - Every number shows its work: ayanamsa preset (SE-true / SE-mean / Drik-compatible), resolved IANA zone and historical UTC offset, Julian Day, and a vermilion asterisk whenever a body sits within 2′ of a sign, pada or tithi boundary.
@@ -25,7 +26,7 @@
 | [docs/IMPLEMENTATION-PROMPT.md](docs/IMPLEMENTATION-PROMPT.md) | **Start here**, the self-contained build prompt; where it disagrees with any other doc, it wins |
 | [GOAL.md](GOAL.md) | Goal statement, vibe, success criteria, non-goals, MVP ✅ / v1 🚀 / Someday 🔮 split |
 | [docs/RESEARCH.md](docs/RESEARCH.md) | Verified library/API/ephemeris research with the adversarial verification log |
-| [docs/DESIGN.md](docs/DESIGN.md) | "Vyom" design system: tokens, type, motion, signature interactions, every screen |
+| [docs/DESIGN.md](docs/DESIGN.md) | "Vyomaphala" design system: tokens, type, motion, signature interactions, every screen |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Stack, data model, the engine and palm algorithms with worked examples, offline/Android, budgets |
 | [docs/PLAN.md](docs/PLAN.md) | Phased build plan with checkboxes, definitions of done, the Weekend MVP path |
 | [docs/TESTING.md](docs/TESTING.md) | Test map, golden-chart matrix, day-1 verification list, manual Android checklist |
@@ -65,7 +66,7 @@ Useful one-off scripts (all outside-the-repo downloads are cached in `%TEMP%`):
 
 ## Attribution
 
-Vyom's own code is MIT. The classical tables (nakshatra lords, yoni animals, gana, nadi, varna, koota matrices, varga rules, yoga definitions) are **facts re-typed from Brihat Parashara Hora Shastra and Muhurta Chintamani**, not code copied from any implementation; PyJHora (AGPL-3.0) and Drik Panchang are consulted as validation oracles only and are never dependencies.
+Vyomaphala's own code is MIT. The classical tables (nakshatra lords, yoni animals, gana, nadi, varna, koota matrices, varga rules, yoga definitions) are **facts re-typed from Brihat Parashara Hora Shastra and Muhurta Chintamani**, not code copied from any implementation; PyJHora (AGPL-3.0) and Drik Panchang are consulted as validation oracles only and are never dependencies.
 
 | Asset / library | Licence | Notes |
 |---|---|---|
@@ -102,4 +103,4 @@ No other network request exists. No analytics, no telemetry, no accounts, no cra
 
 ## Disclaimer
 
-Based on classical Jyotisha / Samudrika Shastra texts. For reflection and fun, not medical, legal or financial advice. Vyom makes no predictions about health, death, fertility, wealth or legal outcomes, and sells nothing.
+Based on classical Jyotisha / Samudrika Shastra texts. For reflection and fun, not medical, legal or financial advice. Vyomaphala makes no predictions about health, death, fertility, wealth or legal outcomes, and sells nothing.

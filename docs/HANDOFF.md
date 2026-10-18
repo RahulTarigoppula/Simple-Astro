@@ -19,7 +19,7 @@ In **Git Bash, outside the repo** (`/c/Work` is not a git working tree):
 
 ```bash
 cd /c/Work
-openssl req -x509 -newkey rsa:4096 -sha256 -days 10950 -nodes -keyout jyoti.key.pem -out jyoti.cert.pem -subj "/CN=Vyom/O=Vyom/C=IN"
+openssl req -x509 -newkey rsa:4096 -sha256 -days 10950 -nodes -keyout jyoti.key.pem -out jyoti.cert.pem -subj "/CN=Vyomaphala/O=Vyomaphala/C=IN"
 openssl pkcs12 -export -inkey jyoti.key.pem -in jyoti.cert.pem -name release -out jyoti-release.p12
 base64 -w0 jyoti-release.p12 > jyoti-release.p12.b64
 rm jyoti.key.pem jyoti.cert.pem

@@ -156,7 +156,7 @@ export const STORY: StoryChapter[] = [
         art: "sage",
         body: [
           "Tradition names the sage Parāśara (grandson of Vasiṣṭha and father of Vyāsa, who compiled the Mahābhārata) as the teacher of horoscope astrology. In the Bṛhat Parāśara Horā Śāstra he answers the questions of his student Maitreya.",
-          "Almost everything a Vedic astrologer uses today comes from that book: the twelve houses, the divisional charts, planetary strengths, and the Viṃśottarī daśā, the 120-year cycle of life chapters that Vyom draws for you.",
+          "Almost everything a Vedic astrologer uses today comes from that book: the twelve houses, the divisional charts, planetary strengths, and the Viṃśottarī daśā, the 120-year cycle of life chapters that Vyomaphala draws for you.",
           "Historians date the text as we have it to many centuries after the Vedas, gathered and re-edited over time, but Parāśara's name is honoured as its source.",
         ],
         fact: "The Viṃśottarī cycle adds up to 120 years because that was taken as the full span of a human life.",
@@ -236,7 +236,7 @@ export const STORY: StoryChapter[] = [
         body: [
           "Sāmudrika Śāstra, the science of the body's marks, is traditionally credited to a sage named Samudra. It reads the face, the body and above all the palm: its lines, mounts and marks.",
           'Buddhist texts list 32 marks of a "great person", including wheels on the palms and soles; statues of the Buddha often show them. Palm reading also flourished in China, Greece and Romani tradition, each with its own rules.',
-          "Science sees palm lines as folds that form before birth, shaped by how the hand bends. Vyom reads them the way the old books do, for fun and reflection. It doesn't predict anything.",
+          "Science sees palm lines as folds that form before birth, shaped by how the hand bends. Vyomaphala reads them the way the old books do, for fun and reflection. It doesn't predict anything.",
         ],
       },
       {
@@ -267,11 +267,11 @@ export const STORY: StoryChapter[] = [
         dev: "पंचांग आज",
         art: "today",
         body: [
-          "In 1952 newly independent India asked the physicist Meghnad Saha to tidy its tangle of some thirty local calendars. His committee chose a national calendar (adopted in 1957) and fixed an official ayanāṃśa, the Lahiri value Vyom uses by default.",
+          "In 1952 newly independent India asked the physicist Meghnad Saha to tidy its tangle of some thirty local calendars. His committee chose a national calendar (adopted in 1957) and fixed an official ayanāṃśa, the Lahiri value Vyomaphala uses by default.",
           "Today the pañcāṅga still sets the dates of Diwali, Holi, Navarātri and countless family rituals; millions check Rāhu Kāla before signing a lease, and families still compare charts before a wedding.",
           "You don't need to believe any of it to find it beautiful: four thousand years of people looking up, giving the lights names and stories, and trying to fit their lives to the rhythm of the sky.",
         ],
-        fact: "Every number Vyom shows is computed fresh on your device, checked against modern ephemerides. The ṛṣis' sky, with today's arithmetic.",
+        fact: "Every number Vyomaphala shows is computed fresh on your device, checked against modern ephemerides. The ṛṣis' sky, with today's arithmetic.",
       },
     ],
   },
@@ -287,8 +287,8 @@ export const STORY: StoryChapter[] = [
         art: "sky",
         body: [
           "From farmers watching the dawn stars, to the ṛṣis naming the Moon's mansions, to Āryabhaṭa saying the Earth spins, every chapter of this story is someone being curious about the sky and refusing to stop at fear.",
-          "That's all Vyom asks of you, too. Look at your chart, read the myths, check the forecast. Then decide for yourself what you believe.",
-          "Thank you for reading. Go outside tonight and find the Moon. Vyom will tell you which of the 27 nakṣatras it is passing through.",
+          "That's all Vyomaphala asks of you, too. Look at your chart, read the myths, check the forecast. Then decide for yourself what you believe.",
+          "Thank you for reading. Go outside tonight and find the Moon. Vyomaphala will tell you which of the 27 nakṣatras it is passing through.",
         ],
       },
     ],

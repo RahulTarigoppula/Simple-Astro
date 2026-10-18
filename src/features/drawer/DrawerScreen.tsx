@@ -122,7 +122,7 @@ function StatsToggle() {
   return (
     <Toggle
       label="Anonymous usage counts"
-      help="Counts which screens are opened and which buttons are tapped, so Rahul can see how Vyom is used. Never your name, birth details, places or photos. No cookies. Off automatically if your browser asks not to be tracked."
+      help="Counts which screens are opened and which buttons are tapped, so Rahul can see how Vyomaphala is used. Never your name, birth details, places or photos. No cookies. Off automatically if your browser asks not to be tracked."
       on={on}
       onChange={(v) => {
         setStatsOn(v);
@@ -132,13 +132,13 @@ function StatsToggle() {
   );
 }
 
-/** Whether the opening journey plays when Vyom opens (stored on this device only). */
+/** Whether the opening journey plays when Vyomaphala opens (stored on this device only). */
 function JourneyToggle() {
   const [on, setOn] = useState(journeyAtStart);
   return (
     <Radio
       label="Opening journey"
-      help="The intro (from the universe to why Vyom exists) plays when Vyom opens."
+      help="The intro (from the universe to why Vyomaphala exists) plays when Vyomaphala opens."
       value={on ? "on" : "off"}
       options={[
         ["on", "Play"],
@@ -260,7 +260,7 @@ export default function DrawerScreen() {
     setBusy(true);
     try {
       const blob = await exportEnvelope(pass);
-      await saveFile(blob, envelopeFileName(), "Vyom encrypted backup");
+      await saveFile(blob, envelopeFileName(), "Vyomaphala encrypted backup");
       play("thunk");
       toast("Encrypted backup saved (AES-GCM). Keep the passphrase safe. It cannot be recovered.");
       setMode("none");
@@ -288,8 +288,8 @@ export default function DrawerScreen() {
         code === "BAD_PASSPHRASE"
           ? "That passphrase does not match this backup."
           : code === "NEWER_FORMAT"
-            ? "This backup was made by a newer Vyom. Update the app first."
-            : "This file is not a Vyom backup.",
+            ? "This backup was made by a newer Vyomaphala. Update the app first."
+            : "This file is not a Vyomaphala backup.",
         "danger",
       );
     } finally {
@@ -386,9 +386,9 @@ export default function DrawerScreen() {
         </section>
 
         <section className="settings-card" aria-labelledby="set-priv">
-          <h2 id="set-priv">What Vyom keeps, and where</h2>
+          <h2 id="set-priv">What Vyomaphala keeps, and where</h2>
           <p className="settings-note">
-            Only in this browser, on this device. Vyom has no server and no account, so there is no copy anywhere else.
+            Only in this browser, on this device. Vyomaphala has no server and no account, so there is no copy anywhere else.
           </p>
           <ul className="settings-list">
             <li>The people you add: name, birth date, time and place.</li>
@@ -401,7 +401,7 @@ export default function DrawerScreen() {
           <HoldStamp
             className="settings-wipe"
             ms={1500}
-            ariaLabel="Delete everything Vyom keeps on this device. Hold to confirm"
+            ariaLabel="Delete everything Vyomaphala keeps on this device. Hold to confirm"
             label={<span>Hold to delete everything</span>}
             onFire={() => {
               void wipeEverything().then(() => {
@@ -493,7 +493,7 @@ export default function DrawerScreen() {
 
         <details className="settings-card settings-more">
           <summary>
-            <span>About Vyom</span>
+            <span>About Vyomaphala</span>
             <span className="settings-more__hint">version {__APP_VERSION__} · credits</span>
           </summary>
           <p className="settings-note">
@@ -501,7 +501,7 @@ export default function DrawerScreen() {
             <Link to="/guide">Read the guide</Link>.
           </p>
           <p className="settings-link">
-            <Link to="/about">How Vyom was made: sources, methods and checks →</Link>
+            <Link to="/about">How Vyomaphala was made: sources, methods and checks →</Link>
           </p>
           <ul className="credits">
             {credits.map((c) => (
@@ -559,7 +559,7 @@ export default function DrawerScreen() {
           >
             <TurmericBand title="Restore from a backup" level={2} />
             <p className="note-lac" style={{ margin: 0 }}>
-              Restoring replaces everything in Vyom on this device with the backup's contents.
+              Restoring replaces everything in Vyomaphala on this device with the backup's contents.
             </p>
             <input
               ref={fileInput}

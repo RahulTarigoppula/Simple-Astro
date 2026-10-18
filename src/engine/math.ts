@@ -26,7 +26,7 @@ export function signedDelta(a: number, b: number): number {
 
 export const clamp = (v: number, lo: number, hi: number): number => (v < lo ? lo : v > hi ? hi : v);
 
-/** Deterministic 32-bit PRNG. `Math.random` is never used anywhere in Vyom. */
+/** Deterministic 32-bit PRNG. `Math.random` is never used anywhere in Vyomaphala. */
 export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {

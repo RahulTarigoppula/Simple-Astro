@@ -210,7 +210,8 @@ export default function ForecastScreen() {
           <p className="fc-kicker">Forecast · भविष्य</p>
           <h1>Your sky ahead</h1>
           <p className="fc-empty__lede">
-            Add your birth date, time and place once. Vyom then reads every day, week, month and year from where the planets really are.
+            Add your birth date, time and place once. Vyomaphala then reads every day, week, month and year from where the planets really
+            are.
           </p>
           <ul className="fc-empty__list">
             <li>A guide for today: good for, go easy on, and your best hours</li>

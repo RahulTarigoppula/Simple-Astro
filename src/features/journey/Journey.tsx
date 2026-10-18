@@ -1,5 +1,5 @@
 // The opening journey: from the observable universe down to a forest on Earth, to us under the stars,
-// to why Vyom exists. A live canvas behind animated words. Tap, swipe or ← → to move; Esc or Skip to
+// to why Vyomaphala exists. A live canvas behind animated words. Tap, swipe or ← → to move; Esc or Skip to
 // leave. With reduced motion it waits for the reader instead of advancing.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -125,7 +125,7 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
       className="journey"
       role="dialog"
       aria-modal="true"
-      aria-label="The journey from the universe to Vyom"
+      aria-label="The journey from the universe to Vyomaphala"
       onTouchStart={(e) => {
         touch.current = e.touches[0]?.clientX ?? null;
       }}
@@ -153,7 +153,7 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
       <header className="journey__top">
         <span className="journey__brand">
           <span className="journey__mark" aria-hidden="true" />
-          Vyom <span lang="hi">व्योम</span>
+          Vyomaphala <span lang="hi">व्योमफल</span>
         </span>
         <button
           type="button"
@@ -170,8 +170,11 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
       {howto ? (
         <section className="journey__text journey__howto" aria-labelledby="howto-h">
           <h2 id="howto-h" className="journey__say journey__say--narr">
-            How to use Vyom
+            How to use Vyomaphala
           </h2>
+          <p className="journey__meaning">
+            <span lang="hi">व्योमफल</span> Vyomaphala is Sanskrit for the fruit of the sky: vyoma, the heavens, and phala, what they yield.
+          </p>
           <ol className="journey__steps">
             <li>
               <b>Add yourself.</b> Your name, birth date, time and place of birth. It takes about a minute.
@@ -200,7 +203,7 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
             <blockquote className="journey__quote">
               {beat.id === BEATS.find((b) => b.quote)?.id ? <p className="journey__kicker">In Rahul's words</p> : null}
               <p className="journey__say">{beat.quote}</p>
-              {beat.sign ? <footer className="journey__sig">Rahul (RT), who made Vyom</footer> : null}
+              {beat.sign ? <footer className="journey__sig">Rahul (RT), who made Vyomaphala</footer> : null}
             </blockquote>
           ) : (
             <>
@@ -210,8 +213,8 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
           )}{" "}
           {last ? (
             <>
-              <section className="journey__made" aria-label="How Vyom was made">
-                <p className="journey__made-h">Vyom 1.0 · Made by Rahul (RT)</p>
+              <section className="journey__made" aria-label="How Vyomaphala was made">
+                <p className="journey__made-h">Vyomaphala · Made by Rahul (RT)</p>
                 <p className="journey__made-p">
                   <b>252 hours</b> of work and dedication: 18 weeks, 7 days a week, 2 hours a day. Planning, development, data gathering and
                   cleaning.
@@ -233,10 +236,10 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
               </section>
               <div className="journey__cta">
                 <button type="button" className="stamp" onClick={() => setHowto(true)}>
-                  <span>Enter Vyom</span>
+                  <span>Enter Vyomaphala</span>
                 </button>
                 <button type="button" className="journey__ghost" onClick={onAbout}>
-                  How Vyom was made
+                  How Vyomaphala was made
                 </button>
               </div>
             </>
@@ -256,7 +259,7 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
           type="button"
           className="journey__btn journey__btn--next"
           onClick={() => (howto ? onDone() : go(at + 1))}
-          aria-label={howto ? "Start" : last ? "Enter Vyom" : "Next"}
+          aria-label={howto ? "Start" : last ? "Enter Vyomaphala" : "Next"}
         >
           {last ? "✓" : "→"}
         </button>

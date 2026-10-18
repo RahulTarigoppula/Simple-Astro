@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 (2026-10-18)
+
+### The app is now Vyomaphala (व्योमफल)
+- Vyom alone was shared by too many apps. Vyomaphala is Sanskrit for "the fruit of the sky": vyoma, the heavens, and phala, what they yield, the same phala as in phalita jyotiṣa, the predictive branch of Indian astrology. The compound follows karmaphala, "the fruit of action", a word everyone knows.
+- The name and its meaning appear in the intro, the Guide, About and the README. Internal storage keys are unchanged, so nothing saved is lost.
+
 ## 1.1.0 (2026-10-18)
 
 ### Birth details you cannot get wrong by accident

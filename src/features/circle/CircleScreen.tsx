@@ -78,7 +78,8 @@ export default function CircleScreen() {
             <p className="people-kicker">People · लोग</p>
             <h1>Add your first person</h1>
             <p className="people-lede">
-              Vyom works from one person's birth details: date, time and place. Everything else is calculated from them, on this device.
+              Vyomaphala works from one person's birth details: date, time and place. Everything else is calculated from them, on this
+              device.
             </p>
           </header>
           <Link to="/leaf/new" className="stamp people-add" aria-label="Add your first person">

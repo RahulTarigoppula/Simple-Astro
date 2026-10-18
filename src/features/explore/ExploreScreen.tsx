@@ -486,7 +486,7 @@ function Hub() {
   const [playing, setPlaying] = useState(false);
   const surprise = () => {
     countEvent("explore-surprise");
-    // Seeded from the clock (Math.random is never used in Vyom).
+    // Seeded from the clock (Math.random is never used in Vyomaphala).
     const r = mulberry32(Date.now() % 2147483647)();
     const k = Math.floor(r * 48);
     if (k < 9) setSel({ kind: "graha", id: GRAHA_IDS[k] ?? "SU" });

@@ -642,7 +642,7 @@ function question(c: Ctx) {
   g.arc(cx, cy, 3.5, 0, TAU);
   g.fill();
 }
-// ── 10. Vyom: the wheel of the sky lights up ─────────────────────────────
+// ── 10. Vyomaphala: the wheel of the sky lights up ─────────────────────────────
 function vyom(c: Ctx) {
   const { g, w, h, t } = c;
   backdrop(c, 0.9);

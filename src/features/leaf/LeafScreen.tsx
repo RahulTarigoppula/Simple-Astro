@@ -624,8 +624,8 @@ export default function LeafScreen() {
       <Sheet open={online === "asking"} onClose={() => setOnline("idle")} label="Search online?">
         <TurmericBand title="Search online?" level={2} />
         <p className="p">
-          Vyom works offline. To look up “{query.trim()}”, only the place name would be sent to Open-Meteo’s geocoder (and, if that finds
-          nothing, to OpenStreetMap Nominatim). No birth details, no names of people. You will be asked once.
+          Vyomaphala works offline. To look up “{query.trim()}”, only the place name would be sent to Open-Meteo’s geocoder (and, if that
+          finds nothing, to OpenStreetMap Nominatim). No birth details, no names of people. You will be asked once.
         </p>
         <div className="tools" style={{ paddingBottom: "var(--space-4)" }}>
           <button

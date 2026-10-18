@@ -144,7 +144,7 @@ function ExportForm({ onDone, onBack }: { onDone: () => void; onBack: () => void
     setErr(null);
     try {
       const blob = await exportEnvelope(pass);
-      await saveFile(blob, envelopeFileName(), "Vyom encrypted backup");
+      await saveFile(blob, envelopeFileName(), "Vyomaphala encrypted backup");
       play("thunk");
       toast("Encrypted backup saved (AES-GCM). Keep the passphrase safe. It cannot be recovered.");
       onDone();

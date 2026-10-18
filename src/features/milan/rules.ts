@@ -139,6 +139,6 @@ export function summaryText({ result: r, first, second, manglikLabel, disclaimer
       }`,
     );
   }
-  lines.push("", disclaimer, "Computed on this device by Vyom.");
+  lines.push("", disclaimer, "Computed on this device by Vyomaphala.");
   return lines.join("\n");
 }

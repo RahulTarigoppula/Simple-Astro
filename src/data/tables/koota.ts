@@ -1,6 +1,6 @@
 // Aṣṭakūṭa (Guna Milan) tables, classical facts, re-typed by hand. Never copied as code from any
 // implementation. The koota scheme is that of Muhūrta Cintāmaṇi ch. 6 (vivāha-prakaraṇa); where the
-// published tables vary between schools, Vyom carries BOTH schools (Settings.ashtakootaSchool):
+// published tables vary between schools, Vyomaphala carries BOTH schools (Settings.ashtakootaSchool):
 //   • "north-common" (the default), the North-Indian almanac tables most families compare against
 //     (Drik Panchang, AstroSage, most printed pañcāṅgas);
 //   • "pyjhora", the saravali.de tables used by PyJHora, whose totals agree with the PyJHora oracle data
@@ -124,7 +124,7 @@ export const VASHYA_PYJHORA: VashyaTable = {
  * 0 with every class but Jalacara (1); Mānava × Jalacara ½; every other pair 1. Re-typed from two
  * sources that agree on 24 of 25 cells: onlinejyotish.com articles/marriage-matching/english/
  * vashya-kootam.php and ganeshmitra.co.in/vasya-matching (both print bride rows × groom columns). They
- * differ only at Mānava groom × Kīṭa bride (onlinejyotish 0, ganeshmitra 1); Vyom takes 1, which
+ * differ only at Mānava groom × Kīṭa bride (onlinejyotish 0, ganeshmitra 1); Vyomaphala takes 1, which
  * keeps the table symmetric, so the side reading cannot change a score. A third family of tables
  * (astroyogi.com, astrobix.com) uses 1½ cells and is not followed.
  * Cells that differ from PyJHora: C→M, M→C, M→J, M→K, J→M, J→V, V→J, K→C, K→M, K→J.
