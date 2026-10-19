@@ -15,11 +15,7 @@ a red CI run does not block the Pages deploy.
 
 ## 2. The Android APK (once, for the life of the app)
 
-**Done on 2026-10-19 on this PC:** the release key lives at `C:\Workyomaphala-keystoreelease.p12` (alias `release`,
-passphrase in `passphrase.txt` beside it, base64 in `release.p12.base64.txt`). Back those three files up in two places.
-A JDK 21 (`C:\Work	ools\jdk\jdk21`) and the Android SDK (`C:\Work	ools\sdk`) are installed for local builds;
-`android/local.properties` points at the SDK. The first signed APK (1.3.0) is in `release/`. To let GitHub build the next
-ones, set the four secrets below from those files (`gh auth login` first).
+**Done on 2026-10-19 on this PC:** the release key lives at `C:/Work/vyomaphala-keystore/release.p12` (alias `release`, passphrase in `passphrase.txt` beside it, base64 in `release.p12.base64.txt`). Back those three files up in two places. A JDK 21 (`C:/Work/tools/jdk/jdk21`) and the Android SDK (`C:/Work/tools/sdk`) are installed for local builds; `android/local.properties` points at the SDK. The first signed APK (1.3.0) is in `release/`. To let GitHub build the next ones, set the four secrets below from those files (`gh auth login` first).
 
 In **Git Bash, outside the repo** (`/c/Work` is not a git working tree):
 
