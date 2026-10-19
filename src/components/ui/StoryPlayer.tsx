@@ -34,15 +34,11 @@ export function StoryPlayer({
   const reduce = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   const slide = slides[at];
   const article = useRef<HTMLElement>(null);
-  // A card taller than the screen must be read at the reader's pace: the clock stops on it.
-  const [tall, setTall] = useState(false);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: measured once per card
-  useEffect(() => {
+  // A card taller than the screen must be read at the reader's pace: the clock holds while it overflows.
+  const tall = () => {
     const el = article.current;
-    if (!el) return;
-    const id = requestAnimationFrame(() => setTall(el.scrollHeight > el.clientHeight + 8));
-    return () => cancelAnimationFrame(id);
-  }, [at]);
+    return !!el && el.scrollHeight > el.clientHeight + 8;
+  };
 
   const go = useCallback(
     (k: number) => {
@@ -62,20 +58,18 @@ export function StoryPlayer({
 
   // The progress clock: one rAF loop, paused while held or for reduced motion.
   useEffect(() => {
-    if (paused || reduce || tall) return;
+    if (paused || reduce) return;
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
-      setT((x) => {
-        const n = x + (now - last) / SLIDE_MS;
-        last = now;
-        return n;
-      });
+      const dt = tall() ? 0 : now - last;
+      last = now;
+      if (dt) setT((x) => x + dt / SLIDE_MS);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [paused, reduce, tall]);
+  }, [paused, reduce]);
 
   useEffect(() => {
     if (t >= 1) go(at + 1);
@@ -119,7 +113,6 @@ export function StoryPlayer({
       </header>
 
       {/* Tapping the card's right third goes forward, its left sixth goes back; links and buttons inside still work. */}
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: the arrow keys and footer buttons already cover the keyboard */}
       <article
         key={slide.id}
         ref={article}

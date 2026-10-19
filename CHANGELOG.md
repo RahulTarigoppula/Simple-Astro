@@ -34,6 +34,7 @@ Measured on a four-times-slowed phone profile: the main thread used to be busy a
 - Manual clock offset starts from the place's own offset, not +05:30; empty coordinates cannot be used; years outside 1800 to 2100 are named.
 - Clock-change messages read in plain words and open Advanced for you; "4:30 in the morning" instead of "at night".
 - The simple card keeps the Sanskrit beside a Telugu or Tamil name.
+- From a code review of all of the above: "Play the intro at start" replays it again; the year box waits for four digits before judging the range; only a real clock-change gap is called one; the Advanced panel reopens on each new clock trouble; a failed dome download is retried next time; the painted sky hides under the dome on older WebViews too; Roots cards measure their height live. Settings shows version 1.3.0; 717 automated tests and 22 browser tests.
 
 ## 1.2.0 (2026-10-18)
 

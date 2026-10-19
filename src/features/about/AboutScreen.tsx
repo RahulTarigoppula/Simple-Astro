@@ -10,7 +10,7 @@ const NUMBERS: Array<[string, string]> = [
   ["82,505", "places, offline"],
   ["9,096", "real stars"],
   ["50", "charts checked against Swiss Ephemeris"],
-  ["714", "automated tests"],
+  ["717", "automated tests"],
   ["0", "bytes of your data uploaded"],
 ];
 
@@ -120,7 +120,7 @@ const CHECKS: string[] = [
   "Almanac names and end times compared with Drik Panchang on 6 days across 3 cities (Bengaluru, Chennai, New Delhi): names exact, times within 2 minutes.",
   "Guna Milan compared with PyJHora on all 11,664 possible pairings.",
   "Every published table checked by hand against the classical texts.",
-  "714 automated tests and 22 browser tests run on every change, on a phone-sized and a desktop screen.",
+  "717 automated tests and 22 browser tests run on every change, on a phone-sized and a desktop screen.",
   "A privacy test watches every network request in a full session and fails if any of your data leaves.",
 ];
 

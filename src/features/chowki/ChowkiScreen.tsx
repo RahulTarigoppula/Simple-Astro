@@ -235,7 +235,7 @@ export default function ChowkiScreen() {
               <b>50</b> charts checked
             </li>
             <li>
-              <b>714</b> tests
+              <b>717</b> tests
             </li>
           </ul>
           <Link to="/about">Sources, methods and checks</Link>

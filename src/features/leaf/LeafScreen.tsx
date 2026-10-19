@@ -300,9 +300,16 @@ export default function LeafScreen() {
   const clockTrouble =
     resolved.err?.code === "TIME_AMBIGUOUS"
       ? "This clock time happened twice here. Open Advanced below, choose Manual and say which."
-      : resolved.err?.code === "TIME_INVALID" && !missing
+      : resolved.err?.code === "TIME_INVALID" && !missing && /did not exist/.test(resolved.err.detail)
         ? "This clock time did not exist here (a clock change skipped it). Open Advanced below and choose Manual."
         : null;
+  // Each new clock trouble opens the Advanced panel once, even if the person closed it before.
+  const [advOpen, setAdvOpen] = useState(false);
+  const lastTrouble = useRef<string | null>(null);
+  useEffect(() => {
+    if (clockTrouble && clockTrouble !== lastTrouble.current) setAdvOpen(true);
+    lastTrouble.current = clockTrouble;
+  }, [clockTrouble]);
   const whyNot = resolved.m ? null : (clockTrouble ?? resolved.err?.detail ?? "Fill in the details above.");
 
   if (id && editing === null) {
@@ -533,7 +540,7 @@ export default function LeafScreen() {
           </span>
         </div>
 
-        <details className="leaf-adv" open={draft.override !== "none" || clockTrouble !== null}>
+        <details className="leaf-adv" open={draft.override !== "none" || advOpen} onToggle={(e) => setAdvOpen(e.currentTarget.open)}>
           <summary>Advanced: clock offset and ayanāṃśa (rarely needed)</summary>
           <div className="radio-row leaf-override" role="radiogroup" aria-label="Clock offset">
             <span className="v">

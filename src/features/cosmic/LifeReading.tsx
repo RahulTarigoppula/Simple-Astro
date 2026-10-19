@@ -53,7 +53,7 @@ const stem = (s: string) =>
     .replace(/[^a-z]/g, " ")
     .trim();
 /** Drop any minus point whose opposite already sits among the plus points (and the reverse). */
-function reconcile(plus: string[], minus: string[]): { plus: string[]; minus: string[] } {
+export function reconcile(plus: string[], minus: string[]): { plus: string[]; minus: string[] } {
   const clash = (a: string, b: string) =>
     OPPOSITES.some(([x, y]) => (stem(a).includes(x) && stem(b).includes(y)) || (stem(a).includes(y) && stem(b).includes(x)));
   const keepPlus = plus.filter((p, i) => !plus.slice(0, i).some((q) => clash(p, q)));

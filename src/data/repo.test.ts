@@ -121,6 +121,20 @@ describe("profiles", () => {
   });
 });
 
+describe("palm captures", () => {
+  it("keeps one capture per hand: a retake replaces the earlier photo, print and reading", async () => {
+    await upsertProfile(makeProfile("p-1"));
+    const r1 = await savePalmCapture(makeCapture("p-1", "r-1"), new Blob([photoBytes(1)]), new Blob([photoBytes(2)]));
+    await saveReading(makeReading(r1.id));
+    await savePalmCapture({ ...makeCapture("p-1", "l-1"), hand: "left" }, new Blob([photoBytes(3)]), new Blob([photoBytes(4)]));
+    await savePalmCapture(makeCapture("p-1", "r-2"), new Blob([photoBytes(5)]), new Blob([photoBytes(6)]));
+    const palms = await db.palms.where("profileId").equals("p-1").toArray();
+    expect(palms.map((p) => p.id).sort()).toEqual(["l-1", "r-2"]);
+    expect(await db.blobs.count()).toBe(4);
+    expect(await db.readings.get("r-1")).toBeUndefined();
+  });
+});
+
 describe("settings", () => {
   it("returns DEFAULT_SETTINGS on an empty drawer and merges forward-compatibly", async () => {
     expect(await getSettings()).toEqual(DEFAULT_SETTINGS);

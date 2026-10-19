@@ -208,7 +208,7 @@ describe("TT", () => {
 
 describe("the clock in plain words", () => {
   it("prints 12-hour clock times with am/pm", async () => {
-    const { formatClock12, clockWords } = await import("./time");
+    const { formatClock12 } = await import("./time");
     expect(formatClock12(7, 25)).toBe("7:25 am");
     expect(formatClock12(0, 5)).toBe("12:05 am");
     expect(formatClock12(12, 0)).toBe("12:00 pm");

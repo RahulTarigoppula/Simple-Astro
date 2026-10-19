@@ -25,7 +25,9 @@ import { buildScene, type PaintedScene } from "./scene";
 import { loadStars } from "./starField";
 import "./sky.css";
 
-const SkyDome = lazy(() => import("./SkyDome"));
+/** A fresh lazy wrapper per attempt: React.lazy caches a rejected import, so a retry needs a new one. */
+const makeSkyDome = () => lazy(() => import("./SkyDome"));
+let SkyDome = makeSkyDome();
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
 const MONTHS_LONG = [
@@ -59,6 +61,7 @@ class DomeBoundary extends Component<{ onFail: () => void; children: ReactNode }
     return { failed: true };
   }
   override componentDidCatch(): void {
+    SkyDome = makeSkyDome(); // the next mount tries the import again
     this.props.onFail();
   }
   override render(): ReactNode {
@@ -296,7 +299,7 @@ export default function SkyScreen() {
           </p>
         </header>
 
-        <div className="sky-stage">
+        <div className={`sky-stage${domeReady ? " has-dome" : ""}`}>
           <PaintedSky
             scene={scene}
             label={`Painted sky over ${place} at ${st.time} ${zone}. Lagna ${SIGN_NAMES[L.sign] ?? ""} rising in the east.`}

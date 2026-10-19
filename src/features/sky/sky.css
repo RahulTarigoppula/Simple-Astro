@@ -176,7 +176,7 @@
   opacity: 1;
 }
 /* once the dome is up, the painted sky under it must not bleed through */
-.sky-stage:has(.dome-wrap.is-ready) > .painted {
+.sky-stage.has-dome > .painted {
   opacity: 0;
 }
 .dome {

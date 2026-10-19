@@ -57,6 +57,7 @@ export const timeFilled = (v: BirthFieldValues): boolean => hourOf(v) >= 0 && v.
 /** What is still missing, in one short sentence, or null when the date and time are complete. */
 export function missingText(v: BirthFieldValues, timeUnknown: boolean): string | null {
   if (!(v.d > 0) || !(v.mo > 0) || !(v.y > 0)) return "Fill in the date of birth.";
+  if (v.y < 1000) return "Fill in the date of birth."; // still typing the year
   if (v.y < YEAR_MIN || v.y > YEAR_MAX) return `Years ${YEAR_MIN} to ${YEAR_MAX} only.`;
   if (v.d > 31) return "Days 1 to 31 only.";
   if (!isValidCivil(v.y, v.mo, v.d, 0, 0)) {

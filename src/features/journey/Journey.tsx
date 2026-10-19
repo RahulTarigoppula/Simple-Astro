@@ -230,7 +230,7 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
                     <b>50</b> charts checked
                   </li>
                   <li>
-                    <b>714</b> tests
+                    <b>717</b> tests
                   </li>
                 </ul>
               </section>
@@ -293,8 +293,11 @@ export function markJourneySeen(): void {
 }
 export function setJourneyAtStart(on: boolean): void {
   try {
-    if (on) localStorage.removeItem(OFF);
-    else localStorage.setItem(OFF, "1");
+    if (on) {
+      localStorage.removeItem(OFF);
+      localStorage.removeItem(SEEN); // "play at start" means the next open, not never again
+      sessionStorage.removeItem(SEEN);
+    } else localStorage.setItem(OFF, "1");
   } catch {
     // ignore
   }
