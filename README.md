@@ -52,7 +52,7 @@ Useful one-off scripts (all outside-the-repo downloads are cached in `%TEMP%`):
 
 | Script | What it does |
 |---|---|
-| `scripts/build-gazetteer.mjs` | GeoNames dumps → `src/data/geonames-in.json.gz` (≤ 1.8 MB gz, asserts its own size and must-resolve names) |
+| `scripts/build-gazetteer.mjs` | GeoNames dumps → `src/data/geonames-in.json.bin` (≤ 1.8 MB gz, asserts its own size and must-resolve names) |
 | `scripts/build-stars.mjs` | Yale BSC5 → `src/data/bsc5.bin` (9 096 stars, 45 kB) |
 | `scripts/import-oracle.mjs` | PyJHora's 11 664-pair Ashtakoota CSV → `src/engine/__fixtures__/ashtakoota-oracle.bin` (numbers only) |
 | `scripts/make-palm-fixtures.mjs` | synthetic palm PNGs for the CV tests (no real hands, ever) |
@@ -62,8 +62,18 @@ Useful one-off scripts (all outside-the-repo downloads are cached in `%TEMP%`):
 ## Ship it
 
 - **Web:** every push to `main` runs `.github/workflows/pages.yml` and deploys to https://rahultarigoppula.github.io/Simple-Astro/.
-- **Android:** see [docs/HANDOFF.md](docs/HANDOFF.md) §2, generate the release keystore once, add the four
-  `ANDROID_*` secrets, then `git tag v0.2.0 && git push --tags` to get a signed APK on the Release.
+- **Android:** a signed, sideloadable APK is attached to each GitHub Release (`git tag v1.3.0 && git push origin v1.3.0`
+  once the four `ANDROID_*` secrets exist, see [docs/HANDOFF.md](docs/HANDOFF.md) §2). To build it on your own machine:
+  a JDK 21 and the Android SDK (platform 36, build-tools 36.0.0), then
+
+  ```bash
+  VITE_BASE_PATH=/ VITE_PLATFORM=android npm run build   # no service worker in the APK
+  npx cap sync android
+  cd android && ./gradlew :app:assembleRelease -PversionCode=130 -PversionName=1.3.0
+  ```
+
+  with `ANDROID_KEYSTORE_FILE`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD` set in the
+  environment (unset, Gradle writes an unsigned APK that phones will not install). The same key must sign every version.
 
 ## Attribution
 

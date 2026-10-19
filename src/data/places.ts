@@ -631,7 +631,9 @@ export function loadGazetteer(): Promise<Gazetteer> {
   if (loaded) return Promise.resolve(loaded);
   if (!loading) {
     loading = (async () => {
-      const url = new URL("./geonames-in.json.gz", import.meta.url);
+      // Named .bin, not .gz: Android packaging strips a .gz suffix (and inflates the file), which would
+      // break the fetch inside the APK. decodeBytes sniffs the gzip magic either way.
+      const url = new URL("./geonames-in.json.bin", import.meta.url);
       const res = await fetch(url, { credentials: "omit" });
       if (!res.ok) throw new Error(`gazetteer: HTTP ${res.status}`);
       return loadGazetteerFromBytes(new Uint8Array(await res.arrayBuffer()));

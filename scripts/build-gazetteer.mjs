@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Builds src/data/geonames-in.json.gz, the offline birthplace gazetteer.
+// Builds src/data/geonames-in.json.bin, the offline birthplace gazetteer.
 //
 // Sources (GeoNames, CC BY 4.0, https://download.geonames.org/export/dump/):
 //   cities15000.zip                      world populated places >= 15 000
@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 import { gzipSync, inflateRawSync } from "node:zlib";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const OUT = resolve(HERE, "../src/data/geonames-in.json.gz");
+const OUT = resolve(HERE, "../src/data/geonames-in.json.bin");
 const CACHE = process.env.GEONAMES_CACHE ?? join(tmpdir(), "claude", "geonames");
 const BASE = "https://download.geonames.org/export/dump/";
 const REFRESH = process.argv.includes("--refresh");

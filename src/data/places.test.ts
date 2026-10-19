@@ -26,7 +26,7 @@ import {
 } from "./places";
 import { getPlaceCache, PLACE_CACHE_TTL, putPlaceCache, saveSettings } from "./repo";
 
-const GZ = fileURLToPath(new URL("./geonames-in.json.gz", import.meta.url));
+const GZ = fileURLToPath(new URL("./geonames-in.json.bin", import.meta.url));
 
 describe("bundled gazetteer", () => {
   let g: Gazetteer;

@@ -13,6 +13,7 @@ const pkg = JSON.parse(readFileSync("./package.json", "utf8")) as {
 const isAndroid = process.env.VITE_PLATFORM === "android";
 const base = process.env.VITE_BASE_PATH ?? "/";
 const empty = fileURLToPath(new URL("./src/shims/empty.ts", import.meta.url));
+const noPwaRegister = fileURLToPath(new URL("./src/shims/pwa-register-none.ts", import.meta.url));
 
 /** Keeps the CSP script hashes in step with the inline scripts actually shipped in index.html. */
 function cspInlineHashes(): Plugin {
@@ -44,6 +45,8 @@ export default defineConfig({
       { find: /^fs$/, replacement: empty },
       { find: /^path$/, replacement: empty },
       { find: /^crypto$/, replacement: empty },
+      // No service worker inside the Capacitor WebView: the register module becomes a no-op.
+      ...(isAndroid ? [{ find: /^virtual:pwa-register$/, replacement: noPwaRegister }] : []),
     ],
   },
   worker: { format: "es" },

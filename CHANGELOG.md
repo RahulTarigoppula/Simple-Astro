@@ -2,6 +2,13 @@
 
 ## 1.3.0 (2026-10-19)
 
+### The Android app
+- A signed APK of the same app, for sideloading: camera for the palm reading, everything offline, no store, no account. Built with Capacitor from the web build without a service worker (the APK ships every file), signed with a release key kept outside the repository.
+- The Android build is named Vyomaphala and wears the astral colours (splash, status bar, icon background).
+- Fixed: the Android web build failed to resolve the PWA register module; it is now a no-op shim on Android.
+- Fixed: Android packaging strips a .gz suffix from assets and inflates them, which broke the offline place search inside the APK; the gazetteer file is now named .bin (same gzip bytes, sniffed on load).
+- The APK for this version is in release/ with its SHA-256; later versions go on GitHub Releases once the signing secrets are set.
+
 ### Fast on a phone
 Measured on a four-times-slowed phone profile: the main thread used to be busy about 95% of the time while the app sat idle, and a screen took 1.8 to 2.8 seconds of work to open. Now idle is idle, and every screen opens in under 0.8 seconds of work (the chart in 0.08).
 - The flicker loop that rewrote two root variables every 80 ms is gone (nothing read them), the starfield no longer drifts or twinkles, and content panes no longer blur what is behind them (the Ledge, toasts and sheets keep their glass).
