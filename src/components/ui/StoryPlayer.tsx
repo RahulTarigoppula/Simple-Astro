@@ -35,10 +35,10 @@ export function StoryPlayer({
   const slide = slides[at];
   const article = useRef<HTMLElement>(null);
   // A card taller than the screen must be read at the reader's pace: the clock holds while it overflows.
-  const tall = () => {
+  const tall = useCallback(() => {
     const el = article.current;
     return !!el && el.scrollHeight > el.clientHeight + 8;
-  };
+  }, []);
 
   const go = useCallback(
     (k: number) => {
@@ -69,7 +69,7 @@ export function StoryPlayer({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [paused, reduce]);
+  }, [paused, reduce, tall]);
 
   useEffect(() => {
     if (t >= 1) go(at + 1);
