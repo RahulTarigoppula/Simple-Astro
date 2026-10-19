@@ -250,7 +250,7 @@ export default function DrawerScreen() {
   const setPreset = (patch: Partial<EnginePreset>) => {
     clearPatriCache();
     saveSettings({ preset: { ...settings.preset, ...patch } })
-      .then(() => toast("Settings changed. Open a chart and hold the red seal to work it out again.", "warn"))
+      .then(() => toast("Settings changed. Every chart uses them from now on.", "warn"))
       .catch((e: unknown) => toast(`Could not save the setting: ${e instanceof Error ? e.message : String(e)}`, "danger"));
   };
   const set = (patch: Partial<Settings>) =>
@@ -383,6 +383,18 @@ export default function DrawerScreen() {
 
         <section className="settings-card" aria-labelledby="set-data">
           <h2 id="set-data">Your data</h2>
+          <div className="toggle-row">
+            <span className="v">
+              Prepare for offline
+              <span className="help">
+                {warm || "Downloads the palm and sky models (about 30 MB) so every screen works without internet."}
+              </span>
+            </span>
+            <button type="button" className="linkish" onClick={() => void prepareOffline()}>
+              Download now
+            </button>
+          </div>
+
           <p className="settings-note">Everything stays on this device. A backup is encrypted with a passphrase only you know.</p>
           <BackupAge zone={active?.birth.zone ?? null} />
           <div className="settings-actions">
@@ -477,7 +489,12 @@ export default function DrawerScreen() {
             ]}
             onChange={(v) => set({ chartScript: v })}
           />
-          <Toggle label="Devanagari digits" on={settings.devanagariDigits} onChange={(v) => set({ devanagariDigits: v })} />
+          <Toggle
+            label="Devanagari digits"
+            help="In the chart figure and the planet ledger only."
+            on={settings.devanagariDigits}
+            onChange={(v) => set({ devanagariDigits: v })}
+          />
           <Radio
             label="Palm framing"
             value={settings.handFraming}
@@ -489,15 +506,6 @@ export default function DrawerScreen() {
           />
           <Toggle label="Haptics" on={settings.haptics} onChange={(v) => set({ haptics: v })} />
           <Toggle label="Calm mode" help="Less motion and no sounds." on={settings.calmDesk} onChange={(v) => set({ calmDesk: v })} />
-          <div className="toggle-row">
-            <span className="v">
-              Prepare for offline
-              <span className="help">{warm || "Downloads the palm and sky models so they work without internet."}</span>
-            </span>
-            <button type="button" className="linkish" onClick={() => void prepareOffline()}>
-              Download
-            </button>
-          </div>
           {est ? <p className="settings-note">Using {(est.usage / 1e6).toFixed(1)} MB on this device.</p> : null}
         </details>
 

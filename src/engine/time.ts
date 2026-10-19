@@ -149,7 +149,7 @@ export function resolveBirthMoment(input: BirthInput): BirthMoment {
     if (offsets.length > 1) {
       throw new EngineError(
         "TIME_AMBIGUOUS",
-        `this clock time happened twice in ${zone} (${offsets.map(formatOffset).join(" / ")}); set the offset drum`,
+        `this clock time happened twice in ${zone} (${offsets.map(formatOffset).join(" / ")}); choose the clock offset by hand`,
       );
     }
     const dt = DateTime.fromObject({ year: y, month: mo, day: d, hour: h, minute: mi }, { zone });
@@ -194,7 +194,7 @@ export function formatClock24(h: number, mi: number): string {
 
 /** The part of the day a 24-hour hour falls in, as people say it. */
 export function partOfDay(h: number): "at night" | "in the morning" | "in the afternoon" | "in the evening" {
-  if (h < 5) return "at night";
+  if (h < 4) return "at night";
   if (h < 12) return "in the morning";
   if (h < 17) return "in the afternoon";
   if (h < 21) return "in the evening";

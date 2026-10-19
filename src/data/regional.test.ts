@@ -19,7 +19,9 @@ describe("regional names", () => {
   });
   it("draws the South Indian chart for Telugu and Tamil readers", () => {
     expect(chartStyleFor("telugu")).toBe("south");
-    expect(chartStyleFor("north")).toBe("north");
+    expect(chartStyleFor("tamil")).toBe("south");
+    // North Indian readers follow the Settings chart style, so no override here.
+    expect(chartStyleFor("north")).toBeUndefined();
     expect(chartStyleFor(undefined)).toBeUndefined();
   });
 });

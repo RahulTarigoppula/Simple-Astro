@@ -42,7 +42,7 @@ async function fontsReady(): Promise<void> {
 function cloth(ctx: CanvasRenderingContext2D, c: (n: string, f?: string) => string, w: number, h: number): void {
   ctx.fillStyle = c("--sky-cloth", "midnightblue");
   ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = c("--surface", "wheat");
+  ctx.fillStyle = c("--cloth-ink", "wheat");
   ctx.globalAlpha = 0.08;
   for (let y = 8; y < h; y += 16) {
     for (let x = 8; x < w; x += 16) {
@@ -80,7 +80,7 @@ function drawSky(
   ctx.arc(0, 0, SKY_R, 0, Math.PI * 2);
   ctx.clip();
 
-  ctx.strokeStyle = c("--surface", "wheat");
+  ctx.strokeStyle = c("--cloth-ink", "wheat");
   ctx.globalAlpha = 0.14;
   ctx.lineWidth = 0.6;
   ctx.setLineDash([2, 3]);
@@ -186,7 +186,7 @@ function drawSky(
     ctx.fillStyle = c("--brass-mid", "goldenrod");
     ctx.font = `600 10px ${FONT_MONO}`;
     ctx.fillText(cd.lat, cd.x, cd.y + 3.5);
-    ctx.fillStyle = c("--surface", "wheat");
+    ctx.fillStyle = c("--cloth-ink", "wheat");
     ctx.font = `12px ${FONT_BODY}`;
     ctx.fillText(cd.dev, cd.ox, cd.oy + 4);
   }
@@ -213,7 +213,7 @@ export async function renderPoster(scene: PaintedScene, text: PosterText): Promi
 
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
-  ctx.fillStyle = c("--surface", "wheat");
+  ctx.fillStyle = c("--cloth-ink", "wheat");
   ctx.font = `92px ${FONT_DISPLAY}`;
   ctx.fillText(text.name, POSTER_W / 2, 196, POSTER_W - 120);
   ctx.font = `38px ${FONT_BODY}`;
@@ -221,7 +221,7 @@ export async function renderPoster(scene: PaintedScene, text: PosterText): Promi
 
   drawSky(ctx, c, scene, POSTER_W / 2, 860, 470);
 
-  ctx.fillStyle = c("--surface", "wheat");
+  ctx.fillStyle = c("--cloth-ink", "wheat");
   ctx.font = `48px ${FONT_BODY}`;
   ctx.fillText(text.lagnaDev, POSTER_W / 2, 1470, POSTER_W - 120);
   ctx.font = `34px ${FONT_BODY}`;
@@ -244,7 +244,7 @@ export async function renderPoster(scene: PaintedScene, text: PosterText): Promi
   ctx.font = `600 30px ${FONT_MONO}`;
   ctx.fillText(text.strip.toUpperCase(), POSTER_W / 2, py + 54, pw - 48);
 
-  ctx.fillStyle = c("--surface", "wheat");
+  ctx.fillStyle = c("--cloth-ink", "wheat");
   ctx.globalAlpha = 0.78;
   ctx.font = `26px ${FONT_BODY}`;
   ctx.fillText(text.colophon, POSTER_W / 2, 1840, POSTER_W - 120);

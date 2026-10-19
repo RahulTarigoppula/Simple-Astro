@@ -1,7 +1,7 @@
 // Explore: the library of the sky, nine grahas, twelve rāśis, twenty-seven nakṣatras, numerology and
 // the Chinese zodiac, each with its myth, its meaning, the real astronomy, and where it sits right now.
 import { useMemo, useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, Navigate, useParams } from "react-router";
 import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { useNowMs } from "../../app/useNow";
 import { InfoDot } from "../../components/ui/Explain";
@@ -675,6 +675,7 @@ export default function ExploreScreen() {
   else if (kind === "nakshatra" && i >= 0 && i < 27) body = <NakshatraDetail i={i} />;
   else if (kind === "numbers") body = <Numbers />;
   else if (kind === "chinese") body = <Chinese />;
+  else if (kind !== undefined) return <Navigate to="/explore" replace />;
   else body = <Hub />;
   return (
     <Screen className="explore" label="Explore the sky">

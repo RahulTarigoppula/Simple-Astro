@@ -23,8 +23,8 @@ test("sealing casts the Patri with the golden numbers", async ({ page }) => {
   await expect(page.getByRole("heading", { name: /this is you/i })).toBeVisible();
   await expect(page.locator(".life")).toContainText("Revatī");
   await page.getByText("Full detail (astro tech)").click();
-  await expect(page.locator(".patri-head .engraved")).toContainText("2449425.5799");
-  await expect(page.locator(".patri-head .engraved")).toContainText("MEENA");
+  await expect(page.locator(".astro-tech .engraved").first()).toContainText("2449425.5799");
+  await expect(page.locator(".astro-tech .engraved").first()).toContainText("MEENA");
   const ledger = page.locator("table.ledger--grahas");
   await expect(ledger.locator("tbody tr")).toHaveCount(10); // Lagna + nine grahas
   await expect(ledger).toContainText("15°39′25″"); // Lagna, Mīna

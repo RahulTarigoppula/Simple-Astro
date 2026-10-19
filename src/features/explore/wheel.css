@@ -193,8 +193,6 @@
   border: 1px solid color-mix(in oklch, var(--tone) 45%, transparent);
   background:
     radial-gradient(500px 220px at 100% 0%, color-mix(in oklch, var(--tone) 22%, transparent), transparent 70%), rgba(14, 17, 46, 0.8);
-  -webkit-backdrop-filter: blur(var(--blur-glass));
-  backdrop-filter: blur(var(--blur-glass));
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   animation: ex-panel-in 500ms var(--ease-out) both;
 }

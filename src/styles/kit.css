@@ -28,7 +28,7 @@ body {
   font-family: var(--font-body);
   font-size: var(--text-base);
   line-height: var(--leading-body);
-  color: var(--surface);
+  color: var(--cloth-ink);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
 }
@@ -169,7 +169,7 @@ a {
   align-content: center;
   gap: 3px;
   border-radius: var(--radius-md);
-  color: var(--surface);
+  color: var(--cloth-ink);
   text-decoration: none;
   transition:
     transform var(--dur-fast) var(--ease-out),
@@ -658,14 +658,14 @@ button.cite:hover {
   font-family: var(--font-display);
   font-weight: 400;
   font-size: var(--text-2xl);
-  color: var(--surface);
+  color: var(--cloth-ink);
   line-height: var(--leading-tight);
   text-wrap: balance;
 }
 .greet p {
   margin: 6px 0 0;
   font-size: var(--text-sm);
-  color: color-mix(in oklch, var(--surface), transparent 18%);
+  color: color-mix(in oklch, var(--cloth-ink), transparent 18%);
   line-height: 1.5;
 }
 .cloth {
@@ -694,7 +694,7 @@ button.cite:hover {
   border-radius: var(--radius-md);
   min-width: 56px;
   min-height: 56px;
-  color: var(--surface);
+  color: var(--cloth-ink);
   position: relative;
   text-decoration: none;
   transition: transform var(--dur-fast) var(--ease-out);
@@ -736,7 +736,7 @@ button.cite:hover {
   left: 50%;
   translate: -50% 100%;
   background: var(--ledge);
-  color: var(--surface);
+  color: var(--cloth-ink);
   border: 1px solid var(--brass);
   padding: 3px 8px;
   border-radius: var(--radius-sm);
@@ -1650,7 +1650,7 @@ button.cite:hover {
   font-style: italic;
 }
 .print-lines .halo {
-  stroke: color-mix(in oklch, var(--surface), transparent 58%);
+  stroke: color-mix(in oklch, var(--cloth-ink), transparent 58%);
   stroke-width: 5;
 }
 .print-lines .lm {

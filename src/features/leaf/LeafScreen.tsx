@@ -3,7 +3,9 @@
 // saved, "Check before you save" reads the Moon sign, birth star and rising sign back, so a wrong
 // am/pm, day or town is caught here and not on the chart. The engraved strip below it is the
 // contract with reality: zone, offset, Julian Day and Lagna.
+import tzlookup from "@photostructure/tz-lookup";
 import * as A from "astronomy-engine";
+import { DateTime } from "luxon";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { useProfile, useSettings } from "../../app/hooks";
@@ -110,13 +112,32 @@ export default function LeafScreen() {
   const abort = useRef<AbortController | null>(null);
   const lastSign = useRef(-1);
 
-  // Edit mode: load the person once.
+  // Edit mode: load the person once. Leaving an edit for "Add a person" starts from an empty draft
+  // (both routes render this same screen, so React would otherwise keep the old state).
   useEffect(() => {
+    if (!id && loadedFrom !== null) {
+      setDraft(freshDraft());
+      setLoadedFrom(null);
+      return;
+    }
     if (editing && loadedFrom !== editing.id) {
       setDraft(draftFromProfile(editing));
       setLoadedFrom(editing.id);
     }
-  }, [editing, loadedFrom]);
+  }, [id, editing, loadedFrom]);
+
+  /** The place's own clock offset on that day (whole minutes), the sensible start for a manual offset. */
+  const offsetAtPlace = (): number => {
+    const p = draft.place;
+    if (!p || !(draft.y > 0)) return 330;
+    try {
+      const zone = tzlookup(p.lat, p.lon);
+      const dt = DateTime.fromObject({ year: draft.y, month: draft.mo || 1, day: draft.d || 1, hour: 12 }, { zone });
+      return dt.isValid ? Math.round(dt.offset) : 330;
+    } catch {
+      return 330;
+    }
+  };
 
   useEffect(() => {
     let live = true;
@@ -276,7 +297,13 @@ export default function LeafScreen() {
   const offAbs = Math.abs(draft.manualOffsetMin);
   const strip = resolved.m;
   const title = id ? "Edit person" : "Add a person";
-  const whyNot = !resolved.m ? (resolved.err?.detail ?? "Fill in the details above.") : null;
+  const clockTrouble =
+    resolved.err?.code === "TIME_AMBIGUOUS"
+      ? "This clock time happened twice here. Open Advanced below, choose Manual and say which."
+      : resolved.err?.code === "TIME_INVALID" && !missing
+        ? "This clock time did not exist here (a clock change skipped it). Open Advanced below and choose Manual."
+        : null;
+  const whyNot = resolved.m ? null : (clockTrouble ?? resolved.err?.detail ?? "Fill in the details above.");
 
   if (id && editing === null) {
     return (
@@ -315,6 +342,23 @@ export default function LeafScreen() {
             autoComplete="off"
             onChange={(e) => set("name", e.target.value)}
           />
+        </div>
+
+        <div className="radio-row leaf-trad" role="radiogroup" aria-label="How do you read your chart?">
+          <span className="v">
+            How do you read your chart?
+            <span className="help">
+              Sets the names you see (Telugu and Tamil names appear beside the Sanskrit) and how the chart is drawn. The planets and the
+              calculation are the same everywhere in India.
+            </span>
+          </span>
+          <span className="seg">
+            {(Object.keys(TRADITION_LABEL) as Tradition[]).map((k) => (
+              <button key={k} type="button" role="radio" aria-checked={draft.tradition === k} onClick={() => set("tradition", k)}>
+                {TRADITION_LABEL[k]}
+              </button>
+            ))}
+          </span>
         </div>
 
         <BirthFields
@@ -454,34 +498,6 @@ export default function LeafScreen() {
           )}
         </section>
 
-        <div className="leaf-strip-wrap">
-          <div className="engraved leaf-strip" role="status" aria-label="Time zone, clock offset, Julian Day and rising sign, worked out">
-            {strip ? (
-              <>
-                <b>{strip.zone.toUpperCase()}</b>
-                <span className="sep">·</span>
-                <span>
-                  {formatOffset(strip.offsetMin)}
-                  {strip.offsetSource === "override" ? " (manual)" : ""}
-                </span>
-                <span className="sep">·</span>
-                <span>
-                  JD <DigitSet text={strip.jdUt.toFixed(4)} />
-                </span>
-                <span className="sep">·</span>
-                <span>
-                  LAGNA {lg != null ? `${SIGN_MARK[lg]} ` : ""}
-                  <b className="lg">
-                    <DigitSet text={lg != null ? (SIGN_ENGRAVED[lg] ?? "") : "-"} />
-                  </b>
-                </span>
-              </>
-            ) : (
-              <span>{resolved.err?.code === "TIME_AMBIGUOUS" ? "THE CLOCK NEEDS THE OFFSET" : "WAITING FOR THE DETAILS"}</span>
-            )}
-          </div>
-        </div>
-
         {localStatus === "nonexistent" || (resolved.err?.code === "TIME_INVALID" && !missing) ? (
           <p className="note-haldi" role="status">
             <span aria-hidden="true">⚑</span>
@@ -503,23 +519,6 @@ export default function LeafScreen() {
           </p>
         ) : null}
 
-        <div className="radio-row leaf-trad" role="radiogroup" aria-label="How do you read your chart?">
-          <span className="v">
-            How do you read your chart?
-            <span className="help">
-              Sets the names you see (Telugu and Tamil names appear beside the Sanskrit) and how the chart is drawn. The planets and the
-              calculation are the same everywhere in India.
-            </span>
-          </span>
-          <span className="seg">
-            {(Object.keys(TRADITION_LABEL) as Tradition[]).map((k) => (
-              <button key={k} type="button" role="radio" aria-checked={draft.tradition === k} onClick={() => set("tradition", k)}>
-                {TRADITION_LABEL[k]}
-              </button>
-            ))}
-          </span>
-        </div>
-
         <div className="radio-row" role="radiogroup" aria-label="Dominant hand">
           <span className="v">
             Dominant hand
@@ -534,7 +533,7 @@ export default function LeafScreen() {
           </span>
         </div>
 
-        <details className="leaf-adv" open={draft.override !== "none"}>
+        <details className="leaf-adv" open={draft.override !== "none" || clockTrouble !== null}>
           <summary>Advanced: clock offset and ayanāṃśa (rarely needed)</summary>
           <div className="radio-row leaf-override" role="radiogroup" aria-label="Clock offset">
             <span className="v">
@@ -547,7 +546,17 @@ export default function LeafScreen() {
             </span>
             <span className="seg">
               {(["none", "bombay", "manual"] as const).map((o) => (
-                <button key={o} type="button" role="radio" aria-checked={draft.override === o} onClick={() => set("override", o)}>
+                <button
+                  key={o}
+                  type="button"
+                  role="radio"
+                  aria-checked={draft.override === o}
+                  onClick={() =>
+                    o === "manual" && draft.override !== "manual"
+                      ? patch({ override: o, manualOffsetMin: offsetAtPlace() })
+                      : set("override", o)
+                  }
+                >
                   {o === "none" ? "Automatic" : o === "bombay" ? "Bombay +04:51" : "Manual"}
                 </button>
               ))}
@@ -589,6 +598,33 @@ export default function LeafScreen() {
               </select>
             </div>
           ) : null}
+          <div className="leaf-strip-wrap">
+            <div className="engraved leaf-strip" role="status" aria-label="Time zone, clock offset, Julian Day and rising sign, worked out">
+              {strip ? (
+                <>
+                  <b>{strip.zone.toUpperCase()}</b>
+                  <span className="sep">·</span>
+                  <span>
+                    {formatOffset(strip.offsetMin)}
+                    {strip.offsetSource === "override" ? " (manual)" : ""}
+                  </span>
+                  <span className="sep">·</span>
+                  <span>
+                    JD <DigitSet text={strip.jdUt.toFixed(4)} />
+                  </span>
+                  <span className="sep">·</span>
+                  <span>
+                    LAGNA {lg != null ? `${SIGN_MARK[lg]} ` : ""}
+                    <b className="lg">
+                      <DigitSet text={lg != null ? (SIGN_ENGRAVED[lg] ?? "") : "-"} />
+                    </b>
+                  </span>
+                </>
+              ) : (
+                <span>{resolved.err?.code === "TIME_AMBIGUOUS" ? "THE CLOCK NEEDS THE OFFSET" : "WAITING FOR THE DETAILS"}</span>
+              )}
+            </div>
+          </div>
           <div className="field" style={{ borderBottom: 0 }}>
             <span className="k">
               Ayanāṃśa <InfoDot id="ayanamsha" />
@@ -615,7 +651,7 @@ export default function LeafScreen() {
           <p className="p p--muted" style={{ margin: 0 }}>
             {whyNot ? whyNot : "Hold for a breath. Nothing leaves this device."}
           </p>
-          {!id ? (
+          {!id && !draft.name && !draft.d && !draft.place ? (
             <div className="leaf-actions">
               <button
                 type="button"
@@ -666,7 +702,8 @@ function ManualPlace({ initial, onSet }: { initial: Place; onSet: (p: Place) => 
   const [name, setName] = useState("");
   const la = Number(lat);
   const lo = Number(lon);
-  const ok = Number.isFinite(la) && Number.isFinite(lo) && Math.abs(la) <= 90 && Math.abs(lo) <= 180;
+  const ok =
+    lat.trim() !== "" && lon.trim() !== "" && Number.isFinite(la) && Number.isFinite(lo) && Math.abs(la) <= 90 && Math.abs(lo) <= 180;
   return (
     <div className="leaf-manual" role="group" aria-label="Manual coordinates">
       <label>

@@ -177,7 +177,7 @@ function build(stars: StarCatalog, tok: Tok, dpr: number): Built {
     fragmentShader: STAR_FRAG,
     transparent: true,
     depthWrite: false,
-    uniforms: { uColor: { value: new Color(tok("--surface", "wheat")) }, uScale, uFade: { value: 1 } },
+    uniforms: { uColor: { value: new Color(tok("--cloth-ink", "wheat")) }, uScale, uFade: { value: 1 } },
   });
   const cloth = new Points(cg, clothMat);
   cloth.renderOrder = -1;
@@ -255,7 +255,7 @@ function build(stars: StarCatalog, tok: Tok, dpr: number): Built {
       ctx.fillStyle = tok("--brass-mid", "goldenrod");
       ctx.font = `600 34px ${FONT_MONO}`;
       ctx.fillText(lat, 40, 44);
-      ctx.fillStyle = tok("--surface", "wheat");
+      ctx.fillStyle = tok("--cloth-ink", "wheat");
       ctx.font = `36px ${FONT_BODY}`;
       ctx.fillText(dev, 92, 46);
     });

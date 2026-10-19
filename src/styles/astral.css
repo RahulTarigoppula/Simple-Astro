@@ -45,7 +45,7 @@ h3 {
 .desk::before {
   content: "";
   position: absolute;
-  inset: -50%;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
   background-image:
@@ -58,7 +58,6 @@ h3 {
     radial-gradient(1px 1px at 360px 190px, rgba(221, 214, 254, 0.75), transparent 60%);
   background-size: 400px 300px;
   opacity: 0.75;
-  animation: star-drift 240s linear infinite;
 }
 .desk::after {
   background:
@@ -66,26 +65,12 @@ h3 {
     radial-gradient(1px 1px at 170px 140px, rgba(255, 255, 255, 0.6), transparent 60%),
     radial-gradient(1.5px 1.5px at 90px 200px, rgba(196, 181, 253, 0.85), transparent 60%);
   background-size: 260px 240px;
-  opacity: 0.5;
+  opacity: 0.45;
   z-index: 0;
-  animation: twinkle 6s ease-in-out infinite alternate;
 }
 .desk > * {
   position: relative;
   z-index: 1;
-}
-@keyframes star-drift {
-  to {
-    transform: translate(200px, 150px);
-  }
-}
-@keyframes twinkle {
-  from {
-    opacity: 0.25;
-  }
-  to {
-    opacity: 0.65;
-  }
 }
 .screen,
 .screen--scroll,
@@ -101,8 +86,6 @@ h3 {
   border: 1px solid var(--glass-edge);
   border-radius: var(--radius-lg);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
-  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(140%);
-  backdrop-filter: blur(var(--blur-glass)) saturate(140%);
 }
 .paper::before {
   display: none;

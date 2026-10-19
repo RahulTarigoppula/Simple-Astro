@@ -36,11 +36,11 @@ describe("zone clock", () => {
     expect(c.offset(t)).toBe("UTC+05:30");
     expect(c.hours(t)).toBeCloseTo(17 + 4 / 60 + 12 / 3600, 6);
   });
-  it("marks an end on the next civil day with +1", () => {
+  it("marks an end on the next civil day as tomorrow", () => {
     const c = zoneClock("Asia/Kolkata");
     const rise = Date.UTC(2026, 9, 6, 0, 40); // 06:10 IST
     const end = Date.UTC(2026, 9, 6, 19, 4); // 00:34 IST next day
-    expect(endsLabel(c, end, rise)).toBe("ends 00:34 +1");
+    expect(endsLabel(c, end, rise)).toBe("ends 00:34 tomorrow");
     expect(rangeLabel(c, [Date.UTC(2026, 9, 6, 9, 52), Date.UTC(2026, 9, 6, 11, 24)])).toBe("15:22-16:54");
   });
   it("survives an unknown zone", () => {
@@ -72,7 +72,7 @@ describe("TodayScreen", { timeout: 60_000 }, () => {
     expect(await screen.findByRole("heading", { level: 1, name: /Today/ })).toBeInTheDocument();
     expect(await screen.findByText(/the dial reads Bengaluru/)).toBeInTheDocument();
     const tithi = await screen.findByRole("button", { name: /^Tithi/ });
-    expect(within(tithi).getByText(/^ends \d{2}:\d{2}( \+\d)?$/)).toBeInTheDocument();
+    expect(within(tithi).getByText(/^ends \d{2}:\d{2}( tomorrow| in \d+ days)?$/)).toBeInTheDocument();
     expect(within(tithi).getByText(/[ऀ-ॿ]/, { selector: "[lang='hi']" })).toBeInTheDocument();
     const rahu = screen.getByRole("button", { name: /^Rāhu Kāla/ });
     expect(rahu.textContent).toMatch(/\d{2}:\d{2}-\d{2}:\d{2}/);
@@ -169,8 +169,8 @@ describe("TodayScreen", { timeout: 60_000 }, () => {
     expect(Number((document.activeElement as HTMLElement).dataset.day)).toBe(nd + 7 <= 28 ? nd + 7 : nd - 7);
     next.focus();
     fireEvent.click(next);
-    await waitFor(() => expect(screen.getByRole("button", { name: "Read this day in full" })).toBeInTheDocument(), { timeout: 20_000 });
-    fireEvent.click(screen.getByRole("button", { name: "Read this day in full" }));
+    // On a phone, picking a day opens the Day tab for that day.
+    await waitFor(() => expect(screen.getByRole("tab", { name: "Day" })).toHaveAttribute("aria-selected", "true"), { timeout: 20_000 });
     expect(await screen.findByRole("button", { name: /^Tithi/ })).toBeInTheDocument();
   });
 

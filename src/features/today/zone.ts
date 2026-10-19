@@ -92,11 +92,11 @@ export function zoneClock(zoneIn: string): ZoneClock {
 /** "ends 17:04" or "ends 09:17 +1", the +n counts civil days past the governing day. */
 export function endsLabel(clock: ZoneClock, endMs: number, dayMs: number): string {
   const dd = clock.dayNumber(endMs) - clock.dayNumber(dayMs);
-  return `ends ${clock.hm(endMs)}${dd > 0 ? ` +${dd}` : ""}`;
+  return `ends ${clock.hm(endMs)}${dd === 1 ? " tomorrow" : dd > 1 ? ` in ${dd} days` : ""}`;
 }
 
 /** "15:22-16:54" (with "+1" on the end when it crosses midnight). */
 export function rangeLabel(clock: ZoneClock, [a, b]: readonly [number, number]): string {
   const dd = clock.dayNumber(b) - clock.dayNumber(a);
-  return `${clock.hm(a)}-${clock.hm(b)}${dd > 0 ? ` +${dd}` : ""}`;
+  return `${clock.hm(a)}-${clock.hm(b)}${dd === 1 ? " (into tomorrow)" : dd > 1 ? ` (+${dd} days)` : ""}`;
 }

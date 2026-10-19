@@ -4,7 +4,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router";
 import { GRAHA_LORE, NAKSHATRA_LORE, RASHI_LORE } from "../../data/lore";
-import { nakName, rashiName } from "../../data/regional";
+import { nakBoth, rashiBoth } from "../../data/regional";
 import { CHAPTER_PLAIN, MOON_TRAITS, NAK_TRAITS, NUMBER_TRAITS } from "../../data/traits";
 import { currentDasha } from "../../engine/dasha";
 import { birthNumbers } from "../../engine/profile";
@@ -33,6 +33,33 @@ const ordinal = (n: number) => {
 };
 const monthYear = (ms: number, zone: string) =>
   new Date(ms).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: safeZone(zone) });
+
+/** Pairs that must not appear on both sides of one card. */
+const OPPOSITES: ReadonlyArray<readonly [string, string]> = [
+  ["patient", "impatient"],
+  ["calm", "restless"],
+  ["steady", "changeable"],
+  ["cautious", "impulsive"],
+  ["careful", "careless"],
+  ["generous", "stingy"],
+  ["bold", "timid"],
+  ["sociable", "withdrawn"],
+  ["decisive", "indecisive"],
+  ["practical", "dreamy"],
+];
+const stem = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z]/g, " ")
+    .trim();
+/** Drop any minus point whose opposite already sits among the plus points (and the reverse). */
+function reconcile(plus: string[], minus: string[]): { plus: string[]; minus: string[] } {
+  const clash = (a: string, b: string) =>
+    OPPOSITES.some(([x, y]) => (stem(a).includes(x) && stem(b).includes(y)) || (stem(a).includes(y) && stem(b).includes(x)));
+  const keepPlus = plus.filter((p, i) => !plus.slice(0, i).some((q) => clash(p, q)));
+  const keepMinus = minus.filter((m) => !keepPlus.some((p) => clash(p, m)));
+  return { plus: keepPlus, minus: keepMinus };
+}
 
 function uniq(xs: string[], n: number): string[] {
   const seen = new Set<string>();
@@ -63,9 +90,9 @@ export function LifeReading({ profile, patri, nowMs }: { profile: Profile; patri
     const cur = currentDasha(patri.dasha, nowMs);
     return {
       first: profile.name.split(/\s+/)[0] ?? profile.name,
-      moonSign: rashiName(mo.sign, profile.tradition),
+      moonSign: rashiBoth(mo.sign, profile.tradition),
       moonWest: RASHI_LORE[mo.sign]?.western ?? "",
-      star: nakName(mo.nakshatra, profile.tradition),
+      star: nakBoth(mo.nakshatra, profile.tradition),
       moon,
       nak,
       nl,
@@ -76,12 +103,17 @@ export function LifeReading({ profile, patri, nowMs }: { profile: Profile; patri
       waxing,
       lg,
       lgSame: patri.lagna.sign === mo.sign,
-      lgName: rashiName(patri.lagna.sign, profile.tradition),
+      lgName: rashiBoth(patri.lagna.sign, profile.tradition),
       d: b.localD,
       cur,
       zone: b.zone,
-      plus: uniq([...(moon?.plus ?? []), ...(nak?.plus ?? []), ...(root?.plus ?? [])], 6),
-      minus: uniq([...(moon?.minus ?? []), ...(nak?.minus ?? []), ...(root?.minus ?? [])], 4),
+      ...(() => {
+        const r = reconcile(
+          uniq([...(moon?.plus ?? []), ...(nak?.plus ?? []), ...(root?.plus ?? [])], 8),
+          uniq([...(moon?.minus ?? []), ...(nak?.minus ?? []), ...(root?.minus ?? [])], 6),
+        );
+        return { plus: r.plus.slice(0, 6), minus: r.minus.slice(0, 4) };
+      })(),
     };
   }, [profile, patri, nowMs]);
 

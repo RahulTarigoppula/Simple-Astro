@@ -16,7 +16,10 @@ export async function hold(page: Page, name: RegExp | string, ms = 800): Promise
 export async function sealReferenceLeaf(page: Page): Promise<string> {
   await page.goto("#/leaf/new");
   await page.getByRole("button", { name: /fill in an example/i }).click();
-  await page.locator(".leaf-strip").getByText(/MEENA/).waitFor();
+  await page
+    .locator(".leaf-check")
+    .getByText(/Revatī/)
+    .waitFor();
   await hold(page, /hold to save/i);
   await page.waitForURL(/#\/patri\//);
   return page.url().split("#/patri/")[1] ?? "";

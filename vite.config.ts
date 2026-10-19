@@ -82,21 +82,22 @@ export default defineConfig({
               clientsClaim: true,
               cleanupOutdatedCaches: true,
               globPatterns: ["**/*.{js,css,html,svg,png,woff2,webmanifest,webm,mp3,bin,gz}"],
-              globIgnores: ["**/models/**", "**/mediapipe/**", "**/*.wasm", "**/opencv*.js", "**/cv-*.js", "**/SkyDome-*.js"],
+              globIgnores: ["**/models/**", "**/mediapipe/**", "**/*.wasm", "**/opencv*.js", "**/cv-*.js"],
               maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
               navigateFallback: `${base}index.html`,
               runtimeCaching: [
                 {
                   urlPattern: /\/models\/.*\.task$/,
                   handler: "CacheFirst",
-                  options: { cacheName: "chowki-models", expiration: { maxEntries: 4 } },
+                  // MediaPipe fetches its loader in CORS mode; the cached copy carries Vary: Origin, so the
+                  // match must ignore Vary or the model never opens offline.
+                  options: { cacheName: "chowki-models", expiration: { maxEntries: 4 }, matchOptions: { ignoreVary: true } },
                 },
                 {
                   urlPattern: /\/(mediapipe|assets\/(opencv|cv)).*\.(wasm|js)$/,
                   handler: "CacheFirst",
-                  options: { cacheName: "chowki-cv", expiration: { maxEntries: 12 } },
+                  options: { cacheName: "chowki-cv", expiration: { maxEntries: 12 }, matchOptions: { ignoreVary: true } },
                 },
-                { urlPattern: /SkyDome-.*\.js$/, handler: "CacheFirst", options: { cacheName: "chowki-sky" } },
                 { urlPattern: /geocoding-api\.open-meteo\.com/, handler: "NetworkOnly" },
                 { urlPattern: /nominatim\.openstreetmap\.org/, handler: "NetworkOnly" },
               ],

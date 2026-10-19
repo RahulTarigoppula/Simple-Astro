@@ -270,7 +270,7 @@ export default function CaptureScreen() {
         </svg>
         {camera !== "live" ? (
           <div className="empty-note" style={{ position: "absolute", inset: 0, color: "var(--surface)" }}>
-            <b style={{ color: "var(--surface)" }}>{camera === "starting" ? "Opening the camera…" : "Gallery only"}</b>
+            <b style={{ color: "var(--cloth-ink)" }}>{camera === "starting" ? "Opening the camera…" : "Gallery only"}</b>
             <span style={{ fontSize: "var(--text-sm)" }}>
               {camera === "denied"
                 ? "The camera was not allowed. Pick a photo of your palm instead. It never leaves this device."

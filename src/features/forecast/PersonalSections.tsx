@@ -165,14 +165,14 @@ export function DayGuideCard({ g, zone, name }: { g: DayGuide; zone: string; nam
                   <span className="mono">
                     {hm(h.startMs, zone)}-{hm(h.endMs, zone)}
                   </span>{" "}
-                  {GRAHA_LORE.find((x) => x.id === h.lord)?.english}
+                  {GRAHA_LORE.find((x) => x.id === h.lord)?.english} hour
                 </span>
               ))
             : "none outside Rāhu Kāla today"}
         </span>
       </div>
       <div className="fc-guide__row">
-        <span className="fc-guide__k">Pause new starts</span>
+        <span className="fc-guide__k">Rāhu Kāla, pause new starts</span>
         <InfoDot id="rahu-kala" />
         <span className="fc-chip fc-chip--warn mono">
           {hm(g.avoid[0], zone)}-{hm(g.avoid[1], zone)}

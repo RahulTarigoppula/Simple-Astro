@@ -268,7 +268,7 @@
   pointer-events: none;
   background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.07) 50%, transparent 65%);
   transform: translateX(-100%);
-  animation: home-sweep 7s ease-in-out infinite;
+  animation: home-sweep 7s ease-in-out 3;
 }
 .home-big:nth-child(2)::after {
   animation-delay: 2.3s;

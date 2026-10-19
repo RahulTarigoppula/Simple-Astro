@@ -1,5 +1,40 @@
 # Changelog
 
+## 1.3.0 (2026-10-19)
+
+### Fast on a phone
+Measured on a four-times-slowed phone profile: the main thread used to be busy about 95% of the time while the app sat idle, and a screen took 1.8 to 2.8 seconds of work to open. Now idle is idle, and every screen opens in under 0.8 seconds of work (the chart in 0.08).
+- The flicker loop that rewrote two root variables every 80 ms is gone (nothing read them), the starfield no longer drifts or twinkles, and content panes no longer blur what is behind them (the Ledge, toasts and sheets keep their glass).
+- "Full detail" on a chart is built only when it is opened; nothing in it is computed before that.
+- No forced layout on the chart screen: the chart figure and the Sāḍe Sātī ribbon measure after paint.
+- "Coming up in the sky" searches the next 45 days after the screen has painted, and remembers the result for an hour.
+- The light sweep on the Home cards runs three times, then rests.
+
+### Tested as a first-time family member
+- The intro plays once per device, not once per browser session; its last slide leads to "How to use it" and then Home.
+- The tradition question (North Indian, Telugu, Tamil) comes right after the name, before any names are shown; the example button hides once typing starts; the technical strip moved under Advanced.
+- Telugu and Tamil readers see Latin letters on the chart figure instead of Devanagari.
+- Plus and minus points never contradict each other on the simple card.
+- Every house in the forecast says which frame it is counted from (Moon sign or rising sign).
+- Manglik in one sentence ("Mars doṣa from Candra, cancelled by an exception"); the Partner screen's Moon-sign badge shows the sign glyph, not a number.
+- "ends 10:52 tomorrow" instead of "+1"; "Rāhu Kāla, pause new starts"; "Venus hour" in best hours.
+- Home's privacy card says the one thing that is sent (anonymous screen counts, switchable off); the clock says "until you add a person".
+- Backup words without cipher jargon; "Prepare for offline" sits under Your data; "Devanagari digits" says where it applies.
+
+### Tested as an adversary, and on the heavy screens
+- Palm reading works offline after "Prepare for offline" (the cached model loader was never matched because of a Vary header).
+- A retaken palm photo replaces the earlier one, so "delete this palm photo" leaves nothing of that hand behind.
+- The 3-D sky dome is precached; if it still cannot load, the painted sky stays instead of an error page, and it no longer bleeds through the dome on wide screens.
+- Light text on the dark sky (the Today pager, the sky poster, the capture frame, the dome) uses one ink token; it was using the glass colour and was unreadable.
+- Roots cards: tap the right of a card to go on, the left to go back; a card taller than the screen waits for you.
+- Picking a day on the phone's month grid opens that day.
+- Leaving an edit for "Add a person" starts from an empty form (the old person's details used to carry over).
+- "Settings changed in another tab" offers a button to work the chart out again; in one tab, charts simply use the new settings.
+- The Settings chart style applies to North Indian people again (Telugu and Tamil keep the South Indian grid).
+- Manual clock offset starts from the place's own offset, not +05:30; empty coordinates cannot be used; years outside 1800 to 2100 are named.
+- Clock-change messages read in plain words and open Advanced for you; "4:30 in the morning" instead of "at night".
+- The simple card keeps the Sanskrit beside a Telugu or Tamil name.
+
 ## 1.2.0 (2026-10-18)
 
 ### The app is now Vyomaphala (व्योमफल)

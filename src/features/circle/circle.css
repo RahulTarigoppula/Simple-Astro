@@ -169,7 +169,7 @@
   display: grid;
   place-items: center;
   align-content: center;
-  color: var(--surface);
+  color: var(--cloth-ink);
   font-size: var(--text-sm);
   line-height: 1.2;
   border-left: 1px solid rgba(255, 235, 200, 0.1);
@@ -409,7 +409,7 @@
   margin: 0 4px 0 20px;
   padding: 10px 16px 10px 17px;
   border-radius: var(--radius-md);
-  background-color: var(--surface);
+  background-color: var(--cloth-ink);
   background-image: repeating-linear-gradient(180deg, transparent 0 21px, color-mix(in oklch, var(--border), transparent 30%) 21px 22px);
   box-shadow: var(--shadow-1);
   color: var(--ink);

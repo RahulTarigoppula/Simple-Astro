@@ -50,13 +50,15 @@ interface Props extends BirthFieldValues {
 
 /** True when the date fields are all filled and name a real day. */
 export const dateFilled = (v: Pick<BirthFieldValues, "y" | "mo" | "d">): boolean =>
-  v.y > 0 && v.mo > 0 && v.d > 0 && isValidCivil(v.y, v.mo, v.d, 0, 0);
+  v.y >= YEAR_MIN && v.y <= YEAR_MAX && v.mo > 0 && v.d > 0 && isValidCivil(v.y, v.mo, v.d, 0, 0);
 /** True when the hour has been chosen. */
 export const timeFilled = (v: BirthFieldValues): boolean => hourOf(v) >= 0 && v.mi >= 0 && v.mi <= 59;
 
 /** What is still missing, in one short sentence, or null when the date and time are complete. */
 export function missingText(v: BirthFieldValues, timeUnknown: boolean): string | null {
   if (!(v.d > 0) || !(v.mo > 0) || !(v.y > 0)) return "Fill in the date of birth.";
+  if (v.y < YEAR_MIN || v.y > YEAR_MAX) return `Years ${YEAR_MIN} to ${YEAR_MAX} only.`;
+  if (v.d > 31) return "Days 1 to 31 only.";
   if (!isValidCivil(v.y, v.mo, v.d, 0, 0)) {
     const n = daysInMonth(v.y, v.mo);
     return n ? `${MONTH_NAMES[v.mo - 1]} ${v.y} has only ${n} days.` : "That date does not exist.";
@@ -74,7 +76,6 @@ function NumberBox({
   id,
   label,
   value,
-  min,
   max,
   width,
   placeholder,
@@ -83,7 +84,6 @@ function NumberBox({
   id: string;
   label: string;
   value: number;
-  min: number;
   max: number;
   width: string;
   placeholder: string;
@@ -116,7 +116,7 @@ function NumberBox({
         const raw = e.target.value.replace(/[^0-9]/g, "");
         setText(raw);
         const n = Number.parseInt(raw, 10);
-        onCommit(Number.isInteger(n) && n >= min && n <= max ? n : 0);
+        onCommit(Number.isInteger(n) && n >= 1 ? n : 0); // range is judged by missingText, so it can say why
       }}
       onBlur={() => {
         focused.current = false;
@@ -139,16 +139,7 @@ export function BirthFields({ y, mo, d, hour12, ampm, mi, timeUnknown, onChange 
       <div className="bf__row" role="group" aria-label="Date of birth">
         <span className="bf__k">Date of birth</span>
         <div className="bf__fields">
-          <NumberBox
-            id="bf-day"
-            label="Day"
-            value={d}
-            min={1}
-            max={31}
-            width="3.4em"
-            placeholder="DD"
-            onCommit={(n) => onChange({ d: n })}
-          />
+          <NumberBox id="bf-day" label="Day" value={d} max={31} width="3.4em" placeholder="DD" onCommit={(n) => onChange({ d: n })} />
           <select
             id="bf-month"
             className="bf__select bf__select--month"
@@ -169,7 +160,6 @@ export function BirthFields({ y, mo, d, hour12, ampm, mi, timeUnknown, onChange 
             id="bf-year"
             label="Year"
             value={y}
-            min={YEAR_MIN}
             max={YEAR_MAX}
             width="4.6em"
             placeholder="YYYY"

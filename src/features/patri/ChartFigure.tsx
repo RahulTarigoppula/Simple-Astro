@@ -50,9 +50,11 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
   useEffect(() => {
     const el = wrap.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => setWidth(el.clientWidth));
-    ro.observe(el);
-    setWidth(el.clientWidth);
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w) setWidth(w);
+    });
+    ro.observe(el); // fires once after layout with the initial size, so no synchronous read is needed
     return () => ro.disconnect();
   }, []);
 

@@ -607,6 +607,7 @@ export default function TodayScreen() {
     if (!base) return;
     const target = dayNumberOf(v) - clock.dayNumber(base.sunriseMs);
     step(target - offset);
+    if (!wide) setTab("day"); // on a phone the grid is its own tab: picking a day should show that day
   };
 
   const head =

@@ -88,8 +88,6 @@
   background:
     radial-gradient(420px 220px at 0% 0%, rgba(139, 92, 246, 0.22), transparent 70%),
     radial-gradient(420px 220px at 100% 100%, rgba(34, 211, 238, 0.12), transparent 70%), rgba(15, 18, 48, 0.78);
-  -webkit-backdrop-filter: blur(var(--blur-glass));
-  backdrop-filter: blur(var(--blur-glass));
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   min-height: 420px;
 }

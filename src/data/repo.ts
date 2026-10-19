@@ -243,9 +243,20 @@ export async function savePalmCapture(capture: HandCapture, originalBlob: Blob, 
     { key: stored.rectifiedBlobKey, blob: rectifiedBlob, type: rectifiedBlob.type },
   ];
   return guard("savePalmCapture", () =>
-    db.transaction("rw", [db.profiles, db.palms, db.blobs], async () => {
+    db.transaction("rw", [db.profiles, db.palms, db.blobs, db.readings], async () => {
       if (!(await db.profiles.get(capture.profileId))) {
         throw new StorageError("NOT_FOUND", `profile ${capture.profileId}`);
+      }
+      // One capture per hand: a retake replaces the earlier photo, its print and its reading, so a
+      // later "delete this palm photo" truly leaves nothing of that hand behind.
+      const older = (await db.palms.where("profileId").equals(capture.profileId).toArray()).filter(
+        (p) => p.hand === capture.hand && p.id !== capture.id,
+      );
+      for (const p of older) {
+        await db.blobs.bulkDelete([p.originalBlobKey, p.rectifiedBlobKey]);
+        await db.blobs.where("key").startsWith(`${p.profileId}/${p.id}/`).delete();
+        await db.readings.delete(p.id);
+        await db.palms.delete(p.id);
       }
       const prev = await db.palms.get(capture.id);
       if (prev) await db.blobs.bulkDelete([prev.originalBlobKey, prev.rectifiedBlobKey]);

@@ -87,7 +87,7 @@
 }
 .capture__outline path {
   fill: none;
-  stroke: var(--surface);
+  stroke: var(--cloth-ink);
   stroke-width: 1.2;
   stroke-dasharray: 5 4;
   opacity: 0.55;

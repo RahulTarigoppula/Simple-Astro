@@ -212,7 +212,7 @@ export function personalReading(patri: Patri, atMs: number, preset: EnginePreset
       }
       notes.push({
         w: fav ? 1 : -1,
-        text: `${Name(k)}, the natural significator of this area, is in the ${ord(h)} from your Moon (${fav ? "supportive" : "a strain"})`,
+        text: `${Name(k)}, the natural significator of this area, is in the ${ord(h)} from your Moon sign (${fav ? "supportive" : "a strain"})`,
       });
     }
     for (const g of GRAHA_IDS) {
@@ -227,7 +227,7 @@ export function personalReading(patri: Patri, atMs: number, preset: EnginePreset
       const h = a.houses.includes(hl) ? hl : hm;
       notes.push({
         w: good ? 1.2 : -1.2,
-        text: `${Name(g)} is passing through your ${ord(h)} house${a.houses.includes(hl) ? "" : " from the Moon"} (${good ? "supportive" : "a strain"})`,
+        text: `${Name(g)} is passing through your ${ord(h)} house from your ${a.houses.includes(hl) ? "rising sign" : "Moon sign"} (${good ? "supportive" : "a strain"})`,
       });
     }
     const score = Math.max(-1, Math.min(1, den ? num / den : 0));

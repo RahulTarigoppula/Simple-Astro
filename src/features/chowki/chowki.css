@@ -269,9 +269,7 @@
   min-height: 64px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--glass-edge);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)), rgba(17, 21, 52, 0.55);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)), rgba(17, 21, 52, 0.8);
   color: var(--ink);
   text-decoration: none;
   transition:

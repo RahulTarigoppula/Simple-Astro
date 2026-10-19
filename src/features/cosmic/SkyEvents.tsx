@@ -1,6 +1,6 @@
 // "Coming up in the sky": Moon phases, Ekādaśī, eclipses (seen here or not), saṅkrāntis, sign changes
 // and retrograde stations for the weeks ahead, each in one plain line.
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { InfoDot } from "../../components/ui/Explain";
 import { GrahaGlyph } from "../../components/ui/GrahaGlyph";
@@ -106,18 +106,46 @@ interface Props {
   limit?: number;
 }
 
+const cache = new Map<string, SkyEvent[]>();
+
+/** The 45-day search costs about a second on a slow phone: it runs after the first paint, once per hour and place. */
+function useSkyEvents(hourKey: number, days: number, lat: number, lon: number, preset: EnginePreset): SkyEvent[] | null {
+  const key = `${hourKey}|${days}|${lat.toFixed(3)}|${lon.toFixed(3)}|${preset.ayanamsa}|${preset.node}`;
+  const [events, setEvents] = useState<SkyEvent[] | null>(() => cache.get(key) ?? null);
+  useEffect(() => {
+    const hit = cache.get(key);
+    if (hit) {
+      setEvents(hit);
+      return;
+    }
+    let live = true;
+    const run = () => {
+      let out: SkyEvent[] = [];
+      try {
+        out = skyEvents(hourKey * HOUR, days, { lat, lon }, preset);
+      } catch {
+        out = [];
+      }
+      if (cache.size > 24) cache.clear();
+      cache.set(key, out);
+      if (live) setEvents(out);
+    };
+    const idle = (window as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    const handle = idle ? idle(run, { timeout: 1500 }) : window.setTimeout(run, 50);
+    return () => {
+      live = false;
+      if (idle) (window as { cancelIdleCallback?: (h: number) => void }).cancelIdleCallback?.(handle);
+      else clearTimeout(handle);
+    };
+  }, [key, hourKey, days, lat, lon, preset]);
+  return events;
+}
+
 export function SkyEvents({ nowMs, place, zone, preset, days = 45, limit = 8 }: Props) {
-  // Recompute at most hourly; the search is ~a second's worth of ephemeris on slow phones.
   const hourKey = Math.floor(nowMs / HOUR);
   const { lat, lon } = place;
-  const events = useMemo(() => {
-    try {
-      return skyEvents(hourKey * HOUR, days, { lat, lon }, preset);
-    } catch {
-      return [];
-    }
-  }, [hourKey, days, lat, lon, preset]);
-  const shown = events.filter((e) => e.ms >= nowMs).slice(0, limit);
+  const events = useSkyEvents(hourKey, days, lat, lon, preset);
+  const shown = useMemo(() => (events ?? []).filter((e) => e.ms >= nowMs).slice(0, limit), [events, nowMs, limit]);
 
   return (
     <section className="cosmic-card sky-events" aria-labelledby="sky-events-h">

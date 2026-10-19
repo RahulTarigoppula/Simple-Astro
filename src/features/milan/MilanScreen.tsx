@@ -11,7 +11,7 @@ import { Sheet } from "../../components/ui/Sheet";
 import { TurmericBand } from "../../components/ui/TurmericBand";
 import { glossary } from "../../data/glossary";
 import { nakBoth, rashiBoth } from "../../data/regional";
-import { NAKSHATRA_DEV, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
+import { NAKSHATRA_DEV, SIGN_DEV, SIGN_MARK, SIGN_NAMES } from "../../data/tables/names";
 import { milan } from "../../engine/ashtakoota";
 import { AYANAMSA_LABEL } from "../../engine/ayanamsa";
 import { MANGLIK_CANCELLATIONS, MANGLIK_REF_LABEL } from "../../engine/manglik";
@@ -52,8 +52,9 @@ const moonOfPatri = (p: Patri): MoonFacts => ({ nak: p.grahas.MO.nakshatra, pada
 
 /** "Manglik (from Lagna, Candra), bhaṅga noted" / "no Manglik mark". */
 export function manglikLabel(m: ManglikStatus): string {
-  if (!m.present) return "no Manglik mark";
-  return `Manglik (from ${m.from.map((f) => MANGLIK_REF_LABEL[f]).join(", ")})${m.cancellations.length > 0 ? ", bhaṅga noted" : ""}`;
+  if (!m.present) return "not Manglik";
+  const from = m.from.map((f) => MANGLIK_REF_LABEL[f]).join(", ");
+  return m.cancellations.length > 0 ? `Mars doṣa from ${from}, cancelled by an exception` : `Manglik (Mars doṣa from ${from})`;
 }
 
 const bodiesOfPatri = (p: Patri): ChartBody[] =>
@@ -152,8 +153,8 @@ function ScrollFace({
       <b>{profile.name}</b>
       {moon ? (
         <span className="mscroll__moon">
-          <span className="mscroll__sign" title={`Moon sign ${moon.sign + 1}, ${SIGN_NAMES[moon.sign]}`}>
-            {moon.sign + 1}
+          <span className="mscroll__sign" title={`Moon sign ${SIGN_NAMES[moon.sign]}`}>
+            {SIGN_MARK[moon.sign]}
           </span>
           <span lang="hi" className="dev">
             {NAKSHATRA_DEV[moon.nak]}

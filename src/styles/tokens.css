@@ -20,7 +20,7 @@
   --nebula-rose: #be185d;
 
   /* ── glass panes (the old "paper") ── */
-  --surface: rgba(17, 21, 52, 0.66);
+  --surface: rgba(17, 21, 52, 0.86);
   --surface-2: rgba(42, 48, 104, 0.42);
   --surface-solid: #11153a;
   --glass-hi: rgba(255, 255, 255, 0.06);
@@ -46,6 +46,7 @@
   --border-strong: rgba(180, 192, 255, 0.3);
   --focus: #67e8f9;
   --moon: #e0e7ff;
+  --cloth-ink: #f3efe4; /* light ink on the dark sky: posters, the dome, the capture frame */
   --ledge: rgba(9, 11, 30, 0.72);
 
   /* semantic aliases (kept from the first system) */
@@ -113,6 +114,7 @@
   --lamp-x: 0;
   --lamp-y: 1;
   --flicker: 0px;
+  --flame-k: 1;
   --shadow-alpha: 0.5;
   --shadow-1: 0 4px 14px rgba(0, 0, 0, 0.35);
   --shadow-2: 0 14px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--glass-edge);

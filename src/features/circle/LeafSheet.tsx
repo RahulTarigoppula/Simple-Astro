@@ -168,8 +168,8 @@ function ExportForm({ onDone, onBack }: { onDone: () => void; onBack: () => void
       }}
     >
       <p className="p p--muted">
-        The backup holds every person, chart and palm photo, encrypted with your passphrase (AES-GCM, PBKDF2 600 000 rounds). Nothing is
-        sent anywhere; the file is handed to you.
+        The backup holds every person, chart and palm photo, locked with your passphrase. Nothing is sent anywhere; the file is handed to
+        you. If you forget the passphrase, nobody can open the file.
       </p>
       <div className="field">
         <label htmlFor="env-pass">Passphrase</label>

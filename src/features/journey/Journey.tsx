@@ -236,7 +236,7 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
               </section>
               <div className="journey__cta">
                 <button type="button" className="stamp" onClick={() => setHowto(true)}>
-                  <span>Enter Vyomaphala</span>
+                  <span>How to use it</span>
                 </button>
                 <button type="button" className="journey__ghost" onClick={onAbout}>
                   How Vyomaphala was made
@@ -259,7 +259,8 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
           type="button"
           className="journey__btn journey__btn--next"
           onClick={() => (howto ? onDone() : go(at + 1))}
-          aria-label={howto ? "Start" : last ? "Enter Vyomaphala" : "Next"}
+          aria-label={howto ? "Start" : last ? "How to use it" : "Next"}
+          hidden={howto}
         >
           {last ? "✓" : "→"}
         </button>
@@ -272,18 +273,19 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
 const SEEN = "vyom-journey-seen";
 const OFF = "vyom-journey-off";
 
-/** Play once per visit, never in automation, and never if the reader turned it off. */
+/** Play once per device (Settings can replay it or switch it back on), never in automation. */
 export function shouldPlayJourney(): boolean {
   try {
     if (typeof navigator !== "undefined" && navigator.webdriver) return false;
     if (localStorage.getItem(OFF) === "1") return false;
-    return sessionStorage.getItem(SEEN) !== "1";
+    return localStorage.getItem(SEEN) !== "1" && sessionStorage.getItem(SEEN) !== "1";
   } catch {
     return false;
   }
 }
 export function markJourneySeen(): void {
   try {
+    localStorage.setItem(SEEN, "1");
     sessionStorage.setItem(SEEN, "1");
   } catch {
     // storage may be unavailable (private mode); the journey simply plays again next time

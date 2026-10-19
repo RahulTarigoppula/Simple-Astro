@@ -51,9 +51,13 @@ export function SadeSatiRibbon({ result, birthMs, nowMs, zone }: SadeSatiRibbonP
   // Bring the opening tab (the running or next spell) into the row's view, without moving the page.
   // biome-ignore lint/correctness/useExhaustiveDependencies: only on first paint
   useEffect(() => {
-    const b = tabs.current[initial];
-    const row = b?.parentElement;
-    if (b && row) row.scrollLeft = Math.max(0, b.offsetLeft - row.offsetLeft - (row.clientWidth - b.offsetWidth) / 2);
+    // After the first paint, so the measurement reads a layout the browser has already done.
+    const id = requestAnimationFrame(() => {
+      const b = tabs.current[initial];
+      const row = b?.parentElement;
+      if (b && row) row.scrollLeft = Math.max(0, b.offsetLeft - row.offsetLeft - (row.clientWidth - b.offsetWidth) / 2);
+    });
+    return () => cancelAnimationFrame(id);
   }, []);
 
   const ticks = useMemo(() => {

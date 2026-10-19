@@ -3,8 +3,7 @@
 import * as A from "astronomy-engine";
 import { useEffect } from "react";
 import { saveSettings } from "../data/repo";
-import { mulberry32 } from "../engine/math";
-import { isNative, reducedMotion } from "../platform/native";
+import { isNative } from "../platform/native";
 import { useUi } from "../state/ui";
 import { useActiveProfile, useSettings } from "./hooks";
 
@@ -66,41 +65,8 @@ export function ThemeController() {
     return () => clearInterval(id);
   }, [settings.theme, lat, lon, setResolved]);
 
-  const theme = useUi((s) => s.desk.resolvedTheme);
-  useEffect(() => {
-    const root = document.documentElement;
-    const still = () => {
-      root.style.setProperty("--flicker", "0px");
-      root.style.setProperty("--flame-k", "1");
-    };
-    if (reducedMotion() || settings.calmDesk || theme === "day") {
-      still();
-      return;
-    }
-    // 1/f-ish flicker sampled every 80 ms; ONE variable drives every shadow in sync.
-    const rng = mulberry32(0xd17a);
-    let a = 0;
-    let b = 0;
-    let timer = 0;
-    const step = () => {
-      if (document.hidden) {
-        still();
-        timer = window.setTimeout(step, 400);
-        return;
-      }
-      a = a * 0.72 + (rng() - 0.5) * 0.6;
-      b = b * 0.93 + (rng() - 0.5) * 0.25;
-      const n = Math.max(-1, Math.min(1, a + b));
-      root.style.setProperty("--flicker", `${(n * 0.6).toFixed(2)}px`);
-      root.style.setProperty("--flame-k", (0.5 + n * 0.5).toFixed(3));
-      timer = window.setTimeout(step, 80);
-    };
-    step();
-    return () => {
-      clearTimeout(timer);
-      still();
-    };
-  }, [settings.calmDesk, theme]);
+  // No per-frame work here: the astral skin has no flame, and writing a custom property on the
+  // root every few milliseconds forced a style recalculation of the whole document each time.
 
   return null;
 }

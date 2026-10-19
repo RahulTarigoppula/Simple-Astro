@@ -14,7 +14,7 @@ export interface Slide {
   tone?: "myth" | "history" | "idea" | "sky" | undefined;
 }
 
-const SLIDE_MS = 11_000;
+const SLIDE_MS = 14_000;
 
 export function StoryPlayer({
   slides,
@@ -33,6 +33,16 @@ export function StoryPlayer({
   const [t, setT] = useState(0);
   const reduce = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   const slide = slides[at];
+  const article = useRef<HTMLElement>(null);
+  // A card taller than the screen must be read at the reader's pace: the clock stops on it.
+  const [tall, setTall] = useState(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: measured once per card
+  useEffect(() => {
+    const el = article.current;
+    if (!el) return;
+    const id = requestAnimationFrame(() => setTall(el.scrollHeight > el.clientHeight + 8));
+    return () => cancelAnimationFrame(id);
+  }, [at]);
 
   const go = useCallback(
     (k: number) => {
@@ -52,7 +62,7 @@ export function StoryPlayer({
 
   // The progress clock: one rAF loop, paused while held or for reduced motion.
   useEffect(() => {
-    if (paused || reduce) return;
+    if (paused || reduce || tall) return;
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
@@ -65,7 +75,7 @@ export function StoryPlayer({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [paused, reduce]);
+  }, [paused, reduce, tall]);
 
   useEffect(() => {
     if (t >= 1) go(at + 1);
@@ -108,7 +118,21 @@ export function StoryPlayer({
         </button>
       </header>
 
-      <article key={slide.id} className="sp-slide" aria-live="polite">
+      {/* Tapping the card's right third goes forward, its left sixth goes back; links and buttons inside still work. */}
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: the arrow keys and footer buttons already cover the keyboard */}
+      <article
+        key={slide.id}
+        ref={article}
+        className="sp-slide"
+        aria-live="polite"
+        onClick={(e) => {
+          if ((e.target as HTMLElement).closest("a, button")) return;
+          const r = e.currentTarget.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width;
+          if (x > 0.66) go(at + 1);
+          else if (x < 0.16) go(at - 1);
+        }}
+      >
         {slide.art ? <div className="sp-art">{slide.art}</div> : null}
         <p className="sp-kicker">{slide.kicker}</p>
         <h2 className="sp-h">

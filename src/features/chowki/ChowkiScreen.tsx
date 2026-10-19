@@ -109,7 +109,7 @@ export default function ChowkiScreen() {
         <div className="home-tools">
           <span className="home-clock mono">
             <span className="vh">Local time at {placeName}: </span>
-            {hhmm(now, zone)} · {placeName}
+            {hhmm(now, zone)} · {active ? placeName : `${placeName} (until you add a person)`}
           </span>
           <Link to="/drawer" className="home-gear" aria-label="Settings">
             <IconDrawer size={18} />
@@ -245,7 +245,8 @@ export default function ChowkiScreen() {
           <ul className="home-card__list">
             <li>No sign up and no login.</li>
             <li>Everything is worked out on this device. Birth details and palm photos never leave it.</li>
-            <li>Nobody else can see your people, and you can't see anyone else's. There is no server holding them.</li>
+            <li>Nobody else can see your people, and you can't see anyone else's. No server holds them.</li>
+            <li>The only thing ever sent is an anonymous count of which screens are opened, and you can switch that off in Settings.</li>
             <li>Delete everything any time in Settings.</li>
           </ul>
         </div>

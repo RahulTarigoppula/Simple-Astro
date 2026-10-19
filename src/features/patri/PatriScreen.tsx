@@ -86,6 +86,8 @@ export default function PatriScreen() {
   const { patri, error } = usePatri(rendered ? profile : undefined, rendered ?? settings.preset, nonce);
   const [lit, setLit] = useState<GrahaId | null>(null);
   const [varga, setVarga] = useState<VargaNumber>(9);
+  // "Full detail" is closed on open; its charts, ledgers and transit scans are not built until asked for.
+  const [techOpened, setTechOpened] = useState(false);
   const [foot, setFoot] = useState<Foot>(null);
   const personStyle = chartStyleFor(profile?.tradition);
   const [style, setStyle] = useState(personStyle ?? settings.chartStyle);
@@ -293,7 +295,53 @@ export default function PatriScreen() {
                   local · {[b.place.name, b.place.admin1, b.place.country].filter(Boolean).join(", ")}
                 </p>
               ) : null}
-              {b && patri ? (
+              {error ? (
+                <p className="note-lac" role="alert" style={{ margin: "var(--space-3) 0 0" }}>
+                  <span aria-hidden="true">⚑</span>
+                  <span>
+                    Something went wrong ({error.message}). Check the birth details with "Edit birth details" below. The last chart stays on
+                    screen.
+                  </span>
+                </p>
+              ) : null}
+              {profile?.timeUnknown && patri ? <TimeUnknownNote profile={profile} patri={patri} /> : null}
+              {stale ? (
+                <p className="note-haldi" style={{ margin: "var(--space-3) 0 0" }}>
+                  <span aria-hidden="true">⚑</span>
+                  <span>Settings changed in another tab.</span>
+                  <button
+                    type="button"
+                    className="linkish"
+                    onClick={() => {
+                      setRendered(settings.preset);
+                      setNonce((n) => n + 1);
+                    }}
+                  >
+                    Work this chart out again
+                  </button>
+                </p>
+              ) : null}
+            </header>
+
+            {patri && profile && patri.profileId === profile.id ? (
+              <div className="patri-cosmic">
+                <LifeReading profile={profile} patri={patri} nowMs={nowMs} />
+                <Link to={`/forecast/${profile.id}`} className="patri-forecast">
+                  <span className="patri-forecast__k">Forecast</span>
+                  <span className="patri-forecast__t">What the sky holds for {profile.name}</span>
+                  <span className="patri-forecast__s">Day · week · month · quarter · year →</span>
+                </Link>
+              </div>
+            ) : null}
+
+            <details className="astro-tech" onToggle={(e) => e.currentTarget.open && setTechOpened(true)}>
+              <summary>
+                <span>
+                  Full detail (astro tech)
+                  <small>The birth chart, almanac, planets, life chapters, yogas and every number</small>
+                </span>
+              </summary>
+              {b && patri && techOpened ? (
                 <div className="engraved">
                   <b>{b.zone.toUpperCase()}</b>
                   <span className="sep">·</span>
@@ -311,48 +359,12 @@ export default function PatriScreen() {
                   </span>
                 </div>
               ) : null}
-              {error ? (
-                <p className="note-lac" role="alert" style={{ margin: "var(--space-3) 0 0" }}>
-                  <span aria-hidden="true">⚑</span>
-                  <span>
-                    Something went wrong ({error.message}). Check the birth details with "Edit birth details" below. The last chart stays on
-                    screen.
-                  </span>
-                </p>
-              ) : null}
-              {profile?.timeUnknown && patri ? <TimeUnknownNote profile={profile} patri={patri} /> : null}
-              {stale ? (
-                <p className="note-haldi" style={{ margin: "var(--space-3) 0 0" }}>
-                  <span aria-hidden="true">⚑</span>
-                  <span>Settings changed. Hold the red seal at the top to work this chart out again.</span>
-                </p>
-              ) : null}
-            </header>
-
-            {patri && profile && patri.profileId === profile.id ? (
-              <div className="patri-cosmic">
-                <LifeReading profile={profile} patri={patri} nowMs={nowMs} />
-                <Link to={`/forecast/${profile.id}`} className="patri-forecast">
-                  <span className="patri-forecast__k">Forecast</span>
-                  <span className="patri-forecast__t">What the sky holds for {profile.name}</span>
-                  <span className="patri-forecast__s">Day · week · month · quarter · year →</span>
-                </Link>
-              </div>
-            ) : null}
-
-            <details className="astro-tech">
-              <summary>
-                <span>
-                  Full detail (astro tech)
-                  <small>The birth chart, almanac, planets, life chapters, yogas and every number</small>
-                </span>
-              </summary>
-              {patri && b ? (
+              {patri && b && techOpened ? (
                 <PatriBody
                   patri={patri}
                   zone={b.zone}
                   style={style}
-                  script={settings.chartScript}
+                  script={profile?.tradition === "telugu" || profile?.tradition === "tamil" ? "latin" : settings.chartScript}
                   inkKey={inkKey}
                   skipInk={skipInk}
                   lit={lit}
@@ -376,7 +388,7 @@ export default function PatriScreen() {
                 </div>
               )}
 
-              {patri && profile && patri.profileId === profile.id ? (
+              {patri && profile && techOpened && patri.profileId === profile.id ? (
                 <div className="patri-cosmic">
                   <CosmicProfile profile={profile} patri={patri} />
                 </div>

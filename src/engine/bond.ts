@@ -41,7 +41,7 @@ const SIGN_LABEL: Record<BondId, string> = {
   companionship: "An easy everyday life together",
   trust: "Trust that grows",
   closeness: "Natural closeness",
-  family: "No flag for family life",
+  family: "Family life, no Nāḍī flag",
 };
 
 const GROUPS: Record<BondId, { label: string; kootas: KootaId[]; from: string }> = {

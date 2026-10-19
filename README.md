@@ -3,10 +3,11 @@
 *Vyomaphala (व्योमफल) is Sanskrit for "the fruit of the sky": vyoma, the heavens, and phala, what they yield, the same phala as in phalita jyotiṣa, the predictive branch of Indian astrology. Indian astrology under a live sky, explained in plain English, with the myths behind every star.*
 
 **Live:** https://rahultarigoppula.github.io/Simple-Astro/ · **Repo:** [Simple-Astro](https://github.com/RahulTarigoppula/Simple-Astro)
-**Status: v1.2.0 (2026-10-18).** Made by Rahul (RT): **252 hours of work and dedication** (18 weeks × 7 days × 2 hours a day) of planning, building, gathering and cleaning data, and checking every chart. What changed is in [CHANGELOG.md](CHANGELOG.md); what was measured is in [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
+**Status: v1.3.0 (2026-10-19).** Made by Rahul (RT): **252 hours of work and dedication** (18 weeks × 7 days × 2 hours a day) of planning, building, gathering and cleaning data, and checking every chart. What changed is in [CHANGELOG.md](CHANGELOG.md); what was measured is in [docs/VERIFICATION-LOG.md](docs/VERIFICATION-LOG.md).
 
 ## Summary
 
+- **1.3.0:** fast on a phone (idle main thread, no blur on content panes, Full detail built on demand) and a round of fixes from testing as a first-time family member (intro once per device, tradition asked first, no contradicting traits, plain Manglik and hour labels).
 - **1.2.0:** the app is now **Vyomaphala**, "the fruit of the sky" (vyoma + phala); same engine, same data, nothing saved is lost.
 - **1.1.0:** Add a person is now impossible to get wrong by accident: day, month and year boxes, a **12-hour clock with am/pm** read back in words ("7:25 in the evening"), a **place that must be chosen** (nothing is assumed), and a **Check before you save** card showing the Moon sign, birth star and rising sign before anything is stored. Every birth time prints with am/pm.
 - **1.0.0:** **Your life, in simple words** on every chart (Moon sign, birth star, numbers, plus and minus points, love, work, your life chapter now), with the astrology behind **Full detail (astro tech)**. **Partner Compatibility** with a score out of 100, five plain bars and **Signs of marriage**. A plain Home: what Vyomaphala can do, how to use it, how it was made, and your privacy. North Indian, Telugu or Tamil names per person. Always updates itself without touching saved data.

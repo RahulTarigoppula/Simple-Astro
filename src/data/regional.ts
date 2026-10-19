@@ -116,5 +116,5 @@ export function rashiBoth(sign: number, t: Tradition | undefined): string {
 
 /** South India draws the square (fixed-sign) chart; the North draws the diamond. */
 export function chartStyleFor(t: Tradition | undefined): "north" | "south" | undefined {
-  return t === undefined ? undefined : t === "north" ? "north" : "south";
+  return t === "telugu" || t === "tamil" ? "south" : undefined;
 }

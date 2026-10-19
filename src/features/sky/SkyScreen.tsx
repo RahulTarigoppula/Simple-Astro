@@ -4,7 +4,7 @@
 // The ScrubRing turns time ±12 h around the birth moment; every frame recomputes the real sky.
 
 import { DateTime } from "luxon";
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Component, lazy, type ReactNode, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useProfile, useSettings } from "../../app/hooks";
 import { DigitSet } from "../../components/ui/DigitSet";
@@ -44,12 +44,27 @@ const MONTHS_LONG = [
 ] as const;
 const PRESET_SHORT: Record<AyanamsaPreset, string> = { "se-true": "SE-true", "se-mean": "SE-mean", "drik-mean": "Drik-mean" };
 
-type Fallback = "reduced" | "nogl" | "lost" | null;
+type Fallback = "reduced" | "nogl" | "lost" | "missing" | null;
 const FALLBACK_NOTE: Record<Exclude<Fallback, null>, string> = {
   reduced: "Painted sky. Reduced motion is on, so the 3D dome stays folded.",
   nogl: "Painted sky. This device offers no WebGL for the 3D dome.",
   lost: "Painted sky. The 3D dome lost its graphics context.",
+  missing: "Painted sky. The 3D dome could not be loaded here; open it once with a connection, or use Prepare for offline in Settings.",
 };
+
+/** The dome's code arrives as a separate file; if it cannot be fetched, the painted sky stays. */
+class DomeBoundary extends Component<{ onFail: () => void; children: ReactNode }, { failed: boolean }> {
+  override state = { failed: false };
+  static getDerivedStateFromError(): { failed: boolean } {
+    return { failed: true };
+  }
+  override componentDidCatch(): void {
+    this.props.onFail();
+  }
+  override render(): ReactNode {
+    return this.state.failed ? null : this.props.children;
+  }
+}
 
 function hasWebGL(): boolean {
   try {
@@ -288,19 +303,21 @@ export default function SkyScreen() {
             describedBy={tableId}
           />
           {showDome ? (
-            <Suspense fallback={null}>
-              <div className={`dome-wrap${domeReady ? " is-ready" : ""}`}>
-                <SkyDome
-                  sky={sky}
-                  stars={stars}
-                  lookAz={L.az}
-                  paused={hidden}
-                  noInertia={settings.calmDesk}
-                  onReady={onDomeReady}
-                  onLost={onDomeLost}
-                />
-              </div>
-            </Suspense>
+            <DomeBoundary onFail={() => setFallback("missing")}>
+              <Suspense fallback={null}>
+                <div className={`dome-wrap${domeReady ? " is-ready" : ""}`}>
+                  <SkyDome
+                    sky={sky}
+                    stars={stars}
+                    lookAz={L.az}
+                    paused={hidden}
+                    noInertia={settings.calmDesk}
+                    onReady={onDomeReady}
+                    onLost={onDomeLost}
+                  />
+                </div>
+              </Suspense>
+            </DomeBoundary>
           ) : null}
         </div>
 
