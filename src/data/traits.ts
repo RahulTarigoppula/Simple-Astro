@@ -272,6 +272,19 @@ export const NUMBER_TRAITS: Readonly<Record<number, { word: string } & Traits>> 
 };
 
 /** What a life chapter (Viṃśottarī mahādaśā) of each graha is traditionally about, in plain words. */
+/** The theme of a shorter daśā stretch, as a noun phrase: "a Moon stretch brings the heart and home to the front". */
+export const CHAPTER_SHORT: Readonly<Record<GrahaId, string>> = {
+  SU: "standing on your own feet",
+  MO: "the heart and home",
+  MA: "energy and effort",
+  ME: "learning and trade",
+  JU: "growth and good fortune",
+  VE: "comfort and love",
+  SA: "hard work and patience",
+  RA: "ambition and change",
+  KE: "letting go and the inner life",
+};
+
 export const CHAPTER_PLAIN: Readonly<Record<GrahaId, string>> = {
   SU: "a chapter about standing on your own feet: recognition, authority, your father and your own strength.",
   MO: "a chapter about the heart: home, mother, feelings, the public and peace of mind.",

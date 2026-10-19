@@ -17,6 +17,7 @@ import "../cosmic/cosmic.css";
 import { AreasCard, ContactsCard, DayGuideCard, DayNotes, StrengthCard } from "./PersonalSections";
 import "./forecast.css";
 import { rashiBoth } from "../../data/regional";
+import { CHAPTER_SHORT } from "../../data/traits";
 import { safeZone } from "../../engine/time";
 import { countEvent } from "../../platform/stats";
 
@@ -438,8 +439,7 @@ export default function ForecastScreen() {
                     </p>
                     <p className="fc-dasha__s">
                       {fmt(d.startMs, zone, { day: "numeric", month: "short", year: "numeric" })} →{" "}
-                      {fmt(d.endMs, zone, { day: "numeric", month: "short", year: "numeric" })} · tradition reads it through{" "}
-                      {lore(d.lord)?.signifies}.
+                      {fmt(d.endMs, zone, { day: "numeric", month: "short", year: "numeric" })} · its theme: {CHAPTER_SHORT[d.lord]}.
                     </p>
                   </div>
                 </li>

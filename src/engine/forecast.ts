@@ -245,6 +245,17 @@ const HEADLINE: Record<Period, Record<Forecast["tone"], string>> = {
   },
 };
 
+/** The band's sentence, then the one planet that helps most and the one that asks for care, so two periods never read alike. */
+function headlineFor(period: Period, tone: Forecast["tone"], lines: ForecastLine[]): string {
+  const base = HEADLINE[period][tone];
+  const help = lines.find((l) => l.favourable);
+  const care = lines.find((l) => !l.favourable);
+  const bits: string[] = [];
+  if (help) bits.push(`${NAME[help.graha]} helps with ${HOUSE_AREA[help.house] ?? "your plans"}`);
+  if (care) bits.push(`${NAME[care.graha]} asks for care with ${HOUSE_AREA[care.house] ?? "your plans"}`);
+  return bits.length ? `${base} ${bits.join("; ")}.` : base;
+}
+
 function dashaSpans(patri: Patri, fromMs: number, toMs: number, period: Period): DashaSpan[] {
   const out: DashaSpan[] = [];
   const levels: Array<"MD" | "AD" | "PD"> = period === "day" || period === "week" || period === "month" ? ["MD", "AD", "PD"] : ["MD", "AD"];
@@ -319,7 +330,7 @@ export function forecast(
     endMs,
     score,
     tone,
-    headline: HEADLINE[period][tone],
+    headline: headlineFor(period, tone, lines),
     lines,
     steps,
     dasha: dashaSpans(patri, startMs, endMs, period),

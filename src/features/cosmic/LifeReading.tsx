@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { Link } from "react-router";
 import { GRAHA_LORE, NAKSHATRA_LORE, RASHI_LORE } from "../../data/lore";
 import { nakBoth, rashiBoth } from "../../data/regional";
-import { CHAPTER_PLAIN, MOON_TRAITS, NAK_TRAITS, NUMBER_TRAITS } from "../../data/traits";
+import { CHAPTER_PLAIN, CHAPTER_SHORT, MOON_TRAITS, NAK_TRAITS, NUMBER_TRAITS } from "../../data/traits";
 import { currentDasha } from "../../engine/dasha";
 import { birthNumbers } from "../../engine/profile";
 import type { GrahaId, Patri, Profile } from "../../engine/types";
@@ -194,7 +194,7 @@ export function LifeReading({ profile, patri, nowMs }: { profile: Profile; patri
             <dd>
               You are in your <b>{lore(r.cur.md.lord)?.english}</b> chapter until {monthYear(r.cur.md.endMs, r.zone)}:{" "}
               {CHAPTER_PLAIN[r.cur.md.lord]} Inside it, a shorter <b>{lore(r.cur.ad.lord)?.english}</b> stretch runs until{" "}
-              {monthYear(r.cur.ad.endMs, r.zone)}, adding {lore(r.cur.ad.lord)?.signifies}.{" "}
+              {monthYear(r.cur.ad.endMs, r.zone)}, bringing {CHAPTER_SHORT[r.cur.ad.lord]} to the front.{" "}
               <Link to={`/forecast/${profile.id}`}>See your forecast</Link>
             </dd>
           </div>
