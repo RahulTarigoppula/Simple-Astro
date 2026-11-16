@@ -263,14 +263,14 @@ export default function SkyScreen() {
 
   if (profile === undefined) {
     return (
-      <Screen label="Rooftop sky" className="sky-screen">
+      <Screen label="Rooftop sky" className="sky-screen v-night">
         <div className="rooftop" />
       </Screen>
     );
   }
   if (profile === null || !birth || !sky || !scene) {
     return (
-      <Screen label="Rooftop sky" className="sky-screen">
+      <Screen label="Rooftop sky" className="sky-screen v-night">
         <div className="rooftop rooftop--missing">
           <section className="v-card v-empty" aria-labelledby="sky-missing-h">
             <h1 id="sky-missing-h" className="v-title">
@@ -296,7 +296,7 @@ export default function SkyScreen() {
   const showDome = domeWanted && !fallback && stars !== null;
 
   return (
-    <Screen label={`Rooftop sky of ${profile.name}`} className="sky-screen">
+    <Screen label={`Rooftop sky of ${profile.name}`} className="sky-screen v-night">
       <div className="rooftop" style={{ "--moon-k": sky.moonK.toFixed(3) } as React.CSSProperties} {...swipeHandlers}>
         <header className="sky-head">
           <Link to={`/patri/${profile.id}`} className="v-back">

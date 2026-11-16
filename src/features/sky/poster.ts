@@ -22,7 +22,8 @@ export interface PosterText {
 
 /** Token colours resolved once per poster; named fallbacks only (no hex outside tokens.css). */
 function palette(): (name: string, fallback?: string) => string {
-  const css = getComputedStyle(document.documentElement);
+  // the sky is night art in both themes: read the night values from the screen that carries them
+  const css = getComputedStyle(document.querySelector(".v-night") ?? document.documentElement);
   return (name, fallback = "gray") => css.getPropertyValue(name).trim() || fallback;
 }
 

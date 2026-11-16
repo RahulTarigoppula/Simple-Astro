@@ -246,7 +246,7 @@
 .ex-facts > div {
   padding: 10px 12px;
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--tint), 0.04);
 }
 .ex-facts > div:last-child:nth-child(odd) {
   grid-column: 1 / -1;
@@ -280,14 +280,14 @@
   padding: 0 16px;
   border: 1px solid var(--card-edge-strong);
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--tint), 0.04);
   color: var(--ink) !important;
   font-weight: 550;
   font-size: 0.9375rem;
   text-decoration: none;
 }
 .ex-chips a:hover {
-  background: rgba(255, 255, 255, 0.09);
+  background: rgba(var(--tint), 0.09);
 }
 .ex-pager {
   display: grid;
@@ -366,7 +366,7 @@
   counter-increment: cn;
   padding: 8px 12px;
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--tint), 0.04);
   font-weight: 550;
   font-size: 0.9375rem;
 }

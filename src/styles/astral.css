@@ -801,3 +801,50 @@ body,
 /* the forecast hint reads as a line, not a fragment */
 
 /* Today: the dial and Moon sit on open sky, not in a box */
+
+/* ── Light theme: the older classes on paper ───────────────────────────── */
+:root[data-theme="day"] ::selection {
+  background: rgba(109, 63, 224, 0.24);
+}
+:root[data-theme="day"] :focus-visible {
+  box-shadow: 0 0 0 5px rgba(11, 114, 133, 0.16);
+}
+:root[data-theme="day"] .toast {
+  background: var(--surface-solid);
+  box-shadow: var(--shadow-2);
+}
+:root[data-theme="day"] .switch::after {
+  background: var(--knob);
+  box-shadow: 0 1px 4px rgba(30, 36, 110, 0.35);
+}
+:root[data-theme="day"] .switch {
+  background: var(--track);
+}
+:root[data-theme="day"] .switch[aria-checked="true"] {
+  background: var(--aurora);
+}
+/* The kundli figure: ink lines on paper, no glow */
+:root[data-theme="day"] .chart .stroke {
+  stroke: rgba(30, 36, 110, 0.6);
+  filter: none;
+}
+:root[data-theme="day"] .chart .graha.is-lit,
+:root[data-theme="day"] .chart .tilak {
+  filter: none;
+}
+:root[data-theme="day"] .chart-wrap {
+  background: radial-gradient(circle at 50% 40%, rgba(109, 63, 224, 0.07), transparent 70%);
+}
+:root[data-theme="day"] .beads i.on {
+  box-shadow: inset 0 0 0 1px rgba(143, 90, 0, 0.55);
+}
+:root[data-theme="day"] .beads i.dosha {
+  box-shadow: inset 0 0 0 1px rgba(190, 18, 60, 0.5);
+}
+:root[data-theme="day"] .ribbon button.is-now {
+  box-shadow: none;
+}
+:root[data-theme="day"] .explain__story {
+  border-color: rgba(143, 90, 0, 0.35);
+  background: var(--gold-soft);
+}

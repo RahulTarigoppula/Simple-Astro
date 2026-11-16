@@ -36,9 +36,19 @@ A redesign of the whole app for people who have never used an astrology app. 1.x
 - **Settings** in four groups (Look, Your data, Advanced, About) with a line under each setting saying what it does.
 - **Guide** as six steps, **About** with the numbers as a grid and the detail in folds. Rahul's own words are unchanged.
 
+### Tested as a first-time family member on a phone, then fixed
+- **A real light theme.** Settings, Theme: Auto, Dark, Light. Auto now follows the phone's own light or dark setting (it used to follow the Sun at the birthplace). Pictures of the night sky (the intro, the story, the sky at birth, the sky wheel, the palm camera) stay dark on purpose.
+- **Text size:** Normal, Large, Larger, in Settings.
+- **Where you are now.** Today's good hours, sunrise and sunset, the almanac and the forecast's days were worked out for the birthplace, which is wrong for anyone who has moved. "Times are for … Change" on Today, the Almanac and the Forecast (and a row in Settings) sets the town you live in. The birth chart never changes.
+- **Add a person keeps what you typed.** A reload, the Back button or leaving and coming back carries on where you left off; Next and Save stay on screen in a bar at the bottom; no tab bar under the form; no warning before anything is typed; towns are listed as "Vijayawada, Andhra Pradesh, India" without coordinates.
+- **Chart:** the figure is labelled Su, Mo, Ma… with a key under it and appears at once (Devanagari is a choice in Settings); the inner view is called Planets; the Now view opens with one plain sentence and three chips, Saturn's seasons in plain words, and the transit table in a fold; the planet table fits a small phone.
+- **One scale of words** everywhere (Strong, Good, Mixed, Go gently), and Today says where each reading comes from: the day from the Moon, the life areas from the slower planets.
+- **Partner match** is the one name for that feature; a line explains why swapping the two people can change a few points; a low traditional score is worded with respect.
+- The person chip always names the person on screen and keeps the view when switching; next and previous pages start at the top; times in "Coming up in the sky" are 12-hour.
+
 ### Under the hood
 - One style layer (src/styles/ui.css) and one page frame (src/components/ui/Page.tsx) for every screen; 114 unused rules removed from the old sheets; the old home, brass dial, drums and ring carousel are deleted.
-- 758 automated tests and 24 browser tests (the browser tests now walk the new flows, the four chart views and the person chip). Settings shows version 2.0.0.
+- 775 automated tests and 26 browser tests (they walk the new flows, the four chart views, the person chip and the light theme). Settings shows version 2.0.0.
 
 ## 1.3.0 (2026-10-19)
 

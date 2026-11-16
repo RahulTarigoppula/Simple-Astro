@@ -68,6 +68,8 @@
 
   /* gradients */
   --aurora: linear-gradient(120deg, #8b5cf6 0%, #6366f1 45%, #22d3ee 100%);
+  /* the primary button: the aurora with a deeper far end, so its white label always reads */
+  --btn-fill: linear-gradient(120deg, #7c3aed 0%, #4f46e5 55%, #0369a1 100%);
   --aurora-soft: linear-gradient(120deg, rgba(139, 92, 246, 0.22), rgba(34, 211, 238, 0.14));
   --gold-glow: radial-gradient(circle at 35% 30%, #fff3cf 0%, #f5c46b 45%, #b7791f 100%);
   --rose-glow: radial-gradient(circle at 35% 30%, #ffd1dc 0%, #fb7185 50%, #9f1239 100%);
@@ -223,10 +225,18 @@
   --care-soft: rgba(251, 113, 133, 0.13);
   --violet-soft: rgba(139, 92, 246, 0.16);
   --gold-soft: rgba(245, 196, 107, 0.14);
+  --knob: var(--ink); /* the thumb of a switch */
+  --track: rgba(var(--tint), 0.1); /* a switch that is off */
   --nav-h: 62px;
   --page-w: 720px;
   --page-pad: 16px;
   --ledge-height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* The page's own ink, for a caption that belongs to a night panel but sits on the page beside it. */
+:root {
+  --page-ink: var(--ink);
+  --page-ink-muted: var(--ink-muted);
 }
 
 /* ── Light theme: paper-white pages, indigo ink. Star charts and sky art keep the night (.v-night). ── */
@@ -246,12 +256,12 @@
   --glass-edge-strong: rgba(30, 36, 110, 0.28);
   --ink: #171b40;
   --ink-muted: #4b5282;
-  --ink-faint: #9299c2;
+  --ink-faint: #838ab8;
   --accent: #6d3fe0;
   --accent-text: #5a2fc9;
-  --accent-2: #8f5a00;
+  --accent-2: #835200;
   --cyan: #0b7285;
-  --success: #15803d;
+  --success: #126c33;
   --warning: #b45309;
   --warning-text: #92400e;
   --danger: #be123c;
@@ -266,16 +276,18 @@
   --card-hi: #e8ebfa;
   --card-edge: rgba(30, 36, 110, 0.13);
   --card-edge-strong: rgba(30, 36, 110, 0.3);
-  --good: #15803d;
+  --good: #126c33;
   --good-soft: rgba(21, 128, 61, 0.11);
   --calm: #0369a1;
   --calm-soft: rgba(3, 105, 161, 0.1);
-  --mixed: #a15c07;
+  --mixed: #925305;
   --mixed-soft: rgba(180, 83, 9, 0.11);
   --care: #be123c;
   --care-soft: rgba(190, 18, 60, 0.09);
   --violet-soft: rgba(109, 63, 224, 0.1);
   --gold-soft: rgba(180, 120, 10, 0.13);
+  --knob: #ffffff;
+  --track: rgba(30, 36, 110, 0.36);
   --aurora-soft: linear-gradient(120deg, rgba(139, 92, 246, 0.14), rgba(34, 211, 238, 0.1));
   --shadow-1: 0 2px 8px rgba(30, 36, 110, 0.1);
   --shadow-2: 0 10px 30px rgba(30, 36, 110, 0.14), 0 0 0 1px var(--glass-edge);
@@ -283,7 +295,7 @@
   --brass-plate: linear-gradient(120deg, rgba(139, 92, 246, 0.14), rgba(34, 211, 238, 0.1)), #ffffff;
 }
 /* A night panel inside the light theme: its own dark ground, so light strokes and stars read. */
-:root[data-theme="day"] .v-night {
+:where(:root[data-theme="day"]) .v-night {
   color-scheme: dark;
   background-color: var(--card);
   color: var(--ink);

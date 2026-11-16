@@ -277,7 +277,7 @@
   padding: 0 12px;
   border: 0;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(var(--tint), 0.1);
   color: var(--cloth-ink);
   font: 550 0.9375rem var(--font-body);
   cursor: pointer;
@@ -287,7 +287,7 @@
 }
 .cap__back:hover,
 .cap__side:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(var(--tint), 0.18);
 }
 .cap__side:disabled {
   opacity: 0.5;
@@ -308,8 +308,8 @@
   margin: 0 12px;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.04);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  background: rgba(var(--tint), 0.04);
+  box-shadow: inset 0 0 0 1px rgba(var(--tint), 0.14);
 }
 .cap__frame video {
   position: absolute;
@@ -407,7 +407,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.2);
+  border: 3px solid rgba(var(--tint), 0.2);
   border-top-color: var(--cloth-ink);
   animation: cap-spin 900ms linear infinite;
 }
@@ -446,8 +446,8 @@
 }
 .cap__seg {
   flex: none;
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(var(--tint), 0.06);
+  border-color: rgba(var(--tint), 0.16);
 }
 .cap__seg > button {
   min-height: 44px;
@@ -470,7 +470,7 @@
   width: 8px;
   height: 14px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(var(--tint), 0.18);
 }
 .cap__pips i.on {
   background: var(--good);
@@ -513,11 +513,11 @@
   transform: scale(0.9);
 }
 .cap__shutter:disabled {
-  border-color: rgba(255, 255, 255, 0.35);
+  border-color: rgba(var(--tint), 0.35);
   cursor: not-allowed;
 }
 .cap__shutter:disabled span {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(var(--tint), 0.25);
 }
 @media (min-width: 360px) {
   .cap__side {

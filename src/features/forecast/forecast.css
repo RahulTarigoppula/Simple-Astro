@@ -112,7 +112,7 @@
 }
 .fc-ring__track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.09);
+  stroke: rgba(var(--tint), 0.09);
   stroke-width: 9;
 }
 .fc-ring__fill {
@@ -190,7 +190,7 @@
   height: 14px;
   margin-top: 12px;
   border-radius: 7px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--tint), 0.08);
 }
 .fc-hours__now + .fc-daybar {
   margin-top: 0;
@@ -377,7 +377,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 .fc-daycell:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--tint), 0.04);
 }
 .fc-daycell[aria-pressed="true"] {
   border-color: var(--card-edge-strong);
@@ -390,7 +390,7 @@
   width: 14px;
   height: 52px;
   border-radius: 7px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--tint), 0.08);
 }
 .fc-daycell__track > span {
   width: 100%;
@@ -472,7 +472,7 @@
   width: 10px;
   height: 30px;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--tint), 0.08);
 }
 .fc-cal__track > span {
   width: 100%;

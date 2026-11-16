@@ -140,7 +140,7 @@ export function SkyWheel({ sky, sel, onSelect, onPlay, natalMoon }: Props) {
   return (
     <div
       ref={box}
-      className={`wheel${dragging ? " is-dragging" : ""}`}
+      className={`wheel v-night${dragging ? " is-dragging" : ""}`}
       role="application"
       aria-roledescription="sky wheel"
       aria-label={`Sky wheel. Selected: ${selName}. Left and right arrows move along the ring, up and down change ring, Enter plays the story.`}

@@ -68,7 +68,8 @@ const FONT_MONO = '"Martian Mono Variable", "Martian Mono", Consolas, monospace'
 
 type Tok = (name: string, fallback?: string) => string;
 function tokens(): Tok {
-  const css = getComputedStyle(document.documentElement);
+  // the sky is night art in both themes: read the night values from the screen that carries them
+  const css = getComputedStyle(document.querySelector(".v-night") ?? document.documentElement);
   return (name, fallback = "gray") => css.getPropertyValue(name).trim() || fallback;
 }
 

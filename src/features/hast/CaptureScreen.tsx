@@ -262,7 +262,7 @@ export default function CaptureScreen() {
           : `${gate.copy[0]?.toUpperCase() ?? ""}${gate.copy.slice(1)}.`;
 
   return (
-    <Screen className="cap" label="Palm capture">
+    <Screen className="cap v-night" label="Palm capture">
       <header className="cap__top">
         <button type="button" className="cap__back" onClick={back}>
           <ChevronLeft />

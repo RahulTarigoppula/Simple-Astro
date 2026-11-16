@@ -609,7 +609,7 @@ button.v-row:hover {
   padding: 0 22px;
   border: 1px solid transparent;
   border-radius: var(--radius-full);
-  background: var(--aurora);
+  background: var(--btn-fill);
   color: var(--accent-ink);
   font: 600 1rem var(--font-body);
   letter-spacing: 0.005em;
@@ -1075,4 +1075,29 @@ dialog.sheet-dialog {
 }
 :root[data-theme="day"] dialog.sheet-dialog::backdrop {
   background: rgba(23, 27, 64, 0.45);
+}
+:root[data-theme="day"] .v-screen {
+  scrollbar-color: rgba(var(--tint), 0.32) transparent;
+}
+:root[data-theme="day"] .v-input:focus,
+:root[data-theme="day"] .v-select:focus {
+  box-shadow: 0 0 0 3px rgba(11, 114, 133, 0.2);
+}
+:root[data-theme="day"] .v-btn--danger {
+  border-color: rgba(190, 18, 60, 0.4);
+}
+:root[data-theme="day"] .v-btn--danger:hover {
+  background: rgba(190, 18, 60, 0.15);
+}
+:root[data-theme="day"] .v-input::placeholder {
+  color: var(--ink-muted);
+  opacity: 0.8;
+}
+
+/* The explain sheet */
+.explain {
+  padding: 6px var(--page-pad) 12px;
+}
+.stamp {
+  background: var(--btn-fill);
 }

@@ -64,7 +64,7 @@
   width: 52px;
   height: 30px;
   border-radius: 15px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--track);
   box-shadow: inset 0 0 0 1px var(--card-edge-strong);
   transition: background var(--dur-fast) var(--ease-out);
 }
@@ -76,7 +76,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--ink);
+  background: var(--knob);
   transition: transform var(--dur-base) var(--ease-out);
 }
 .set-switch[aria-checked="true"] {

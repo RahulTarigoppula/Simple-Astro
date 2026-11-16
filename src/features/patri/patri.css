@@ -126,7 +126,7 @@
   min-height: 3em;
   padding: 10px 12px;
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--tint), 0.04);
   font-size: 0.9375rem;
   line-height: 1.5;
   text-align: center;
@@ -561,10 +561,15 @@
   cursor: pointer;
 }
 .dasha__head:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--tint), 0.04);
 }
-.dasha.is-past .dasha__head > * {
+/* a chapter already lived: the medallion fades and the words go quiet, but stay readable */
+.dasha.is-past .dasha__head > .graha-glyph {
   opacity: 0.62;
+}
+.dasha.is-past .dasha__t,
+.dasha.is-past .dasha__y {
+  color: var(--ink-muted);
 }
 .dasha__body {
   flex: 1;

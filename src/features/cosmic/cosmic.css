@@ -303,7 +303,7 @@
   padding: 10px 4px;
   border: 1px solid var(--card-edge);
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(var(--tint), 0.03);
   text-decoration: none;
   text-align: center;
 }
@@ -414,4 +414,13 @@
 }
 .life__fc {
   margin: 0;
+}
+/* light theme: the new and half Moon keep a visible rim on paper */
+:root[data-theme="day"] .ev-moon--new {
+  background: var(--card-hi);
+  box-shadow: inset 0 0 0 1.5px var(--card-edge-strong);
+}
+:root[data-theme="day"] .ev-moon--half {
+  background: linear-gradient(90deg, var(--card-hi) 35%, var(--moon) 35%);
+  box-shadow: inset 0 0 0 1px var(--card-edge-strong);
 }

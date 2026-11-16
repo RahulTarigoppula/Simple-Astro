@@ -53,3 +53,10 @@ Tokens: `--card`, `--card-2`, `--card-hi`, `--card-edge`, `--card-edge-strong`, 
 - Voice: readings are "tradition says", for reflection. Never health, death, fertility, money or legal advice, remedies, gemstones.
 - Rahul's own story and the "252 hours" lines are quoted from him: move them, never reword or add to them.
 - Internal names stay (`chowki` DB, `vyom-`/`chowki` storage keys, route paths, engine and repo APIs).
+
+## Light and dark
+- Settings → Theme: Auto / Dark / Light (`src/app/theme.ts` sets `<html data-theme="night|day">`). The light palette is the `:root[data-theme="day"]` block at the end of `tokens.css`; fix a light-theme colour there, not in a component.
+- Lift a surface with `rgba(var(--tint), a)` (white on dark, indigo on light), never `rgba(255, 255, 255, a)`.
+- Pictures of the night sky stay night in both themes: put `v-night` on their container (journey, story player and story art, Sky at birth, the sky wheel, star patches, the wheel's glyph panel, palm capture and the palm print). Inside it every token has its night value. A caption that belongs to such a panel but sits on the page uses `--page-ink` / `--page-ink-muted`.
+- Switches use `--knob` and `--track`. Text on white must reach 4.5:1: the day values of `--good`, `--calm`, `--mixed`, `--care`, `--accent-2` and `--accent-text` are tuned for that on their `-soft` grounds.
+- `e2e/theme.spec.ts` switches to Light through Settings and runs axe over the main screens.

@@ -46,7 +46,7 @@ export function panelFor(sel: WheelSel, sky: Record<GrahaId, TransitGraha>, patr
       dev: g?.dev,
       tagline: `${cap(g?.signifies ?? "")}.`,
       art: (
-        <div className="panel-glyph">
+        <div className="panel-glyph v-night">
           <span className="panel-glyph__orbit" />
           <GrahaGlyph id={sel.id} size={120} />
         </div>

@@ -49,7 +49,7 @@
   stroke-width: 1;
 }
 .wheel__nak path {
-  fill: rgba(255, 255, 255, 0.025);
+  fill: rgba(var(--tint), 0.025);
   stroke: rgba(180, 192, 255, 0.2);
   stroke-width: 0.7;
   transition: fill var(--dur-fast) var(--ease-out);
@@ -169,7 +169,7 @@
   bottom: -2px;
   translate: -50% 100%;
   font-size: 13px;
-  color: var(--ink-muted);
+  color: var(--page-ink-muted);
   white-space: nowrap;
 }
 
@@ -268,4 +268,8 @@
     animation: none;
     transition: none;
   }
+}
+/* in the light theme the glyph panel is a small piece of night */
+:root[data-theme="day"] .panel-glyph {
+  background-color: var(--void-1);
 }

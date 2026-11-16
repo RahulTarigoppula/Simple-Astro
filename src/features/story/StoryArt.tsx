@@ -215,7 +215,7 @@ function Motif({ art }: { art: Art }) {
 
 export function StoryArt({ art }: { art: Art }) {
   return (
-    <svg className="story-art" viewBox="0 0 208 112" aria-hidden="true" data-decorative="true">
+    <svg className="story-art v-night" viewBox="0 0 208 112" aria-hidden="true" data-decorative="true">
       <Stars />
       <Motif art={art} />
     </svg>

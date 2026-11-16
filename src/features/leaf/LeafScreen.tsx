@@ -543,16 +543,22 @@ export default function LeafScreen() {
       {strip ? (
         <>
           <b>{strip.zone.toUpperCase()}</b>
-          <span className="sep">·</span>
+          <span className="sep" aria-hidden="true">
+            ·
+          </span>
           <span>
             {formatOffset(strip.offsetMin)}
             {strip.offsetSource === "override" ? " (manual)" : ""}
           </span>
-          <span className="sep">·</span>
+          <span className="sep" aria-hidden="true">
+            ·
+          </span>
           <span>
             JD <DigitSet text={strip.jdUt.toFixed(4)} />
           </span>
-          <span className="sep">·</span>
+          <span className="sep" aria-hidden="true">
+            ·
+          </span>
           <span>
             LAGNA {lg != null ? `${SIGN_MARK[lg]} ` : ""}
             <b>
@@ -942,9 +948,11 @@ export default function LeafScreen() {
               <div>
                 <dt>Name</dt>
                 <dd>{draft.name.trim()}</dd>
-                <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the name" onClick={() => goTo(0)}>
-                  Change
-                </button>
+                <dd className="leaf-review__act">
+                  <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the name" onClick={() => goTo(0)}>
+                    Change
+                  </button>
+                </dd>
               </div>
               <div>
                 <dt>Born</dt>
@@ -959,35 +967,41 @@ export default function LeafScreen() {
                     timeUnknown={draft.timeUnknown}
                   />
                 </dd>
-                <button
-                  type="button"
-                  className="v-btn v-btn--quiet v-btn--sm"
-                  aria-label="Change the date and time"
-                  onClick={() => goTo(1)}
-                >
-                  Change
-                </button>
+                <dd className="leaf-review__act">
+                  <button
+                    type="button"
+                    className="v-btn v-btn--quiet v-btn--sm"
+                    aria-label="Change the date and time"
+                    onClick={() => goTo(1)}
+                  >
+                    Change
+                  </button>
+                </dd>
               </div>
               <div>
                 <dt>Place</dt>
                 <dd>{draft.place ? placeLabel(draft.place) : "Not chosen yet"}</dd>
-                <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the place" onClick={() => goTo(2)}>
-                  Change
-                </button>
+                <dd className="leaf-review__act">
+                  <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the place" onClick={() => goTo(2)}>
+                    Change
+                  </button>
+                </dd>
               </div>
               <div>
                 <dt>Tradition</dt>
                 <dd>
                   {TRADITION_LABEL[draft.tradition]} · {draft.handedness === "right" ? "right-handed" : "left-handed"}
                 </dd>
-                <button
-                  type="button"
-                  className="v-btn v-btn--quiet v-btn--sm"
-                  aria-label="Change the tradition or writing hand"
-                  onClick={() => goTo(0)}
-                >
-                  Change
-                </button>
+                <dd className="leaf-review__act">
+                  <button
+                    type="button"
+                    className="v-btn v-btn--quiet v-btn--sm"
+                    aria-label="Change the tradition or writing hand"
+                    onClick={() => goTo(0)}
+                  >
+                    Change
+                  </button>
+                </dd>
               </div>
             </dl>
 

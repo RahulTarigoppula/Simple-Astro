@@ -381,7 +381,7 @@ export default function HastScreen() {
                   <Section title="Your palm, traced" />
                   <div className="v-card palm-printcard">
                     <div
-                      className={`palm-print${tracing ? " is-tracing" : ""}`}
+                      className={`palm-print v-night${tracing ? " is-tracing" : ""}`}
                       onPointerDown={(e) => {
                         if (!url || !tracing) return;
                         e.currentTarget.setPointerCapture(e.pointerId);

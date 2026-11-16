@@ -77,7 +77,7 @@
 .alm-hero__sun > div {
   padding: 10px 12px;
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(var(--tint), 0.05);
 }
 .alm-hero__sun dt {
   font-size: 0.8125rem;
@@ -175,7 +175,7 @@
   cursor: pointer;
 }
 .alm-row__main:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--tint), 0.04);
 }
 .alm-row__body {
   flex: 1 1 0;
@@ -358,13 +358,13 @@
   padding: 6px 0 4px;
   border: 1px solid transparent;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(var(--tint), 0.03);
   color: var(--ink);
   font: inherit;
   cursor: pointer;
 }
 .mcell:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--tint), 0.08);
 }
 .mcell[aria-current="date"] {
   border-color: var(--accent-2);

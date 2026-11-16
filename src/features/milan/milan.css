@@ -121,7 +121,7 @@
 }
 .mm-ring__track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.09);
+  stroke: rgba(var(--tint), 0.09);
   stroke-width: 9;
 }
 .mm-ring__fill {
@@ -373,7 +373,7 @@
 }
 .mm-krow:hover,
 .mm-check:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--tint), 0.04);
 }
 .mm-krow__t {
   display: block;

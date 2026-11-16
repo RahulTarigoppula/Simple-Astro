@@ -124,7 +124,7 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
   // Rendered on <body> so no transformed ancestor (a screen's entry animation) can clip it.
   return createPortal(
     <div
-      className="journey"
+      className="journey v-night"
       role="dialog"
       aria-modal="true"
       aria-label="The journey from the universe to Vyomaphala"
@@ -206,7 +206,7 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
                     <b>50</b> charts checked
                   </li>
                   <li>
-                    <b>758</b> tests
+                    <b>775</b> tests
                   </li>
                 </ul>
               </section>

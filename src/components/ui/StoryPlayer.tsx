@@ -79,7 +79,7 @@ export function StoryPlayer({
   return (
     <dialog
       ref={ref}
-      className={`storyplayer storyplayer--${slide.tone ?? "sky"}`}
+      className={`storyplayer v-night storyplayer--${slide.tone ?? "sky"}`}
       aria-label={title}
       onCancel={(e) => {
         e.preventDefault();
