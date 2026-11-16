@@ -78,14 +78,12 @@ describe("CircleScreen", () => {
     const priya = cards.find((c) => within(c).queryByText("Priya"));
     expect(rahul).toHaveTextContent("Moon sign MīnaBirth star Revatī");
     expect(rahul).toHaveTextContent("14 Mar 1994 · 7:25 am · Bengaluru");
-    await waitFor(() => expect(priya).toHaveTextContent("Active"));
-    expect(rahul).not.toHaveTextContent("Active");
+    await waitFor(() => expect(priya).toHaveTextContent("Viewing now"));
+    expect(rahul).not.toHaveTextContent("Viewing now");
     expect(screen.queryByText("रेवती")).toBeNull();
-    expect(within(rahul as HTMLElement).getByRole("link", { name: "Edit: Rahul" })).toHaveAttribute(
-      "href",
-      `/leaf/${REFERENCE_PROFILE.id}/edit`,
-    );
-    expect(screen.getByRole("link", { name: "+ Add a person" })).toHaveAttribute("href", "/leaf/new");
+    // One row and one menu button each: no strip of small buttons.
+    expect(within(rahul as HTMLElement).getAllByRole("button")).toHaveLength(2);
+    expect(screen.getByRole("link", { name: "Add a person" })).toHaveAttribute("href", "/leaf/new");
   });
 
   it("a tap on the row makes that person active and opens their chart", async () => {
@@ -97,15 +95,23 @@ describe("CircleScreen", () => {
     await waitFor(async () => expect((await db.settings.get("app"))?.value.activeProfileId).toBe(REFERENCE_PROFILE.id));
   });
 
-  it("Chart and Forecast are plain buttons that also put the person in view", async () => {
+  /** Open the "..." menu of one person and return the sheet. */
+  async function menuFor(name: string) {
+    fireEvent.click(await screen.findByRole("button", { name: `More for ${name}` }));
+    return screen.findByRole("dialog");
+  }
+
+  it("the menu opens Chart and Forecast, puts the person in view, and links to Edit", async () => {
     await upsertProfile(REFERENCE_PROFILE);
     await upsertProfile(PRIYA);
     const first = renderCircle();
-    fireEvent.click(await screen.findByRole("button", { name: "Chart: Priya" }));
+    const dlg1 = await menuFor("Priya");
+    expect(within(dlg1).getByRole("link", { name: /^Edit birth details/ })).toHaveAttribute("href", `/leaf/${PRIYA.id}/edit`);
+    fireEvent.click(within(dlg1).getByRole("button", { name: /^Chart/ }));
     await waitFor(() => expect(first.router.state.location.pathname).toBe(`/patri/${PRIYA.id}`));
     first.unmount();
     const { router } = renderCircle();
-    fireEvent.click(await screen.findByRole("button", { name: "Forecast: Rahul" }));
+    fireEvent.click(within(await menuFor("Rahul")).getByRole("button", { name: /^Forecast/ }));
     await waitFor(() => expect(router.state.location.pathname).toBe(`/forecast/${REFERENCE_PROFILE.id}`));
     await waitFor(async () => expect((await db.settings.get("app"))?.value.activeProfileId).toBe(REFERENCE_PROFILE.id));
   });
@@ -113,12 +119,12 @@ describe("CircleScreen", () => {
   it("Match opens straight away with one other person, and to the match screen with nobody else", async () => {
     await upsertProfile(REFERENCE_PROFILE);
     const alone = renderCircle();
-    fireEvent.click(await screen.findByRole("button", { name: "Match: Rahul" }));
+    fireEvent.click(within(await menuFor("Rahul")).getByRole("button", { name: /^Match with…/ }));
     await waitFor(() => expect(alone.router.state.location.pathname).toBe("/milan"));
     alone.unmount();
     await upsertProfile(PRIYA);
     const { router } = renderCircle();
-    fireEvent.click(await screen.findByRole("button", { name: "Match: Rahul" }));
+    fireEvent.click(within(await menuFor("Rahul")).getByRole("button", { name: /^Match with…/ }));
     await waitFor(() => expect(router.state.location.pathname).toBe(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`));
   });
 
@@ -127,22 +133,20 @@ describe("CircleScreen", () => {
     await upsertProfile(PRIYA);
     await upsertProfile(MEERA);
     const { router } = renderCircle();
-    fireEvent.click(await screen.findByRole("button", { name: "Match: Rahul" }));
-    const dlg = await screen.findByRole("dialog");
-    expect(within(dlg).getByRole("heading", { name: "Match Rahul with…" })).toBeInTheDocument();
-    fireEvent.click(within(dlg).getByRole("button", { name: /^Meera/ }));
+    const dlg = await menuFor("Rahul");
+    fireEvent.click(within(dlg).getByRole("button", { name: /^Match with…/ }));
+    expect(await within(dlg).findByRole("heading", { name: "Match Rahul with…" })).toBeInTheDocument();
+    fireEvent.click(within(dlg).getByRole("button", { name: "Back" }));
+    fireEvent.click(await within(dlg).findByRole("button", { name: /^Match with…/ }));
+    fireEvent.click(await within(dlg).findByRole("button", { name: /^Meera/ }));
     await waitFor(() => expect(router.state.location.pathname).toBe(`/milan/${REFERENCE_PROFILE.id}/${MEERA.id}`));
   });
 
-  it("More holds the rare things: palm, choosing a partner, the backup", async () => {
+  it("the menu also holds the rare things: the backup and palm", async () => {
     await upsertProfile(REFERENCE_PROFILE);
     await upsertProfile(PRIYA);
     const { router } = renderCircle();
-    fireEvent.click(await screen.findByRole("button", { name: "More for Rahul" }));
-    const dlg = await screen.findByRole("dialog");
-    fireEvent.click(within(dlg).getByRole("button", { name: /^Match with…/ }));
-    expect(await within(dlg).findByRole("button", { name: /^Priya/ })).toBeInTheDocument();
-    fireEvent.click(within(dlg).getByRole("button", { name: "Back" }));
+    const dlg = await menuFor("Rahul");
     fireEvent.click(await within(dlg).findByRole("button", { name: /^Back up/ }));
     const create = await within(dlg).findByRole("button", { name: "Create the backup" });
     expect(create).toBeDisabled();

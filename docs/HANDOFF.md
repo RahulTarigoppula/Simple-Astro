@@ -4,6 +4,10 @@ Written 2026-10-06 at the end of the first build session. The code, tests, CI wo
 Android shell are in this repository and committed on `main` locally. **Nothing has been pushed
 anywhere**, creating a public repo, a keystore and secrets needs your accounts and your decisions.
 
+## 00. Version 3.0.0 (2026-11-16): the second redesign
+
+You asked for a complete redesign again, cleaner. 3.0.0 changes the look ("ivory and ink": warm paper, serif headings, no outlines, one warm accent) and roughly halves what is on each screen. The rules are in `docs/DESIGN-V3.md`; the way around the app from 2.0 is unchanged. `release/Vyomaphala-3.0.0.apk` is signed with the same key, so it installs over 2.0.0 and keeps saved people (Gradle: `'-PversionCode=300' '-PversionName=3.0.0'`). Still not checked on a real phone: the camera, haptics, the status bar colour, the sticky Save bar with the keyboard open. Decisions you may want to reverse: planet symbols and the sky wheel are now one ink colour (the nine planet colours are gone); the Explore hub no longer shows "In the sky right now"; sunrise and sunset on the Almanac are in the heading, not a tappable row.
+
 ## 0. Version 2.0.0 (2026-11-16): the redesign, and what is left for you
 
 The whole app was redesigned in one unattended session; what changed is in CHANGELOG.md and the design is in docs/DESIGN-V2.md. Everything is committed on `main` locally. **Nothing was pushed**, so the live site still shows 1.3.0 until you push.

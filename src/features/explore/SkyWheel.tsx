@@ -192,12 +192,6 @@ export function SkyWheel({ sky, sel, onSelect, onPlay, natalMoon }: Props) {
       }}
     >
       <svg viewBox="0 0 400 400" aria-hidden="true">
-        <defs>
-          <radialGradient id="wheel-core">
-            <stop offset="0" stopColor="var(--accent)" stopOpacity="0.35" />
-            <stop offset="1" stopColor="var(--accent)" stopOpacity="0" />
-          </radialGradient>
-        </defs>
         <g className="wheel__spin">
           <circle cx={C} cy={C} r={NAK[1] + 1} className="wheel__rim" />
           {NAKSHATRA_NAMES.map((n, i) => {
@@ -242,7 +236,6 @@ export function SkyWheel({ sky, sel, onSelect, onPlay, natalMoon }: Props) {
             );
           })}
         </g>
-        <circle cx={C} cy={C} r="52" fill="url(#wheel-core)" />
         <circle cx={C} cy={C} r="16" className="wheel__earth" />
         <path d={`M${C} 0 l-7 -0 l7 12 l7 -12 z`} className="wheel__pointer" />
       </svg>

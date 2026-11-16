@@ -60,26 +60,20 @@ export function DashaRibbon({ tree, nowMs, zone, yearDays }: DashaRibbonProps) {
       {cur ? (
         <section className="v-card v-card--hero dasha-now" aria-labelledby="dasha-now-h">
           <p className="v-eyebrow">Your chapter now</p>
-          <div className="dasha-now__top">
-            <GrahaGlyph id={cur.md.lord} size={52} />
-            <div>
-              <h2 id="dasha-now-h" className="dasha-now__h">
-                The {GRAHA_ENGLISH[cur.md.lord]} chapter
-              </h2>
-              <p className="dasha-now__when">
-                {fmtMonth(cur.md.startMs, zone)} to {fmtMonth(cur.md.endMs, zone)} · {Math.round(intervalYears(cur.md, yearDays))} years
-              </p>
-            </div>
-          </div>
+          <h2 id="dasha-now-h" className="dasha-now__h">
+            The {GRAHA_ENGLISH[cur.md.lord]} chapter
+          </h2>
           <p className="dasha-now__line">{cap(CHAPTER_PLAIN[cur.md.lord])}</p>
           <div>
             <span className="v-meter" role="img" aria-label={`${Math.round(share(cur.md, nowMs))} percent of this chapter has passed`}>
               <span style={{ width: `${Math.max(3, share(cur.md, nowMs))}%` }} />
             </span>
             <p className="dasha-now__ends">
-              <span>Began {yearOf(cur.md.startMs, zone)}</span>
-              <span>{Math.round(share(cur.md, nowMs))}% through</span>
-              <span>Ends {yearOf(cur.md.endMs, zone)}</span>
+              <span>{fmtMonth(cur.md.startMs, zone)}</span>
+              <span>
+                {Math.round(share(cur.md, nowMs))}% through · {Math.round(intervalYears(cur.md, yearDays))} years
+              </span>
+              <span>{fmtMonth(cur.md.endMs, zone)}</span>
             </p>
           </div>
           <dl className="dasha-now__dl">
@@ -140,7 +134,7 @@ export function DashaRibbon({ tree, nowMs, zone, yearDays }: DashaRibbonProps) {
                 </span>
                 <span className="dasha__end">
                   <span className="dasha__y">
-                    {yearOf(d.startMs, zone)} to {yearOf(d.endMs, zone)}
+                    {yearOf(d.startMs, zone)}–{yearOf(d.endMs, zone)}
                   </span>
                   <span className="dasha__n">{intervalYears(d, yearDays).toFixed(1)} yr</span>
                 </span>

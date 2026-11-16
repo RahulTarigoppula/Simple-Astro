@@ -1,16 +1,16 @@
-// "In simple words": the first thing on a person's chart. One short answer (who you are at heart),
-// the three key signs as cards, plus and minus points, love and work, the life chapter running now,
-// then the doors onward. Plain sentences from src/data/traits.ts; the chart itself is another view.
+// "In simple words": the first thing on a person's chart. One short answer (the Moon sign's three
+// words, set large, then who you are at heart), the three key signs in one card, plus and minus points
+// with love and work in another, then the doors onward (the first is the life chapter running now).
+// The same birth in other traditions folds away. Plain sentences from src/data/traits.ts.
 import { useMemo } from "react";
-import { Link } from "react-router";
-import { ChevronRight, Row, Section } from "../../components/ui/Page";
+import { Row, Section } from "../../components/ui/Page";
 import { GRAHA_LORE, RASHI_LORE } from "../../data/lore";
 import { rashiBoth } from "../../data/regional";
-import { CHAPTER_PLAIN, CHAPTER_SHORT, MOON_TRAITS, NAK_TRAITS, NUMBER_TRAITS } from "../../data/traits";
+import { MOON_TRAITS, NAK_TRAITS, NUMBER_TRAITS } from "../../data/traits";
 import { currentDasha } from "../../engine/dasha";
 import { birthNumbers } from "../../engine/profile";
 import type { GrahaId, Patri, Profile } from "../../engine/types";
-import { IconForecast, IconMilan, IconPalm, IconSky } from "../chowki/icons";
+import { IconChart, IconForecast, IconMilan, IconPalm, IconSky } from "../chowki/icons";
 import { CosmicProfile, KeyFacts } from "./CosmicProfile";
 import "./cosmic.css";
 import { safeZone } from "../../engine/time";
@@ -34,6 +34,7 @@ const ordinal = (n: number) => {
   const s = n % 100 >= 11 && n % 100 <= 13 ? "th" : (({ 1: "st", 2: "nd", 3: "rd" } as Record<number, string>)[n % 10] ?? "th");
   return `${n}${s}`;
 };
+const cap = (t: string) => (t ? (t[0] ?? "").toUpperCase() + t.slice(1) : t);
 const monthYear = (ms: number, zone: string) =>
   new Date(ms).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: safeZone(zone) });
 
@@ -100,6 +101,7 @@ export function LifeReading({ profile, patri, nowMs, onChapters }: LifeReadingPr
     const cur = currentDasha(patri.dasha, nowMs);
     return {
       first: profile.name.split(/\s+/)[0] ?? profile.name,
+      word: cap(RASHI_LORE[mo.sign]?.nature ?? ""),
       moonSign: rashiBoth(mo.sign, profile.tradition),
       moon,
       nak,
@@ -124,12 +126,17 @@ export function LifeReading({ profile, patri, nowMs, onChapters }: LifeReadingPr
     };
   }, [profile, patri, nowMs]);
 
+  const curLord = r.cur ? lore(r.cur.md.lord)?.english : undefined;
+  const chapterSub = r.cur
+    ? `Until ${monthYear(r.cur.md.endMs, r.zone)}. Inside it, a shorter ${lore(r.cur.ad.lord)?.english} stretch runs until ${monthYear(r.cur.ad.endMs, r.zone)}.`
+    : "";
+
   return (
     <div className="life">
       <section className="v-card v-card--hero life__hero" aria-labelledby="life-h">
-        <p className="v-eyebrow">In simple words</p>
         <h2 id="life-h" className="life__h">
-          {r.first}, this is you
+          <span className="v-eyebrow">{r.first}, this is you</span>
+          <span className="life__word">{r.word}</span>
         </h2>
         <p className="life__lead">
           {r.moon?.plain}
@@ -146,103 +153,81 @@ export function LifeReading({ profile, patri, nowMs, onChapters }: LifeReadingPr
 
       <KeyFacts profile={profile} patri={patri} />
 
-      <div className="v-grid2 life__pm">
-        <section className="v-card" aria-labelledby="life-plus-h">
-          <h3 id="life-plus-h" className="life__k life__k--plus">
-            Plus points
-          </h3>
-          <ul>
-            {r.plus.map((x) => (
-              <li key={x}>{x}</li>
-            ))}
-          </ul>
-        </section>
-        <section className="v-card" aria-labelledby="life-minus-h">
-          <h3 id="life-minus-h" className="life__k life__k--minus">
-            Watch out for
-          </h3>
-          <ul>
-            {r.minus.map((x) => (
-              <li key={x}>{x}</li>
-            ))}
-          </ul>
-        </section>
-      </div>
-
-      <div className="v-cols">
-        <section className="v-card" aria-label="In love and at work">
-          <dl className="life__dl">
-            <div>
-              <dt>In love</dt>
-              <dd>{r.moon?.love}</dd>
-            </div>
-            <div>
-              <dt>At work</dt>
-              <dd>{r.moon?.work}</dd>
-            </div>
-          </dl>
-        </section>
-        {r.cur ? (
-          <section className="v-card life__now" aria-labelledby="life-now-h">
-            <p className="life__k">Right now</p>
-            <h3 id="life-now-h" className="v-card__title">
-              Your {lore(r.cur.md.lord)?.english} chapter
+      <div className="v-card life__traits">
+        <div className="life__pm">
+          <section aria-labelledby="life-plus-h">
+            <h3 id="life-plus-h" className="life__k life__k--plus">
+              Plus points
             </h3>
-            <p className="life__p">
-              You are in your <b>{lore(r.cur.md.lord)?.english}</b> chapter until {monthYear(r.cur.md.endMs, r.zone)}:{" "}
-              {CHAPTER_PLAIN[r.cur.md.lord]} Inside it, a shorter <b>{lore(r.cur.ad.lord)?.english}</b> stretch runs until{" "}
-              {monthYear(r.cur.ad.endMs, r.zone)}, bringing {CHAPTER_SHORT[r.cur.ad.lord]} to the front.
-            </p>
-            <div className="v-actions">
-              {onChapters ? (
-                <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={onChapters}>
-                  All life chapters
-                </button>
-              ) : null}
-              <Link to={`/forecast/${profile.id}`} className="v-link life__fc">
-                See your forecast <ChevronRight size={16} />
-              </Link>
-            </div>
+            <ul>
+              {r.plus.map((x) => (
+                <li key={x}>{x}</li>
+              ))}
+            </ul>
           </section>
-        ) : null}
+          <section aria-labelledby="life-minus-h">
+            <h3 id="life-minus-h" className="life__k life__k--minus">
+              Watch out for
+            </h3>
+            <ul>
+              {r.minus.map((x) => (
+                <li key={x}>{x}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
+        <dl className="life__dl">
+          <div>
+            <dt>In love</dt>
+            <dd>{r.moon?.love}</dd>
+          </div>
+          <div>
+            <dt>At work</dt>
+            <dd>{r.moon?.work}</dd>
+          </div>
+        </dl>
       </div>
 
       <Section title="Go further" />
       <ul className="v-list">
+        {r.cur ? (
+          <li>
+            {onChapters ? (
+              <Row onClick={onChapters} icon={<IconChart />} title={`Your ${curLord} chapter`} sub={chapterSub} />
+            ) : (
+              <Row icon={<IconChart />} title={`Your ${curLord} chapter`} sub={chapterSub} />
+            )}
+          </li>
+        ) : null}
         <li>
-          <Row
-            to={`/forecast/${profile.id}`}
-            icon={<IconForecast />}
-            tone="cyan"
-            title="Forecast"
-            sub="Your day, week, month and year ahead"
-          />
+          <Row to={`/forecast/${profile.id}`} icon={<IconForecast />} title="Forecast" sub="Your day, week, month and year ahead" />
         </li>
         <li>
-          <Row to={`/hast/${profile.id}`} icon={<IconPalm />} tone="green" title="Palm reading" sub="From a photo of your hand" />
+          <Row to={`/hast/${profile.id}`} icon={<IconPalm />} title="Palm reading" sub="From a photo of your hand" />
         </li>
         <li>
           <Row to={`/patri/${profile.id}/sky`} icon={<IconSky />} title="Sky at birth" sub="The real stars at the moment of birth" />
         </li>
         <li>
-          <Row to="/milan" icon={<IconMilan />} tone="rose" title="Partner match" sub="How two people fit, with a score" />
+          <Row to="/milan" icon={<IconMilan />} title="Partner match" sub="How two people fit, with a score" />
         </li>
       </ul>
 
-      <Section title="Your birth in other traditions" />
-      <div className="v-cols">
-        <section className="v-card" aria-labelledby="life-num-h">
-          <p className="life__k">Your numbers</p>
-          <h3 id="life-num-h" className="v-card__title">
-            {r.n.root} · {r.n.destiny}
-          </h3>
+      <details className="v-fold life__more">
+        <summary>
+          <span>
+            Your birth in other traditions
+            <span className="v-fold__s">Western Sun sign, the Chinese year and your numbers</span>
+          </span>
+        </summary>
+        <div className="v-fold__body">
           <p className="life__p">
             Born on the {ordinal(r.d)}: number {r.n.root}, {r.root?.word}. {r.root?.plain} Your whole birth date adds up to {r.n.destiny},{" "}
             {r.dest?.word}: what your life tends to grow towards.
           </p>
-        </section>
-        <CosmicProfile profile={profile} patri={patri} />
-      </div>
+          <CosmicProfile profile={profile} patri={patri} />
+        </div>
+      </details>
 
       <p className="v-foot">This is what the tradition says, in simple words. It isn't a fact about you. Your choices write the rest.</p>
     </div>

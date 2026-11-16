@@ -18,31 +18,30 @@ export default function StoryScreen() {
 
   return (
     <Page label="Roots: the story of the stars" back="/explore" backLabel="Explore">
-      <section className="v-card v-card--hero story-hero" aria-labelledby="story-h">
+      <section className="story-top" aria-labelledby="story-h">
         {first ? (
-          <span className="story-hero__art" aria-hidden="true">
+          <span className="story-top__art" aria-hidden="true">
             <StoryArt art={first.art} />
           </span>
         ) : null}
-        <p className="v-eyebrow">Roots</p>
-        <h1 id="story-h" className="v-title">
-          The story of the stars
-        </h1>
-        <p className="v-lede">
-          Four thousand years of people looking up: gods and ṛṣis, Greeks and astronomers, palm-readers and number-mystics.
-        </p>
-        <div className="v-actions">
-          <button
-            type="button"
-            className="v-btn"
-            onClick={() => {
-              countEvent("roots-start");
-              setPlay(0);
-            }}
-          >
-            Start the story
-          </button>
-        </div>
+        <header className="v-head">
+          <h1 id="story-h" className="v-title">
+            The story of the stars
+          </h1>
+          <p className="v-lede">
+            Four thousand years of people looking up: gods and ṛṣis, Greeks and astronomers, palm-readers and number-mystics.
+          </p>
+        </header>
+        <button
+          type="button"
+          className="v-btn"
+          onClick={() => {
+            countEvent("roots-start");
+            setPlay(0);
+          }}
+        >
+          Start the story
+        </button>
         <p className="v-small v-muted">
           {slides.length} short stories · about {minutes} minutes · tap to move, hold to pause
         </p>
@@ -55,7 +54,7 @@ export default function StoryScreen() {
           return (
             <li key={ch.id}>
               <button type="button" className="v-row" onClick={() => setPlay(chapterStart(ch.id))}>
-                <span className="v-row__icon v-row__icon--gold story-chapters__n" aria-hidden="true">
+                <span className="v-row__icon story-chapters__n" aria-hidden="true">
                   {i + 1}
                 </span>
                 <span className="v-row__body">

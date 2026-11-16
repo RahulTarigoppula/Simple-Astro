@@ -220,7 +220,7 @@ describe("SadeSatiRibbon", () => {
 });
 
 describe("DailyStrengthCard", () => {
-  it("answers in one plain sentence, then three plain chips with the Sanskrit small and a progress rule", () => {
+  it("answers in one plain sentence, then three plain rows with the Sanskrit small and a progress rule", () => {
     const { container } = render(<DailyStrengthCard patri={patri} nowMs={NOW} zone="Asia/Kolkata" />);
     const card = screen.getByRole("region", { name: "Today for this chart" });
     expect(card).toHaveTextContent("Today · 12 Oct");
@@ -234,10 +234,11 @@ describe("DailyStrengthCard", () => {
     expect(h.textContent).not.toMatch(/Tārā|bala|Janma|daśā/); // no jargon in the answer
     const chips = Array.from(card.querySelectorAll(".v-chip")).map((c) => c.textContent?.replace(/^[✓·~] /, ""));
     expect(chips).toEqual([
-      `Moon's support: ${chandra.favourable ? "good" : "quiet"}`,
-      `Day's star: ${{ kind: "kind", unkind: "asks care", mixed: "mixed" }[tara.tone]}`,
-      expect.stringMatching(/^Life chapter: \w+$/),
+      chandra.favourable ? "Good" : "Quiet",
+      { kind: "Kind", unkind: "Asks care", mixed: "Mixed" }[tara.tone],
+      expect.stringMatching(/^\w+$/),
     ]);
+    for (const label of ["Moon's support", "The day's star", "Life chapter"]) expect(within(card).getByText(label)).toBeInTheDocument();
     expect(container.textContent).toContain(`Tārā-bala · Tārā ${tara.tara} ${tara.name}`);
     expect(container.textContent).toMatch(/Candra-bala · today's Moon is in the \d+(st|nd|rd|th) sign from yours/);
     expect(container.textContent).toMatch(/Daśā · \w+ · \w+ · \w+/);

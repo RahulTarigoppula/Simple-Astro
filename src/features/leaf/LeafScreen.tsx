@@ -137,10 +137,14 @@ const roughly = (p: Place) =>
   `near ${Math.abs(p.lat).toFixed(1)}° ${p.lat >= 0 ? "N" : "S"}, ${Math.abs(p.lon).toFixed(1)}° ${p.lon >= 0 ? "E" : "W"}`;
 
 const STEPS = [
-  { label: "Who", title: "Who is this for?" },
-  { label: "When", title: "When were they born?" },
-  { label: "Where", title: "Where were they born?" },
-  { label: "Check", title: "Check and save" },
+  { label: "Who", title: "Who is this for?", hint: "Four short steps, about a minute. Everything stays on this device." },
+  {
+    label: "When",
+    title: "When were they born?",
+    hint: "The time matters most: a few hours changes the rising sign, and a wrong am/pm can change the Moon sign and birth star.",
+  },
+  { label: "Where", title: "Where were they born?", hint: "" },
+  { label: "Check", title: "Check and save", hint: "Read it back once. Nothing leaves this device." },
 ] as const;
 const LAST = STEPS.length - 1;
 
@@ -573,29 +577,33 @@ export default function LeafScreen() {
   );
 
   return (
-    <Page label={title} title={title} back noPerson className="leafscreen">
-      <nav className="leaf-steps" aria-label="Steps">
-        <p className="leaf-steps__now" aria-live="polite">
-          Step {step + 1} of {STEPS.length}
-        </p>
-        <ol>
-          {STEPS.map((s, i) => (
-            <li key={s.label}>
-              <button
-                type="button"
-                className={i < step ? "is-done" : undefined}
-                aria-label={`Step ${i + 1}: ${s.label}`}
-                aria-current={i === step ? "step" : undefined}
-                disabled={i > reach}
-                onClick={() => goTo(i)}
-              >
-                <span className="leaf-steps__bar" aria-hidden="true" />
-                <span className="leaf-steps__l">{s.label}</span>
-              </button>
-            </li>
-          ))}
-        </ol>
-      </nav>
+    <Page label={title} back noPerson className="leafscreen">
+      <header className="leaf-head">
+        <div className="leaf-head__row">
+          <h1 className="leaf-kicker">{title}</h1>
+          <p className="leaf-steps__now" aria-live="polite">
+            Step {step + 1} of {STEPS.length}
+          </p>
+        </div>
+        <nav className="leaf-steps" aria-label="Steps">
+          <ol>
+            {STEPS.map((s, i) => (
+              <li key={s.label}>
+                <button
+                  type="button"
+                  className={i < step ? "is-done" : undefined}
+                  aria-label={`Step ${i + 1}: ${s.label}`}
+                  aria-current={i === step ? "step" : undefined}
+                  disabled={i > reach}
+                  onClick={() => goTo(i)}
+                >
+                  <span className="leaf-steps__bar" aria-hidden="true" />
+                </button>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      </header>
 
       <form
         ref={body}
@@ -607,9 +615,18 @@ export default function LeafScreen() {
           else next();
         }}
       >
-        <h2 className="leaf-q" tabIndex={-1} data-autofocus={step === LAST ? "" : undefined}>
-          {STEPS[step]?.title}
-        </h2>
+        <div className="leaf-ask-head">
+          <h2 className="v-title leaf-q" tabIndex={-1} data-autofocus={step === LAST ? "" : undefined}>
+            {STEPS[step]?.title}
+          </h2>
+          {step === 2 ? (
+            <p className="v-lede" id="leaf-place-hint">
+              Type the first letters of the town or city, then tap it in the list.
+            </p>
+          ) : (
+            <p className="v-lede">{STEPS[step]?.hint}</p>
+          )}
+        </div>
 
         {step === 0 ? (
           <>
@@ -621,7 +638,6 @@ export default function LeafScreen() {
                 </button>
               </div>
             ) : null}
-            <p className="v-muted">Four short steps, about a minute. Everything stays on this device.</p>
             <div className="v-field">
               <label className="v-label" htmlFor="leaf-name">
                 Name
@@ -646,11 +662,7 @@ export default function LeafScreen() {
               <span className="v-label" id="leaf-trad-l">
                 Which tradition does the family follow?
               </span>
-              <span className="v-hint">
-                This only sets the names you see and how the chart is drawn. The planets and the calculation are the same everywhere in
-                India.
-              </span>
-              <div className="leaf-choices" role="radiogroup" aria-labelledby="leaf-trad-l">
+              <div className="leaf-choices" role="radiogroup" aria-labelledby="leaf-trad-l" aria-describedby="leaf-trad-s">
                 {(Object.keys(TRADITION_LABEL) as Tradition[]).map((k) => (
                   <button
                     key={k}
@@ -660,21 +672,25 @@ export default function LeafScreen() {
                     aria-checked={draft.tradition === k}
                     onClick={() => set("tradition", k)}
                   >
-                    <span className="leaf-choice__dot" aria-hidden="true" />
                     <span className="leaf-choice__body">
                       <span className="leaf-choice__t">{TRADITION_LABEL[k]}</span>
                       <span className="leaf-choice__s">{TRADITION_NOTE[k]}</span>
                     </span>
+                    <span className="leaf-choice__tick" aria-hidden="true">
+                      <Tick />
+                    </span>
                   </button>
                 ))}
               </div>
+              <span className="v-hint" id="leaf-trad-s">
+                Only the names and the way the chart is drawn change. The calculation is the same everywhere in India.
+              </span>
             </div>
 
             <div className="v-field">
               <span className="v-label" id="leaf-hand-l">
-                Writing hand
+                Writing hand <span className="leaf-label-s">for the palm reading</span>
               </span>
-              <span className="v-hint">Used only for the palm reading.</span>
               <div className="v-seg leaf-seg" role="radiogroup" aria-labelledby="leaf-hand-l">
                 {(["right", "left"] as const).map((h) => (
                   <button key={h} type="button" role="radio" aria-checked={draft.handedness === h} onClick={() => set("handedness", h)}>
@@ -688,9 +704,6 @@ export default function LeafScreen() {
 
         {step === 1 ? (
           <>
-            <p className="v-muted">
-              The time matters most: a few hours changes the rising sign, and a wrong am/pm can change the Moon sign and birth star.
-            </p>
             <DateFields y={draft.y} mo={draft.mo} d={draft.d} onChange={patch} />
             <TimeFields hour12={draft.hour12} ampm={draft.ampm} mi={draft.mi} timeUnknown={draft.timeUnknown} onChange={patch} />
             <Readback
@@ -729,12 +742,9 @@ export default function LeafScreen() {
         {step === 2 ? (
           <>
             <div className="v-field">
-              <label className="v-label" htmlFor="leaf-place">
+              <label className="vh" htmlFor="leaf-place">
                 Place of birth
               </label>
-              <span className="v-hint" id="leaf-place-hint">
-                Type the first letters of the town or city, then tap it in the list.
-              </span>
               <input
                 id="leaf-place"
                 className="v-input"
@@ -776,7 +786,7 @@ export default function LeafScreen() {
               </ul>
             ) : null}
             {query.trim().length >= 2 && results.length === 0 ? (
-              <div className="v-card leaf-online">
+              <div className="leaf-online">
                 <p role="status">{gazReady ? "Not in the built-in list." : "Loading places…"}</p>
                 <div className="v-actions">
                   <button
@@ -1005,13 +1015,13 @@ export default function LeafScreen() {
               </div>
             </dl>
 
-            <section className={`v-card leaf-check${check ? "" : " is-waiting"}`} aria-labelledby="leaf-check-h" aria-live="polite">
-              <h3 id="leaf-check-h" className="leaf-check__h">
-                Check before you save
-              </h3>
+            <section className={`leaf-check${check ? "" : " is-waiting"}`} aria-labelledby="leaf-check-h" aria-live="polite">
+              <div className="v-sec">
+                <h3 id="leaf-check-h">Check before you save</h3>
+              </div>
               {check ? (
                 <>
-                  <dl className="leaf-check__grid">
+                  <dl className="v-card leaf-check__grid">
                     <div>
                       <dt>Moon sign (rāśi)</dt>
                       <dd>
@@ -1040,7 +1050,7 @@ export default function LeafScreen() {
                   </p>
                 </>
               ) : (
-                <p className="leaf-check__p">
+                <p className="v-card leaf-check__p">
                   {problem ?? "These details could not be worked out."} Your Moon sign, birth star and rising sign appear here as soon as
                   they can be worked out.
                 </p>
@@ -1074,12 +1084,10 @@ export default function LeafScreen() {
           </>
         ) : null}
 
-        {step === LAST ? <p className="v-small v-muted leaf-foot__note">Nothing leaves this device.</p> : null}
-
         {step === 0 && !id && (restored || (!draft.name && !draft.d && !draft.place)) ? (
           <div className="leaf-example">
-            <p className="v-small v-muted">Just looking around?</p>
-            <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={fillExample}>
+            <span className="v-muted">Just looking around?</span>
+            <button type="button" className="v-link" onClick={fillExample}>
               Fill in an example (Rahul, 14 Mar 1994)
             </button>
           </div>
@@ -1114,7 +1122,7 @@ export default function LeafScreen() {
 
       <Sheet open={online === "asking"} onClose={() => setOnline("idle")} label="Search online?">
         <div className="leaf-ask">
-          <h2 className="v-card__title">Search online?</h2>
+          <h2>Search online?</h2>
           <p>
             Vyomaphala works offline. To look up “{query.trim()}”, only the place name would be sent to Open-Meteo’s geocoder (and, if that
             finds nothing, to OpenStreetMap Nominatim). No birth details, no names of people. You will be asked once.

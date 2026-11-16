@@ -13,7 +13,7 @@
   color: var(--ink);
   background:
     radial-gradient(900px 600px at 80% -10%, color-mix(in oklch, var(--tone) 38%, transparent), transparent 60%),
-    radial-gradient(700px 500px at -10% 110%, rgba(34, 211, 238, 0.16), transparent 60%), var(--void-0);
+    radial-gradient(700px 500px at -10% 110%, rgba(var(--accent-rgb), 0.16), transparent 60%), var(--void-0);
   overflow: hidden;
   display: grid;
   grid-template-rows: auto auto 1fr auto;

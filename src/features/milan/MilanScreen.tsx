@@ -6,7 +6,7 @@ import { Link, useNavigate, useParams } from "react-router";
 import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { DISCLAIMER } from "../../components/ui/Colophon";
 import { InfoDot } from "../../components/ui/Explain";
-import { Page, Section } from "../../components/ui/Page";
+import { Page } from "../../components/ui/Page";
 import { Avatar, birthLine } from "../../components/ui/PersonChip";
 import { Sheet } from "../../components/ui/Sheet";
 import { glossary } from "../../data/glossary";
@@ -29,7 +29,7 @@ import { haptics } from "../../platform/haptics";
 import { toast } from "../../state/ui";
 import { IconMilan } from "../chowki/icons";
 import { type ChartBody, KundliChart } from "../patri/KundliChart";
-import { BondCard } from "./BondCard";
+import { BondCard, Fold, ORDER_NOTE } from "./BondCard";
 import { Mala } from "./Mala";
 import { PoruthamThread } from "./PoruthamThread";
 import {
@@ -75,22 +75,6 @@ const bodiesOfPatri = (p: Patri): ChartBody[] =>
     const g = p.grahas[id];
     return { id, sign: g.sign, degInSign: g.degInSign, retro: g.retrograde, nakshatra: g.nakshatra, pada: g.pada };
   });
-
-/** A fold that stays out of the way; `lazy` content is mounted only once it is opened. */
-function Fold({ title, sub, lazy, children }: { title: string; sub?: React.ReactNode; lazy?: boolean; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <details className="v-fold" open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
-      <summary>
-        <span>
-          {title}
-          {sub ? <span className="v-fold__s">{sub}</span> : null}
-        </span>
-      </summary>
-      {!lazy || open ? <div className="v-fold__body">{children}</div> : null}
-    </details>
-  );
-}
 
 /** One person's Rāśi chart, static, the Moon lit; captioned with the Moon's star and sign. */
 function PersonChart({
@@ -139,17 +123,42 @@ function Slot({ who, person, onChoose }: { who: string; person: Profile | null; 
       aria-label={person ? `${who}: ${person.name}. Change` : `${who}: choose a person`}
       onClick={onChoose}
     >
+      {person ? <Avatar name={person.name} size={64} /> : <Plus />}
+      <span className="mm-slot__name">
+        <span>{person ? person.name : "Choose"}</span>
+        <Caret />
+      </span>
       <span className="mm-slot__who">{who}</span>
-      {person ? (
-        <Avatar name={person.name} size={44} />
-      ) : (
-        <span className="mm-slot__plus" aria-hidden="true">
-          +
-        </span>
-      )}
-      <span className="mm-slot__name">{person ? person.name : "Choose"}</span>
-      <span className="mm-slot__change">{person ? "Change" : "Tap to pick"}</span>
     </button>
+  );
+}
+
+function Plus() {
+  return (
+    <span className="mm-slot__plus" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+    </span>
+  );
+}
+
+function Caret() {
+  return (
+    <svg
+      className="mm-slot__caret"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
   );
 }
 
@@ -270,7 +279,7 @@ function MilanScreen() {
       label="Partner match"
       title="Partner match"
       lede={matched ? undefined : "How two people fit, read the traditional way from their two Moons."}
-      wide={matched}
+      {...(matched ? { className: "mm-result" } : {})}
     >
       {loading ? null : (
         <>
@@ -283,60 +292,53 @@ function MilanScreen() {
           ) : null}
 
           {list.length > 0 ? (
-            <section className="v-card mm-pair" aria-label="The two people">
-              <div className="mm-pair__row">
-                <Slot who="First person" person={slotA} onChoose={() => setSheet({ kind: "pick", side: "a" })} />
-                {list.length > 1 ? (
-                  <button type="button" className="v-iconbtn mm-pair__swap" onClick={swap} disabled={!slotA || !slotB}>
-                    <SwapIcon />
-                    <span className="vh">Swap first and second person</span>
-                  </button>
-                ) : (
-                  <span aria-hidden="true" />
-                )}
-                {list.length > 1 ? (
-                  <Slot who="Second person" person={slotB} onChoose={() => setSheet({ kind: "pick", side: "b" })} />
-                ) : (
-                  <Link to="/leaf/new" className="mm-slot is-empty">
-                    <span className="mm-slot__who">Second person</span>
-                    <span className="mm-slot__plus" aria-hidden="true">
-                      +
-                    </span>
-                    <span className="mm-slot__name">Add a person</span>
-                    <span className="mm-slot__change">Birth date, time, place</span>
-                  </Link>
-                )}
-              </div>
-              {ready && slotA && slotB ? (
-                <button type="button" className="v-btn v-btn--block" onClick={() => go(slotA, slotB, false)}>
-                  See the match
+            <section className="mm-pair" aria-label="The two people">
+              <Slot who="First person" person={slotA} onChoose={() => setSheet({ kind: "pick", side: "a" })} />
+              {list.length > 1 ? (
+                <button type="button" className="v-iconbtn mm-pair__swap" onClick={swap} disabled={!slotA || !slotB}>
+                  <SwapIcon />
+                  <span className="vh">Swap first and second person</span>
                 </button>
-              ) : !matched && list.length > 1 ? (
-                <p className="v-small v-muted mm-pair__hint">
-                  Tap a card to choose each person. The match opens as soon as both are chosen.
-                </p>
-              ) : null}
+              ) : (
+                <span aria-hidden="true" />
+              )}
+              {list.length > 1 ? (
+                <Slot who="Second person" person={slotB} onChoose={() => setSheet({ kind: "pick", side: "b" })} />
+              ) : (
+                <Link to="/leaf/new" className="mm-slot is-empty">
+                  <Plus />
+                  <span className="mm-slot__name">
+                    <span>Add a person</span>
+                  </span>
+                  <span className="mm-slot__who">Second person</span>
+                </Link>
+              )}
             </section>
+          ) : null}
+
+          {ready && slotA && slotB ? (
+            <button type="button" className="v-btn v-btn--block mm-go" onClick={() => go(slotA, slotB, false)}>
+              See the match
+            </button>
+          ) : !matched && list.length > 1 ? (
+            <p className="v-muted mm-pair__hint">Tap each side to choose a person. The match opens as soon as both are chosen.</p>
           ) : null}
 
           {list.length < 2 ? (
             <section className="v-card v-empty" aria-labelledby="mm-empty-h">
-              <span className="v-empty__art" aria-hidden="true">
-                <IconMilan size={30} />
-              </span>
-              <h2 id="mm-empty-h" className="v-card__title">
+              {list.length === 0 ? (
+                <span className="v-empty__art" aria-hidden="true">
+                  <IconMilan size={30} />
+                </span>
+              ) : null}
+              <h2 id="mm-empty-h" className="mm-empty__h">
                 {list.length === 0 ? "A match needs two people" : "Add one more person"}
               </h2>
-              <p>
+              <p className="v-muted">
                 {list.length === 0
-                  ? "No one is saved yet. Add two people with their birth date, time and place, and Vyomaphala will compare them."
+                  ? "No one is saved yet. Add two people with their birth date, time and place, and Vyomaphala will compare them: one answer, then understanding, companionship, trust, closeness and family, each in a line."
                   : `Only ${list[0]?.name ?? "one person"} is saved. Add their partner's birth date, time and place to see the match.`}
               </p>
-              <ul className="v-ticks">
-                <li>One score out of 100, with the traditional 36 points</li>
-                <li>Understanding, companionship, trust, closeness and family, each in a line</li>
-                <li>What is strongest between you, and what to work on</li>
-              </ul>
               <Link to="/leaf/new" className="v-btn">
                 Add a person
               </Link>
@@ -350,11 +352,23 @@ function MilanScreen() {
                 The match could not be worked out: {err}
               </div>
             ) : r && patA && patB ? (
-              <>
-                <BondCard r={r} pa={pa} pb={pb} patA={patA} patB={patB} onCopy={() => void copySummary()} />
-
-                <Section title="Full detail" note="The astrology behind the answer. Open what you want to check." />
-
+              <BondCard
+                r={r}
+                pa={pa}
+                pb={pb}
+                patA={patA}
+                patB={patB}
+                onCopy={() => void copySummary()}
+                manglikFacts={
+                  <>
+                    <dl className="mm-facts">
+                      <ManglikFact profile={pa} m={r.manglik.a} />
+                      <ManglikFact profile={pb} m={r.manglik.b} />
+                    </dl>
+                    <p className="v-small v-muted">Manglik is shown beside the score, never added to it.</p>
+                  </>
+                }
+              >
                 <Fold
                   title="The 36-point score"
                   sub={`Guna Milan: ${fmtPts(r.total)} of 36, ${r.band === "not-recommended" ? "under the traditional line of 18" : BAND_LABEL[r.band]}`}
@@ -379,40 +393,6 @@ function MilanScreen() {
                   </Fold>
                 ) : null}
 
-                <Fold title="Schools, exceptions and Manglik" sub="Where traditions differ, and what was applied">
-                  <dl className="mm-facts">
-                    <div>
-                      <dt>School</dt>
-                      <dd>
-                        {SCHOOL_LABEL[settings.ashtakootaSchool]}: {SCHOOL_NOTE[settings.ashtakootaSchool]}.
-                      </dd>
-                    </div>
-                    {r.kootas
-                      .filter((k) => HAS_EXCEPTION.has(k.id))
-                      .map((k) => {
-                        const exc = exceptionLine(k, r.kootas);
-                        return exc ? (
-                          <div key={k.id}>
-                            <dt>{k.name} exception</dt>
-                            <dd>
-                              {exc.text}
-                              {exc.source ? <span className="v-muted"> ({exc.source})</span> : null}
-                            </dd>
-                          </div>
-                        ) : null;
-                      })}
-                    <ManglikFact profile={pa} m={r.manglik.a} />
-                    <ManglikFact profile={pb} m={r.manglik.b} />
-                  </dl>
-                  <p className="v-small v-muted">
-                    Manglik is shown beside the score, never added to it. The school and the Bhakūṭa exception can be changed in{" "}
-                    <Link to="/drawer" className="mm-inline">
-                      Settings
-                    </Link>
-                    .
-                  </p>
-                </Fold>
-
                 <Fold title="Both birth charts" sub="Rāśi charts with the Moon lit" lazy>
                   <div className="mm-charts">
                     <PersonChart profile={pa} patri={patA} style={settings.chartStyle} script={settings.chartScript} />
@@ -420,7 +400,8 @@ function MilanScreen() {
                   </div>
                 </Fold>
 
-                <Fold title="How this was calculated">
+                <Fold title="How this was calculated" sub="The method, the school and its exceptions">
+                  <p>{ORDER_NOTE}</p>
                   <dl className="mm-facts">
                     {(
                       [
@@ -445,10 +426,27 @@ function MilanScreen() {
                         <dd>{v}</dd>
                       </div>
                     ))}
+                    {r.kootas
+                      .filter((k) => HAS_EXCEPTION.has(k.id))
+                      .map((k) => {
+                        const exc = exceptionLine(k, r.kootas);
+                        return exc ? (
+                          <div key={k.id}>
+                            <dt>{k.name} exception</dt>
+                            <dd>
+                              {exc.text}
+                              {exc.source ? <span className="v-muted"> ({exc.source})</span> : null}
+                            </dd>
+                          </div>
+                        ) : null;
+                      })}
                   </dl>
-                  <p className="v-small v-muted">A score is a tradition's arithmetic, not a verdict on two people.</p>
+                  <p className="v-small v-muted">
+                    The school and the Bhakūṭa exception can be changed in <Link to="/drawer">Settings</Link>. A score is a tradition's
+                    arithmetic, not a verdict on two people.
+                  </p>
                 </Fold>
-              </>
+              </BondCard>
             ) : (
               <div className="v-skel" role="status">
                 Reading both charts…
@@ -598,7 +596,7 @@ function KootaSheet({
       </p>
       <h2 className="mm-sheet__h">
         <span>{g?.plain ?? k.name}</span>
-        <span className="v-chip v-chip--gold">
+        <span className="v-chip">
           {fmtPts(k.score)} / {k.max}
         </span>
       </h2>

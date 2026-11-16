@@ -223,6 +223,9 @@ function SpellFold({ spell, nowMs, zone }: { spell: SaturnSpell; nowMs: number; 
       role="tabpanel"
       aria-label={`${SPELL_PLAIN[spell.kind]} (${SPELL_LABEL[spell.kind]}): its dated parts`}
     >
+      <p className="gochar-fold__name">
+        {SPELL_LABEL[spell.kind]} · {fmtDate(spell.startMs, zone)} to {fmtDate(spell.endMs, zone)}
+      </p>
       <ul>
         {spell.intervals.map((iv) => {
           const again = seen.has(iv.phase);

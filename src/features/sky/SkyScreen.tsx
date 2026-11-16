@@ -369,7 +369,7 @@ export default function SkyScreen() {
           </div>
           {fallback ? <p className="sky-note">{FALLBACK_NOTE[fallback]}</p> : null}
           <p className="sky-note sky-help">
-            The real sky at birth: stars, the golden zodiac band, and each planet. The violet mark is the rising sign (east). Turn the ring
+            The real sky at birth: stars, the golden zodiac band, and each planet. The amber mark is the rising sign (east). Turn the ring
             to move time.
           </p>
         </div>

@@ -4,21 +4,41 @@ import { GrahaGlyph } from "../../components/ui/GrahaGlyph";
 import { RASHI_LORE } from "../../data/lore";
 import { CHAPTER_SHORT } from "../../data/traits";
 import type { SkyEvent } from "../../engine/events";
-import type { Forecast, ForecastLine, Period } from "../../engine/forecast";
+import { type DayRating, type Forecast, type ForecastLine, HOUSE_AREA, ord, type Period } from "../../engine/forecast";
 import type { PersonalReading } from "../../engine/personal";
-import { english, fmt, lore } from "./util";
+import { MoonDisc } from "../home/MoonDisc";
+import { english, fmt, lore, STAR_LINE, TARA_ENGLISH } from "./util";
 
-function Fold({ title, sub, children }: { title: string; sub?: React.ReactNode; children: React.ReactNode }) {
+export function Fold({ title, sub, children }: { title: string; sub?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <details className="v-fold">
+    <details className="fc-fold">
       <summary>
         <span>
           {title}
-          {sub ? <span className="v-fold__s">{sub}</span> : null}
+          {sub ? <span className="fc-fold__s">{sub}</span> : null}
         </span>
       </summary>
-      <div className="v-fold__body">{children}</div>
+      <div className="fc-fold__body">{children}</div>
     </details>
+  );
+}
+
+/** The day's Moon in one sentence, with the two classical measures behind it. */
+export function MoonFold({ step, elongation }: { step: DayRating; elongation: number | null }) {
+  const taraWord = TARA_ENGLISH[step.tara];
+  return (
+    <Fold title="The Moon today" sub={`The mood turns toward ${HOUSE_AREA[step.moonHouse]}.`}>
+      <div className="fc-saturn">
+        {elongation !== null ? <MoonDisc elongation={elongation} size={44} /> : null}
+        <div>
+          <p>{STAR_LINE[step.taraTone]}</p>
+          <p className="v-small v-muted fc-fine">
+            Moon in your {ord(step.moonHouse)} house from your Moon sign <InfoDot id="chandra-bala" /> · {step.tara} star
+            {taraWord ? ` (${taraWord})` : ""} <InfoDot id="tara-bala" />
+          </p>
+        </div>
+      </div>
+    </Fold>
   );
 }
 
@@ -45,7 +65,7 @@ export function TransitsFold({ lines }: { lines: ForecastLine[] }) {
       title="What is helping and what needs care"
       sub={`${count(good.length, "planet helps", "planets help")} · ${count(care.length, "needs care", "need care")}`}
     >
-      <h3 className="fc-h3 fc-h3--good">
+      <h3 className="fc-h3" data-tone="bright">
         Working for you <InfoDot id="gochar" />
       </h3>
       {good.length ? (
@@ -53,7 +73,9 @@ export function TransitsFold({ lines }: { lines: ForecastLine[] }) {
       ) : (
         <p className="v-muted">No planet in a favourable house for this period. A time to rest and plan.</p>
       )}
-      <h3 className="fc-h3 fc-h3--care">Go gently with</h3>
+      <h3 className="fc-h3" data-tone="mixed">
+        Go gently with
+      </h3>
       {care.length ? <Lines lines={care} /> : <p className="v-muted">Nothing strained. Every listed planet is in a supportive house.</p>}
     </Fold>
   );
@@ -218,12 +240,10 @@ export function MethodFold({ name, moonSign }: { name: string; moonSign: string 
         ch. 26); days add the Moon's Tārā-bala and Candra-bala. It is a traditional reading for reflection. It is not a prediction of events
         and not advice.
       </p>
-      <div className="v-note fc-karma">
-        <p>
-          <strong>Karma, not fate.</strong> A forecast shows what <em>could</em> happen, like the weather. What does happen is shaped by
-          your karma: your own choices and actions. Use this to reflect and plan, never to fear.
-        </p>
-      </div>
+      <p className="fc-karma">
+        <strong>Karma, not fate.</strong> A forecast shows what <em>could</em> happen, like the weather. What does happen is shaped by your
+        karma: your own choices and actions. Use this to reflect and plan, never to fear.
+      </p>
     </Fold>
   );
 }

@@ -161,101 +161,88 @@ export function MonthGrid({ place, preset, clock, ym, onMonth, today, selected, 
   const title = monthTitle(ym.y, ym.m);
 
   return (
-    <section className="month" aria-labelledby="month-h">
-      <h2 id="month-h" className="alm-h">
-        The month
-        <span className="alm-h__note">Tap a date to read that day</span>
-      </h2>
-      <div className="month__nav">
-        <button type="button" className="v-iconbtn" aria-label="Previous month" onClick={() => onMonth(shiftMonth(ym.y, ym.m, -1))}>
-          <ChevronLeft />
-        </button>
-        <p className="month__title" id="month-title" aria-live="polite">
-          {title}
-        </p>
-        <button type="button" className="v-iconbtn" aria-label="Next month" onClick={() => onMonth(shiftMonth(ym.y, ym.m, 1))}>
-          <ChevronRight />
-        </button>
-      </div>
-      {cal ? (
-        <div ref={tableRef} className="month__grid" role="grid" aria-labelledby="month-title" aria-colcount={7} onKeyDown={onKey}>
-          <div className="month__row month__row--head" role="row" tabIndex={-1}>
-            {WEEK.map(([s, l], i) => (
-              <span key={l} className="month__wd" role="columnheader" tabIndex={-1} aria-colindex={i + 1} aria-label={l}>
-                {s}
-              </span>
+    <section className="month" aria-labelledby="month-title">
+      <div className="v-card month__card">
+        <div className="month__nav">
+          <h2 className="month__title" id="month-title" aria-live="polite">
+            {title}
+          </h2>
+          <button type="button" className="v-iconbtn" aria-label="Previous month" onClick={() => onMonth(shiftMonth(ym.y, ym.m, -1))}>
+            <ChevronLeft />
+          </button>
+          <button type="button" className="v-iconbtn" aria-label="Next month" onClick={() => onMonth(shiftMonth(ym.y, ym.m, 1))}>
+            <ChevronRight size={20} />
+          </button>
+        </div>
+        {cal ? (
+          <div ref={tableRef} className="month__grid" role="grid" aria-labelledby="month-title" aria-colcount={7} onKeyDown={onKey}>
+            <div className="month__row month__row--head" role="row" tabIndex={-1}>
+              {WEEK.map(([s, l], i) => (
+                <span key={l} className="month__wd" role="columnheader" tabIndex={-1} aria-colindex={i + 1} aria-label={l}>
+                  {s}
+                </span>
+              ))}
+            </div>
+            {weeks.map((w) => (
+              <div key={`w${w.find((c) => c)?.day ?? 0}`} className="month__row" role="row" tabIndex={-1}>
+                {w.map((c, i) =>
+                  c ? (
+                    <button
+                      key={c.day}
+                      type="button"
+                      role="gridcell"
+                      aria-colindex={i + 1}
+                      aria-selected={sel === c.day}
+                      data-day={c.day}
+                      tabIndex={c.day === fd ? 0 : -1}
+                      className={`mcell${c.marks.includes("purnima") ? " mcell--purnima" : ""}${c.marks.includes("amavasya") ? " mcell--amavasya" : ""}`}
+                      aria-current={tday === c.day ? "date" : undefined}
+                      aria-label={`${dayLabel(cal, c, clock)}${tday === c.day ? "; today" : ""}`}
+                      onClick={() => {
+                        setFocusDay(c.day);
+                        onPick({ y: ym.y, m: ym.m, d: c.day });
+                      }}
+                      onFocus={() => setFocusDay(c.day)}
+                    >
+                      <span className="mcell__d">{c.day}</span>
+                      <MoonFace className="mcell__moon" k={c.moonK} waxing={c.elongation < 180} south={south} />
+                      <span className="mcell__t">{tithiPlain(c.tithi.index)}</span>
+                      <span className="mcell__m">
+                        {c.marks.includes("purnima") && c.tithi.index !== 15 ? <i className="mmark">Full</i> : null}
+                        {c.marks.includes("amavasya") && c.tithi.index !== 30 ? <i className="mmark">New</i> : null}
+                        {c.marks.includes("ekadashi") ? <i className="mmark">Ek</i> : null}
+                        {c.marks.includes("sankranti") ? <i className="mmark">☉</i> : null}
+                      </span>
+                    </button>
+                  ) : (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: a blank cell has no identity but its column
+                    <span key={`b${i}`} className="mcell--blank" aria-hidden="true" />
+                  ),
+                )}
+              </div>
             ))}
           </div>
-          {weeks.map((w) => (
-            <div key={`w${w.find((c) => c)?.day ?? 0}`} className="month__row" role="row" tabIndex={-1}>
-              {w.map((c, i) =>
-                c ? (
-                  <button
-                    key={c.day}
-                    type="button"
-                    role="gridcell"
-                    aria-colindex={i + 1}
-                    aria-selected={sel === c.day}
-                    data-day={c.day}
-                    tabIndex={c.day === fd ? 0 : -1}
-                    className={`mcell${c.marks.includes("purnima") ? " mcell--purnima" : ""}${c.marks.includes("amavasya") ? " mcell--amavasya" : ""}`}
-                    aria-current={tday === c.day ? "date" : undefined}
-                    aria-label={`${dayLabel(cal, c, clock)}${tday === c.day ? "; today" : ""}`}
-                    onClick={() => {
-                      setFocusDay(c.day);
-                      onPick({ y: ym.y, m: ym.m, d: c.day });
-                    }}
-                    onFocus={() => setFocusDay(c.day)}
-                  >
-                    <span className="mcell__d">{c.day}</span>
-                    <MoonFace className="mcell__moon" k={c.moonK} waxing={c.elongation < 180} south={south} />
-                    <span className="mcell__t">{tithiPlain(c.tithi.index)}</span>
-                    <span className="mcell__m">
-                      {c.marks.includes("purnima") && c.tithi.index !== 15 ? <i className="mmark">Full</i> : null}
-                      {c.marks.includes("amavasya") && c.tithi.index !== 30 ? <i className="mmark">New</i> : null}
-                      {c.marks.includes("ekadashi") ? <i className="mmark">Ek</i> : null}
-                      {c.marks.includes("sankranti") ? <i className="mmark mmark--sun">☉</i> : null}
-                    </span>
-                  </button>
-                ) : (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: a blank cell has no identity but its column
-                  <span key={`b${i}`} className="mcell--blank" aria-hidden="true" />
-                ),
-              )}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="v-note v-note--warn" role="status">
-          The month could not be read for this place.
+        ) : (
+          <p className="v-note v-note--warn" role="status">
+            The month could not be read for this place.
+          </p>
+        )}
+        <p className="month__legend">
+          Tap a date to read that day. The small number is the lunar day at sunrise (↑ growing Moon, ↓ fading). <i className="mmark">Ek</i>{" "}
+          is Ekādaśī, a fasting day; <i className="mmark">☉</i> the Sun changes sign.
         </p>
-      )}
-      <p className="month__legend">
-        <span>Small number = lunar day (tithi) at sunrise; ↑ growing, ↓ fading</span>
-        <span>
-          <i className="mmark">Ek</i> Ekādaśī (fasting day)
-        </span>
-        <span>
-          <i className="mmark mmark--sun">☉</i> the Sun changes sign
-        </span>
-      </p>
+      </div>
       {picked && cal ? (
         <div className="v-card month__pick" aria-live="polite">
           <p className="v-card__title">{dateLong(cal.year, cal.month, picked.day)}</p>
           <p className="v-card__sub">
-            {picked.tithi.name} · Moon in {NAKSHATRA_NAMES[picked.nakshatra]}{" "}
-            <span lang="hi" className="alm-dev">
-              {NAKSHATRA_DEV[picked.nakshatra]}
-            </span>{" "}
-            · sunrise {clock.hm12(picked.sunriseMs)}
+            {picked.tithi.name} · Moon in {NAKSHATRA_NAMES[picked.nakshatra]} <span lang="hi">{NAKSHATRA_DEV[picked.nakshatra]}</span> ·
+            sunrise {clock.hm12(picked.sunriseMs)}
             {picked.sankranti ? (
               <>
                 {" "}
-                · the Sun enters {SIGN_NAMES[picked.sankranti.sign]}{" "}
-                <span lang="hi" className="alm-dev">
-                  {SIGN_DEV[picked.sankranti.sign]}
-                </span>{" "}
-                at {clock.hm12(picked.sankranti.ms)}
+                · the Sun enters {SIGN_NAMES[picked.sankranti.sign]} <span lang="hi">{SIGN_DEV[picked.sankranti.sign]}</span> at{" "}
+                {clock.hm12(picked.sankranti.ms)}
               </>
             ) : null}
           </p>

@@ -8,8 +8,8 @@ const config: CapacitorConfig = {
     webContentsDebuggingEnabled: false,
   },
   plugins: {
-    SplashScreen: { backgroundColor: "#04050d", launchAutoHide: false, launchFadeOutDuration: 240 },
-    StatusBar: { overlaysWebView: true, style: "DARK", backgroundColor: "#04050d" },
+    SplashScreen: { backgroundColor: "#0f0e0c", launchAutoHide: false, launchFadeOutDuration: 240 },
+    StatusBar: { overlaysWebView: true, style: "DARK", backgroundColor: "#0f0e0c" },
     Camera: { presentationStyle: "fullscreen" },
   },
 };

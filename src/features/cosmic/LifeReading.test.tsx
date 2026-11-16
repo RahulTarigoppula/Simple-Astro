@@ -58,7 +58,7 @@ describe("the reading in simple words", () => {
       </MemoryRouter>,
     );
 
-  it("answers first, then shows the three key signs as cards that open their stories", () => {
+  it("answers first, then shows the three key signs as rows that open their stories", () => {
     const { container } = show();
     expect(screen.getByRole("heading", { level: 2, name: /this is you/ })).toBeInTheDocument();
     const facts = within(screen.getByRole("list", { name: "Your three key signs" })).getAllByRole("listitem");
@@ -81,9 +81,8 @@ describe("the reading in simple words", () => {
     expect(screen.getByText("At work")).toBeInTheDocument();
     const cur = currentDasha(patri.dasha, NOW);
     if (!cur) throw new Error("no chapter");
-    const now = screen.getByRole("region", { name: /Your \w+ chapter/ });
-    expect(now).toHaveTextContent(`Your ${GRAHA_LORE.find((g) => g.id === cur.md.lord)?.english} chapter`);
-    expect(now).toHaveTextContent(/Inside it, a shorter \w+ stretch runs until \w+ 20\d\d/);
+    const now = screen.getByText(`Your ${GRAHA_LORE.find((g) => g.id === cur.md.lord)?.english} chapter`).closest("li") as HTMLElement;
+    expect(now).toHaveTextContent(/Until \w+ 20\d\d\. Inside it, a shorter \w+ stretch runs until \w+ 20\d\d/);
   });
 
   it("offers the next steps: forecast, palm, sky at birth and partner match", () => {
@@ -104,10 +103,10 @@ describe("the reading in simple words", () => {
     }
   });
 
-  it("opens the Life chapters view from the chapter card when the screen provides it", () => {
+  it("opens the Life chapters view from the chapter row when the screen provides it", () => {
     const onChapters = vi.fn();
     show(onChapters);
-    fireEvent.click(screen.getByRole("button", { name: "All life chapters" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Your \w+ chapter/ }));
     expect(onChapters).toHaveBeenCalledTimes(1);
   });
 
@@ -119,6 +118,6 @@ describe("the reading in simple words", () => {
     );
     expect(screen.getByRole("heading", { level: 2, name: /this is you/ }).parentElement).not.toHaveTextContent(/Your rising sign is/);
     expect(screen.getByText("Birth time unknown, so this is uncertain.")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "All life chapters" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Your \w+ chapter/ })).toBeNull();
   });
 });

@@ -4,6 +4,7 @@ import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef } fr
 import { GRAHA_ABBR_DEV, GRAHA_ENGLISH, NAKSHATRA_NAMES, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
 import { GRAHA_IDS, type GrahaId, type SignIdx } from "../../engine/types";
 import { layoutChips, NORTH_ANCHOR, SOUTH_CELL, signInHouse, tilakPath } from "./geometry";
+import "./chart.css";
 
 export interface ChartBody {
   id: GrahaId;

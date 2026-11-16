@@ -10,48 +10,48 @@
   color-scheme: dark;
 
   /* tint: the colour that lifts a surface (white on dark, indigo on light); always used as rgba(var(--tint), a) */
-  --tint: 255, 255, 255;
+  --tint: 255, 244, 224;
 
   /* ── space ── */
-  --bg: #04050d; /* the void behind everything */
-  --bg-elevated: #0a0e27; /* the deep indigo of panels' backdrop */
-  --void-0: #04050d;
-  --void-1: #070a1c;
-  --void-2: #0b1030;
+  --bg: #0f0e0c; /* the void behind everything */
+  --bg-elevated: #171613; /* the deep indigo of panels' backdrop */
+  --void-0: #0f0e0c;
+  --void-1: #131210;
+  --void-2: #1a1916;
   --nebula-violet: #6d28d9;
   --nebula-blue: #1d4ed8;
   --nebula-cyan: #0891b2;
   --nebula-rose: #be185d;
 
   /* ── glass panes (the old "paper") ── */
-  --surface: rgba(17, 21, 52, 0.86);
-  --surface-2: rgba(42, 48, 104, 0.42);
-  --surface-solid: #11153a;
-  --glass-hi: rgba(255, 255, 255, 0.06);
-  --glass-edge: rgba(180, 192, 255, 0.16);
-  --glass-edge-strong: rgba(180, 192, 255, 0.3);
+  --surface: rgba(27, 26, 23, 0.96);
+  --surface-2: rgba(255, 244, 224, 0.06);
+  --surface-solid: #1b1a17;
+  --glass-hi: rgba(255, 244, 224, 0.05);
+  --glass-edge: rgba(255, 244, 224, 0.1);
+  --glass-edge-strong: rgba(255, 244, 224, 0.22);
 
   /* ── starlight text ── */
-  --ink: #eef0ff;
+  --ink: #f5f2ea;
   --ink-muted: #a7aed8;
-  --ink-faint: #5d6598; /* art only, never text */
+  --ink-faint: #6f6a60; /* art only, never text */
 
   /* ── accents ── */
-  --accent: #8b5cf6; /* nebula violet: primary actions, the Lagna mark, the thread */
-  --accent-text: #c4b5fd; /* violet for small text on glass */
-  --accent-ink: #ffffff; /* text on accent fills */
-  --accent-2: #f5c46b; /* stellar gold: instruments, earned beads, "now" */
-  --cyan: #67e8f9;
-  --success: #4ade80;
-  --warning: #fbbf24;
-  --warning-text: #fcd34d;
-  --danger: #fb7185;
-  --border: rgba(180, 192, 255, 0.14);
-  --border-strong: rgba(180, 192, 255, 0.3);
-  --focus: #67e8f9;
-  --moon: #e0e7ff;
+  --accent: #f0a65a; /* nebula violet: primary actions, the Lagna mark, the thread */
+  --accent-text: #f5b877; /* violet for small text on glass */
+  --accent-ink: #1c1408; /* text on accent fills */
+  --accent-2: #e6c36a; /* stellar gold: instruments, earned beads, "now" */
+  --cyan: #8fd0e8;
+  --success: #7bd88f;
+  --warning: #f0c05a;
+  --warning-text: #f3cd7c;
+  --danger: #f2848f;
+  --border: rgba(255, 244, 224, 0.1);
+  --border-strong: rgba(255, 244, 224, 0.24);
+  --focus: #f5b877;
+  --moon: #efe9da;
   --cloth-ink: #f3efe4; /* light ink on the dark sky: posters, the dome, the capture frame */
-  --ledge: rgba(9, 11, 30, 0.72);
+  --ledge: rgba(15, 14, 12, 0.94);
 
   /* semantic aliases (kept from the first system) */
   --paper: var(--surface);
@@ -62,20 +62,20 @@
   --lac: var(--danger);
   --haldi: var(--warning);
   --tulsi: var(--success);
-  --engraved: #f8f5ff; /* text on instrument plates */
+  --engraved: #f5f2ea; /* text on instrument plates */
   --moon-k: 0;
   --moon-fill: color-mix(in oklch, var(--bg-elevated), var(--moon) calc(var(--moon-k) * 10%));
 
   /* gradients */
-  --aurora: linear-gradient(120deg, #8b5cf6 0%, #6366f1 45%, #22d3ee 100%);
+  --aurora: linear-gradient(135deg, #f5b877 0%, #e8894a 100%);
   /* the primary button: the aurora with a deeper far end, so its white label always reads */
-  --btn-fill: linear-gradient(120deg, #7c3aed 0%, #4f46e5 55%, #0369a1 100%);
-  --aurora-soft: linear-gradient(120deg, rgba(139, 92, 246, 0.22), rgba(34, 211, 238, 0.14));
+  --btn-fill: #f5f2ea;
+  --aurora-soft: linear-gradient(120deg, rgba(240, 166, 90, 0.16), rgba(230, 195, 106, 0.08));
   --gold-glow: radial-gradient(circle at 35% 30%, #fff3cf 0%, #f5c46b 45%, #b7791f 100%);
   --rose-glow: radial-gradient(circle at 35% 30%, #ffd1dc 0%, #fb7185 50%, #9f1239 100%);
 
   /* ── typography ── */
-  --font-display: "Sora Variable", "Sora", "Noto Sans Devanagari Variable", system-ui, sans-serif;
+  --font-display: "Source Serif 4 Variable", "Source Serif 4", "Noto Sans Devanagari Variable", Georgia, serif;
   --font-body: "Inter Variable", "Inter", "Noto Sans Devanagari Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, Consolas, monospace;
   --mono-wdth: 100;
@@ -111,8 +111,8 @@
 
   /* ── radius ── */
   --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
   --radius-xl: 28px;
   --radius-full: 9999px;
 
@@ -122,12 +122,12 @@
   --flicker: 0px;
   --flame-k: 1;
   --shadow-alpha: 0.5;
-  --shadow-1: 0 4px 14px rgba(0, 0, 0, 0.35);
-  --shadow-2: 0 14px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--glass-edge);
-  --shadow-3: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--glass-edge-strong);
-  --glow-violet: 0 0 24px rgba(139, 92, 246, 0.45);
-  --glow-gold: 0 0 18px rgba(245, 196, 107, 0.55);
-  --glow-cyan: 0 0 18px rgba(103, 232, 249, 0.45);
+  --shadow-1: 0 2px 10px rgba(0, 0, 0, 0.3);
+  --shadow-2: 0 14px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--glass-edge);
+  --shadow-3: 0 24px 70px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--glass-edge-strong);
+  --glow-violet: 0 0 0 rgba(0, 0, 0, 0);
+  --glow-gold: 0 0 0 rgba(0, 0, 0, 0);
+  --glow-cyan: 0 0 0 rgba(0, 0, 0, 0);
   --grain-opacity: 0;
   --vignette-far: 0;
   --blur-glass: 18px;
@@ -160,24 +160,24 @@
   --brass-mid: #f5c46b;
   --brass-lo: #b7791f;
   --brass-dark: #7c4a0f;
-  --brass-shadow: #3b2a6b;
-  --brass-ink: #1b1440;
+  --brass-shadow: #3a3020;
+  --brass-ink: #1c1408;
   --brass-label: #ffffff;
-  --teak-light: #2b2f6b;
-  --leaf-face: #262c66;
+  --teak-light: #2b2a26;
+  --leaf-face: #262420;
   --lac-hi: #fda4af;
   --lac-deep: #9f1239;
   --lac-dark: #4c0519;
   --lac-text: #ffe4ea;
   --flame-core: #ffffff;
-  --flame-mid: #c4b5fd;
+  --flame-mid: #f5d9a8;
   --flame-tip: #e0f2fe;
-  --flame-glow: #a78bfa;
+  --flame-glow: #f0a65a;
   --sun-disc: #ffe7a8;
   --parapet: #04050d;
   --star: #f1f3ff;
-  --print-ground: #0a0d24;
-  --palm-ground: #0a0d24;
+  --print-ground: #100f0d;
+  --palm-ground: #100f0d;
   --sky-night-0: #04050d;
   --sky-night-1: #0b1030;
   --sky-astro-1: #1e1b4b;
@@ -192,10 +192,10 @@
   --sky-noon-0: #1e40af;
   --sky-noon-1: #7dd3fc;
   /* instrument plates: dark glass with a gold rim instead of brass */
-  --brass-cyl: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(0, 0, 0, 0.25) 100%), #12163d;
-  --brass-cyl-v: linear-gradient(90deg, #8b5cf6, #6366f1 50%, #22d3ee);
-  --brass-plate: linear-gradient(120deg, rgba(139, 92, 246, 0.32), rgba(34, 211, 238, 0.18)), rgba(15, 18, 48, 0.8);
-  --brass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 0 1px rgba(180, 192, 255, 0.18);
+  --brass-cyl: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(0, 0, 0, 0.2) 100%), #1b1a17;
+  --brass-cyl-v: linear-gradient(90deg, #f5b877, #e8894a);
+  --brass-plate: linear-gradient(120deg, rgba(240, 166, 90, 0.2), rgba(230, 195, 106, 0.1)), #1b1a17;
+  --brass-edge: inset 0 0 0 1px rgba(255, 244, 224, 0.12);
   --grain-url: none;
 }
 
@@ -209,27 +209,29 @@
 /* ── 2.0 "clear sky": calm solid surfaces, one scale, semantic tones ── */
 :root,
 .v-night {
-  --ink-muted: #b7bde2;
-  --card: #10153a;
-  --card-2: #171d4b;
-  --card-hi: #20275c;
-  --card-edge: rgba(190, 200, 255, 0.13);
-  --card-edge-strong: rgba(190, 200, 255, 0.28);
-  --good: #4ade80;
-  --good-soft: rgba(74, 222, 128, 0.13);
-  --calm: #7dd3fc;
-  --calm-soft: rgba(125, 211, 252, 0.13);
-  --mixed: #fbbf24;
-  --mixed-soft: rgba(251, 191, 36, 0.13);
-  --care: #fb7185;
-  --care-soft: rgba(251, 113, 133, 0.13);
-  --violet-soft: rgba(139, 92, 246, 0.16);
-  --gold-soft: rgba(245, 196, 107, 0.14);
+  --ink-muted: #aca698;
+  --accent-rgb: 240, 166, 90;
+  --shadow-card: none;
+  --card: #1a1917;
+  --card-2: #211f1c;
+  --card-hi: #2d2b27;
+  --card-edge: rgba(255, 244, 224, 0.09);
+  --card-edge-strong: rgba(255, 244, 224, 0.2);
+  --good: #7bd88f;
+  --good-soft: rgba(123, 216, 143, 0.13);
+  --calm: #8ec5f0;
+  --calm-soft: rgba(142, 197, 240, 0.13);
+  --mixed: #f0c05a;
+  --mixed-soft: rgba(240, 192, 90, 0.13);
+  --care: #f2848f;
+  --care-soft: rgba(242, 132, 143, 0.13);
+  --violet-soft: rgba(240, 166, 90, 0.14);
+  --gold-soft: rgba(230, 195, 106, 0.14);
   --knob: var(--ink); /* the thumb of a switch */
   --track: rgba(var(--tint), 0.1); /* a switch that is off */
-  --nav-h: 62px;
-  --page-w: 720px;
-  --page-pad: 16px;
+  --nav-h: 64px;
+  --page-w: 680px;
+  --page-pad: 20px;
   --ledge-height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
 }
 
@@ -242,57 +244,62 @@
 /* ── Light theme: paper-white pages, indigo ink. Star charts and sky art keep the night (.v-night). ── */
 :root[data-theme="day"] {
   color-scheme: light;
-  --tint: 30, 36, 110;
-  --bg: #f3f4fb;
+  --tint: 38, 30, 14;
+  --bg: #f5f2ea;
   --bg-elevated: #ffffff;
-  --void-0: #f3f4fb;
-  --void-1: #eceefa;
-  --void-2: #e2e6f8;
+  --void-0: #f5f2ea;
+  --void-1: #f0ece2;
+  --void-2: #e8e3d6;
   --surface: #ffffff;
-  --surface-2: rgba(30, 36, 110, 0.06);
+  --surface-2: rgba(38, 30, 14, 0.05);
   --surface-solid: #ffffff;
-  --glass-hi: rgba(30, 36, 110, 0.04);
-  --glass-edge: rgba(30, 36, 110, 0.14);
-  --glass-edge-strong: rgba(30, 36, 110, 0.28);
-  --ink: #171b40;
-  --ink-muted: #4b5282;
-  --ink-faint: #838ab8;
-  --accent: #6d3fe0;
-  --accent-text: #5a2fc9;
-  --accent-2: #835200;
-  --cyan: #0b7285;
-  --success: #126c33;
-  --warning: #b45309;
-  --warning-text: #92400e;
-  --danger: #be123c;
-  --border: rgba(30, 36, 110, 0.14);
-  --border-strong: rgba(30, 36, 110, 0.3);
-  --focus: #0b7285;
-  --moon: #e7a81a;
-  --ledge: rgba(255, 255, 255, 0.9);
-  --engraved: #171b40;
+  --glass-hi: rgba(38, 30, 14, 0.04);
+  --glass-edge: rgba(38, 30, 14, 0.12);
+  --glass-edge-strong: rgba(38, 30, 14, 0.26);
+  --ink: #1c1a16;
+  --ink-muted: #5f594e;
+  --ink-faint: #9a9488;
+  --accent: #b04a12;
+  --accent-text: #9a3f0d;
+  --accent-2: #7d5200;
+  --cyan: #0f6b80;
+  --success: #1b6e37;
+  --warning: #a65a00;
+  --warning-text: #8a4a00;
+  --danger: #b3261e;
+  --border: rgba(38, 30, 14, 0.12);
+  --border-strong: rgba(38, 30, 14, 0.28);
+  --focus: #9a3f0d;
+  --moon: #d9a21b;
+  --ledge: rgba(245, 242, 234, 0.95);
+  --engraved: #1c1a16;
   --card: #ffffff;
-  --card-2: #f7f8ff;
-  --card-hi: #e8ebfa;
-  --card-edge: rgba(30, 36, 110, 0.13);
-  --card-edge-strong: rgba(30, 36, 110, 0.3);
-  --good: #126c33;
-  --good-soft: rgba(21, 128, 61, 0.11);
-  --calm: #0369a1;
-  --calm-soft: rgba(3, 105, 161, 0.1);
-  --mixed: #925305;
-  --mixed-soft: rgba(180, 83, 9, 0.11);
-  --care: #be123c;
-  --care-soft: rgba(190, 18, 60, 0.09);
-  --violet-soft: rgba(109, 63, 224, 0.1);
-  --gold-soft: rgba(180, 120, 10, 0.13);
+  --card-2: #fbf9f4;
+  --card-hi: #ece7db;
+  --card-edge: rgba(38, 30, 14, 0.09);
+  --card-edge-strong: rgba(38, 30, 14, 0.24);
+  --good: #1b6e37;
+  --good-soft: rgba(27, 110, 55, 0.1);
+  --calm: #175f8f;
+  --calm-soft: rgba(23, 95, 143, 0.1);
+  --mixed: #855200;
+  --mixed-soft: rgba(160, 100, 0, 0.12);
+  --care: #b3261e;
+  --care-soft: rgba(179, 38, 30, 0.09);
+  --violet-soft: rgba(176, 74, 18, 0.09);
+  --gold-soft: rgba(150, 100, 0, 0.12);
   --knob: #ffffff;
-  --track: rgba(30, 36, 110, 0.36);
-  --aurora-soft: linear-gradient(120deg, rgba(139, 92, 246, 0.14), rgba(34, 211, 238, 0.1));
-  --shadow-1: 0 2px 8px rgba(30, 36, 110, 0.1);
-  --shadow-2: 0 10px 30px rgba(30, 36, 110, 0.14), 0 0 0 1px var(--glass-edge);
-  --shadow-3: 0 20px 60px rgba(30, 36, 110, 0.2), 0 0 0 1px var(--glass-edge-strong);
-  --brass-plate: linear-gradient(120deg, rgba(139, 92, 246, 0.14), rgba(34, 211, 238, 0.1)), #ffffff;
+  --accent-rgb: 176, 74, 18;
+  --accent-ink: #ffffff;
+  --btn-fill: #1c1a16;
+  --aurora: linear-gradient(135deg, #c2591c 0%, #9a3f0d 100%);
+  --shadow-card: 0 1px 2px rgba(38, 30, 14, 0.05), 0 6px 20px rgba(38, 30, 14, 0.04);
+  --track: rgba(38, 30, 14, 0.32);
+  --aurora-soft: linear-gradient(120deg, rgba(176, 74, 18, 0.1), rgba(150, 100, 0, 0.06));
+  --shadow-1: 0 2px 8px rgba(38, 30, 14, 0.08);
+  --shadow-2: 0 10px 30px rgba(38, 30, 14, 0.12), 0 0 0 1px var(--glass-edge);
+  --shadow-3: 0 20px 60px rgba(38, 30, 14, 0.18), 0 0 0 1px var(--glass-edge-strong);
+  --brass-plate: linear-gradient(120deg, rgba(176, 74, 18, 0.1), rgba(150, 100, 0, 0.06)), #ffffff;
 }
 /* A night panel inside the light theme: its own dark ground, so light strokes and stars read. */
 :where(:root[data-theme="day"]) .v-night {

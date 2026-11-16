@@ -1,6 +1,6 @@
-// People: everyone saved on this device, one clear card each. Tap a person to put them in view and
-// open their chart; Chart, Forecast, Match and Edit are plain buttons; "More" holds the rare things
-// (palm, choosing a partner, the encrypted backup, and delete, which stays a deliberate hold).
+// People: everyone saved on this device, one calm row each. Tap a person to put them in view and
+// open their chart; the "..." button opens one menu with everything else (forecast, match, palm,
+// edit, the encrypted backup, and delete, which stays a deliberate hold).
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useActiveProfile, useProfiles, useSettings } from "../../app/hooks";
@@ -96,11 +96,11 @@ export default function CircleScreen() {
   if (list.length === 0) {
     return (
       <Page label="People" title="People" back>
-        <section className="v-card v-empty" aria-labelledby="ppl-empty-h">
+        <section className="v-card v-empty ppl-empty" aria-labelledby="ppl-empty-h">
           <span className="v-empty__art" aria-hidden="true">
             <PeopleArt />
           </span>
-          <h2 id="ppl-empty-h" className="v-card__title">
+          <h2 id="ppl-empty-h" className="ppl-empty__h">
             No one here yet
           </h2>
           <p className="v-muted">
@@ -110,79 +110,56 @@ export default function CircleScreen() {
           <Link to="/leaf/new" className="v-btn">
             Add a person
           </Link>
+          <p className="v-small v-muted">About a minute. Nothing leaves this device.</p>
         </section>
       </Page>
     );
   }
 
   return (
-    <Page label="People" title="People" lede="Tap a person to see their chart. They become the person shown across the app." back>
-      <ul className="ppl-list" aria-label="People">
+    <Page label="People" title="People" lede="Tap a person to open their chart. They become the person shown across the app." back>
+      <ul className="v-list ppl-list" aria-label="People">
         {list.map((p) => {
           const m = leafMoon(p, settings.preset.ayanamsa);
           const isActive = active?.id === p.id;
           return (
-            <li key={p.id} className={`v-card v-card--flush ppl${isActive ? " is-active" : ""}`}>
-              <div className="ppl__head">
-                <button type="button" className="ppl__main" onClick={(e) => open(p, "patri", e.currentTarget)}>
-                  <Avatar name={p.name} size={48} />
-                  <span className="ppl__text">
-                    <span className="ppl__name">
-                      <span className="ppl__n">{p.name}</span>
-                      {isActive ? <span className="v-chip v-chip--violet">Active</span> : null}
-                    </span>
-                    {m ? (
-                      <span className="ppl__moon">
-                        <span>Moon sign {rashiBoth(m.sign, p.tradition)}</span>
-                        <span>Birth star {nakBoth(m.nak, p.tradition)}</span>
-                      </span>
-                    ) : null}
-                    <span className="ppl__birth">{birthLine(p)}</span>
+            <li key={p.id} className="ppl">
+              <button type="button" className="ppl__main" onClick={(e) => open(p, "patri", e.currentTarget)}>
+                <Avatar name={p.name} size={48} />
+                <span className="ppl__text">
+                  <span className="ppl__name">
+                    <span className="ppl__n">{p.name}</span>
+                    {isActive ? <span className="v-chip">Viewing now</span> : null}
                   </span>
-                </button>
-                <button
-                  type="button"
-                  className="v-iconbtn ppl__more"
-                  aria-label={`More for ${p.name}`}
-                  aria-haspopup="dialog"
-                  onClick={() => setSheet({ id: p.id, mode: "menu" })}
-                >
-                  <Dots />
-                </button>
-              </div>
-              <div className="ppl__actions">
-                <button
-                  type="button"
-                  className="v-btn v-btn--ghost v-btn--sm"
-                  aria-label={`Chart: ${p.name}`}
-                  onClick={(e) => open(p, "patri", e.currentTarget)}
-                >
-                  Chart
-                </button>
-                <button
-                  type="button"
-                  className="v-btn v-btn--ghost v-btn--sm"
-                  aria-label={`Forecast: ${p.name}`}
-                  onClick={() => open(p, "forecast", null)}
-                >
-                  Forecast
-                </button>
-                <button type="button" className="v-btn v-btn--ghost v-btn--sm" aria-label={`Match: ${p.name}`} onClick={() => match(p)}>
-                  Match
-                </button>
-                <Link to={`/leaf/${p.id}/edit`} className="v-btn v-btn--ghost v-btn--sm" aria-label={`Edit: ${p.name}`}>
-                  Edit
-                </Link>
-              </div>
+                  {m ? (
+                    <span className="ppl__moon">
+                      <span>Moon sign {rashiBoth(m.sign, p.tradition)}</span>
+                      <span>Birth star {nakBoth(m.nak, p.tradition)}</span>
+                    </span>
+                  ) : null}
+                  <span className="ppl__birth">{birthLine(p)}</span>
+                </span>
+              </button>
+              <button
+                type="button"
+                className="v-iconbtn ppl__more"
+                aria-label={`More for ${p.name}`}
+                aria-haspopup="dialog"
+                onClick={() => setSheet({ id: p.id, mode: "menu" })}
+              >
+                <Dots />
+              </button>
             </li>
           );
         })}
       </ul>
 
-      <Link to="/leaf/new" className="v-btn v-btn--block" onClick={(e) => rememberOrigin(e.currentTarget)}>
-        + Add a person
+      <Link to="/leaf/new" className="v-btn v-btn--block ppl-add" onClick={(e) => rememberOrigin(e.currentTarget)}>
+        Add a person
       </Link>
-      <p className="v-foot">Everyone here is kept on this device only. The ⋯ button on a person has the encrypted backup and delete.</p>
+      <p className="v-foot ppl-foot">
+        Everyone here is kept on this device only. The ⋯ button has the forecast, match, palm, edit, backup and delete.
+      </p>
 
       <Sheet open={sheet !== null && sheetProfile !== undefined} onClose={() => setSheet(null)} label={sheetProfile?.name ?? "Person"}>
         {sheet && sheetProfile ? (
@@ -192,6 +169,9 @@ export default function CircleScreen() {
             mode={sheet.mode}
             ayanamsa={settings.preset.ayanamsa}
             setMode={(mode) => setSheet({ id: sheetProfile.id, mode })}
+            onChart={() => open(sheetProfile, "patri", null)}
+            onForecast={() => open(sheetProfile, "forecast", null)}
+            onMatch={() => match(sheetProfile)}
             onPalm={() => {
               setSheet(null);
               void saveSettings({ activeProfileId: sheetProfile.id });

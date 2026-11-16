@@ -1,188 +1,299 @@
-/* Cosmic cards: profile, sky events, forecast, explore, shared glass and medallions */
-.cosmic-card {
-  position: relative;
-  padding: 18px;
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--glass-edge);
-  background:
-    radial-gradient(520px 200px at 0% 0%, rgba(139, 92, 246, 0.16), transparent 70%),
-    radial-gradient(520px 200px at 100% 100%, rgba(34, 211, 238, 0.08), transparent 70%), rgba(14, 17, 46, 0.86);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
-  overflow: hidden;
-}
-.cosmic-card::before {
-  /* a faint constellation watermark */
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(1.4px 1.4px at 82% 18%, rgba(241, 243, 255, 0.7), transparent),
-    radial-gradient(1.2px 1.2px at 90% 34%, rgba(241, 243, 255, 0.5), transparent),
-    radial-gradient(1.6px 1.6px at 74% 40%, rgba(241, 243, 255, 0.6), transparent),
-    radial-gradient(1px 1px at 95% 12%, rgba(241, 243, 255, 0.5), transparent);
-  opacity: 0.8;
-}
-/* ── Navagraha medallions ─────────────────────────────────────────────── */
+/* Cosmic pieces: planet marks, the reading in simple words, the three key signs, sky events.
+   Ivory and ink: tokens only, no outlines, no gradients. */
+
+/* ── Planet marks: an ink drawing on a soft disc ───────────────────────── */
 .graha-glyph {
   flex: none;
   display: block;
   overflow: visible;
 }
 .graha-glyph__disc {
-  fill: color-mix(in oklch, var(--gc, var(--accent)) 16%, rgba(8, 10, 30, 0.9));
-  stroke: color-mix(in oklch, var(--gc, var(--accent)) 70%, transparent);
-  stroke-width: 1;
+  fill: rgba(var(--tint), 0.07);
+  stroke: none;
 }
 .graha-glyph__mark {
-  stroke: var(--gc, var(--accent-text));
-  filter: drop-shadow(0 0 3px color-mix(in oklch, var(--gc, var(--accent)) 80%, transparent));
-}
-.graha-glyph--SU {
-  --gc: var(--g-SU);
-}
-.graha-glyph--MO {
-  --gc: var(--g-MO);
-}
-.graha-glyph--MA {
-  --gc: var(--g-MA);
-}
-.graha-glyph--ME {
-  --gc: var(--g-ME);
-}
-.graha-glyph--JU {
-  --gc: var(--g-JU);
-}
-.graha-glyph--VE {
-  --gc: var(--g-VE);
-}
-.graha-glyph--SA {
-  --gc: var(--g-SA);
-}
-.graha-glyph--RA {
-  --gc: var(--g-RA);
-}
-.graha-glyph--KE {
-  --gc: var(--g-KE);
+  stroke: var(--ink);
 }
 
-/* ── Sign and number medallions (also used by Explore and Forecast) ───── */
+/* A letter or number on the same soft disc (the Chinese year, a birth number) */
 .cp-sign {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 14px;
+  background: rgba(var(--tint), 0.07);
   color: var(--ink);
-  background: radial-gradient(circle at 35% 30%, rgba(196, 181, 253, 0.5), rgba(76, 29, 149, 0.4));
-  box-shadow:
-    inset 0 0 0 1px rgba(196, 181, 253, 0.6),
-    0 0 12px rgba(139, 92, 246, 0.45);
+  font: 600 0.9375rem / 1 var(--font-body);
 }
 .cp-sign--cn {
-  font-size: 12px;
-  background: radial-gradient(circle at 35% 30%, rgba(251, 113, 133, 0.5), rgba(136, 19, 55, 0.45));
-  box-shadow:
-    inset 0 0 0 1px rgba(253, 164, 175, 0.6),
-    0 0 12px rgba(251, 113, 133, 0.4);
+  font-size: 0.8125rem;
 }
 .cp-sign--num {
-  font-size: 18px;
-  background: radial-gradient(circle at 35% 30%, rgba(245, 196, 107, 0.6), rgba(146, 64, 14, 0.45));
-  box-shadow:
-    inset 0 0 0 1px rgba(253, 230, 138, 0.6),
-    0 0 12px rgba(245, 196, 107, 0.45);
+  font: 540 1.125rem / 1 var(--font-display);
 }
 
-/* ── Key facts: Moon sign, birth star, rising sign ─────────────────────── */
+/* ── In simple words ───────────────────────────────────────────────────── */
+.life {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.life__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.life__h {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.life__word {
+  font: 520 clamp(1.875rem, 8.4vw, 2.5rem) / 1.08 var(--font-display);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.life__lead {
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  max-width: 60ch;
+}
+.life__born {
+  padding-top: 14px;
+  border-top: 1px solid var(--card-edge);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+/* ── The three key signs: three rows in one card ───────────────────────── */
 .kf {
   list-style: none;
   margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 10px;
+  padding: 4px 0;
+  overflow: hidden;
 }
-.kf__card {
+.kf__row {
   position: relative;
   display: flex;
+  align-items: center;
   gap: 14px;
-  padding: 14px 16px;
-  border: 1px solid var(--card-edge);
-  border-radius: var(--radius-lg);
-  background: var(--card);
+  padding: 14px 18px;
 }
-.kf__card:hover {
-  border-color: var(--card-edge-strong);
+.kf__row + .kf__row {
+  border-top: 1px solid var(--card-edge);
+}
+.kf__row:hover {
+  background: rgba(var(--tint), 0.04);
 }
 .kf__glyph {
   flex: none;
-  padding-top: 2px;
 }
 .kf__body {
   flex: 1;
   min-width: 0;
 }
 .kf__k {
-  margin: 0;
-  font: 600 0.8125rem / 1.4 var(--font-body);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  line-height: 1.4;
   color: var(--ink-muted);
 }
-.kf__term {
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
+.kf__term::before {
+  content: "· ";
 }
 .kf__k .info-dot {
+  position: relative;
   z-index: 1;
 }
 .kf__v {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 32px;
+  display: block;
   color: var(--ink);
-  font: 650 1.3125rem / 1.2 var(--font-display);
-  letter-spacing: -0.02em;
+  font: 600 1.1875rem / 1.3 var(--font-body);
+  letter-spacing: -0.01em;
   text-decoration: none;
 }
-/* the whole card is the link's target */
+/* the whole row is the link's target */
 .kf__v::after {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: var(--radius-lg);
 }
 .kf__s {
-  margin: 0;
+  margin-top: 1px;
   font-size: 0.875rem;
   line-height: 1.45;
   color: var(--ink-muted);
 }
 .kf__warn {
-  margin: 6px 0 0;
-  font-size: 0.8125rem;
+  margin-top: 4px;
+  font-size: 0.875rem;
   line-height: 1.4;
   color: var(--mixed);
 }
+
+/* ── Plus points, watch out for, in love, at work: one card, hairlines ─── */
+.life__traits {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.life__pm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 359px) {
+  .life__pm {
+    grid-template-columns: 1fr;
+  }
+}
+.life__k {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font: 600 0.9375rem / 1.3 var(--font-body);
+  color: var(--ink);
+}
+.life__k::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--good);
+}
+.life__k--minus::before {
+  background: var(--mixed);
+}
+.life__pm ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+.life__dl {
+  margin: 0;
+  display: grid;
+}
+.life__dl > div {
+  padding-top: 16px;
+  border-top: 1px solid var(--card-edge);
+}
+.life__dl > div + div {
+  margin-top: 16px;
+}
+.life__dl dt {
+  font: 600 0.9375rem / 1.3 var(--font-body);
+  color: var(--ink);
+}
+.life__dl dd {
+  margin: 4px 0 0;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
 @media (min-width: 720px) {
-  .kf {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .life__dl {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--card-edge);
   }
-  .kf__card {
-    flex-direction: column;
-    gap: 10px;
+  .life__dl > div,
+  .life__dl > div + div {
+    margin: 0;
+    padding: 0;
+    border: 0;
   }
+}
+.life__p {
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+/* The same birth in other traditions: plain rows inside the fold, not a card in a card */
+.life__more .cosmic-profile {
+  margin: 0 -20px -20px;
+  border-top: 1px solid var(--card-edge);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: none;
+  box-shadow: none;
 }
 .cosmic-profile .v-row__icon {
   background: none;
 }
 
-/* ── Sky events ───────────────────────────────────────────────────────── */
+/* ── Meet the planets: a strip of marks that scrolls sideways ──────────── */
+.meet__sub {
+  margin-bottom: 12px;
+}
+.meet__k {
+  margin: 0 0 2px;
+  font: 600 1.0625rem / 1.3 var(--font-body);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.meet ul {
+  list-style: none;
+  margin: 0 -20px;
+  padding: 0 14px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 76px;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.meet ul::-webkit-scrollbar {
+  display: none;
+}
+.meet__a {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 6px;
+  min-height: 84px;
+  padding: 6px 2px 0;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  text-align: center;
+}
+.meet__a:hover {
+  background: rgba(var(--tint), 0.05);
+}
+.meet__t {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.meet__s {
+  margin-top: -4px;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  color: var(--ink-muted);
+}
+@media (min-width: 900px) {
+  .meet ul {
+    margin: 0;
+    padding: 0;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+  }
+}
+
+/* ── Sky events ────────────────────────────────────────────────────────── */
 .sky-events__head {
   display: flex;
   align-items: flex-start;
@@ -225,7 +336,7 @@
   color: var(--ink);
 }
 .ev__note {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   line-height: 1.4;
   color: var(--ink-muted);
 }
@@ -234,7 +345,7 @@
   justify-items: end;
   text-align: right;
   gap: 1px;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   white-space: nowrap;
 }
 .ev__day {
@@ -253,174 +364,19 @@
 .ev--eclipse .ev__title {
   color: var(--mixed);
 }
+/* Moon phases: a full disc, an empty ring, a half */
 .ev-moon {
   display: block;
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--moon);
+  background: var(--ink);
 }
 .ev-moon--new {
-  background: var(--void-0);
-  box-shadow: inset 0 0 0 1.5px rgba(224, 231, 255, 0.55);
-}
-.ev-moon--half {
-  background: linear-gradient(90deg, var(--void-0) 35%, var(--moon) 35%);
-  box-shadow: inset 0 0 0 1px rgba(224, 231, 255, 0.5);
-}
-
-@keyframes fc-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* ── Meet the planets: a strip of medallions that scrolls sideways ─────── */
-.meet__k {
-  margin: 0 0 10px;
-  font-size: 0.875rem;
-  color: var(--ink-muted);
-}
-.meet ul {
-  list-style: none;
-  margin: 0 -18px;
-  padding: 0 18px 2px;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 84px;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.meet ul::-webkit-scrollbar {
-  display: none;
-}
-.meet a {
-  display: grid;
-  justify-items: center;
-  gap: 4px;
-  min-height: 96px;
-  padding: 10px 4px;
-  border: 1px solid var(--card-edge);
-  border-radius: var(--radius-md);
-  background: rgba(var(--tint), 0.03);
-  text-decoration: none;
-  text-align: center;
-}
-.meet a:hover {
-  border-color: var(--card-edge-strong);
-}
-.meet__t {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-.meet__s {
-  font-size: 0.8125rem;
-  line-height: 1.2;
-  color: var(--ink-muted);
-}
-@media (min-width: 900px) {
-  .meet ul {
-    grid-auto-flow: row;
-    grid-template-columns: repeat(9, minmax(0, 1fr));
-  }
-}
-
-/* ── In simple words ──────────────────────────────────────────────────── */
-.life {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.life__hero {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.life__h {
-  margin: 0;
-  font: 650 1.5rem / 1.2 var(--font-display);
-  letter-spacing: -0.025em;
-  color: var(--ink);
-}
-.life__lead {
-  font-size: 1.0625rem;
-  line-height: 1.55;
-  max-width: 62ch;
-}
-.life__born {
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  color: var(--ink-muted);
-  max-width: 62ch;
-}
-.life__k {
-  margin: 0 0 6px;
-  font: 650 0.8125rem var(--font-body);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-}
-.life__k--plus {
-  color: var(--good);
-}
-.life__k--minus {
-  color: var(--mixed);
-}
-.life__pm .v-card {
-  padding: 16px;
-}
-.life__pm ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 0.9375rem;
-  line-height: 1.4;
-}
-@media (max-width: 359px) {
-  .life__pm {
-    grid-template-columns: 1fr;
-  }
-}
-.life__dl {
-  margin: 0;
-  display: grid;
-  gap: 14px;
-}
-.life__dl dt {
-  font: 650 0.8125rem var(--font-body);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-}
-.life__dl dd {
-  margin: 4px 0 0;
-  line-height: 1.55;
-}
-.life__p {
-  line-height: 1.55;
-}
-.life__p b {
-  color: var(--accent-2);
-  font-weight: 600;
-}
-.life__now .v-actions {
-  margin-top: 12px;
-  gap: 10px 18px;
-}
-.life__fc {
-  margin: 0;
-}
-/* light theme: the new and half Moon keep a visible rim on paper */
-:root[data-theme="day"] .ev-moon--new {
-  background: var(--card-hi);
+  background: none;
   box-shadow: inset 0 0 0 1.5px var(--card-edge-strong);
 }
-:root[data-theme="day"] .ev-moon--half {
-  background: linear-gradient(90deg, var(--card-hi) 35%, var(--moon) 35%);
-  box-shadow: inset 0 0 0 1px var(--card-edge-strong);
+.ev-moon--half {
+  background: var(--ink);
+  clip-path: inset(0 0 0 50%);
 }

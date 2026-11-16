@@ -40,9 +40,20 @@ interface Credit {
 }
 
 /** One setting: its name, one plain line of what it does, and the control on the right. */
-function Setting({ label, help, children }: { label: React.ReactNode; help?: React.ReactNode; children: React.ReactNode }) {
+function Setting({
+  label,
+  help,
+  stack,
+  children,
+}: {
+  label: React.ReactNode;
+  help?: React.ReactNode;
+  /** The control sits under the name, full width (segmented choices). */
+  stack?: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="set-row">
+    <div className={`set-row${stack ? " set-row--stack" : ""}`}>
       <span className="set-row__body">
         <span className="set-row__t">{label}</span>
         {help ? <span className="set-row__s">{help}</span> : null}
@@ -113,7 +124,7 @@ function Radio<T extends string | number>({
   onChange: (v: T) => void;
 }) {
   return (
-    <Setting label={label} help={help}>
+    <Setting label={label} help={help} stack>
       <span className="v-seg set-seg" role="radiogroup" aria-label={label}>
         {options.map(([v, text, disabled]) => (
           <button
@@ -136,14 +147,13 @@ function Radio<T extends string | number>({
   );
 }
 
-/** The three ayanāṃśa presets as ticks on a magnified brass arc, labelled at the chart's date. */
 /** Anonymous counts (screens opened and named clicks, never personal data). */
 function StatsToggle() {
   const [on, setOn] = useState(statsOn);
   return (
     <Toggle
       label="Anonymous usage counts"
-      help="Counts which screens are opened and which buttons are tapped, so Rahul can see how Vyomaphala is used. Never your name, birth details, places or photos. No cookies. Off automatically if your browser asks not to be tracked."
+      help="Screens opened and buttons tapped. Never names, birth details or photos."
       on={on}
       onChange={(v) => {
         setStatsOn(v);
@@ -159,7 +169,7 @@ function JourneyToggle() {
   return (
     <Toggle
       label="Opening journey"
-      help="The intro (from the universe to why Vyomaphala exists) plays when Vyomaphala opens."
+      help="The intro plays when Vyomaphala opens."
       on={on}
       onChange={(v) => {
         setJourneyAtStart(v);
@@ -323,36 +333,9 @@ export default function DrawerScreen() {
       <Section title="Look" id="set-look" />
       <ul className="v-list" aria-labelledby="set-look">
         <li>
-          <Row
-            title="Where you are now"
-            sub={
-              <>
-                <span className="set-here">
-                  {here.birthplace ? "Each person's birthplace" : here.name.split(",").slice(0, 2).join(",")}
-                </span>
-                <span className="set-here__s">Today's hours, sunrise and the almanac are worked out for this place.</span>
-              </>
-            }
-            onClick={() => setHereOpen(true)}
-          />
-        </li>
-        <li>
-          <Radio
-            label="Text size"
-            help="Makes the words bigger on every screen."
-            value={settings.textSize}
-            options={[
-              ["normal", "Normal"],
-              ["large", "Large"],
-              ["larger", "Larger"],
-            ]}
-            onChange={(v) => set({ textSize: v })}
-          />
-        </li>
-        <li>
           <Radio
             label="Theme"
-            help="Auto follows your phone's light or dark setting."
+            help="Auto follows your phone."
             value={settings.theme}
             options={[
               ["auto", "Auto"],
@@ -364,8 +347,19 @@ export default function DrawerScreen() {
         </li>
         <li>
           <Radio
+            label="Text size"
+            value={settings.textSize}
+            options={[
+              ["normal", "Normal"],
+              ["large", "Large"],
+              ["larger", "Larger"],
+            ]}
+            onChange={(v) => set({ textSize: v })}
+          />
+        </li>
+        <li>
+          <Radio
             label="Chart style"
-            help="How birth charts are drawn."
             value={settings.chartStyle}
             options={[
               ["north", "North Indian"],
@@ -374,33 +368,24 @@ export default function DrawerScreen() {
             onChange={(v) => set({ chartStyle: v })}
           />
         </li>
+      </ul>
+
+      <Section title="Sound and motion" id="set-sound" />
+      <ul className="v-list" aria-labelledby="set-sound">
         <li>
           <Toggle label="Sound" help="Soft sounds when you tap and save." on={settings.sound} onChange={(v) => set({ sound: v })} />
         </li>
         <li>
-          <Toggle
-            label="Haptics"
-            help="A small buzz on taps, on phones that can."
-            on={settings.haptics}
-            onChange={(v) => set({ haptics: v })}
-          />
+          <Toggle label="Haptics" help="A small buzz on taps." on={settings.haptics} onChange={(v) => set({ haptics: v })} />
         </li>
         <li>
           <Toggle label="Calm mode" help="Less motion and no sounds." on={settings.calmDesk} onChange={(v) => set({ calmDesk: v })} />
         </li>
         <li>
-          <Toggle
-            label="Devanagari digits"
-            help="In the chart figure and the planet ledger only."
-            on={settings.devanagariDigits}
-            onChange={(v) => set({ devanagariDigits: v })}
-          />
-        </li>
-        <li>
           <JourneyToggle />
         </li>
         <li>
-          <Row to="/journey" title="Play the intro now" sub="From the universe to why Vyomaphala exists" />
+          <Row to="/journey" title="Play the intro now" />
         </li>
       </ul>
 
@@ -409,27 +394,30 @@ export default function DrawerScreen() {
         <h3 className="v-card__title">Backup</h3>
         <p className="v-card__sub">Everything stays on this device. A backup is encrypted with a passphrase only you know.</p>
         <BackupAge zone={active?.birth.zone ?? null} />
-        <div className="v-actions">
-          <button type="button" className="v-btn v-btn--sm" onClick={() => setMode("export")}>
+        <div className="set-backup__btns">
+          <button type="button" className="v-btn" onClick={() => setMode("export")}>
             Create a backup
           </button>
-          <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={() => setMode("import")}>
+          <button type="button" className="v-btn v-btn--ghost" onClick={() => setMode("import")}>
             Restore a backup
           </button>
         </div>
       </section>
       <ul className="v-list" aria-labelledby="set-data">
         <li>
+          <Row
+            title="Where you are now"
+            sub={here.birthplace ? "Each person's birthplace" : here.name.split(",").slice(0, 2).join(",")}
+            onClick={() => setHereOpen(true)}
+          />
+        </li>
+        <li>
           <Setting
             label="Prepare for offline"
-            help={
-              <span aria-live="polite">
-                {warm || "Downloads the palm and sky models (about 30 MB) so every screen works without internet."}
-              </span>
-            }
+            help={<span aria-live="polite">{warm || "Saves the palm and sky models, about 30 MB."}</span>}
           >
             <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={() => void prepareOffline()}>
-              Download now
+              Download
             </button>
           </Setting>
         </li>
@@ -438,12 +426,7 @@ export default function DrawerScreen() {
         </li>
       </ul>
       <details className="v-fold">
-        <summary>
-          <span>
-            What Vyomaphala keeps, and where
-            <span className="v-fold__s">Only in this browser, on this device</span>
-          </span>
-        </summary>
+        <summary>What Vyomaphala keeps, and where</summary>
         <div className="v-fold__body">
           <p>Only in this browser, on this device. Vyomaphala has no server and no account, so there is no copy anywhere else.</p>
           <ul className="set-kept">
@@ -453,34 +436,21 @@ export default function DrawerScreen() {
             <li>Place names you searched online, for up to 90 days.</li>
           </ul>
           <p>Clearing this site's data in your browser removes all of it too.</p>
+          <p>
+            Where you are now is used for today's hours, sunrise and the almanac. Anonymous usage counts are which screens are opened and
+            which buttons are tapped, so Rahul can see how Vyomaphala is used. Never your name, birth details, places or photos. No cookies.
+            Off automatically if your browser asks not to be tracked.
+          </p>
           {est ? <p className="v-small v-muted">Using {(est.usage / 1e6).toFixed(1)} MB on this device.</p> : null}
         </div>
       </details>
-      <section className="v-card set-danger" aria-label="Delete everything">
-        <h3 className="v-card__title">Delete everything</h3>
-        <p className="v-card__sub">
-          Removes every person, palm photo, chart and setting from this device. It cannot be undone, so the button must be held down.
-        </p>
-        <HoldStamp
-          className="set-wipe"
-          ms={1500}
-          ariaLabel="Delete everything Vyomaphala keeps on this device. Hold to confirm"
-          label={<span>Hold to delete everything</span>}
-          onFire={() => {
-            void wipeEverything().then(() => {
-              toast("Everything is deleted from this device.", "danger");
-              navigate("/");
-            });
-          }}
-        />
-      </section>
 
       <Section title="Advanced" />
       <details className="v-fold">
         <summary>
           <span>
             Calculation choices
-            <span className="v-fold__s">For people who know Jyotiṣa. Changing these changes every chart.</span>
+            <span className="v-fold__s">For people who know Jyotiṣa. These change every chart.</span>
           </span>
         </summary>
         <div className="v-fold__body set-adv">
@@ -490,7 +460,7 @@ export default function DrawerScreen() {
             </h3>
             <AyanamsaChoice jdTt={jdTt} value={settings.preset.ayanamsa} onChange={(p) => setPreset({ ayanamsa: p })} />
           </div>
-          <ul className="v-list">
+          <ul className="set-plain">
             <li>
               <Radio
                 label="Rāhu / Ketu"
@@ -560,6 +530,14 @@ export default function DrawerScreen() {
               />
             </li>
             <li>
+              <Toggle
+                label="Devanagari digits"
+                help="In the chart figure and the planet ledger only."
+                on={settings.devanagariDigits}
+                onChange={(v) => set({ devanagariDigits: v })}
+              />
+            </li>
+            <li>
               <Radio
                 label="Palm framing"
                 help="Which hand the palm reading treats as the main one."
@@ -578,37 +556,48 @@ export default function DrawerScreen() {
       <Section title="About" />
       <ul className="v-list">
         <li>
-          <Row
-            title="Version"
-            sub={`Planet positions by astronomy-engine ${__ENGINE_BUILD__}, computed on this device.`}
-            end={__APP_VERSION__}
-          />
+          <Row to="/guide" title="How to use Vyomaphala" />
         </li>
         <li>
-          <Row to="/about" title="How Vyomaphala was made" sub="Sources, methods and checks" />
+          <Row to="/about" title="How Vyomaphala was made" />
         </li>
         <li>
-          <Row to="/guide" title="How to use Vyomaphala" sub="Read the guide" />
+          <Row title="Version" sub={`astronomy-engine ${__ENGINE_BUILD__}, computed on this device`} end={__APP_VERSION__} />
         </li>
       </ul>
       <details className="v-fold">
-        <summary>
-          <span>
-            Credits and licences
-            <span className="v-fold__s">The open work Vyomaphala is built on</span>
-          </span>
-        </summary>
+        <summary>Credits and licences</summary>
         <div className="v-fold__body">
           <ul className="set-credits">
             {credits.map((c) => (
               <li key={c.name}>
-                <b>{c.name}</b>
-                {c.author ? `, ${c.author}` : ""} <span className="v-chip">{c.licence}</span>
+                <span>
+                  <b>{c.name}</b>
+                  {c.author ? `, ${c.author}` : ""}
+                </span>
+                <span className="set-credits__l">{c.licence}</span>
               </li>
             ))}
           </ul>
         </div>
       </details>
+
+      <section className="set-danger" aria-label="Delete everything">
+        <h2 className="set-danger__t">Delete everything</h2>
+        <p className="v-small v-muted">Removes every person, palm photo, chart and setting from this device. It cannot be undone.</p>
+        <HoldStamp
+          className="set-wipe"
+          ms={1500}
+          ariaLabel="Delete everything Vyomaphala keeps on this device. Hold to confirm"
+          label={<span>Hold to delete everything</span>}
+          onFire={() => {
+            void wipeEverything().then(() => {
+              toast("Everything is deleted from this device.", "danger");
+              navigate("/");
+            });
+          }}
+        />
+      </section>
       <p className="v-foot">For reflection, not advice.</p>
 
       <HereSheet open={hereOpen} onClose={() => setHereOpen(false)} profile={active} here={here} />
@@ -726,10 +715,7 @@ function BackupAge({ zone }: { zone: string | null }) {
   if (last === undefined || !count) return null;
   const { days, text } = backupAge(count, last, Date.now(), zone ?? Intl.DateTimeFormat().resolvedOptions().timeZone);
   return days === null || days > 30 ? (
-    <p className="v-note v-note--warn">
-      <span aria-hidden="true">⚑</span>
-      <span>{text} A phone can be lost; an encrypted backup kept elsewhere cannot be read without your passphrase.</span>
-    </p>
+    <p className="v-note v-note--warn">{text} A phone can be lost. Keep an encrypted backup somewhere else.</p>
   ) : (
     <p className="v-small v-muted">{text}</p>
   );

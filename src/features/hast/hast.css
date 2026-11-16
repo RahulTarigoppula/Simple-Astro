@@ -1,39 +1,40 @@
-/* Palm reading: the start card, the reading cards, the traced print, and the camera. */
+/* Palm reading: the start card, the summary, the lines as one list, the traced print, and the camera. */
 
 /* ── Before a photo ────────────────────────────────────────────────── */
 .palm-start {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 22px 20px;
+  gap: 16px;
+  padding: 24px 20px;
 }
 .palm-start__h {
   margin: 0;
-  font: 650 1.375rem / 1.2 var(--font-display);
+  font: 540 1.625rem / 1.15 var(--font-display);
   letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 .palm-steps {
   list-style: none;
-  margin: 2px 0;
+  margin: 4px 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 .palm-steps li {
   display: flex;
-  gap: 12px;
+  gap: 14px;
 }
 .palm-steps__n {
   display: grid;
   place-items: center;
   flex: none;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: var(--violet-soft);
-  color: var(--accent-text);
-  font: 650 0.9375rem var(--font-display);
+  background: rgba(var(--tint), 0.06);
+  color: var(--ink);
+  font: 540 1.0625rem / 1 var(--font-display);
 }
 .palm-steps b {
   display: block;
@@ -46,21 +47,50 @@
   line-height: 1.45;
   color: var(--ink-muted);
 }
+.v-page .palm-framing {
+  padding: 0 2px;
+}
 
-/* ── The reading ───────────────────────────────────────────────────── */
+/* ── The summary ───────────────────────────────────────────────────── */
+.palm-sum {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.palm-sum__h {
+  margin: 0;
+  font: 540 2.25rem / 1.05 var(--font-display);
+  letter-spacing: -0.025em;
+}
+.v-page .palm-sum__p {
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  max-width: 56ch;
+}
+.palm-sum__lines {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ── Line by line: one list, hairlines between ─────────────────────── */
 .palm-readcol > .v-sec:first-child {
-  margin-top: 4px;
+  margin-top: 6px;
 }
 .palm-line {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  padding: 18px 20px;
 }
 .palm-line__head {
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: 8px 10px;
+  gap: 8px 12px;
 }
 .palm-line__title {
   flex: 1;
@@ -68,26 +98,25 @@
 }
 .palm-line__title h3 {
   margin: 0;
-  font: 600 1.0625rem / 1.3 var(--font-display);
-  letter-spacing: -0.015em;
+  font: 600 1.0625rem / 1.3 var(--font-body);
 }
 .palm-line__letter {
   display: inline-grid;
   place-items: center;
   flex: none;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: var(--calm-soft);
-  color: var(--calm);
-  font: 650 0.8125rem / 1 var(--font-body);
+  background: rgba(var(--tint), 0.07);
+  color: var(--ink);
+  font: 650 0.875rem / 1 var(--font-body);
 }
 
 /* ── The traced print ──────────────────────────────────────────────── */
 .palm-printcard {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   padding: 14px;
 }
 .palm-print {
@@ -129,16 +158,17 @@
   stroke-linejoin: round;
 }
 .palm-lines .halo {
-  stroke: rgba(4, 5, 13, 0.6);
+  stroke: var(--print-ground);
+  stroke-opacity: 0.6;
   stroke-width: 7;
 }
 .palm-lines .ln {
-  stroke: var(--cyan);
+  stroke: var(--cloth-ink);
   stroke-width: 3;
 }
 .palm-lines .ln--faint {
   stroke-dasharray: 7 6;
-  opacity: 0.75;
+  opacity: 0.8;
 }
 .palm-lines .ln--traced {
   stroke: var(--accent-2);
@@ -146,7 +176,8 @@
 }
 .palm-lines text {
   fill: var(--cloth-ink);
-  stroke: rgba(4, 5, 13, 0.75);
+  stroke: var(--print-ground);
+  stroke-opacity: 0.75;
   stroke-width: 4;
   paint-order: stroke;
   font: 650 24px var(--font-body);
@@ -157,7 +188,7 @@
 .palm-legend {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 4px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px 16px;
@@ -166,10 +197,23 @@
 .palm-legend li {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+}
+.palm-printcard__btns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+.palm-printcard__btns .v-btn {
+  padding: 0 10px;
 }
 .palm-trace {
+  display: flex;
   flex-direction: column;
+  gap: 12px;
+  padding: 4px 4px 2px;
+  font-size: 0.9375rem;
+  line-height: 1.45;
 }
 .palm-nudge {
   display: flex;
@@ -189,18 +233,25 @@
 .palm-nudge .v-seg {
   max-width: 100%;
 }
+
+/* ── Private, and delete: quiet, last, still a deliberate hold ─────── */
 .palm-private {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 24px 2px 0;
+  border-top: 1px solid var(--card-edge);
 }
-.palm-private .v-card__title {
+.palm-private__t {
   margin: 0;
+  font: 600 1rem / 1.3 var(--font-body);
 }
 .palm-delete {
   position: relative;
   overflow: hidden;
-  align-self: flex-start;
+  margin-top: 6px;
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
@@ -208,7 +259,7 @@
 .palm-delete__fill {
   position: absolute;
   inset: 0;
-  background: rgba(251, 113, 133, 0.35);
+  background: var(--care-soft);
   transform: scaleX(0);
   transform-origin: left;
 }
@@ -224,9 +275,7 @@
   gap: 12px;
 }
 .palm-facts dt {
-  font: 600 0.8125rem var(--font-body);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font: 600 0.875rem / 1.4 var(--font-body);
   color: var(--ink-muted);
 }
 .palm-facts dd {
@@ -237,7 +286,7 @@
 }
 .palm-sources {
   margin: 4px 0 0;
-  padding: 12px 0 0 20px;
+  padding: 14px 0 0 20px;
   border-top: 1px solid var(--card-edge);
   display: flex;
   flex-direction: column;
@@ -297,7 +346,7 @@
   flex: 1;
   min-width: 0;
   margin: 0;
-  font: 600 1.0625rem / 1.25 var(--font-display);
+  font: 540 1.1875rem / 1.25 var(--font-display);
   letter-spacing: -0.015em;
   color: var(--cloth-ink);
 }
@@ -309,7 +358,6 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: rgba(var(--tint), 0.04);
-  box-shadow: inset 0 0 0 1px rgba(var(--tint), 0.14);
 }
 .cap__frame video {
   position: absolute;
@@ -345,15 +393,14 @@
   margin: 0;
   padding: 8px 14px;
   border-radius: var(--radius-md);
-  background: rgba(4, 5, 13, 0.72);
+  background: color-mix(in srgb, var(--print-ground) 78%, transparent);
   color: var(--cloth-ink);
   text-align: center;
   line-height: 1.4;
 }
 .cap__tips {
   top: 12px;
-  font-size: 0.8125rem;
-  letter-spacing: 0.02em;
+  font-size: 0.875rem;
 }
 .cap__hint {
   bottom: 12px;
@@ -373,7 +420,7 @@
 }
 .cap__state h2 {
   margin: 0;
-  font: 650 1.375rem / 1.2 var(--font-display);
+  font: 540 1.625rem / 1.15 var(--font-display);
   letter-spacing: -0.02em;
   color: var(--cloth-ink);
 }
@@ -398,7 +445,7 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
-  background: rgba(4, 5, 13, 0.8);
+  background: color-mix(in srgb, var(--print-ground) 82%, transparent);
   color: var(--cloth-ink);
   font-size: 1.0625rem;
   font-weight: 550;
@@ -446,13 +493,16 @@
 }
 .cap__seg {
   flex: none;
-  background: rgba(var(--tint), 0.06);
-  border-color: rgba(var(--tint), 0.16);
+  background: rgba(var(--tint), 0.1);
 }
 .cap__seg > button {
   min-height: 44px;
   min-width: 72px;
   color: var(--cloth-ink);
+}
+.cap__seg > button[aria-checked="true"] {
+  background: var(--cloth-ink);
+  color: var(--print-ground);
 }
 .cap__gauge {
   display: inline-flex;

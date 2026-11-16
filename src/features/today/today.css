@@ -1,172 +1,155 @@
-/* Almanac: the day in plain words, then rows you can tap for the exact times. */
+/* Almanac: today in plain words, set large; then calm lists you can tap for the exact times. */
 .alm-dev {
-  font-size: 0.8125rem;
-  font-weight: 400;
+  font: 400 0.9375rem var(--font-body);
+  letter-spacing: 0;
   color: var(--ink-muted);
-}
-.alm-aside {
-  font-size: 0.8125rem;
-  font-weight: 400;
-  color: var(--ink-muted);
-}
-.alm-link {
-  color: var(--accent-text);
 }
 
-/* The answer */
-.alm-hero {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.alm-hero__top {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.alm-hero__moon {
-  flex: none;
-  width: 84px;
-  height: 84px;
-}
+/* The Moon disc (also drawn small in the month) */
 .alm-moon {
   display: block;
   width: 100%;
   height: 100%;
 }
 .alm-moon__dark {
-  fill: var(--card-hi);
-  stroke: var(--card-edge-strong);
-  stroke-width: 2;
+  fill: rgba(var(--tint), 0.1);
 }
 .alm-moon__lit {
   fill: var(--moon);
 }
-.alm-hero__text {
-  min-width: 0;
-}
-.alm-hero__date {
-  margin: 0;
+
+/* The answer */
+.alm-hero {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  font: 500 0.9375rem / 1.35 var(--font-body);
-  color: var(--ink-muted);
+  gap: 18px;
+  margin: 6px 0 4px;
 }
-.alm-hero__plain {
-  margin-top: 4px;
-  font: 650 1.4375rem / 1.2 var(--font-display);
-  letter-spacing: -0.02em;
-  text-wrap: balance;
-}
-.alm-hero__small {
+.alm-hero__bar {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 4px 8px;
-  margin-top: 4px;
-  font-size: 0.875rem;
-  color: var(--ink-muted);
-}
-.alm-hero__sun {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(98px, 1fr));
-  gap: 8px;
-  margin: 0;
-}
-.alm-hero__sun > div {
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
-  background: rgba(var(--tint), 0.05);
-}
-.alm-hero__sun dt {
-  font-size: 0.8125rem;
-  color: var(--ink-muted);
-}
-.alm-hero__sun dd {
-  margin: 0;
-  font-weight: 600;
-}
-.alm-step {
-  display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
+  gap: 12px;
+}
+.alm-hero__when {
+  min-width: 0;
+}
+.alm-hero__when .v-eyebrow {
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
-.alm-step .v-btn {
-  padding: 0 14px;
+.alm-hero__date {
+  margin-top: 2px;
+  font-size: 1.0625rem;
+  font-weight: 550;
+  line-height: 1.35;
 }
-.alm-step .v-chev {
+.alm-hero__nav {
+  flex: none;
+  display: flex;
+  gap: 8px;
+}
+.alm-hero__nav .v-chev,
+.month__nav .v-chev {
   color: inherit;
 }
+.alm-hero__main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.alm-hero__text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.alm-hero__small {
+  color: var(--ink-muted);
+}
+.alm-hero__small .info-dot {
+  margin-left: 4px;
+}
+.alm-hero__moon {
+  flex: none;
+  width: 84px;
+  height: 84px;
+}
+.alm-hero__sun {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--card-edge);
+  color: var(--ink-muted);
+}
+.alm-hero__sun > span {
+  white-space: nowrap;
+}
+.alm-hero__sun b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.alm-hero__back {
+  align-self: flex-start;
+}
+@media (max-width: 359px) {
+  .alm-hero__moon {
+    width: 64px;
+    height: 64px;
+  }
+}
 .alm-where {
-  margin: 0 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-/* The four views */
+/* The four views: one row, short words on a narrow phone */
 .alm-seg > button {
-  padding: 0 10px;
+  flex: 1 1 0;
   min-height: 44px;
-  font-size: 0.875rem;
+  padding: 0 8px;
 }
-@media (max-width: 429px) {
-  .alm-seg {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    border-radius: var(--radius-lg);
+.alm-seg__short {
+  display: inline-block;
+}
+@media (max-width: 519px) {
+  .alm-seg__lead {
+    display: none;
   }
-  .alm-seg > button {
-    border-radius: var(--radius-md);
+  .alm-seg__short::first-letter {
+    text-transform: uppercase;
   }
 }
 .alm-panel {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 .alm-panel .v-sec {
-  margin-top: 6px;
-}
-.alm-h {
-  margin: 6px 2px 0;
-  font: 650 1.1875rem / 1.25 var(--font-display);
-  letter-spacing: -0.02em;
-}
-.alm-h__note {
-  display: block;
-  margin-top: 2px;
-  font: 400 0.8125rem / 1.4 var(--font-body);
-  letter-spacing: 0;
-  color: var(--ink-muted);
-}
-.alm-sub {
-  margin: 0 2px;
-  font: 600 1rem var(--font-body);
-}
-.alm-sub__meta {
-  margin-left: 6px;
-  font-weight: 400;
-  font-size: 0.8125rem;
-  color: var(--ink-muted);
+  margin-top: 10px;
 }
 
-/* Rows: one fact each, tap for the detail sheet */
+/* Rows: what it is on the left, its value on the right; tap for the details sheet */
+.alm-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.alm-rows--plain > li + li {
+  border-top: 1px solid var(--card-edge);
+}
 .alm-row {
   display: flex;
-  align-items: center;
-}
-.alm-row > .info-dot {
-  flex: none;
-  margin: 0 14px 0 2px;
-}
-.alm-row__main {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 64px;
-  padding: 12px 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  min-height: 68px;
+  padding: 13px 20px;
   border: 0;
   background: none;
   color: var(--ink);
@@ -174,110 +157,86 @@
   text-align: left;
   cursor: pointer;
 }
-.alm-row__main:hover {
+.alm-row:hover {
   background: rgba(var(--tint), 0.04);
 }
-.alm-row__body {
-  flex: 1 1 0;
-  min-width: 0;
+.alm-row__l,
+.alm-row__r {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
+  min-width: 0;
+}
+.alm-row__l {
+  flex: 0 1 auto;
+  max-width: 52%;
+}
+.alm-row__r {
+  flex: 1 1 0;
+  align-items: flex-end;
+  text-align: right;
+}
+.alm-row--win .alm-row__l {
+  flex: 1 1 0;
+  max-width: none;
+}
+.alm-row--win .alm-row__r {
+  flex: 0 1 auto;
+  max-width: 50%;
 }
 .alm-row__k {
-  font-size: 0.8125rem;
-  line-height: 1.4;
-  color: var(--ink-muted);
-}
-.alm-row__term {
-  opacity: 0.85;
+  font-weight: 500;
+  line-height: 1.35;
 }
 .alm-row__v {
   font-weight: 600;
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
-.alm-row__until {
-  font-size: 0.8125rem;
+.alm-row__s {
+  font-size: 0.875rem;
   line-height: 1.4;
   color: var(--ink-muted);
 }
-.alm-row__end {
+.alm-row--win .alm-row__r--time {
   flex: none;
-  margin-left: auto;
-  text-align: right;
+  max-width: none;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
-.alm-row--time .alm-row__end {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  max-width: 52%;
-}
-.alm-row__time {
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: var(--ink);
-}
-.alm-row--time .alm-row__main {
-  display: grid;
-  grid-template-columns: 4px minmax(0, 1fr) auto;
-  gap: 6px 12px;
-}
-@media (max-width: 419px) {
-  .alm-row--time .alm-row__main {
-    grid-template-columns: 4px minmax(0, 1fr);
-  }
-  .alm-row--time .alm-row__mark {
-    grid-row: 1 / span 2;
-  }
-  .alm-row--time .alm-row__end {
-    grid-column: 2;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    max-width: none;
-    margin-left: 0;
-  }
-  .alm-step .v-btn {
-    padding: 0 10px;
-    gap: 4px;
-  }
-}
-.alm-row__mark {
-  width: 4px;
-  align-self: stretch;
-  min-height: 36px;
-  border-radius: 2px;
-  background: var(--card-edge-strong);
-}
-.alm-row--avoid .alm-row__mark {
-  background: var(--care);
-}
-.alm-row--good .alm-row__mark {
-  background: var(--good);
+/* inside a fold the rows sit on the fold's own card */
+.v-fold__body > .alm-rows--plain {
+  margin: 0 -20px -12px;
 }
 
-/* Slots and planet hours */
-.alm-periods > li {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+/* Good, and avoid: the word and its mark head each short list */
+.alm-win__h {
+  display: flex;
   align-items: center;
-  gap: 2px 12px;
-  min-height: 60px;
-  padding: 10px 16px;
+  gap: 10px;
+  margin: 0;
+  padding: 16px 20px 6px;
+  font: 600 1rem / 1.3 var(--font-body);
+  color: var(--tone);
 }
-.alm-periods > li.is-now {
-  background: var(--gold-soft);
-  box-shadow: inset 3px 0 0 var(--accent-2);
+.alm-win[data-kind="good"] {
+  --tone: var(--good);
+  --tone-soft: var(--good-soft);
 }
-.alm-periods__aside {
-  grid-column: 2;
-  grid-row: 1 / span 2;
+.alm-win[data-kind="avoid"] {
+  --tone: var(--care);
+  --tone-soft: var(--care-soft);
 }
-.alm-periods__aside .v-chip {
-  text-transform: capitalize;
+.alm-win__mark {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--tone-soft);
+}
+.alm-win .alm-row__k {
+  font-weight: 600;
 }
 .alm-qmark {
   width: 12px;
@@ -288,135 +247,182 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.alm-periods__name {
-  grid-column: 1;
+
+/* Slots and planet hours */
+.alm-periods {
+  list-style: none;
+  margin: 0 -8px -8px;
+  padding: 0;
+}
+.alm-periods > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 62px;
+  padding: 10px 8px;
+  border-radius: var(--radius-md);
+}
+.alm-periods > li + li:not(.is-now) {
+  box-shadow: 0 -1px 0 var(--card-edge);
+}
+.alm-periods > li.is-now {
+  background: var(--gold-soft);
+}
+.alm-periods > li.is-now + li {
+  box-shadow: none;
+}
+.alm-periods__body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.alm-periods__t {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 2px 8px;
   font-weight: 600;
-}
-.alm-periods__n {
-  min-width: 2ch;
-  font-weight: 400;
-  font-size: 0.8125rem;
-  color: var(--ink-muted);
   font-variant-numeric: tabular-nums;
 }
-.alm-periods__t {
-  grid-column: 1;
+.alm-periods__s {
   font-size: 0.875rem;
+  font-weight: 400;
   color: var(--ink-muted);
+}
+.alm-periods__time {
   font-variant-numeric: tabular-nums;
+}
+.alm-periods__end {
+  flex: none;
+  max-width: 55%;
+}
+.alm-periods__end .v-chip {
+  text-transform: capitalize;
+}
+.alm-periods > li.is-now .alm-periods__s {
+  color: var(--ink);
 }
 
 /* The month */
 .month {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   max-width: 640px;
   width: 100%;
-  margin: 0 auto;
+}
+.month__card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 12px 18px;
 }
 .month__nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
+  padding: 0 4px 0 8px;
 }
 .month__title {
-  font: 650 1.125rem var(--font-display);
-  letter-spacing: -0.015em;
+  flex: 1;
+  margin: 0;
+  font: 540 1.375rem / 1.2 var(--font-display);
+  letter-spacing: -0.02em;
+}
+@media (max-width: 359px) {
+  .month__title {
+    font-size: 1.1875rem;
+  }
 }
 .month__grid {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px;
-  border: 1px solid var(--card-edge);
-  border-radius: var(--radius-lg);
-  background: var(--card);
+  gap: 2px;
 }
 .month__row {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 4px;
+  gap: 2px;
 }
 .month__wd {
-  padding: 4px 0;
+  padding: 6px 0;
   text-align: center;
   font-size: 0.8125rem;
+  font-weight: 500;
   color: var(--ink-muted);
 }
 .mcell {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  min-height: 72px;
-  padding: 6px 0 4px;
-  border: 1px solid transparent;
-  border-radius: 12px;
-  background: rgba(var(--tint), 0.03);
+  gap: 3px;
+  min-height: 78px;
+  padding: 5px 0 4px;
+  border: 0;
+  border-radius: 14px;
+  background: none;
   color: var(--ink);
   font: inherit;
   cursor: pointer;
 }
 .mcell:hover {
-  background: rgba(var(--tint), 0.08);
-}
-.mcell[aria-current="date"] {
-  border-color: var(--accent-2);
+  background: rgba(var(--tint), 0.05);
 }
 .mcell[aria-selected="true"] {
-  background: var(--violet-soft);
-  border-color: var(--accent);
-}
-.mcell--purnima {
-  background: var(--gold-soft);
+  background: rgba(var(--tint), 0.08);
 }
 .mcell__d {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 4px;
+  border-radius: var(--radius-full);
   font-weight: 600;
   font-size: 0.9375rem;
-  line-height: 1.2;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+/* today is the one filled date */
+.mcell[aria-current="date"] .mcell__d {
+  background: var(--btn-fill);
+  color: var(--accent-ink);
 }
 .mcell__moon {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 .mcell__moon .alm-moon__dark {
-  stroke-width: 5;
+  fill: rgba(var(--tint), 0.16);
 }
 .mcell__t {
   font-size: 0.75rem;
-  line-height: 1.2;
+  line-height: 1.1;
   color: var(--ink-muted);
 }
 .mcell__m {
   display: flex;
-  gap: 2px;
+  gap: 3px;
   min-height: 12px;
 }
 .mmark {
   font-style: normal;
   font-size: 0.6875rem;
   line-height: 1.1;
-  font-weight: 600;
-  color: var(--accent-text);
-}
-.mmark--sun {
-  color: var(--accent-2);
+  font-weight: 650;
+  color: var(--ink);
 }
 .month__legend {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 0.8125rem;
+  padding: 12px 8px 0;
+  border-top: 1px solid var(--card-edge);
+  font-size: 0.875rem;
+  line-height: 1.5;
   color: var(--ink-muted);
 }
 .month__legend .mmark {
-  font-size: 0.8125rem;
+  font-size: inherit;
 }
 .month__pick {
   display: flex;
@@ -425,7 +431,7 @@
 }
 .month__open {
   align-self: flex-start;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 /* Exact times: the fold and the details sheet */
@@ -438,7 +444,7 @@
   display: grid;
   grid-template-columns: 96px minmax(0, 1fr);
   gap: 12px;
-  padding: 9px 0;
+  padding: 10px 0;
   font-size: 0.9375rem;
   line-height: 1.4;
 }
@@ -458,13 +464,13 @@
 .alm-foot {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   padding: 6px var(--page-pad) 8px;
   font-family: var(--font-body);
 }
 .alm-foot h2 {
   margin: 0;
-  font: 650 1.25rem / 1.25 var(--font-display);
+  font: 540 1.625rem / 1.2 var(--font-display);
   letter-spacing: -0.02em;
 }
 .alm-foot p {
@@ -480,8 +486,4 @@
 }
 .alm-foot .v-actions {
   justify-content: flex-end;
-}
-
-.alm-where p {
-  margin: 0;
 }

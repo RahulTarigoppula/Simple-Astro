@@ -1,6 +1,6 @@
 // A person at a glance. `KeyFacts` is the three things everyone asks first (Moon sign, birth star,
-// rising sign) as compact cards; `CosmicProfile` is the same birth read by other traditions (Sun
-// sign, the Chinese year, numbers). Every card opens its story in Explore.
+// rising sign) as three rows in one card; `CosmicProfile` is the same birth read by other traditions
+// (Sun sign, the Chinese year, numbers). Every row opens its story in Explore.
 import { useMemo } from "react";
 import { Link } from "react-router";
 import { InfoDot } from "../../components/ui/Explain";
@@ -24,6 +24,18 @@ interface Fact {
   to: string;
   glyph: React.ReactNode;
   warn?: string;
+}
+
+/** The horizon with a body coming up over it: the rising sign. */
+function RisingMark() {
+  return (
+    <svg className="graha-glyph" width="40" height="40" viewBox="0 0 32 32" aria-hidden="true">
+      <circle className="graha-glyph__disc" cx="16" cy="16" r="15" />
+      <g className="graha-glyph__mark" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M7 20.5h18M11.2 20.5a4.8 4.8 0 0 1 9.6 0M16 9.5v2.6M9.6 12.6l1.7 1.7M22.4 12.6l-1.7 1.7" />
+      </g>
+    </svg>
+  );
 }
 
 export function KeyFacts({ profile, patri }: { profile: Profile; patri: Patri }) {
@@ -53,7 +65,7 @@ export function KeyFacts({ profile, patri }: { profile: Profile; patri: Patri })
         term: "Rāśi",
         explain: "rashi",
         v: rashiName(mo.sign, profile.tradition),
-        s: `${sk(mo.sign)}${r(mo.sign)?.western}, the sign of ${r(mo.sign)?.symbol}. In three words: ${r(mo.sign)?.nature}.`,
+        s: `${sk(mo.sign)}${r(mo.sign)?.western}, the sign of ${r(mo.sign)?.symbol}.`,
         to: `/explore/rashi/${mo.sign}`,
         glyph: <GrahaGlyph id="MO" size={40} />,
       },
@@ -76,16 +88,16 @@ export function KeyFacts({ profile, patri }: { profile: Profile; patri: Patri })
         v: rashiName(L, profile.tradition),
         s: `${sk(L)}${r(L)?.western} rising: how you meet the world.`,
         to: `/explore/rashi/${L}`,
-        glyph: <span className="cp-sign">{L + 1}</span>,
+        glyph: <RisingMark />,
         ...(profile.timeUnknown ? { warn: "Birth time unknown, so this is uncertain." } : {}),
       },
     ];
   }, [patri, profile]);
 
   return (
-    <ul className="kf" aria-label="Your three key signs">
+    <ul className="kf v-card" aria-label="Your three key signs">
       {facts.map((f) => (
-        <li key={f.key} className="kf__card" data-fact={f.key}>
+        <li key={f.key} className="kf__row" data-fact={f.key}>
           <span className="kf__glyph" aria-hidden="true">
             {f.glyph}
           </span>
@@ -95,11 +107,11 @@ export function KeyFacts({ profile, patri }: { profile: Profile; patri: Patri })
             </p>
             <Link to={f.to} className="kf__v" aria-label={`${f.k}: ${f.v}. Read its story`}>
               {f.v}
-              <ChevronRight size={16} />
             </Link>
             <p className="kf__s">{f.s}</p>
             {f.warn ? <p className="kf__warn">{f.warn}</p> : null}
           </div>
+          <ChevronRight />
         </li>
       ))}
     </ul>

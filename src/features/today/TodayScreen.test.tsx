@@ -76,42 +76,44 @@ describe("TodayScreen", { timeout: 60_000 }, () => {
 
   it("reads Bengaluru when nobody is saved, answers in plain words and prints 12-hour end times", async () => {
     renderToday();
-    expect(await screen.findByRole("heading", { level: 1, name: "Almanac" })).toBeInTheDocument();
+    // The answer first: the lunar day as a sentence is the page's heading, with the date, the Moon, sunrise and sunset.
     expect(
-      await screen.findByRole("heading", { level: 2, name: /^Today\s*\w+day, \d+ \w+ \d{4}$/ }, { timeout: 5000 }),
+      await screen.findByRole("heading", { level: 1, name: /day of the (growing|fading) Moon$|^(Full|New) Moon day$/ }, { timeout: 5000 }),
     ).toBeInTheDocument();
+    const hero = screen.getByRole("region", { name: /^Today, \w+day, \d+ \w+ \d{4}$/ });
+    expect(within(hero).getByText(/^\w+day, \d+ \w+ \d{4}$/)).toBeInTheDocument();
     expect(screen.getByText(/^Times are for/).closest("p")).toHaveTextContent(/^Times are for Bengaluru\. Change/);
     expect(screen.getByRole("link", { name: "Add a person" })).toHaveAttribute("href", "/leaf/new");
-    // The answer first: the lunar day as a sentence, the Moon, sunrise and sunset.
-    expect(screen.getByText(/day of the (growing|fading) Moon$|^(Full|New) Moon day$/)).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /^The Moon: \d+% lit, (growing|fading)$/ })).toBeInTheDocument();
-    const hero = screen.getByRole("region", { name: /^Today/ });
     expect(within(hero).getByText("Sunrise").nextElementSibling?.textContent).toMatch(TIME);
     expect(within(hero).getByText("Sunset").nextElementSibling?.textContent).toMatch(TIME);
     const tithi = screen.getByRole("button", { name: /^Tithi/ });
-    expect(within(tithi).getByText(/^Lunar day/)).toBeInTheDocument();
+    expect(within(tithi).getByText("Lunar day")).toBeInTheDocument();
+    expect(within(tithi).getByText("Tithi")).toBeInTheDocument();
     expect(within(tithi).getByText(/^until \d{1,2}:\d{2} (am|pm)( tomorrow| in \d+ days)?$/)).toBeInTheDocument();
-    expect(within(tithi).getByText(/[ऀ-ॿ]/, { selector: "[lang='hi']" })).toBeInTheDocument();
-    // Every one of the five limbs has its own plain-English ⓘ.
+    // The five limbs are one list; each row opens its own details.
     const limbs = screen.getByRole("list", { name: "The five parts of the day" });
     expect(within(limbs).getAllByRole("listitem")).toHaveLength(5);
-    expect(within(limbs).getAllByRole("button", { name: /^What is .*\? Explain in plain English$/ })).toHaveLength(5);
-    const rahu = screen.getByRole("button", { name: /^Rāhu Kāla: Avoid\./ });
+    expect(within(limbs).getAllByRole("button", { name: /\. Details$/ })).toHaveLength(5);
+    // What to avoid is its own short list, headed by the word.
+    const avoid = screen.getByRole("list", { name: "Times to avoid" });
+    expect(within(avoid).getAllByRole("listitem")).toHaveLength(3);
+    const rahu = within(avoid).getByRole("button", { name: /^Rāhu Kāla: Avoid\./ });
     expect(rahu.textContent).toMatch(RANGE);
-    expect(within(rahu).getByText("Avoid")).toBeInTheDocument();
-    expect(within(screen.getByRole("button", { name: /^Abhijit/ })).queryByText("Avoid")).toBeNull();
+    expect(within(avoid.parentElement as HTMLElement).getByRole("heading", { name: "Avoid" })).toBeInTheDocument();
+    expect(within(avoid).queryByRole("button", { name: /^Abhijit/ })).toBeNull();
   });
 
   it("pages days with the stepper and comes back to today", async () => {
     renderToday();
     fireEvent.click(await screen.findByRole("button", { name: "Next day" }));
-    expect(await screen.findByRole("heading", { level: 2, name: /^Tomorrow/ }, { timeout: 20_000 })).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: /^Tomorrow, / }, { timeout: 20_000 })).toBeInTheDocument();
     expect(screen.getByText(/Read at sunrise/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Previous day" }));
     fireEvent.click(screen.getByRole("button", { name: "Previous day" }));
-    expect(await screen.findByRole("heading", { level: 2, name: /^Yesterday/ }, { timeout: 20_000 })).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: /^Yesterday, / }, { timeout: 20_000 })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Back to today" }));
-    expect(await screen.findByRole("heading", { level: 2, name: /^Today/ })).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: /^Today, / })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Back to today" })).toBeNull();
   });
 
@@ -123,6 +125,7 @@ describe("TodayScreen", { timeout: 60_000 }, () => {
     expect(within(dlg).getByText(/Asia\/Kolkata · UTC\+05:30/)).toBeInTheDocument();
     expect(within(dlg).getByText(/upper limb on a refracted horizon/)).toBeInTheDocument();
     expect(within(dlg).getByText(/Lahiri/)).toBeInTheDocument();
+    expect(within(dlg).getByText(/[ऀ-ॿ]/, { selector: "[lang='hi']" })).toBeInTheDocument();
     // Plain words first, with the way on to the full explanation and to the star's story.
     expect(within(dlg).getByText(/Simply put/)).toBeInTheDocument();
     expect(within(dlg).getByRole("button", { name: "Tell me more" })).toBeInTheDocument();
@@ -132,14 +135,17 @@ describe("TodayScreen", { timeout: 60_000 }, () => {
     );
   });
 
-  it("prints Brahma-muhūrta and Godhūli among the times of day, marked good in words", async () => {
+  it("prints Brahma-muhūrta and Godhūli among the good times, headed good in words", async () => {
     renderToday();
-    const brahma = await screen.findByRole("button", { name: /^Brahma-muhūrta/ }, { timeout: 5000 });
+    const brahma = await screen.findByRole("button", { name: /^Brahma-muhūrta: Good\./ }, { timeout: 5000 });
     expect(brahma.textContent).toMatch(RANGE);
-    expect(within(brahma).getByText("Good")).toBeInTheDocument();
-    const godhuli = screen.getByRole("button", { name: /^Godhūli/ });
+    const good = screen.getByRole("list", { name: "Good times" });
+    expect(within(good).getAllByRole("listitem")).toHaveLength(3);
+    expect(within(good.parentElement as HTMLElement).getByRole("heading", { name: "Good" })).toBeInTheDocument();
+    const godhuli = within(good).getByRole("button", { name: /^Godhūli/ });
     expect(godhuli.textContent).toMatch(RANGE);
-    expect(within(screen.getByRole("list", { name: "Times of day" })).getAllByRole("listitem")).toHaveLength(8);
+    // Moonrise, the month and the season wait in a fold.
+    expect(within(screen.getByRole("list", { name: "More about this day" })).getAllByRole("listitem")).toHaveLength(4);
   });
 
   it("lists the day and night choghaḍiyās with quality in words and at most one 'now'", async () => {

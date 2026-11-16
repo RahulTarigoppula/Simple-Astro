@@ -142,16 +142,19 @@ export default function AboutScreen() {
   return (
     <Page
       label="About Vyomaphala"
-      eyebrow={
+      title="How Vyomaphala was made"
+      lede={
         <>
-          About Vyomaphala · <span lang="hi">व्योमफल</span> · the fruit of the sky
+          Vyomaphala (<span lang="hi">व्योमफल</span>), the fruit of the sky.
         </>
       }
-      title="How Vyomaphala was made"
       back
       className="about"
     >
       <section className="v-card v-card--hero about-hero" aria-label="From the maker">
+        <span className="about-mark" aria-hidden="true">
+          “
+        </span>
         <blockquote className="about-quote">
           <p>It took almost 18 weeks of extensive planning, development, data gathering and cleaning. This is the result: Vyomaphala.</p>
           <footer>Rahul (RT), who made Vyomaphala</footer>
@@ -162,7 +165,7 @@ export default function AboutScreen() {
       </section>
 
       <Section title="In numbers" />
-      <ul className="about-numbers" aria-label="Vyomaphala in numbers">
+      <ul className="v-card about-numbers" aria-label="Vyomaphala in numbers">
         {NUMBERS.map(([n, l]) => (
           <li key={l}>
             <span className="about-numbers__n">{n}</span>
@@ -171,7 +174,7 @@ export default function AboutScreen() {
         ))}
       </ul>
 
-      <Section title="The detail" note="Open any part" />
+      <Section title="The detail" />
       <Fold title="Where the data comes from" sub={`${SOURCES.length} open, credited sources`}>
         <p>Every source below is open and credited, and the app works only from them.</p>
         <ul className="about-sources">

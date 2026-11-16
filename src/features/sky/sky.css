@@ -1,5 +1,5 @@
-/* Rooftop sky, #/patri/:id/sky. Full-bleed neel cloth, a painted chart of the real sky, an
-   engraved brass strip and a brass scrub ring. Colours only from tokens. */
+/* Sky at birth, #/patri/:id/sky. A full-bleed night picture (v-night) with quiet ink chrome:
+   a serif title, one line of facts, a time ring and one button. Colours only from tokens. */
 
 .rooftop {
   --moon-fill: color-mix(in oklch, var(--sky-cloth), var(--moon) calc(var(--moon-k) * 14%));
@@ -9,23 +9,24 @@
   flex-direction: column;
   color: var(--cloth-ink);
   background-color: var(--moon-fill);
-  background-image: radial-gradient(color-mix(in oklch, var(--surface) 8%, transparent) 1px, transparent 1.2px);
-  background-size: 8px 8px;
   overflow: hidden;
   touch-action: none; /* swipe-down to the desk; the sky never scrolls */
 }
 
 .sky-head {
   flex: none;
-  padding: 4px var(--page-pad) 0;
+  padding: 6px var(--page-pad) 0;
+}
+.sky-head .v-back {
+  margin-bottom: 10px;
 }
 .sky-head__text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 .sky-head .v-title {
-  font-size: 1.5rem;
+  font-size: 2rem;
 }
 .sky-head__sub {
   margin: 0;
@@ -199,7 +200,15 @@
 }
 .sky-strip {
   justify-content: center;
+  justify-self: center;
   margin: 0;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: rgba(var(--tint), 0.07);
+  box-shadow: none;
+  color: var(--ink-muted);
+  font-size: 12px;
   text-align: center;
 }
 .sky-controls {
@@ -214,22 +223,15 @@
   align-items: flex-end;
   gap: var(--space-2);
 }
-.sky-btn {
-  min-height: 44px;
-  min-width: 44px;
-  padding: 0 var(--space-4);
-  border: 1px solid color-mix(in oklch, var(--brass) 55%, transparent);
-  border-radius: var(--radius-md);
-  color: var(--cloth-ink);
-  font-size: var(--text-base);
-  background: transparent;
-  transition: border-color var(--dur-fast) var(--ease-out);
-}
+.sky-btn,
 .sky-btn:hover {
-  border-color: var(--brass);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: rgba(var(--tint), 0.1);
+  color: var(--ink);
 }
 .sky-btn:disabled {
-  color: color-mix(in oklch, var(--cloth-ink), transparent 40%);
+  color: var(--ink-muted);
 }
 .sky-note {
   margin: 0;
@@ -239,7 +241,7 @@
   color: var(--ink-muted);
 }
 
-/* ScrubRing, a knurled brass ring; the sindoor notch at the top is the index */
+/* ScrubRing: an ink ring with hour ticks; the amber notch at the top is the index */
 .scrub {
   position: relative;
   flex: none;
@@ -264,7 +266,7 @@
   border-radius: 50%;
   touch-action: none;
   cursor: grab;
-  box-shadow: var(--shadow-1);
+  box-shadow: none;
 }
 .scrub__ring:active {
   cursor: grabbing;
@@ -273,25 +275,25 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
+  /* ticks, not decoration: a long one every 30°, a short one between */
   background:
-    repeating-conic-gradient(from 0deg, var(--brass-ink) 0deg 1.4deg, transparent 1.4deg 30deg),
-    repeating-conic-gradient(from 15deg, color-mix(in oklch, var(--brass-ink), transparent 55%) 0deg 0.8deg, transparent 0.8deg 30deg),
-    conic-gradient(from 200deg, var(--brass-lo), var(--brass-hi), var(--brass-mid), var(--brass-dark), var(--brass-lo));
-  -webkit-mask: radial-gradient(circle closest-side, transparent 56%, black 57.5%);
-  mask: radial-gradient(circle closest-side, transparent 56%, black 57.5%);
+    repeating-conic-gradient(from -0.6deg, var(--ink) 0deg 1.2deg, transparent 1.2deg 30deg),
+    repeating-conic-gradient(from 14.65deg, var(--ink-faint) 0deg 0.7deg, transparent 0.7deg 30deg), var(--card-hi);
+  -webkit-mask: radial-gradient(circle closest-side, transparent 60%, black 61.5%);
+  mask: radial-gradient(circle closest-side, transparent 60%, black 61.5%);
   will-change: transform;
 }
 .scrub__hub {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 66px;
-  height: 66px;
+  width: 70px;
+  height: 70px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: var(--brass-plate);
-  box-shadow: var(--brass-edge);
-  color: var(--brass-label);
+  background: rgba(var(--tint), 0.07);
+  box-shadow: none;
+  color: var(--ink);
   font-size: var(--text-xs);
   display: grid;
   place-items: center;

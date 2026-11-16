@@ -8,11 +8,12 @@ import "./cosmic.css";
 export function MeetGrahas({ patri }: { patri: Patri }) {
   return (
     <nav className="meet" aria-label="The nine grahas in this chart">
-      <p className="meet__k">Meet the planets in this chart. Tap one for its story.</p>
+      <p className="meet__k">Meet the planets</p>
+      <p className="v-card__sub meet__sub">Tap one for its story.</p>
       <ul>
         {GRAHA_LORE.map((g) => (
           <li key={g.id}>
-            <Link to={`/explore/graha/${g.id}`}>
+            <Link to={`/explore/graha/${g.id}`} className="meet__a">
               <GrahaGlyph id={g.id} size={40} />
               <span className="meet__t">{g.english}</span>
               <span className="meet__s">in {RASHI_LORE[patri.grahas[g.id].sign]?.name}</span>

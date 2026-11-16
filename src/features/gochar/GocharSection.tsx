@@ -202,24 +202,20 @@ export function GocharSection({ patri, nowMs, zone, forceOpen }: GocharSectionPr
   return (
     <section className="gochar" aria-labelledby="gochar-h">
       <div className="v-card gochar__card">
-        <h2 id="gochar-h" className="v-card__title">
+        <h2 id="gochar-h" className="gochar__k">
           Saturn's long seasons
         </h2>
         {season ? (
           <div className="gochar-season">
             <p className="gochar-season__t">{season.title}</p>
             <p>{season.when}</p>
-            <p>{season.says}</p>
+            <p className="gochar-season__says">{season.says}</p>
             <p className="gochar__src">
               {season.term ? `Sanskrit: ${season.term} · ` : ""}
               Source: {season.cite.text}, {season.cite.ref}
             </p>
           </div>
         ) : null}
-        <p className="v-card__sub gochar__about">
-          A long season is Saturn (Śani) passing over {SIGN_NAMES[(moon + 11) % 12]}, {SIGN_NAMES[moon]} and {SIGN_NAMES[(moon + 1) % 12]},
-          the signs around your Moon. Sanskrit: Sāḍe-sātī <InfoDot id="sade-sati" label="Sāḍe-sātī" /> · dates in {zone}.
-        </p>
         {ss ? (
           <SadeSatiRibbon key={ssKey(patri)} result={ss} birthMs={birthMs} nowMs={nowMs} zone={zone} />
         ) : (
@@ -235,6 +231,10 @@ export function GocharSection({ patri, nowMs, zone, forceOpen }: GocharSectionPr
             <div className="ink-wait" aria-hidden="true" />
           </div>
         )}
+        <p className="gochar__about">
+          A long season is Saturn (Śani) passing over {SIGN_NAMES[(moon + 11) % 12]}, {SIGN_NAMES[moon]} and {SIGN_NAMES[(moon + 1) % 12]},
+          the signs around your Moon. Sanskrit: Sāḍe-sātī <InfoDot id="sade-sati" label="Sāḍe-sātī" /> · dates in {zone}.
+        </p>
       </div>
 
       <details className="v-fold gochar__fold" open={forceOpen || undefined}>

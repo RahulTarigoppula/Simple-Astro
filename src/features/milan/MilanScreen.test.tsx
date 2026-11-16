@@ -113,12 +113,12 @@ describe("MilanScreen", () => {
     expect(
       screen.getByText(/reads the match from the first person toward the second, so swapping can change a few points/),
     ).toBeInTheDocument();
-    // A part shows its level word, with the points as small text beside it.
+    // A part shows its level in a word; the points are on the meter's name, not printed beside it.
     const parts = document.querySelectorAll(".mm-parts__w");
     expect(parts).toHaveLength(bond.parts.length);
     bond.parts.forEach((p, i) => {
-      expect(parts[i]?.querySelector(".mm-parts__n")).toHaveTextContent(`${p.score} of 100`);
-      expect(parts[i]?.textContent).not.toContain("·");
+      expect(parts[i]?.textContent).toMatch(/^(Strong|Good|Mixed|Needs care)$/);
+      expect(parts[i]?.parentElement?.querySelector(".v-meter")).toHaveAccessibleName(new RegExp(`, ${p.score} out of 100$`));
     });
     // Not the lowest band, so no flag sentence leads the answer.
     expect(want.band).not.toBe("not-recommended");
@@ -153,8 +153,8 @@ describe("MilanScreen", () => {
     const zero = bond.parts.findIndex((p) => p.score === 0);
     expect(zero).toBeGreaterThanOrEqual(0); // Nāḍī doṣa: Family scores nothing for this pair
     const cell = container.querySelectorAll(".mm-parts__w")[zero];
-    expect(cell?.firstChild?.textContent).toBe("Needs care");
-    expect(cell?.querySelector(".mm-parts__n")).toHaveTextContent("0 of 100");
+    expect(cell?.textContent).toBe("Needs care");
+    expect(cell?.parentElement?.querySelector(".v-meter")).toHaveAccessibleName(/: Needs care, 0 out of 100$/);
   });
 
   it("strings exactly milan()'s output on the mala, every row, the total and the band", async () => {

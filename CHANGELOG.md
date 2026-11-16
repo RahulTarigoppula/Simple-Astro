@@ -1,5 +1,27 @@
 # Changelog
 
+## 3.0.0 (2026-11-16)
+
+A second redesign, of the look and of how much is on each screen. 2.0 fixed the way around the app but still read as a dark dashboard: navy and violet gradients, an outline around everything, small type, boxes inside boxes and very long screens. 3.0 is "ivory and ink": warm paper, ink text, serif headings, one warm accent, cards with no outlines, and about half as much on every screen. The engine, the numbers and everything saved on the device are unchanged. The design is written down in docs/DESIGN-V3.md.
+
+### The look
+- **Warm paper and ink** in both themes: an ivory page with white cards in Light, a warm near-black page with charcoal cards in Dark. No blue, violet, gradients, glows or star specks behind pages. Pictures of the night sky stay night.
+- **Serif headings** (Source Serif 4, which draws Sanskrit letters such as ā, ī, ṇ, ś correctly); Inter for everything else. Bigger type and more space throughout.
+- **One accent**, a warm terracotta, used sparingly. The main button is plain ink. Green, blue, amber and red are used only for Strong, Good, Mixed and Go gently, always with the word.
+- Planet symbols, the birth chart figure and the sky wheel are drawn in thin ink lines.
+
+### Less on every screen
+- **Today:** the day's word set large with the score beside it, the sentence, and "Good for" / "Go easy on" in the same card. Good times is one sentence and one bar, with the full list in a fold. The grid of shortcuts is one list.
+- **Chart:** About you is one answer ("Gentle, imaginative, spiritual"), three rows, one card of plus points and cautions, and a list. Life chapters leads with the chapter you are in and how far through it. Planets shows the figure with one key, and a calmer table. Now leads with one sentence.
+- **Forecast:** every view leads with one word and one sentence. Day is about half its old length; Week is seven rows, Month a plain calendar with the best days listed, Quarter and Year one row per month (tap to open it). The astrology is one group of folds at the bottom.
+- **Partner match:** two faces, the answer, the five things as one list, one thing to try; everything else is folded under "More detail".
+- **People:** one row per person; Chart, Forecast, Match, Palm, Edit, Backup and Delete are behind one ⋯ button.
+- **Almanac:** today in plain words at the top ("7th day of the growing Moon"), the five parts as one list, then Good and Avoid as two short lists. Slots and Hours open at the present moment.
+- **Explore:** one list instead of a grid; detail pages lead with one paragraph and fold the rest.
+- **Add a person:** one large question per step, calmer choices, the same checks.
+- **Settings:** grouped rows (Look, Sound and motion, Your data, Advanced, About), with Delete everything quiet at the bottom.
+- **Palm, Guide, About, the intro and the not-found page** follow the same look.
+
 ## 2.0.0 (2026-11-16)
 
 A redesign of the whole app for people who have never used an astrology app. 1.x opened on a list of features, had six tabs that overlapped, long screens of equal-weight cards with Sanskrit in the headings, and a form that was saved by holding a seal. 2.0 answers first, in plain words, and keeps the astrology one tap behind. The engine, the numbers and everything saved on the device are unchanged. The design is written down in docs/DESIGN-V2.md.

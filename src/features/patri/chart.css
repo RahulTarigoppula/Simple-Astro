@@ -1,0 +1,90 @@
+/* The kundli figure: thin ink lines on the card, clear labels, one gold mark for the rising sign.
+   Loaded with KundliChart, so every screen that draws a chart gets the same figure.
+   `:root:root` outranks the older themed rules without touching the shared files. */
+:root:root .chart-wrap {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+:root:root .chart .stroke {
+  stroke: var(--ink);
+  stroke-opacity: 0.5;
+  stroke-width: 1.1px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: none;
+}
+:root:root .chart .signnum {
+  fill: var(--ink-muted);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+:root:root .chart .graha {
+  fill: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+:root:root .chart .graha.is-retro {
+  fill: var(--ink);
+}
+:root:root .chart .graha .retro {
+  fill: var(--ink-muted);
+}
+:root:root .chart .graha.is-lit {
+  fill: var(--accent-text);
+  filter: none;
+}
+:root:root .chart .grahadeg {
+  fill: var(--ink-muted);
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+:root:root .chart .tilak {
+  fill: var(--accent-2);
+  filter: none;
+}
+:root:root .chart .lagna-tick {
+  stroke: var(--accent-2);
+  stroke-width: 1.6px;
+}
+:root:root .chart .signname {
+  fill: var(--ink-muted);
+  font-family: var(--font-body);
+}
+
+/* The loupe: a plain lens with a paper rim */
+:root:root .loupe.is-up {
+  box-shadow: var(--shadow-2);
+}
+:root:root .loupe__glass {
+  background: var(--card);
+}
+:root:root .loupe__rim {
+  background: var(--card-hi);
+}
+:root:root .loupe__flare {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--card-edge-strong);
+}
+
+/* One short fade for a newly worked-out chart, none with reduced motion. */
+.chart[data-fade="on"] {
+  animation: pt-chart-in 240ms var(--ease-out) both;
+}
+.chart .tilak {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes pt-chart-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chart[data-fade="on"] {
+    animation: none;
+  }
+}

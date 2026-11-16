@@ -1,12 +1,11 @@
-/* The story art: small line drawings used on the chapter list and in the story player. */
+/* The story art: small line drawings used on the story page and in the story player. Always a night picture. */
 .story-art {
   display: block;
   width: 100%;
   height: auto;
   max-height: 150px;
   border-radius: var(--radius-lg);
-  background: radial-gradient(circle at 50% 40%, rgba(99, 102, 241, 0.18), transparent 70%), rgba(4, 5, 13, 0.5);
-  border: 1px solid var(--glass-edge);
+  background-color: var(--card);
 }
 .sa-stars circle {
   fill: var(--star);
@@ -23,14 +22,13 @@
 .sa-line {
   stroke: var(--accent-text);
   stroke-width: 1.6;
-  filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.6));
 }
 .sa-thin {
   stroke: var(--ink-muted);
   stroke-width: 1.2;
 }
 .sa-orbit {
-  stroke: rgba(196, 181, 253, 0.45);
+  stroke: rgba(var(--tint), 0.35);
   stroke-width: 1;
   stroke-dasharray: 2 4;
 }
@@ -41,45 +39,37 @@
 .sa-sun,
 .sa-sun-sm {
   fill: var(--accent-2);
-  filter: drop-shadow(0 0 10px rgba(245, 196, 107, 0.8));
 }
 .sa-moon {
   fill: var(--moon);
-  filter: drop-shadow(0 0 10px rgba(224, 231, 255, 0.6));
 }
 .sa-star {
   fill: var(--ink);
-  filter: drop-shadow(0 0 5px rgba(196, 181, 253, 0.9));
 }
 .sa-dot {
   fill: var(--accent-text);
 }
-.sa-gold {
-  fill: var(--accent-2);
-}
+.sa-gold,
 .sa-gold-star {
   fill: var(--accent-2);
-  filter: drop-shadow(0 0 8px rgba(245, 196, 107, 0.9));
 }
 .sa-corona {
   fill: none;
   stroke: var(--accent-2);
   stroke-width: 6;
-  opacity: 0.35;
-  filter: blur(3px);
+  opacity: 0.25;
 }
 .sa-shadow {
-  fill: var(--void-0);
+  fill: var(--bg);
 }
 .sa-card {
-  fill: rgba(var(--tint), 0.04);
-  stroke: var(--glass-edge-strong);
+  fill: rgba(var(--tint), 0.05);
+  stroke: rgba(var(--tint), 0.3);
 }
 .sa-zero {
   fill: none;
   stroke: var(--accent-2);
   stroke-width: 3;
-  filter: drop-shadow(0 0 8px rgba(245, 196, 107, 0.7));
 }
 .sa-digits {
   fill: var(--ink-muted);
@@ -90,33 +80,35 @@
   fill: var(--accent-text);
   font-family: var(--font-display);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 560;
 }
 .sa-num--big {
   fill: var(--accent-2);
   font-size: 18px;
 }
 
-/* The landing page */
-.story-hero {
+/* The story page: the picture, the invitation, then the chapters */
+.story-top {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 22px;
+  gap: 16px;
+  margin: 4px 0 6px;
 }
-.story-hero__art .story-art {
-  max-height: 140px;
+.story-top__art .story-art {
+  max-height: 168px;
+}
+.story-top .v-head {
+  margin: 4px 0 0;
+}
+.story-top .v-btn {
+  align-self: flex-start;
 }
 .story-chapters__n {
-  font: 650 0.9375rem / 1 var(--font-display);
+  font: 540 1.0625rem / 1 var(--font-display);
 }
 .story-chapters .v-row {
   align-items: flex-start;
 }
 .story-chapters .v-chev {
   align-self: center;
-}
-/* in the light theme the drawing is a small night panel */
-:root[data-theme="day"] .story-art {
-  background-color: var(--void-1);
 }

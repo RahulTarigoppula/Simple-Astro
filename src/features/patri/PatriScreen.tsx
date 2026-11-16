@@ -8,7 +8,7 @@ import { usePatri, useProfile, useSettings, useSettingsLoaded } from "../../app/
 import { useNowMs } from "../../app/useNow";
 import { Colophon } from "../../components/ui/Colophon";
 import { InfoDot } from "../../components/ui/Explain";
-import { ChevronRight, Page } from "../../components/ui/Page";
+import { ChevronRight, Page, Row, Section } from "../../components/ui/Page";
 import { Sheet } from "../../components/ui/Sheet";
 import { chartStyleFor, nakBoth, rashiBoth, type Tradition } from "../../data/regional";
 import { saveSettings } from "../../data/repo";
@@ -30,7 +30,7 @@ import {
 import { VARGA_NAMES } from "../../engine/vargas";
 import { haptics } from "../../platform/haptics";
 import { isNative } from "../../platform/native";
-import { IconChart } from "../chowki/icons";
+import { IconChart, IconForecast } from "../chowki/icons";
 import { LifeReading } from "../cosmic/LifeReading";
 import { MeetGrahas } from "../cosmic/MeetGrahas";
 import { DailyStrengthCard, GocharSection } from "../gochar";
@@ -374,13 +374,16 @@ function ViewBody(p: ViewProps) {
         <>
           <DailyStrengthCard patri={p.patri} nowMs={p.nowMs} zone={zone} />
           <GocharSection patri={p.patri} nowMs={p.nowMs} zone={zone} forceOpen={!!p.printing} />
-          <Link to={`/forecast/${p.profile.id}`} className="v-card pt-next">
-            <span>
-              <span className="v-card__title">What this means for your days</span>
-              <span className="v-card__sub">The forecast turns these positions into plain words: day, week, month and year.</span>
-            </span>
-            <ChevronRight />
-          </Link>
+          <ul className="v-list">
+            <li>
+              <Row
+                to={`/forecast/${p.profile.id}`}
+                icon={<IconForecast />}
+                title="What this means for your days"
+                sub="The forecast in plain words: day, week, month and year"
+              />
+            </li>
+          </ul>
         </>
       );
   }
@@ -412,13 +415,10 @@ function ChartView({ profile, patri, settings, printing, onRecompute, onPrint }:
     <>
       <div className="v-cols">
         <section className="v-card pt-fig" aria-labelledby="pt-fig-h">
-          <h2 id="pt-fig-h" className="v-card__title">
+          <h2 id="pt-fig-h" className="pt-h">
             Birth chart <InfoDot id="patri" label="the birth chart" />
           </h2>
-          <p className="v-card__sub">
-            Where the planets stood at birth. Sanskrit: Rāśi chart (D1) · whole-sign houses · {style === "north" ? "North" : "South"} Indian
-            style
-          </p>
+          <p className="v-card__sub">Where the planets stood at the moment of birth. Touch one to read it.</p>
           <ChartFigure
             patri={patri}
             style={style}
@@ -430,16 +430,16 @@ function ChartView({ profile, patri, settings, printing, onRecompute, onPrint }:
             onFlip={() => setStyle((s) => (s === "north" ? "south" : "north"))}
           />
           <p className="pt-cap">
-            The gold mark is the rising sign (Lagna), {SIGN_NAMES[patri.lagna.sign]} {formatDms(patri.lagna.degInSign)}. {presetLabel(p)},{" "}
-            {p.node} node. Ayanāṃśa at birth {formatDms(patri.ayanamsa)}.
+            The gold mark is the rising sign (Lagna), {SIGN_NAMES[patri.lagna.sign]} {formatDms(patri.lagna.degInSign)}. Sanskrit: Rāśi
+            chart (D1), whole-sign houses.
           </p>
         </section>
 
         <section className="v-card pt-planets" aria-labelledby="pt-planets-h">
-          <h2 id="pt-planets-h" className="v-card__title">
+          <h2 id="pt-planets-h" className="pt-h">
             The nine planets <InfoDot id="graha" label="graha" />
           </h2>
-          <p className="v-card__sub">Sign, exact degree and star for each. Tap a row to light it on the chart.</p>
+          <p className="v-card__sub">Sign, degree and star for each. Tap a row to light it on the chart.</p>
           <div className="pt-scroll">
             <GrahaLedger
               devDigits={settings.devanagariDigits}
@@ -450,12 +450,11 @@ function ChartView({ profile, patri, settings, printing, onRecompute, onPrint }:
               onBoundary={(id) => setFoot({ kind: "boundary", id })}
             />
           </div>
-          <p className="pt-cap">
-            Sidereal positions, {PRESET_SHORT[p.ayanamsa]}. ℞ means the planet appears to move backwards (retrograde).
-            {nearEdge
-              ? " An asterisk marks a body within 2′ of a sign, star or quarter edge: tap it to see what the other presets would read."
-              : ""}
-          </p>
+          {nearEdge ? (
+            <p className="pt-cap">
+              An asterisk marks a body within 2′ of a sign, star or quarter edge: tap it to see what the other presets would read.
+            </p>
+          ) : null}
         </section>
       </div>
 
@@ -463,31 +462,33 @@ function ChartView({ profile, patri, settings, printing, onRecompute, onPrint }:
         <MeetGrahas patri={patri} />
       </section>
 
-      <h2 className="pt-deep">Full detail</h2>
-      <Fold
-        title="Birth almanac"
-        sub={`Pañcāṅga: the lunar day, weekday and star at birth · sunrise ${hhmmss(patri.birthPanchang.sunriseMs, zone)}`}
-        forced={printing}
-      >
-        {() => <Almanac patri={patri} zone={zone} tradition={tradition} setFoot={setFoot} />}
-      </Fold>
-      <Fold title="Divisional charts" sub="Varga: Navāṃśa (D9) and seven more finer charts" forced={printing}>
-        {() => <Vargas patri={patri} style={style} script={script} inkKey={inkKey} skipInk={skipInk || !!printing} />}
-      </Fold>
-      <Fold title="Planet patterns" sub={`Yoga: ${formed} formed in this chart`} forced={printing}>
-        {() => <Yogas patri={patri} setFoot={setFoot} />}
-      </Fold>
-      <Fold title="Strength points" sub="Aṣṭakavarga: how much support each sign holds" forced={printing}>
-        {() => <AshtakavargaSection patri={patri} script={script} style={style} skipInk={skipInk || !!printing} />}
-      </Fold>
-      <Fold title="House cusps" sub="Bhāva Chalit: where each house starts and ends by degree" forced={printing}>
-        {() => <BhavaChalitTable patri={patri} />}
-      </Fold>
+      <Section title="Full detail" />
+      <div className="pt-folds">
+        <Fold
+          title="Birth almanac"
+          sub={`Pañcāṅga: the lunar day, weekday and star at birth · sunrise ${hhmmss(patri.birthPanchang.sunriseMs, zone)}`}
+          forced={printing}
+        >
+          {() => <Almanac patri={patri} zone={zone} tradition={tradition} setFoot={setFoot} />}
+        </Fold>
+        <Fold title="Divisional charts" sub="Varga: Navāṃśa (D9) and seven more finer charts" forced={printing}>
+          {() => <Vargas patri={patri} style={style} script={script} inkKey={inkKey} skipInk={skipInk || !!printing} />}
+        </Fold>
+        <Fold title="Planet patterns" sub={`Yoga: ${formed} formed in this chart`} forced={printing}>
+          {() => <Yogas patri={patri} setFoot={setFoot} />}
+        </Fold>
+        <Fold title="Strength points" sub="Aṣṭakavarga: how much support each sign holds" forced={printing}>
+          {() => <AshtakavargaSection patri={patri} script={script} style={style} skipInk={skipInk || !!printing} />}
+        </Fold>
+        <Fold title="House cusps" sub="Bhāva Chalit: where each house starts and ends by degree" forced={printing}>
+          {() => <BhavaChalitTable patri={patri} />}
+        </Fold>
+      </div>
 
       <div className="v-actions pt-tools">
         {isNative() ? null : (
           <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={onPrint}>
-            Print · save as PDF
+            Print or save as PDF
           </button>
         )}
         <button type="button" className="v-btn v-btn--quiet v-btn--sm" onClick={onRecompute}>

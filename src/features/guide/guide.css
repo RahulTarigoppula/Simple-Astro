@@ -1,66 +1,41 @@
-/* Guide: numbered steps, what is real and what is tradition, then every word in folds. */
-.guide-steps {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 12px;
-}
-@media (min-width: 700px) {
-  .guide-steps {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (min-width: 1180px) {
-  .guide-steps {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-.guide-steps > li {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-}
+/* Guide: six things to do as one list, what is real and what is tradition, then every word in folds. */
 .guide-steps__n {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  margin-bottom: 4px;
-  border-radius: 50%;
-  background: var(--violet-soft);
-  color: var(--accent-text);
-  font: 650 1rem / 1 var(--font-display);
+  font: 540 1.125rem / 1 var(--font-display);
 }
-.guide-steps .v-card__title {
-  margin: 0;
-}
-.guide-steps .v-card__sub {
+.v-page .guide-tip {
+  padding: 0 2px;
   font-size: 0.9375rem;
-  line-height: 1.5;
-  flex: 1;
+  color: var(--ink-muted);
 }
-.guide-steps .v-link {
-  margin: 4px 0 -8px;
+.guide-i {
+  color: var(--ink);
+  font-weight: 600;
 }
 .guide-link {
   margin: 0;
   align-self: flex-start;
 }
-.guide-i {
-  color: var(--accent-text);
-  font-weight: 600;
-}
+
+/* Real and tradition: one card, two parts, a hairline between */
 .guide-real {
+  padding: 4px 20px;
+}
+.guide-real > section {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: 8px;
+  padding: 18px 0;
 }
-.guide-real .v-card__title {
+.guide-real > section + section {
+  border-top: 1px solid var(--card-edge);
+}
+.guide-real h3 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
   margin: 0;
+  font: 600 1.0625rem / 1.3 var(--font-body);
 }
 .guide-real p {
   font-size: 0.9375rem;
@@ -68,7 +43,7 @@
   color: var(--ink-muted);
 }
 
-/* The glossary: a group is a fold, each word a smaller fold inside it */
+/* The glossary: a group is a fold, each word a plain row inside it */
 .guide-group .v-fold__body {
   gap: 0;
   padding-bottom: 8px;
@@ -80,9 +55,9 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1px;
-  min-height: 56px;
-  padding: 8px 28px 8px 0;
+  gap: 2px;
+  min-height: 60px;
+  padding: 10px 28px 10px 0;
   position: relative;
   list-style: none;
   cursor: pointer;
@@ -107,11 +82,11 @@
 }
 .guide-item__dev {
   font-weight: 400;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   color: var(--ink-muted);
 }
 .guide-item__plain {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   line-height: 1.4;
   color: var(--ink-muted);
 }
@@ -127,7 +102,7 @@
   font-weight: 550;
 }
 .guide-item__how {
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-radius: var(--radius-md);
-  background: var(--violet-soft);
+  background: rgba(var(--tint), 0.05);
 }

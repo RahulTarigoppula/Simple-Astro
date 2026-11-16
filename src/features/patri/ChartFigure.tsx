@@ -1,5 +1,6 @@
 // The D1 figure: the drawn Kundli, the loupe that rises under the finger and snaps planet to
-// planet, a plain-words readout of the planet in view, and a button for North or South style.
+// planet, then one quiet panel under it (the key to the two-letter labels, or the planet in view in
+// plain words) and a button for North or South style.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GRAHA_ENGLISH, NAKSHATRA_NAMES, SIGN_NAMES } from "../../data/tables/names";
 import { formatArcmin, formatDms } from "../../engine/math";
@@ -240,35 +241,36 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
           <div className="loupe__flare" />
         </div>
       </div>
-      <p className="pt-readout" aria-live="polite">
-        {g && lit ? (
-          <>
-            <b>{GRAHA_ENGLISH[lit]}</b> at {formatDms(g.degInSign)} of {SIGN_NAMES[g.sign]} · star {NAKSHATRA_NAMES[g.nakshatra]}, quarter{" "}
-            {g.pada} · star lord {GRAHA_ENGLISH[g.nakshatraLord]}
-            {g.retrograde ? " · retrograde ℞" : ""}
-            {g.boundary ? (
-              <span className="v-chip v-chip--mixed">
-                within 2′ · {formatArcmin(g.boundary.arcminutesTo)} to {g.boundary.otherSide}
-              </span>
-            ) : null}
-          </>
-        ) : (
-          <span className="v-muted">Touch a planet on the chart to read it.</span>
-        )}
-      </p>
-      <ul className="pt-key" aria-label="Chart key">
-        {GRAHA_IDS.map((id) => (
-          <li key={id}>
-            <b lang={script === "devanagari" ? "hi" : undefined}>{grahaAbbr(id, script)}</b> {GRAHA_ENGLISH[id]}
-            {id === "RA" ? " (north node)" : id === "KE" ? " (south node)" : ""}
+      <div className="pt-under">
+        <p className="pt-readout" aria-live="polite">
+          {g && lit ? (
+            <>
+              <b>{GRAHA_ENGLISH[lit]}</b> at {formatDms(g.degInSign)} of {SIGN_NAMES[g.sign]} · star {NAKSHATRA_NAMES[g.nakshatra]}, quarter{" "}
+              {g.pada} · star lord {GRAHA_ENGLISH[g.nakshatraLord]}
+              {g.retrograde ? " · retrograde ℞" : ""}
+              {g.boundary ? (
+                <span className="v-chip v-chip--mixed">
+                  within 2′ · {formatArcmin(g.boundary.arcminutesTo)} to {g.boundary.otherSide}
+                </span>
+              ) : null}
+            </>
+          ) : null}
+        </p>
+        {/* the key gives way to the planet in view, and comes back when nothing is lit */}
+        <ul className="pt-key" aria-label="Chart key" hidden={lit !== null}>
+          {GRAHA_IDS.map((id) => (
+            <li key={id}>
+              <b lang={script === "devanagari" ? "hi" : undefined}>{grahaAbbr(id, script)}</b> {GRAHA_ENGLISH[id]}
+              {id === "RA" ? " (north node)" : id === "KE" ? " (south node)" : ""}
+            </li>
+          ))}
+          <li>
+            <b>℞</b> moving backwards
           </li>
-        ))}
-        <li>
-          <b>℞</b> moving backwards
-        </li>
-      </ul>
+        </ul>
+      </div>
       <div className="pt-charttools">
-        <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={flip}>
+        <button type="button" className="v-btn v-btn--quiet v-btn--sm" onClick={flip}>
           {style === "north" ? "Show South Indian style" : "Show North Indian style"}
         </button>
       </div>

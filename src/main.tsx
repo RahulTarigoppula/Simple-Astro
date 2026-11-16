@@ -1,4 +1,4 @@
-import "@fontsource-variable/sora";
+import "@fontsource-variable/source-serif-4";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/jetbrains-mono";
 import "@fontsource-variable/noto-sans-devanagari";

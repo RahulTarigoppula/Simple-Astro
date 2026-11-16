@@ -1,60 +1,6 @@
-/* Add / edit a person: four short steps. Built on the 2.0 blocks in styles/ui.css. */
+/* Add / edit a person: four steps, each one large question. Ivory and ink (docs/DESIGN-V3.md). */
 
-/* ── Progress: "Step 2 of 4" and four tappable steps ───────────────────── */
-.leaf-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.leaf-steps__now {
-  font: 600 0.8125rem var(--font-body);
-  letter-spacing: 0.04em;
-  color: var(--accent-text);
-}
-.leaf-steps ol {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-}
-.leaf-steps button {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  min-height: 44px;
-  padding: 8px 0 4px;
-  border: 0;
-  background: none;
-  color: var(--ink-muted);
-  font: 550 0.8125rem var(--font-body);
-  text-align: left;
-  cursor: pointer;
-}
-.leaf-steps button:disabled {
-  color: var(--ink-faint);
-  cursor: default;
-}
-.leaf-steps__bar {
-  display: block;
-  height: 5px;
-  border-radius: 3px;
-  background: rgba(var(--tint), 0.1);
-}
-.leaf-steps button.is-done .leaf-steps__bar {
-  background: var(--accent-text);
-  opacity: 0.55;
-}
-.leaf-steps button[aria-current="step"] {
-  color: var(--ink);
-}
-.leaf-steps button[aria-current="step"] .leaf-steps__bar {
-  background: var(--accent-text);
-}
-
-/* ── One step ──────────────────────────────────────────────────────────── */
+/* ── The frame ─────────────────────────────────────────────────────────── */
 /* The page fills the screen so the action bar sits at its bottom even on a short step; a field
    that takes focus is scrolled clear of the bar (scroll-padding), keyboard up or not. */
 .leafscreen {
@@ -67,87 +13,188 @@
 }
 @media (min-width: 900px) {
   .leafscreen {
-    --leaf-pad: 32px;
+    --leaf-pad: 40px;
   }
 }
+
+/* ── Progress: what this is, "Step 2 of 4", and a thin bar of four tappable parts ── */
+.leaf-head {
+  display: flex;
+  flex-direction: column;
+}
+.leaf-head__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.leaf-kicker {
+  margin: 0;
+  font: 600 0.9375rem / 1.4 var(--font-body);
+  color: var(--ink);
+}
+.v-page .leaf-steps__now {
+  font: 500 0.875rem / 1.4 var(--font-body);
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+.leaf-steps ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.leaf-steps button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.leaf-steps button:disabled {
+  cursor: default;
+}
+.leaf-steps__bar {
+  display: block;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(var(--tint), 0.12);
+  transition: background var(--dur-base) var(--ease-out);
+}
+.leaf-steps button.is-done .leaf-steps__bar,
+.leaf-steps button[aria-current="step"] .leaf-steps__bar {
+  background: var(--ink);
+}
+.leaf-steps button:not(:disabled):hover .leaf-steps__bar {
+  background: var(--ink);
+}
+
+/* ── One step ──────────────────────────────────────────────────────────── */
 .leaf-form {
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 28px;
 }
-.leaf-kept {
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-.leaf-kept .v-btn {
-  min-height: 44px;
+.leaf-ask-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 4px;
 }
 .leaf-q {
-  margin: 4px 0 -6px;
-  font: 650 1.3125rem / 1.25 var(--font-display);
-  letter-spacing: -0.02em;
-  color: var(--ink);
+  font-size: clamp(1.875rem, 8vw, 2.5rem);
 }
 .leaf-q:focus,
 .leaf-q:focus-visible {
   outline: none;
   box-shadow: none;
 }
+.leaf-ask-head .v-lede:empty {
+  display: none;
+}
+.leaf-form .v-field {
+  gap: 10px;
+}
+.leaf-form .v-label {
+  font-size: 1rem;
+}
+.leaf-label-s {
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+.leaf-form .v-input,
+.leaf-form .v-select {
+  min-height: 60px;
+  font-size: 1.125rem;
+}
+.leaf-kept {
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
 .leaf-seg > button {
-  min-height: 44px;
+  flex: 1 1 auto;
+  min-height: 48px;
+  padding: 0 10px;
+}
+@media (max-width: 359px) {
+  .v-fold .leaf-seg {
+    flex-direction: column;
+    border-radius: var(--radius-md);
+  }
 }
 
-/* Tradition: three choices, each with a line that says what it changes */
+/* Tradition: three calm rows. The chosen one is a filled shape with an ink ring and a tick. */
 .leaf-choices {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 4px;
 }
 .leaf-choice {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  min-height: 60px;
-  padding: 10px 14px;
-  border: 1px solid var(--card-edge-strong);
+  min-height: 72px;
+  padding: 12px 18px;
+  border: 0;
   border-radius: var(--radius-md);
-  background: var(--card);
+  background: rgba(var(--tint), 0.05);
   color: var(--ink);
   font: inherit;
   text-align: left;
   cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.leaf-choice:hover {
+  background: rgba(var(--tint), 0.08);
 }
 .leaf-choice[aria-checked="true"] {
-  border-color: var(--accent-text);
-  background: var(--violet-soft);
-}
-.leaf-choice__dot {
-  flex: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2px solid var(--ink-muted);
-}
-.leaf-choice[aria-checked="true"] .leaf-choice__dot {
-  border-color: var(--accent-text);
-  background: radial-gradient(circle, var(--accent-text) 0 45%, transparent 50%);
+  background: var(--card);
+  box-shadow:
+    inset 0 0 0 2px var(--ink),
+    var(--shadow-card);
 }
 .leaf-choice__body {
+  flex: 1;
   min-width: 0;
 }
 .leaf-choice__t {
   display: block;
   font-weight: 600;
+  font-size: 1.0625rem;
+  line-height: 1.3;
 }
 .leaf-choice__s {
   display: block;
-  font-size: 0.8125rem;
+  margin-top: 2px;
+  font-size: 0.875rem;
   line-height: 1.4;
   color: var(--ink-muted);
+}
+.leaf-choice__tick {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: transparent;
+}
+.leaf-choice[aria-checked="true"] .leaf-choice__tick {
+  background: var(--btn-fill);
+  color: var(--accent-ink);
+}
+.leaf-choice__tick svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* ── Date and time boxes ───────────────────────────────────────────────── */
@@ -159,10 +206,10 @@
 }
 .bf-group > legend {
   padding: 0;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .bf-group.is-off {
-  opacity: 0.45;
+  opacity: 0.4;
 }
 .bf-row {
   display: grid;
@@ -180,12 +227,13 @@
 .bf-cell {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
 }
 .bf-cell > label,
 .bf-cell__l {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
   color: var(--ink-muted);
 }
 .bf-num {
@@ -194,56 +242,57 @@
   font-variant-numeric: tabular-nums;
 }
 .bf-select {
-  padding: 0 28px 0 12px;
+  padding: 0 28px 0 14px;
   background-position:
     calc(100% - 16px) 50%,
     calc(100% - 10px) 50%;
 }
+/* am / pm: two large pills. Neither is lit until one is tapped; the lit one is solid ink. */
 .bf-ampm {
-  gap: 6px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  overflow: visible;
+  height: 60px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 .bf-ampm > button {
   flex: 1 1 0;
-  min-height: 52px;
+  min-height: 0;
   padding: 0 6px;
-  border: 1px solid var(--card-edge-strong);
-  border-radius: var(--radius-md);
-  background: var(--card);
+  border-radius: 12px;
   color: var(--ink);
   font-size: 1.0625rem;
 }
 .bf-ampm > button[aria-checked="true"] {
-  border-color: transparent;
-  background: var(--aurora);
+  background: var(--btn-fill);
   color: var(--accent-ink);
   box-shadow: none;
 }
-.bf-read {
-  padding: 12px 14px;
+/* The read-back: the date and time said in words, or what is still missing. */
+.v-page .bf-read {
+  padding: 16px 18px;
   border-radius: var(--radius-md);
-  background: var(--violet-soft);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
   color: var(--ink);
+  font-size: 1.0625rem;
   line-height: 1.45;
 }
 .bf-read b {
   font-weight: 600;
 }
-.bf-read.is-hint {
-  background: none;
-  box-shadow: inset 0 0 0 1px var(--card-edge-strong);
+.v-page .bf-read.is-hint {
+  background: rgba(var(--tint), 0.05);
+  box-shadow: none;
   color: var(--ink-muted);
+  font-size: 1rem;
 }
-.bf-read.is-missing {
+.v-page .bf-read.is-missing {
   background: var(--mixed-soft);
+  box-shadow: none;
   color: var(--warning-text);
+  font-size: 1rem;
 }
-.bf-read.is-urgent {
-  box-shadow: inset 0 0 0 1.5px var(--warning-text);
+.v-page .bf-read.is-urgent {
+  box-shadow: inset 0 0 0 2px var(--warning-text);
   font-weight: 600;
 }
 
@@ -251,7 +300,7 @@
 .leaf-switchrow {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 .leaf-switch {
   display: flex;
@@ -259,11 +308,11 @@
   justify-content: space-between;
   gap: 12px;
   width: 100%;
-  min-height: 56px;
-  padding: 0 14px;
-  border: 1px solid var(--card-edge-strong);
+  min-height: 60px;
+  padding: 0 14px 0 18px;
+  border: 0;
   border-radius: var(--radius-md);
-  background: var(--card);
+  background: rgba(var(--tint), 0.05);
   color: var(--ink);
   font: 600 1rem var(--font-body);
   text-align: left;
@@ -273,10 +322,9 @@
   position: relative;
   flex: none;
   width: 52px;
-  height: 30px;
-  border-radius: 15px;
-  background: rgba(var(--tint), 0.12);
-  box-shadow: inset 0 0 0 1px var(--card-edge-strong);
+  height: 32px;
+  border-radius: 16px;
+  background: var(--track);
   transition: background var(--dur-fast) var(--ease-out);
 }
 .leaf-switch__knob::after {
@@ -284,69 +332,84 @@
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: var(--knob);
   transition: transform var(--dur-fast) var(--ease-out);
 }
 .leaf-switch[aria-checked="true"] {
-  border-color: var(--accent-text);
+  background: var(--card);
+  box-shadow:
+    inset 0 0 0 2px var(--ink),
+    var(--shadow-card);
 }
 .leaf-switch[aria-checked="true"] .leaf-switch__knob {
-  background: var(--accent);
+  background: var(--btn-fill);
 }
 .leaf-switch[aria-checked="true"] .leaf-switch__knob::after {
-  transform: translateX(22px);
+  transform: translateX(20px);
+  background: var(--card);
+}
+.leaf-switchrow .v-hint {
+  padding: 0 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .leaf-steps__bar,
+  .leaf-switch__knob,
+  .leaf-switch__knob::after {
+    transition: none;
+  }
 }
 
 /* ── Place ─────────────────────────────────────────────────────────────── */
 .leaf-ll {
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   color: var(--ink-muted);
   white-space: nowrap;
 }
-.leaf-coords {
-  margin-top: 8px;
+.leaf-results {
+  margin-top: -16px;
 }
-.leaf-results .v-row__s {
-  font-size: 0.9375rem;
+.leaf-results .v-row {
+  min-height: 60px;
 }
 .leaf-online {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-top: -12px;
+  color: var(--ink-muted);
 }
 .leaf-chosen {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-height: 56px;
-  padding: 10px 14px;
-  border: 1px dashed var(--card-edge-strong);
+  gap: 14px;
+  min-height: 64px;
+  padding: 12px 18px;
   border-radius: var(--radius-md);
+  background: rgba(var(--tint), 0.05);
   color: var(--ink-muted);
 }
 .leaf-chosen.is-missing {
-  border-color: var(--warning-text);
   background: var(--mixed-soft);
   color: var(--warning-text);
   font-weight: 600;
 }
 .leaf-chosen.is-set {
-  border: 1px solid rgba(74, 222, 128, 0.4);
-  background: var(--good-soft);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
   color: var(--ink);
 }
 .leaf-chosen__tick {
   display: grid;
   place-items: center;
   flex: none;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: rgba(74, 222, 128, 0.18);
+  background: var(--good-soft);
   color: var(--good);
 }
 .leaf-chosen__body {
@@ -356,6 +419,8 @@
 }
 .leaf-chosen__t {
   font-weight: 600;
+  font-size: 1.0625rem;
+  line-height: 1.35;
 }
 .leaf-manual {
   display: flex;
@@ -369,13 +434,22 @@
   min-height: 44px;
   color: var(--accent-text);
   font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .leafscreen .leaf-strip {
   font-size: 0.8125rem;
-  line-height: 1.5;
+  line-height: 1.6;
+}
+.leafscreen .v-fold .v-input,
+.leafscreen .v-fold .v-select {
+  min-height: 52px;
+  font-size: 1rem;
+  background-color: var(--card-2);
 }
 
 /* ── Check and save ────────────────────────────────────────────────────── */
+/* What was typed: four rows, each with its own Change. */
 .leaf-review {
   margin: 0;
 }
@@ -387,82 +461,88 @@
     "v b";
   align-items: center;
   column-gap: 8px;
-  padding: 10px 6px 10px 16px;
+  padding: 14px 8px 14px 20px;
 }
 .leaf-review > div + div {
   border-top: 1px solid var(--card-edge);
 }
 .leaf-review dt {
   grid-area: k;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
   color: var(--ink-muted);
 }
 .leaf-review dd {
   grid-area: v;
   margin: 0;
   font-weight: 600;
+  font-size: 1.0625rem;
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
 .leaf-review dd.leaf-review__act {
   grid-area: b;
 }
-.leaf-review .bf-read {
+.v-page .leaf-review .bf-read {
   padding: 0;
   background: none;
+  box-shadow: none;
+  font-size: inherit;
 }
-.leaf-review .bf-read.is-missing {
+.v-page .leaf-review .bf-read.is-missing {
   color: var(--warning-text);
 }
 
-/* "Check before you save": the three facts a family knows about a person */
+/* "Check before you save": the three facts a family knows about a person, set large. */
 .leaf-check {
-  border-color: rgba(245, 196, 107, 0.45);
-  background: radial-gradient(360px 140px at 0% 0%, rgba(245, 196, 107, 0.12), transparent 70%), var(--card);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
-.leaf-check.is-waiting {
-  border-color: var(--card-edge);
-  background: var(--card);
-}
-.leaf-check__h {
-  margin: 0 0 12px;
-  font: 600 1.0625rem / 1.3 var(--font-display);
-  letter-spacing: -0.015em;
-  color: var(--accent-2);
-}
-.leaf-check.is-waiting .leaf-check__h {
-  color: var(--ink-muted);
+.leaf-check .v-sec {
+  margin-top: 4px;
 }
 .leaf-check__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
-  gap: 14px 12px;
   margin: 0;
+  padding: 6px 20px;
 }
 .leaf-check__grid > div {
   min-width: 0;
+  padding: 14px 0;
+}
+.leaf-check__grid > div + div {
+  border-top: 1px solid var(--card-edge);
 }
 .leaf-check__grid dt {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
   color: var(--ink-muted);
 }
 .leaf-check__grid dd {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
   margin: 2px 0 0;
-  font: 600 1.25rem / 1.2 var(--font-display);
+  /* Inter, not the serif: these names carry macrons (Revatī), which the serif's subset draws badly. */
+  font: 650 1.375rem / 1.25 var(--font-body);
+  letter-spacing: -0.015em;
   color: var(--ink);
 }
 .leaf-check__grid dd small {
-  margin-top: 2px;
-  font: 400 0.8125rem / 1.4 var(--font-body);
+  font: 400 0.875rem / 1.4 var(--font-body);
+  letter-spacing: 0;
   color: var(--ink-muted);
 }
 .v-page .leaf-check__p {
-  margin-top: 12px;
+  padding: 0 2px;
   font-size: 0.875rem;
   line-height: 1.5;
   color: var(--ink-muted);
+}
+.v-page .leaf-check__p.v-card {
+  padding: 20px;
+  font-size: 1rem;
 }
 
 /* ── Foot: Back, Next / Save ───────────────────────────────────────────── */
@@ -471,8 +551,7 @@
   font-weight: 600;
 }
 /* Pinned to the bottom of the scrolling page (sticky, never fixed: it rides above the keyboard with
-   the page and cannot sit on top of the field being typed in). Solid behind the buttons, with a
-   short fade above so the content slides under it instead of being cut. */
+   the page and cannot sit on top of the field being typed in). Solid, so content slides under it. */
 .leaf-foot {
   position: sticky;
   bottom: 0;
@@ -481,65 +560,68 @@
   flex-direction: column;
   gap: 8px;
   margin: auto calc(-1 * var(--leaf-pad)) 0;
-  padding: 22px var(--leaf-pad) calc(12px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(to bottom, transparent, var(--void-0) 16px);
+  padding: 14px var(--leaf-pad) calc(14px + env(safe-area-inset-bottom, 0px));
+  background: var(--bg);
 }
 .leaf-foot__row {
   display: flex;
   gap: 10px;
 }
+.leaf-foot .v-btn {
+  min-height: 56px;
+  font-size: 1.0625rem;
+}
 .leaf-foot__go {
   flex: 1;
 }
-.leaf-foot__note {
-  text-align: center;
+@media (min-width: 900px) {
+  .leaf-foot__row {
+    justify-content: flex-start;
+  }
+  .leaf-foot__go {
+    flex: 0 1 280px;
+  }
 }
 @media (max-height: 480px) {
   .leafscreen {
     scroll-padding-bottom: 92px;
   }
   .leaf-foot {
-    padding-top: 16px;
+    padding-top: 8px;
     padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+  .leaf-foot .v-btn {
+    min-height: 48px;
   }
 }
 .leaf-example {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  padding-top: 16px;
-  border-top: 1px solid var(--card-edge);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+  font-size: 0.9375rem;
 }
-.leaf-example .v-btn {
-  height: auto;
-  padding-block: 8px;
-  line-height: 1.25;
-  text-align: center;
+.leaf-example .v-link {
+  margin: 0;
+  white-space: normal;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .leaf-ask {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 8px 20px 4px;
+  padding: 8px var(--page-pad) 4px;
   color: var(--ink);
+  font-family: var(--font-body);
   line-height: 1.5;
+}
+.leaf-ask h2 {
+  margin: 0;
+  font: 540 1.5rem / 1.2 var(--font-display);
+  letter-spacing: -0.02em;
 }
 .leaf-ask p {
   margin: 0;
-}
-@media (prefers-reduced-motion: reduce) {
-  .leaf-switch__knob,
-  .leaf-switch__knob::after {
-    transition: none;
-  }
-}
-:root[data-theme="day"] .leaf-switch__knob {
-  background: var(--track);
-}
-:root[data-theme="day"] .leaf-switch[aria-checked="true"] .leaf-switch__knob {
-  background: var(--accent);
-}
-:root[data-theme="day"] .leaf-chosen.is-set {
-  border-color: rgba(21, 128, 61, 0.4);
 }

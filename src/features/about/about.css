@@ -2,38 +2,45 @@
 .about-hero {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 22px;
+  gap: 16px;
+  padding: 24px;
+}
+.about-mark {
+  height: 28px;
+  font: 560 3.5rem / 1 var(--font-display);
+  color: var(--accent);
 }
 .about-quote {
   margin: 0;
-  padding-left: 14px;
-  border-left: 3px solid var(--accent-2);
 }
 .about-quote p {
-  font: 500 1.1875rem / 1.5 var(--font-display);
-  letter-spacing: -0.01em;
+  font: 500 1.375rem / 1.4 var(--font-display);
+  letter-spacing: -0.015em;
+  text-wrap: pretty;
 }
 .about-quote footer {
-  margin-top: 8px;
-  font-size: 0.875rem;
+  margin-top: 12px;
+  font-size: 0.9375rem;
   color: var(--ink-muted);
 }
 .about-hours {
+  padding-top: 16px;
+  border-top: 1px solid var(--card-edge);
   font-size: 1rem;
   line-height: 1.5;
 }
 .about-hours b {
-  color: var(--accent-2);
   font-weight: 650;
 }
+
+/* The numbers: one card, a plain grid, no tiles */
 .about-numbers {
   list-style: none;
   margin: 0;
-  padding: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 22px 16px;
+  padding: 24px 20px;
 }
 @media (min-width: 560px) {
   .about-numbers {
@@ -43,25 +50,31 @@
 .about-numbers li {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 14px;
-  border: 1px solid var(--card-edge);
-  border-radius: var(--radius-lg);
-  background: var(--card);
+  gap: 4px;
+  min-width: 0;
 }
 .about-numbers li:first-child {
   grid-column: 1 / -1;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--card-edge);
 }
 .about-numbers__n {
-  font: 650 1.625rem / 1.1 var(--font-display);
+  font: 540 1.75rem / 1.1 var(--font-display);
   letter-spacing: -0.02em;
-  color: var(--accent-2);
+  color: var(--ink);
+  font-variant-numeric: lining-nums;
+}
+.about-numbers li:first-child .about-numbers__n {
+  font-size: 3rem;
+  line-height: 1;
 }
 .about-numbers__l {
   font-size: 0.875rem;
   line-height: 1.4;
   color: var(--ink-muted);
 }
+
+/* The folds */
 .about .v-fold__body {
   font-size: 0.9375rem;
   line-height: 1.55;
@@ -76,7 +89,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 14px 0;
+  padding: 16px 0;
   border-top: 1px solid var(--card-edge);
 }
 .about-sources h3 {
@@ -85,24 +98,25 @@
 }
 .about-by {
   display: block;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 400;
   color: var(--ink-muted);
 }
 .about-clean {
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-radius: var(--radius-md);
-  background: var(--violet-soft);
+  background: rgba(var(--tint), 0.05);
 }
 .about-alg {
   margin: 0;
 }
 .about-alg > div {
-  padding: 12px 0;
+  padding: 14px 0;
   border-top: 1px solid var(--card-edge);
 }
 .about-alg > div:first-child,
-.about-sources li:first-child {
+.about-sources li:first-child,
+.about-lics li:first-child {
   border-top: 0;
   padding-top: 0;
 }
@@ -118,12 +132,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 0;
+  padding: 12px 0;
   border-top: 1px solid var(--card-edge);
-}
-.about-lics li:first-child {
-  border-top: 0;
-  padding-top: 0;
 }
 .about-lics b {
   font-weight: 600;

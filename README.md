@@ -7,6 +7,7 @@
 
 ## Summary
 
+- **3.0.0:** a second redesign of the look, "ivory and ink": warm paper, serif headings, cards without outlines, and about half as much on every screen. Design notes in [docs/DESIGN-V3.md](docs/DESIGN-V3.md).
 - **2.0.0:** the whole app redesigned to be easy for a first-time family member: a Today home that answers "how is my day", five tabs, a person chip on every screen, add a person in four steps with a Save button, Chart in four views, answer-first Forecast and Partner match. Design notes in [docs/DESIGN-V2.md](docs/DESIGN-V2.md).
 - **1.3.0:** fast on a phone (idle main thread, no blur on content panes, Full detail built on demand) and a round of fixes from testing as a first-time family member (intro once per device, tradition asked first, no contradicting traits, plain Manglik and hour labels).
 - **1.2.0:** the app is now **Vyomaphala**, "the fruit of the sky" (vyoma + phala); same engine, same data, nothing saved is lost.
@@ -63,14 +64,14 @@ Useful one-off scripts (all outside-the-repo downloads are cached in `%TEMP%`):
 ## Ship it
 
 - **Web:** every push to `main` runs `.github/workflows/pages.yml` and deploys to https://rahultarigoppula.github.io/Simple-Astro/.
-- **Android:** a signed, sideloadable APK is attached to each GitHub Release (`git tag v2.0.0 && git push origin v2.0.0`
+- **Android:** a signed, sideloadable APK is attached to each GitHub Release (`git tag v3.0.0 && git push origin v3.0.0`
   once the four `ANDROID_*` secrets exist, see [docs/HANDOFF.md](docs/HANDOFF.md) §2). To build it on your own machine:
   a JDK 21 and the Android SDK (platform 36, build-tools 36.0.0), then
 
   ```bash
   VITE_BASE_PATH=/ VITE_PLATFORM=android npm run build   # no service worker in the APK
   npx cap sync android
-  cd android && ./gradlew :app:assembleRelease -PversionCode=200 -PversionName=2.0.0
+  cd android && ./gradlew :app:assembleRelease -PversionCode=300 -PversionName=3.0.0
   ```
 
   with `ANDROID_KEYSTORE_FILE`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD` set in the
@@ -91,7 +92,7 @@ Vyomaphala's own code is MIT. The classical tables (nakshatra lords, yoni animal
 | MediaPipe `hand_landmarker.task` (Google) | Apache-2.0 (model card, Oct 2021) | 21 hand landmarks, self-hosted in `public/models` |
 | `@mediapipe/tasks-vision` + its `wasm/` folder | Apache-2.0 | Self-hosted for offline use |
 | `@techstark/opencv-js` 4.12.0-release.1 | Apache-2.0 | CLAHE, black-hat, Hessian, warpPerspective, lazy-loaded on the Hast screen only |
-| Sora via `@fontsource-variable/sora` | SIL OFL 1.1 | Display: screen titles and headings |
+| Source Serif 4 via `@fontsource-variable/source-serif-4` | SIL OFL 1.1 | Display: screen titles and headings |
 | Inter (Rasmus Andersson) via `@fontsource-variable/inter` | SIL OFL 1.1 | Body text and labels |
 | Noto Sans Devanagari (Google) via `@fontsource-variable/noto-sans-devanagari` | SIL OFL 1.1 | Devanagari names and terms |
 | JetBrains Mono via `@fontsource-variable/jetbrains-mono` | SIL OFL 1.1 | Degrees, times and instrument labels |

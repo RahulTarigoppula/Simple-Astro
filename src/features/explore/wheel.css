@@ -1,7 +1,7 @@
-/* The sky wheel, its story panel art and the real-star patch */
+/* The sky wheel, its panel art and the real-star patch. All three are night pictures (.v-night). */
 .ex-stage {
   display: grid;
-  gap: 28px;
+  gap: 40px;
   align-items: start;
 }
 .wheel {
@@ -45,12 +45,12 @@
 }
 .wheel__rim {
   fill: none;
-  stroke: rgba(196, 181, 253, 0.35);
+  stroke: rgba(var(--tint), 0.22);
   stroke-width: 1;
 }
 .wheel__nak path {
-  fill: rgba(var(--tint), 0.025);
-  stroke: rgba(180, 192, 255, 0.2);
+  fill: rgba(var(--tint), 0.03);
+  stroke: rgba(var(--tint), 0.2);
   stroke-width: 0.7;
   transition: fill var(--dur-fast) var(--ease-out);
 }
@@ -60,63 +60,43 @@
   font-family: var(--font-mono);
 }
 .wheel__nak.is-moon path {
-  fill: rgba(224, 231, 255, 0.18);
-}
-.wheel__nak.is-on path {
-  fill: rgba(245, 196, 107, 0.35);
-  stroke: var(--accent-2);
-  stroke-width: 1.2;
-  filter: drop-shadow(0 0 8px rgba(245, 196, 107, 0.8));
-}
-.wheel__nak.is-on text {
-  fill: var(--ink);
-  font-weight: 700;
+  fill: rgba(var(--tint), 0.2);
 }
 .wheel__rashi path {
-  --c: var(--accent);
-  fill: color-mix(in oklch, var(--c) 12%, transparent);
-  stroke: rgba(180, 192, 255, 0.24);
+  fill: rgba(var(--tint), 0.07);
+  stroke: rgba(var(--tint), 0.24);
   stroke-width: 0.8;
-}
-.wheel__rashi--fire path {
-  --c: var(--el-fire);
-}
-.wheel__rashi--earth path {
-  --c: var(--el-earth);
-}
-.wheel__rashi--air path {
-  --c: var(--el-air);
-}
-.wheel__rashi--water path {
-  --c: var(--el-water);
 }
 .wheel__rashi text {
   fill: var(--ink);
   font-size: 10.5px;
-  font-family: var(--font-display);
-  font-weight: 600;
-  opacity: 0.85;
+  font-family: var(--font-body);
+  font-weight: 550;
 }
 .wheel__rashi.is-natal path {
-  stroke: var(--cyan);
+  stroke: var(--ink);
   stroke-width: 1.4;
 }
+.wheel__nak.is-on path,
 .wheel__rashi.is-on path {
-  fill: color-mix(in oklch, var(--c) 40%, transparent);
+  fill: var(--accent-2);
   stroke: var(--accent-2);
-  stroke-width: 1.4;
-  filter: drop-shadow(0 0 10px color-mix(in oklch, var(--c) 80%, transparent));
+  stroke-width: 1.2;
+}
+.wheel__nak.is-on text,
+.wheel__rashi.is-on text {
+  fill: var(--accent-ink);
+  font-weight: 700;
 }
 .wheel__inner {
-  fill: rgba(8, 10, 30, 0.6);
-  stroke: rgba(180, 192, 255, 0.18);
+  fill: var(--bg);
+  stroke: rgba(var(--tint), 0.18);
   stroke-dasharray: 2 4;
 }
 .wheel__planet circle {
-  fill: color-mix(in oklch, var(--gc, var(--accent)) 22%, rgba(8, 10, 30, 0.95));
-  stroke: var(--gc, var(--accent-text));
+  fill: var(--card-hi);
+  stroke: rgba(var(--tint), 0.5);
   stroke-width: 1.2;
-  filter: drop-shadow(0 0 6px color-mix(in oklch, var(--gc, var(--accent)) 70%, transparent));
 }
 .wheel__planet text {
   fill: var(--ink);
@@ -124,51 +104,24 @@
   font-weight: 700;
 }
 .wheel__planet.is-on circle {
-  stroke-width: 2.6;
+  fill: var(--accent-2);
+  stroke: var(--accent-2);
 }
-.wheel__planet--SU {
-  --gc: var(--g-SU);
-}
-.wheel__planet--MO {
-  --gc: var(--g-MO);
-}
-.wheel__planet--MA {
-  --gc: var(--g-MA);
-}
-.wheel__planet--ME {
-  --gc: var(--g-ME);
-}
-.wheel__planet--JU {
-  --gc: var(--g-JU);
-}
-.wheel__planet--VE {
-  --gc: var(--g-VE);
-}
-.wheel__planet--SA {
-  --gc: var(--g-SA);
-}
-.wheel__planet--RA {
-  --gc: var(--g-RA);
-}
-.wheel__planet--KE {
-  --gc: var(--g-KE);
+.wheel__planet.is-on text {
+  fill: var(--accent-ink);
 }
 .wheel__earth {
-  fill: var(--el-air);
-  stroke: rgba(255, 255, 255, 0.6);
-  stroke-width: 1;
-  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.7));
+  fill: var(--ink-muted);
 }
 .wheel__pointer {
   fill: var(--accent-2);
-  filter: drop-shadow(0 0 6px rgba(245, 196, 107, 0.9));
 }
 .wheel__hint {
   position: absolute;
   left: 50%;
-  bottom: -2px;
+  bottom: -4px;
   translate: -50% 100%;
-  font-size: 13px;
+  font-size: 0.875rem;
   color: var(--page-ink-muted);
   white-space: nowrap;
 }
@@ -178,19 +131,15 @@
   display: grid;
   place-items: center;
   height: 170px;
-  border-radius: var(--radius-lg);
-  background:
-    radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--tone, var(--accent)) 20%, transparent), transparent 70%),
-    rgba(4, 5, 13, 0.5);
-  border: 1px solid var(--card-edge);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 .panel-glyph__orbit {
   position: absolute;
-  width: 160px;
-  height: 160px;
+  width: 152px;
+  height: 152px;
   border-radius: 50%;
-  border: 1px dashed rgba(196, 181, 253, 0.5);
+  border: 1px dashed rgba(var(--tint), 0.3);
   animation: wheel-spin 30s linear infinite;
 }
 .panel-glyph__orbit::after {
@@ -202,7 +151,6 @@
   height: 8px;
   border-radius: 50%;
   background: var(--accent-2);
-  box-shadow: var(--glow-gold);
 }
 @keyframes wheel-spin {
   to {
@@ -218,9 +166,10 @@
   display: block;
   width: 100%;
   height: auto;
-  border-radius: var(--radius-lg);
-  background: radial-gradient(ellipse at 50% 50%, rgba(30, 27, 75, 0.9), rgba(4, 5, 13, 0.95));
-  border: 1px solid var(--card-edge);
+  border-radius: var(--radius-md);
+}
+.starpatch__band {
+  fill: rgba(var(--tint), 0.06);
 }
 .starpatch__star {
   fill: var(--star);
@@ -241,23 +190,29 @@
   stroke-dasharray: 3 3;
 }
 .starpatch__edge {
-  stroke: rgba(196, 181, 253, 0.35);
+  stroke: rgba(var(--tint), 0.3);
   stroke-dasharray: 2 4;
 }
 .starpatch__ecl {
-  stroke: rgba(245, 196, 107, 0.35);
+  stroke: var(--accent-2);
+  stroke-opacity: 0.4;
   stroke-width: 0.8;
 }
 .starpatch figcaption {
-  margin-top: 6px;
-  font-size: 13px;
+  margin-top: 8px;
+  font-size: 0.875rem;
   line-height: 1.4;
   color: var(--ink-muted);
+}
+/* in the dark theme a night picture needs a ground a shade away from the card it sits on */
+.panel-glyph,
+.starpatch svg {
+  background-color: var(--bg);
 }
 @media (min-width: 900px) {
   .ex-stage {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 24px;
+    gap: 32px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -268,8 +223,4 @@
     animation: none;
     transition: none;
   }
-}
-/* in the light theme the glyph panel is a small piece of night */
-:root[data-theme="day"] .panel-glyph {
-  background-color: var(--void-1);
 }

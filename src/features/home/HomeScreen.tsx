@@ -12,7 +12,7 @@ import { forecast, periodBounds } from "../../engine/forecast";
 import { computePanchang } from "../../engine/panchang";
 import { type AreaReading, dayGuide, personalReading } from "../../engine/personal";
 import type { Patri, Profile, Settings } from "../../engine/types";
-import { IconChart, IconForecast, IconMilan, IconNumbers, IconPalm, IconSky, IconStory, IconToday } from "../chowki/icons";
+import { IconChart, IconForecast, IconMilan, IconPalm, IconSky, IconStory, IconToday } from "../chowki/icons";
 import { SkyEvents } from "../cosmic/SkyEvents";
 import { HereLine, townOf } from "../here/HereSheet";
 import { MoonDisc } from "./MoonDisc";
@@ -58,14 +58,14 @@ function DayRing({ score, word }: { score: number; word: string }) {
   );
 }
 
-function Shortcut({ to, icon, title, sub }: { to: string; icon: React.ReactNode; title: string; sub: string }) {
+function Made() {
   return (
-    <Link to={to} className="home-short">
-      <span className="home-short__icon" aria-hidden="true">
-        {icon}
+    <Link to="/about" className="v-card home-made">
+      <span className="home-made__n">252 hours</span>
+      <span className="home-made__t">of work and dedication by Rahul (RT). Every chart is worked out from real astronomy and checked.</span>
+      <span className="v-link">
+        How Vyomaphala was made <ChevronRight size={16} />
       </span>
-      <span className="home-short__t">{title}</span>
-      <span className="home-short__s">{sub}</span>
     </Link>
   );
 }
@@ -87,15 +87,7 @@ function Trust() {
           </li>
         </ul>
       </div>
-      <Link to="/about" className="v-card home-made">
-        <span className="home-made__n">252 hours</span>
-        <span className="home-made__t">
-          of work and dedication by Rahul (RT). Every chart is worked out from real astronomy and checked.
-        </span>
-        <span className="v-link">
-          How Vyomaphala was made <ChevronRight size={16} />
-        </span>
-      </Link>
+      <Made />
     </>
   );
 }
@@ -218,21 +210,39 @@ function Day({ profile, patri, settings, now }: DayProps) {
     <>
       <section className="v-card v-card--hero home-day" data-tone={f.tone} aria-labelledby="home-day-h">
         <div className="home-day__top">
-          <DayRing score={f.score} word={word} />
           <div className="home-day__text">
-            <p className="v-eyebrow">Your day · from the Moon</p>
+            <p className="v-eyebrow">Your day</p>
             <h2 id="home-day-h" className="home-day__word">
               {word}
             </h2>
             <p className="home-day__hint">{TONE_HINT[f.tone]}</p>
           </div>
+          <DayRing score={f.score} word={word} />
         </div>
         <p className="home-day__line">{f.headline}</p>
+        <div className="home-do">
+          <div>
+            <h3 className="home-do__h home-do__h--good">Good for</h3>
+            <ul>
+              {g.goodFor.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="home-do__h home-do__h--easy">Go easy on</h3>
+            <ul>
+              {g.easyOn.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
         <div className="v-actions">
-          <Link to={`/forecast/${profile.id}`} className="v-btn v-btn--sm">
+          <Link to={`/forecast/${profile.id}`} className="v-btn">
             See the full day
           </Link>
-          <Link to={`/forecast/${profile.id}?p=week`} className="v-btn v-btn--ghost v-btn--sm">
+          <Link to={`/forecast/${profile.id}?p=week`} className="v-btn v-btn--ghost">
             Week ahead
           </Link>
         </div>
@@ -240,32 +250,9 @@ function Day({ profile, patri, settings, now }: DayProps) {
 
       <div className="v-cols">
         <div className="v-stack">
-          <div className="v-grid2 home-do">
-            <section className="v-card" aria-labelledby="home-good-h">
-              <h2 id="home-good-h" className="home-do__h home-do__h--good">
-                Good for
-              </h2>
-              <ul>
-                {g.goodFor.map((t) => (
-                  <li key={t}>{t}</li>
-                ))}
-              </ul>
-            </section>
-            <section className="v-card" aria-labelledby="home-easy-h">
-              <h2 id="home-easy-h" className="home-do__h home-do__h--easy">
-                Go easy on
-              </h2>
-              <ul>
-                {g.easyOn.map((t) => (
-                  <li key={t}>{t}</li>
-                ))}
-              </ul>
-            </section>
-          </div>
-
           {p ? (
             <section className="v-card home-hours" aria-labelledby="home-hours-h">
-              <h2 id="home-hours-h" className="v-card__title">
+              <h2 id="home-hours-h" className="home-hours__h">
                 Good times today
               </h2>
               <p className="home-hours__now">
@@ -292,40 +279,39 @@ function Day({ profile, patri, settings, now }: DayProps) {
                 <span>Sunrise {t12(p.sunriseMs, zone)}</span>
                 <span>Sunset {t12(p.sunsetMs, zone)}</span>
               </div>
-              <dl className="home-hours__list">
-                <div>
-                  <dt>
-                    <i className="home-dot home-dot--good" aria-hidden="true" />
-                    Best hours <InfoDot id="hora" />
-                  </dt>
-                  <dd>
-                    {g.bestHours.length ? (
-                      g.bestHours.map((h) => (
-                        <span key={h.startMs} className="v-chip v-chip--good">
-                          {span12(h.startMs, h.endMs, zone)}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="v-muted">None stand out today.</span>
-                    )}
-                  </dd>
-                </div>
-                <div>
-                  <dt>
-                    <i className="home-dot home-dot--care" aria-hidden="true" />
-                    Pause new starts <InfoDot id="rahu-kala" label="Rāhu Kāla" />
-                  </dt>
-                  <dd>
-                    <span className="v-chip v-chip--care">{span12(g.avoid[0], g.avoid[1], zone)}</span>
-                  </dd>
-                </div>
-                <div>
-                  <dt>Colour of the day</dt>
-                  <dd>
-                    <span className="v-chip">{g.colour}</span>
-                  </dd>
-                </div>
-              </dl>
+              <details className="home-times">
+                <summary>All of today's times</summary>
+                <dl className="home-hours__list">
+                  <div>
+                    <dt>
+                      <i className="home-dot home-dot--good" aria-hidden="true" />
+                      Best hours <InfoDot id="hora" />
+                    </dt>
+                    <dd>
+                      {g.bestHours.length ? (
+                        g.bestHours.map((h) => <span key={h.startMs}>{span12(h.startMs, h.endMs, zone)}</span>)
+                      ) : (
+                        <span className="v-muted">None stand out today.</span>
+                      )}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <i className="home-dot home-dot--care" aria-hidden="true" />
+                      Pause new starts <InfoDot id="rahu-kala" label="Rāhu Kāla" />
+                    </dt>
+                    <dd>
+                      <span>{span12(g.avoid[0], g.avoid[1], zone)}</span>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Colour of the day</dt>
+                    <dd>
+                      <span>{g.colour}</span>
+                    </dd>
+                  </div>
+                </dl>
+              </details>
               <HereLine profile={profile} />
             </section>
           ) : null}
@@ -355,43 +341,40 @@ function Day({ profile, patri, settings, now }: DayProps) {
           </ul>
         </div>
         <div className="v-stack">
-          {moon ? (
-            <>
-              <Section
-                title="Today's almanac"
-                action={
-                  <Link to="/today" className="v-link">
-                    Open <ChevronRight size={16} />
-                  </Link>
-                }
-              />
-              <Link to="/today" className="v-card home-alm" aria-label="Open today's almanac">
-                <MoonDisc elongation={moon.elongation} />
-                <span className="home-alm__body">
-                  <span className="home-alm__t">
-                    {moon.tithi.paksha === "shukla" ? "Growing Moon" : "Fading Moon"}, {Math.round(moon.moonIllumination * 100)}% lit
-                  </span>
-                  <span className="home-alm__s">
-                    Lunar day {((moon.tithi.index - 1) % 15) + 1} of 15 · {moon.tithi.name}
-                  </span>
-                  <span className="home-alm__s">Moon's star today: {nakBoth(moon.nakshatra.index, profile.tradition)}</span>
-                </span>
-                <ChevronRight />
-              </Link>
-            </>
-          ) : null}
-
           <Section title={`More for ${profile.name}`} />
-          <nav className="home-shorts" aria-label="More">
-            <Shortcut to={`/patri/${profile.id}`} icon={<IconChart />} title="Birth chart" sub="Your life in simple words" />
-            <Shortcut to="/milan" icon={<IconMilan />} title="Partner match" sub="How two people fit" />
-            <Shortcut to={`/hast/${profile.id}`} icon={<IconPalm />} title="Palm reading" sub="From a photo of your hand" />
-            <Shortcut to="/explore/numbers" icon={<IconNumbers />} title="Numbers" sub="What your birth date says" />
-            <Shortcut to={`/patri/${profile.id}/sky`} icon={<IconSky />} title="Sky at birth" sub="The real stars that night" />
-            <Shortcut to="/story" icon={<IconStory />} title="Stories" sub="How it all began" />
-          </nav>
+          <ul className="v-list">
+            {moon ? (
+              <li>
+                <Link to="/today" className="v-row" aria-label="Open today's almanac">
+                  <span className="home-moon" aria-hidden="true">
+                    <MoonDisc elongation={moon.elongation} size={42} />
+                  </span>
+                  <span className="v-row__body">
+                    <span className="v-row__t">Today's almanac</span>
+                    <span className="v-row__s">
+                      {moon.tithi.paksha === "shukla" ? "Growing Moon" : "Fading Moon"}, {Math.round(moon.moonIllumination * 100)}% lit ·
+                      Moon in {nakBoth(moon.nakshatra.index, profile.tradition)}
+                    </span>
+                  </span>
+                  <ChevronRight />
+                </Link>
+              </li>
+            ) : null}
+            <li>
+              <Row to={`/patri/${profile.id}`} icon={<IconChart />} title="Birth chart" sub="Your life in simple words" />
+            </li>
+            <li>
+              <Row to="/milan" icon={<IconMilan />} title="Partner match" sub="How two people fit" />
+            </li>
+            <li>
+              <Row to={`/hast/${profile.id}`} icon={<IconPalm />} title="Palm reading" sub="From a photo of your hand" />
+            </li>
+            <li>
+              <Row to={`/patri/${profile.id}/sky`} icon={<IconSky />} title="Sky at birth" sub="The real stars that night" />
+            </li>
+          </ul>
 
-          <SkyEvents nowMs={now} place={{ lat, lon, name: townOf(placeName) }} zone={zone} preset={settings.preset} limit={3} />
+          <SkyEvents nowMs={now} place={{ lat, lon, name: townOf(placeName) }} zone={zone} preset={settings.preset} limit={2} />
         </div>
       </div>
     </>
@@ -431,9 +414,7 @@ export default function HomeScreen() {
       ) : (
         <div className="v-skel">Reading the sky…</div>
       )}
-      <div className="home-trust">
-        <Trust />
-      </div>
+      <Made />
       <p className="v-foot">A traditional reading for reflection, never a prediction or advice.</p>
     </Page>
   );

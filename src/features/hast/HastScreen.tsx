@@ -1,6 +1,6 @@
-// Palm reading for one person. Before a photo: three steps and one button. After a photo: the reading
-// in plain sentences, line by line, each with how clearly the line was seen (in words and a number),
-// then the traced print, retake and delete, and the measurements folded away.
+// Palm reading for one person. Before a photo: three steps and one button. After a photo: a short
+// summary first, then the reading line by line (each with how clearly the line was seen, in words and
+// a number), the traced print with retake and trace, the measurements folded away, and delete last.
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
@@ -20,7 +20,6 @@ import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
 import { countEvent } from "../../platform/stats";
 import { toast } from "../../state/ui";
-import { IconPalm } from "../chowki/icons";
 import "./hast.css";
 
 const S = 512; // canonical print frame
@@ -112,7 +111,7 @@ function DeleteHold({ onDelete }: { onDelete: () => void }) {
     onFire: onDelete,
   });
   return (
-    <button type="button" className="v-btn v-btn--danger palm-delete" aria-label="Delete this palm photo (hold)" {...hold}>
+    <button type="button" className="v-btn v-btn--danger v-btn--sm palm-delete" aria-label="Delete this palm photo (hold)" {...hold}>
       <span className="palm-delete__fill" ref={fill} aria-hidden="true" />
       <span>Hold to delete this photo</span>
     </button>
@@ -240,21 +239,18 @@ export default function HastScreen() {
   const foundLines = LINE_ORDER.map((lid) => lines.find((l) => l.id === lid)).filter((l): l is PalmLine => !!l);
 
   return (
-    <Page label={`Palm reading: ${name}`} eyebrow={name || undefined} title="Palm reading" back wide={!!capture}>
+    <Page label={`Palm reading: ${name}`} title="Palm reading" back wide={!!capture}>
       {loading ? null : (
         <>
           <HandChoice hand={hand} onChange={setHand} />
 
           {!capture ? (
             <>
-              <section className="v-card v-card--hero palm-start" aria-labelledby="palm-start-h">
-                <span className="v-empty__art" aria-hidden="true">
-                  <IconPalm size={30} />
-                </span>
+              <section className="v-card palm-start" aria-labelledby="palm-start-h">
                 <h2 id="palm-start-h" className="palm-start__h">
                   One photo of {name ? `${name}'s` : "your"} {hand} palm
                 </h2>
-                <p className="v-lede">
+                <p className="v-card__sub">
                   Vyomaphala finds the heart, head and life lines in the photo and tells you what tradition says about each.{" "}
                   <InfoDot id="hast-rekha" label="palm reading" />
                 </p>
@@ -292,10 +288,36 @@ export default function HastScreen() {
                 </Link>
                 <p className="v-small v-muted">The photo stays on this device. It is never uploaded, and you can delete it any time.</p>
               </section>
-              <p className="v-small v-muted">{framingNote(hand, profile?.handedness ?? "right", settings.handFraming)}</p>
+              <p className="v-small v-muted palm-framing">{framingNote(hand, profile?.handedness ?? "right", settings.handFraming)}</p>
             </>
           ) : (
             <>
+              {reading ? (
+                <section className="v-card v-card--hero palm-sum" aria-labelledby="palm-sum-h" aria-live="polite">
+                  <p className="v-eyebrow">In short</p>
+                  <h2 id="palm-sum-h" className="palm-sum__h">
+                    {ELEMENT[reading.element]} hand
+                  </h2>
+                  {shapeHits[0] ? <p className="palm-sum__p">{shapeHits[0].text}</p> : null}
+                  <ul className="palm-sum__lines" aria-label="How clearly each line was seen">
+                    {foundLines.map((l) => (
+                      <li key={l.id} className={`v-chip ${clarity(l).chip}`}>
+                        {NAME[l.id]}: {clarity(l).word.toLowerCase()}
+                      </li>
+                    ))}
+                    {missing.map((lid) => (
+                      <li key={lid} className="v-chip">
+                        {NAME[lid]}: not found
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : (
+                <div className="v-card">
+                  <p>This photo has the hand marked but no reading yet. Retake it to read the lines.</p>
+                </div>
+              )}
+
               {weak.length || missing.length ? (
                 <div className="v-note v-note--warn">
                   <span>
@@ -308,15 +330,15 @@ export default function HastScreen() {
               ) : null}
 
               <div className="v-cols">
-                <div className="v-stack palm-readcol">
-                  <Section title="What your palm says" note={framingNote(hand, profile?.handedness ?? "right", settings.handFraming)} />
-                  {reading ? (
-                    <div className="v-stack" aria-live="polite">
+                {reading ? (
+                  <div className="v-stack palm-readcol">
+                    <Section title="Line by line" />
+                    <ul className="v-list palm-list" aria-live="polite">
                       {foundLines.map((l) => {
                         const c = clarity(l);
                         const hits = hitsOf(l.id);
                         return (
-                          <section key={l.id} className="v-card palm-line" aria-labelledby={`palm-${l.id}`}>
+                          <li key={l.id} className="palm-line">
                             <div className="palm-line__head">
                               <span className="palm-line__letter" aria-hidden="true">
                                 {LETTER[l.id]}
@@ -340,11 +362,11 @@ export default function HastScreen() {
                             ) : (
                               <p className="v-muted">The line was found, but none of the traditional rules applies to its shape.</p>
                             )}
-                          </section>
+                          </li>
                         );
                       })}
                       {missing.map((lid) => (
-                        <section key={lid} className="v-card palm-line" aria-labelledby={`palm-${lid}`}>
+                        <li key={lid} className="palm-line">
                           <div className="palm-line__head">
                             <div className="palm-line__title">
                               <h3 id={`palm-${lid}`}>{NAME[lid]} line</h3>
@@ -353,29 +375,24 @@ export default function HastScreen() {
                             <span className="v-chip">Not found</span>
                           </div>
                           <p className="v-muted">This line could not be seen in the photo, so nothing is said about it.</p>
-                        </section>
+                        </li>
                       ))}
-                      {shapeHits.length ? (
-                        <section className="v-card palm-line" aria-labelledby="palm-shape">
+                      {shapeHits.length > 1 ? (
+                        <li className="palm-line">
                           <div className="palm-line__head">
                             <div className="palm-line__title">
                               <h3 id="palm-shape">Hand shape</h3>
-                              <p className="v-small v-muted">Palm, fingers and thumb</p>
+                              <p className="v-small v-muted">Fingers and thumb</p>
                             </div>
-                            <span className="v-chip v-chip--violet">{ELEMENT[reading.element]} hand</span>
                           </div>
-                          {shapeHits.map((h) => (
+                          {shapeHits.slice(1).map((h) => (
                             <p key={h.ruleId}>{h.text}</p>
                           ))}
-                        </section>
+                        </li>
                       ) : null}
-                    </div>
-                  ) : (
-                    <div className="v-card">
-                      <p>This photo has the hand marked but no reading yet. Retake it to read the lines.</p>
-                    </div>
-                  )}
-                </div>
+                    </ul>
+                  </div>
+                ) : null}
 
                 <div className="v-stack">
                   <Section title="Your palm, traced" />
@@ -416,8 +433,8 @@ export default function HastScreen() {
                         ))}
                       </ul>
                     ) : null}
-                    <div className="v-actions">
-                      <Link className="v-btn v-btn--sm" to={captureTo} replace>
+                    <div className="palm-printcard__btns">
+                      <Link className="v-btn v-btn--ghost v-btn--sm" to={captureTo} replace>
                         Retake the photo
                       </Link>
                       {reading ? (
@@ -432,7 +449,7 @@ export default function HastScreen() {
                       ) : null}
                     </div>
                     {tracing && reading ? (
-                      <div className="v-note palm-trace">
+                      <div className="palm-trace">
                         <p>
                           Draw along a line on the photo with your finger.{" "}
                           {weak[0] || missing[0]
@@ -475,68 +492,58 @@ export default function HastScreen() {
                       </div>
                     ) : null}
                   </div>
-
-                  <div className="v-card palm-private">
-                    <h3 className="v-card__title">Your photo is private</h3>
-                    <p className="v-card__sub">
-                      It stays on this device and is never uploaded. Deleting removes the photo and its reading.
-                    </p>
-                    <DeleteHold onDelete={remove} />
-                  </div>
                 </div>
               </div>
 
               {reading ? (
-                <>
-                  <Section title="Full detail" />
-                  <details className="v-fold">
-                    <summary>
-                      <span>
-                        Measurements
-                        <span className="v-fold__s">What was measured for each sentence, and its source</span>
-                      </span>
-                    </summary>
-                    <div className="v-fold__body">
-                      <dl className="palm-facts">
-                        <div>
-                          <dt>Hand shape</dt>
+                <details className="v-fold">
+                  <summary>
+                    <span>
+                      Measurements
+                      <span className="v-fold__s">What was measured for each sentence, and its source</span>
+                    </span>
+                  </summary>
+                  <div className="v-fold__body">
+                    <p className="v-small v-muted">{framingNote(hand, profile?.handedness ?? "right", settings.handFraming)}</p>
+                    <dl className="palm-facts">
+                      <div>
+                        <dt>Hand shape</dt>
+                        <dd>
+                          {ELEMENT[reading.element]} · width/length {reading.ratios.widthOverLength.toFixed(2)} · finger/palm{" "}
+                          {reading.ratios.fingerOverPalm.toFixed(2)}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Fingers</dt>
+                        <dd>
+                          index/ring {reading.ratios.indexOverRing.toFixed(2)} · thumb angle {reading.ratios.thumbAngleDeg.toFixed(0)}°
+                        </dd>
+                      </div>
+                      {foundLines.map((l) => (
+                        <div key={l.id}>
+                          <dt>
+                            {LETTER[l.id]}. {NAME[l.id]} line
+                          </dt>
                           <dd>
-                            {ELEMENT[reading.element]} · width/length {reading.ratios.widthOverLength.toFixed(2)} · finger/palm{" "}
-                            {reading.ratios.fingerOverPalm.toFixed(2)}
+                            length {l.metrics.length.toFixed(2)} · curve {l.metrics.curvature.toFixed(2)} · confidence{" "}
+                            {l.confidence.toFixed(2)}
+                            {l.source === "traced" ? " · traced" : ""}
                           </dd>
                         </div>
-                        <div>
-                          <dt>Fingers</dt>
-                          <dd>
-                            index/ring {reading.ratios.indexOverRing.toFixed(2)} · thumb angle {reading.ratios.thumbAngleDeg.toFixed(0)}°
-                          </dd>
-                        </div>
-                        {foundLines.map((l) => (
-                          <div key={l.id}>
-                            <dt>
-                              {LETTER[l.id]}. {NAME[l.id]} line
-                            </dt>
-                            <dd>
-                              length {l.metrics.length.toFixed(2)} · curve {l.metrics.curvature.toFixed(2)} · confidence{" "}
-                              {l.confidence.toFixed(2)}
-                              {l.source === "traced" ? " · traced" : ""}
-                            </dd>
-                          </div>
-                        ))}
-                      </dl>
-                      <ol className="palm-sources">
-                        {reading.hits.map((h: Hit) => (
-                          <li key={h.ruleId}>
-                            <span>{h.text}</span>
-                            <span className="v-small v-muted">
-                              Measured: {h.measured}. Source: {h.citation.text}, {h.citation.ref}
-                            </span>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  </details>
-                </>
+                      ))}
+                    </dl>
+                    <ol className="palm-sources">
+                      {reading.hits.map((h: Hit) => (
+                        <li key={h.ruleId}>
+                          <span>{h.text}</span>
+                          <span className="v-small v-muted">
+                            Measured: {h.measured}. Source: {h.citation.text}, {h.citation.ref}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </details>
               ) : null}
             </>
           )}
@@ -560,6 +567,15 @@ export default function HastScreen() {
               </dl>
             </div>
           </details>
+          {capture ? (
+            <section className="palm-private" aria-labelledby="palm-private-h">
+              <h2 id="palm-private-h" className="palm-private__t">
+                Your photo is private
+              </h2>
+              <p className="v-small v-muted">It stays on this device and is never uploaded. Deleting removes the photo and its reading.</p>
+              <DeleteHold onDelete={remove} />
+            </section>
+          ) : null}
           <p className="v-foot">{DISCLAIMER} All computation happened on this device. Nothing left it.</p>
         </>
       )}

@@ -81,14 +81,7 @@ export function StarPatch({ from, span, lat = 30, label }: Props) {
   return (
     <figure className="starpatch">
       <svg className="v-night" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label ?? "The real stars in this part of the zodiac"}>
-        <defs>
-          <linearGradient id="sp-band" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stopColor="var(--accent)" stopOpacity="0" />
-            <stop offset="0.5" stopColor="var(--accent)" stopOpacity="0.16" />
-            <stop offset="1" stopColor="var(--accent)" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <rect x={x1} y="0" width={x0 - x1} height={H} fill="url(#sp-band)" />
+        <rect x={x1} y="0" width={x0 - x1} height={H} className="starpatch__band" />
         <line x1={x0} y1="0" x2={x0} y2={H} className="starpatch__edge" />
         <line x1={x1} y1="0" x2={x1} y2={H} className="starpatch__edge" />
         <line x1="0" y1={H / 2} x2={W} y2={H / 2} className="starpatch__ecl" />

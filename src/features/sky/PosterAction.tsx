@@ -14,7 +14,7 @@ export function PosterAction({ make }: PosterActionProps) {
   return (
     <button
       type="button"
-      className="sky-btn"
+      className="v-btn v-btn--ghost v-btn--sm sky-btn"
       disabled={busy}
       aria-busy={busy}
       onClick={() => {

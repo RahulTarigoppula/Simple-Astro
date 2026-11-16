@@ -1,5 +1,7 @@
 # Vyomaphala 2.0 design: "clear sky"
 
+> The look described here was replaced in 3.0.0 by docs/DESIGN-V3.md. The navigation and building blocks below still hold.
+
 Written 2026-11-16. This replaces docs/UI-CONVENTIONS.md and the visual parts of docs/DESIGN.md for every screen.
 The reference implementation is `src/features/home/HomeScreen.tsx` + `home.css`; read it before writing a screen.
 

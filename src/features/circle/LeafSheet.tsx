@@ -1,9 +1,9 @@
-// "More" for one person: the rare things. Palm reading, choosing a partner for a match, the
-// encrypted backup, and delete (a hold, with the person's name on the button).
+// The one menu for a person: chart, forecast, match, palm, edit, the encrypted backup, and
+// delete (a hold, with the person's name on the button).
 import { useState } from "react";
 import { Link } from "react-router";
 import { Row } from "../../components/ui/Page";
-import { birthLine } from "../../components/ui/PersonChip";
+import { Avatar, birthLine } from "../../components/ui/PersonChip";
 import { envelopeFileName, exportEnvelope } from "../../data/crypto";
 import { nakBoth } from "../../data/regional";
 import { setMeta } from "../../data/repo";
@@ -22,6 +22,10 @@ interface LeafSheetProps {
   mode: SheetMode;
   ayanamsa: Parameters<typeof leafMoon>[1];
   setMode: (m: SheetMode) => void;
+  onChart: () => void;
+  onForecast: () => void;
+  /** Opens the match straight away with one other person; asks for the partner when there are several. */
+  onMatch: () => void;
   onPalm: () => void;
   onPair: (other: Profile) => void;
   onBurn: () => void;
@@ -30,28 +34,71 @@ interface LeafSheetProps {
 
 const MIN_PASS = 6;
 
+const G = {
+  chart: "M4 4h16v16H4zM4 4l16 16M20 4L4 20",
+  forecast: "M4 17l5-5 4 3 7-8M15 7h5v5",
+  match: "M9 12a4 4 0 1 0 0-.01M15 12a4 4 0 1 0 0-.01",
+  palm: "M8 12V6.5a1.5 1.5 0 0 1 3 0V11m0-5.5v-1a1.5 1.5 0 0 1 3 0V11m0-4.5a1.5 1.5 0 0 1 3 0V14c0 3.5-2 6-5.5 6-2.6 0-4-1.200-5.300-3.400L4.500 13.500a1.400 1.400 0 0 1 2.300-1.500L8 13.500",
+  edit: "M4 20h4L19 9l-4-4L4 16zM13.500 6.500l4 4",
+  backup: "M12 4v10m0 0l-4-4m4 4l4-4M5 19h14",
+} as const;
+
+function Glyph({ d }: { d: string }) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={d} />
+    </svg>
+  );
+}
+
 export function LeafSheet(props: LeafSheetProps) {
   const { profile, others, mode } = props;
   const name = profile.name || "Unnamed person";
 
   return (
     <div className="ppl-sheet">
-      <header>
-        <h2 className="ppl-sheet__h">{mode === "milan" ? `Match ${name} with…` : mode === "export" ? "Encrypted backup" : name}</h2>
-        {mode === "menu" ? <p className="ppl-sheet__sub">{birthLine(profile)}</p> : null}
-      </header>
+      {mode === "menu" ? (
+        <header className="ppl-sheet__who">
+          <Avatar name={name} size={48} />
+          <div>
+            <h2 className="ppl-sheet__h">{name}</h2>
+            <p className="ppl-sheet__sub">{birthLine(profile)}</p>
+          </div>
+        </header>
+      ) : (
+        <h2 className="ppl-sheet__h">{mode === "milan" ? `Match ${name} with…` : "Encrypted backup"}</h2>
+      )}
 
       {mode === "menu" ? (
         <>
-          <ul className="v-list">
+          <ul className="v-list ppl-menu">
             <li>
-              <Row title="Palm reading" sub="From a photo of the hand" onClick={props.onPalm} />
+              <Row icon={<Glyph d={G.chart} />} title="Chart" onClick={props.onChart} />
             </li>
             <li>
-              <Row title="Match with…" sub="Choose the partner to compare with" onClick={() => props.setMode("milan")} />
+              <Row icon={<Glyph d={G.forecast} />} title="Forecast" onClick={props.onForecast} />
             </li>
             <li>
-              <Row title="Back up" sub="An encrypted file with everyone saved here" onClick={() => props.setMode("export")} />
+              <Row icon={<Glyph d={G.match} />} title="Match with…" onClick={props.onMatch} />
+            </li>
+            <li>
+              <Row icon={<Glyph d={G.palm} />} title="Palm reading" onClick={props.onPalm} />
+            </li>
+            <li>
+              <Row icon={<Glyph d={G.edit} />} title="Edit birth details" to={`/leaf/${profile.id}/edit`} />
+            </li>
+            <li>
+              <Row icon={<Glyph d={G.backup} />} title="Back up everyone" onClick={() => props.setMode("export")} />
             </li>
           </ul>
           <div className="ppl-sheet__danger">

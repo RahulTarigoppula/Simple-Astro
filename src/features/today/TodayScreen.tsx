@@ -23,10 +23,10 @@ import { play } from "../../platform/sound";
 import { useUi } from "../../state/ui";
 import { SkyEvents } from "../cosmic/SkyEvents";
 import { HereLine } from "../here/HereSheet";
-import { ayanaDev, ayanaLatin, karanaDev, masaDev, rituDev, tithiDev, yogaDev } from "./dev";
+import { ayanaDev, ayanaLatin, karanaDev, rituDev, tithiDev, yogaDev } from "./dev";
 import { MonthGrid, type Ymd } from "./MonthGrid";
 import { MoonFace } from "./moon";
-import { ChoghadiyaPanel, HoraPanel } from "./Periods";
+import { ChoghadiyaPanel, HoraPanel, QualityMark } from "./Periods";
 import { endsLabel, rangeLabel, type ZoneClock, zoneClock } from "./zone";
 import "./today.css";
 
@@ -90,6 +90,10 @@ interface RowSpec {
   k: string;
   /** What it is, in plain words. */
   plain: string;
+  /** The small line under the plain words, when it says more than the traditional name. */
+  term?: string;
+  /** The window's two instants, for rows that are a stretch of the clock. */
+  span?: readonly [number, number];
   v: React.ReactNode;
   /** The value again as plain text, for the row's accessible name. */
   text: string;
@@ -98,14 +102,6 @@ interface RowSpec {
   /** Glossary entry behind the ⓘ and "Tell me more". */
   info?: string;
   foot: Foot;
-}
-
-function Dev({ children }: { children: string }) {
-  return (
-    <span lang="hi" className="alm-dev">
-      {children}
-    </span>
-  );
 }
 
 function instantLines(clock: ZoneClock, label: string, ms: number): Array<[string, string]> {
@@ -161,7 +157,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): { lim
   const season = SEASON[RITU_NAMES.indexOf(p.ritu as (typeof RITU_NAMES)[number])] ?? "";
   const timed = (r: readonly [number, number]) => {
     const t = rangeLabel(clock, r);
-    return { v: t, text: t };
+    return { v: t, text: t, span: r };
   };
 
   const limbs: RowSpec[] = [
@@ -170,11 +166,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): { lim
       k: "Tithi",
       plain: "Lunar day",
       info: "tithi",
-      v: (
-        <>
-          {p.tithi.name} <Dev>{tDev}</Dev>
-        </>
-      ),
+      v: p.tithi.name,
       text: p.tithi.name,
       end: endsLabel(clock, p.tithi.endMs, dayMs),
       foot: ending(p.tithi.name, tDev, p.tithi.endMs, `Tithi ${p.tithi.index} of 30. Each is 12° of the Moon pulling away from the Sun.`),
@@ -184,11 +176,8 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): { lim
       k: "Vāra",
       plain: "Weekday",
       info: "vara",
-      v: (
-        <>
-          {WEEKDAY[p.vara.index]} · {VARA_NAMES[p.vara.index]} <Dev>{vDev}</Dev>
-        </>
-      ),
+      term: `Vāra · ${VARA_NAMES[p.vara.index]}`,
+      v: WEEKDAY[p.vara.index],
       text: `${WEEKDAY[p.vara.index]}, ${VARA_NAMES[p.vara.index]}`,
       end: endsLabel(clock, p.nextSunriseMs, dayMs),
       foot: {
@@ -203,11 +192,8 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): { lim
       k: "Nakṣatra",
       plain: "Moon's star",
       info: "nakshatra",
-      v: (
-        <>
-          {nName} <Dev>{nDev}</Dev> <span className="alm-aside">quarter (pada) {p.nakshatra.pada}</span>
-        </>
-      ),
+      term: `Nakṣatra · quarter ${p.nakshatra.pada}`,
+      v: nName,
       text: `${nName}, pada ${p.nakshatra.pada}`,
       end: endsLabel(clock, p.nakshatra.endMs, dayMs),
       foot: {
@@ -223,13 +209,9 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): { lim
     {
       id: "yoga",
       k: "Yoga",
-      plain: "Sun + Moon combination",
+      plain: "Sun + Moon",
       info: "yoga-panchang",
-      v: (
-        <>
-          {p.yoga.name} <Dev>{yDev}</Dev>
-        </>
-      ),
+      v: p.yoga.name,
       text: p.yoga.name,
       end: endsLabel(clock, p.yoga.endMs, dayMs),
       foot: ending(p.yoga.name, yDev, p.yoga.endMs, `Yoga ${p.yoga.index} of 27: the sum of the sidereal Sun and Moon in steps of 13°20′.`),
@@ -239,11 +221,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): { lim
       k: "Karaṇa",
       plain: "Half lunar day",
       info: "karana",
-      v: (
-        <>
-          {p.karana.name} <Dev>{kDev}</Dev>
-        </>
-      ),
+      v: p.karana.name,
       text: p.karana.name,
       end: endsLabel(clock, p.karana.endMs, dayMs),
       foot: ending(p.karana.name, kDev, p.karana.endMs, `Karaṇa ${p.karana.index} of 60: half a tithi, 6° of elongation.`),
@@ -374,19 +352,10 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): { lim
       k: "Māsa",
       plain: "Hindu lunar month",
       info: "panchang",
-      v: (
-        <>
-          {p.masaAmanta} <Dev>{masaDev(p.masaAmanta)}</Dev> <span className="alm-aside">amānta</span>
-          {p.masaPurnimanta !== p.masaAmanta ? (
-            <>
-              {" · "}
-              {p.masaPurnimanta} <Dev>{masaDev(p.masaPurnimanta)}</Dev> <span className="alm-aside">pūrṇimānta</span>
-            </>
-          ) : (
-            <span className="alm-aside"> · pūrṇimānta too</span>
-          )}
-        </>
-      ),
+      v:
+        p.masaPurnimanta !== p.masaAmanta
+          ? `${p.masaAmanta} (amānta) · ${p.masaPurnimanta} (pūrṇimānta)`
+          : `${p.masaAmanta}, in both conventions`,
       text:
         p.masaPurnimanta !== p.masaAmanta
           ? `${p.masaAmanta} amānta, ${p.masaPurnimanta} pūrṇimānta`
@@ -407,12 +376,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): { lim
       k: "Ṛtu · ayana",
       plain: "Season and half-year",
       info: "panchang",
-      v: (
-        <>
-          {season ? `${season} · ` : ""}
-          {p.ritu} <Dev>{rituDev(p.ritu)}</Dev> · {ayanaLatin(p.ayana)} <Dev>{ayanaDev(p.ayana)}</Dev>
-        </>
-      ),
+      v: `${season ? `${season} · ` : ""}${p.ritu} · ${ayanaLatin(p.ayana)}`,
       text: `${season ? `${season}, ` : ""}${p.ritu}, ${ayanaLatin(p.ayana)}`,
       foot: {
         title: `${p.ritu} · ${ayanaLatin(p.ayana)}`,
@@ -444,27 +408,27 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): { lim
 }
 
 /** A fact of the day: what it is in plain words, its traditional name small, its value, and when it ends. */
-function LimbRows({ rows, onOpen, label }: { rows: RowSpec[]; onOpen: (r: RowSpec) => void; label: string }) {
+function LimbRows({ rows, onOpen, label, plain }: { rows: RowSpec[]; onOpen: (r: RowSpec) => void; label: string; plain?: boolean }) {
   return (
-    <ul className="v-list alm-rows" aria-label={label}>
+    <ul className={plain ? "alm-rows alm-rows--plain" : "v-list alm-rows"} aria-label={label}>
       {rows.map((r) => (
-        <li key={r.id} className="alm-row">
+        <li key={r.id}>
           <button
             type="button"
-            className="alm-row__main"
+            className="alm-row"
             onClick={() => onOpen(r)}
             aria-haspopup="dialog"
             aria-label={`${r.k} (${r.plain}): ${r.text}${r.end ? `, ${r.end}` : ""}. Details`}
           >
-            <span className="alm-row__body">
-              <span className="alm-row__k">
-                {r.plain} <span className="alm-row__term">· {r.k}</span>
-              </span>
+            <span className="alm-row__l">
+              <span className="alm-row__k">{r.plain}</span>
+              <span className="alm-row__s">{r.term ?? r.k}</span>
+            </span>
+            <span className="alm-row__r">
               <span className="alm-row__v">{r.v}</span>
-              {r.end ? <span className="alm-row__until">{r.end}</span> : null}
+              {r.end ? <span className="alm-row__s">{r.end}</span> : null}
             </span>
           </button>
-          {r.info ? <InfoDot id={r.info} label={r.k} /> : null}
         </li>
       ))}
     </ul>
@@ -473,41 +437,65 @@ function LimbRows({ rows, onOpen, label }: { rows: RowSpec[]; onOpen: (r: RowSpe
 
 const TONE_WORD = { avoid: "Avoid", good: "Good" } as const;
 
-/** A window of the day: its name, what tradition says of it, the clock times, and "Avoid" / "Good" in words. */
-function TimeRows({ rows, onOpen }: { rows: RowSpec[]; onOpen: (r: RowSpec) => void }) {
+/** The windows tradition favours, or sets aside: a word and a mark on top, then each window with its clock times. */
+function Windows({
+  tone,
+  rows,
+  clock,
+  onOpen,
+}: {
+  tone: "good" | "avoid";
+  rows: RowSpec[];
+  clock: ZoneClock;
+  onOpen: (r: RowSpec) => void;
+}) {
+  const label = tone === "good" ? "Good times" : "Times to avoid";
   return (
-    <ul className="v-list alm-rows" aria-label="Times of day">
-      {rows.map((r) => (
-        <li key={r.id} className={`alm-row alm-row--time${r.tone ? ` alm-row--${r.tone}` : ""}`}>
-          <button
-            type="button"
-            className="alm-row__main"
-            onClick={() => onOpen(r)}
-            aria-haspopup="dialog"
-            aria-label={`${r.k}: ${r.tone ? `${TONE_WORD[r.tone]}. ` : ""}${r.plain}, ${r.text}. Details`}
-          >
-            <span className="alm-row__mark" aria-hidden="true" />
-            <span className="alm-row__body">
-              <span className="alm-row__v">{r.k}</span>
-              <span className="alm-row__k">{r.plain}</span>
-            </span>
-            <span className="alm-row__end">
-              <span className="alm-row__time">{r.v}</span>
-              {r.tone ? <span className={`v-chip v-chip--${r.tone === "avoid" ? "care" : "good"}`}>{TONE_WORD[r.tone]}</span> : null}
-            </span>
-          </button>
-        </li>
-      ))}
-    </ul>
+    <div className="v-card v-card--flush alm-win" data-kind={tone}>
+      <h3 className="alm-win__h">
+        <span className="alm-win__mark">
+          <QualityMark q={tone === "good" ? "good" : "bad"} />
+        </span>
+        {TONE_WORD[tone]}
+      </h3>
+      <ul className="alm-rows alm-rows--plain" aria-label={label}>
+        {rows.map((r) => (
+          <li key={r.id}>
+            <button
+              type="button"
+              className="alm-row alm-row--win"
+              onClick={() => onOpen(r)}
+              aria-haspopup="dialog"
+              aria-label={`${r.k}: ${r.tone ? `${TONE_WORD[r.tone]}. ` : ""}${r.plain}, ${r.text}. Details`}
+            >
+              <span className="alm-row__l">
+                <span className="alm-row__k">{r.k}</span>
+                <span className="alm-row__s">{r.plain}</span>
+              </span>
+              {r.span ? (
+                <span className="alm-row__r alm-row__r--time">
+                  <span className="alm-row__v">{clock.hm12(r.span[0])}</span> <span className="alm-row__s">to {clock.hm12(r.span[1])}</span>
+                </span>
+              ) : (
+                <span className="alm-row__r">
+                  <span className="alm-row__s">{r.v}</span>
+                </span>
+              )}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
 type Tab = "day" | "chog" | "hora" | "month";
-const TABS: ReadonlyArray<{ id: Tab; label: string }> = [
-  { id: "day", label: "Day" },
-  { id: "chog", label: "Good & bad slots" },
-  { id: "hora", label: "Planet hours" },
-  { id: "month", label: "Month" },
+/** `label` is the tab's name; on a narrow phone only `short` is shown, and it is always part of the name. */
+const TABS: ReadonlyArray<{ id: Tab; label: string; lead?: string; short: string }> = [
+  { id: "day", label: "Day", short: "Day" },
+  { id: "chog", label: "Good & bad slots", lead: "Good & bad ", short: "slots" },
+  { id: "hora", label: "Planet hours", lead: "Planet ", short: "hours" },
+  { id: "month", label: "Month", short: "Month" },
 ];
 
 /** The civil date of an instant on the place's calendar. */
@@ -538,12 +526,16 @@ function Tabs({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void }) {
           id={`tab-${t.id}`}
           type="button"
           role="tab"
+          aria-label={t.label}
           aria-selected={tab === t.id}
           aria-controls={tab === t.id ? `panel-${t.id}` : undefined}
           tabIndex={tab === t.id ? 0 : -1}
           onClick={() => onTab(t.id)}
         >
-          {t.label}
+          <span>
+            {t.lead ? <span className="alm-seg__lead">{t.lead}</span> : null}
+            <span className="alm-seg__short">{t.short}</span>
+          </span>
         </button>
       ))}
     </div>
@@ -668,19 +660,13 @@ export default function TodayScreen() {
 
   const openFoot = (r: RowSpec) => setFoot(r.info ? { ...r.foot, explain: r.info } : r.foot);
 
+  // In the order of the clock: before dawn, midday, dusk.
+  const good = rows ? ["brahma", "abhijit", "godhuli"].flatMap((id) => rows.times.filter((r) => r.id === id)) : [];
+  const avoid = rows ? rows.times.filter((r) => r.tone === "avoid") : [];
+  const more = rows ? [...rows.times.filter((r) => r.id === "moon"), ...rows.season] : [];
+
   return (
-    <Page
-      label="Today's almanac"
-      eyebrow={
-        <>
-          The Hindu calendar · Pañcāṅga <InfoDot id="panchang" />
-        </>
-      }
-      title="Almanac"
-      back="/"
-      wide
-      className="alm"
-    >
+    <Page label="Today's almanac" back="/" wide className="alm">
       {!place ? (
         <div className="v-skel">Reading the sky…</div>
       ) : !p || !periods || !rows ? (
@@ -689,51 +675,52 @@ export default function TodayScreen() {
         </div>
       ) : (
         <>
-          <section className="v-card v-card--hero alm-hero" aria-labelledby="alm-day-h">
-            <div className="alm-hero__top">
+          <section className="alm-hero" aria-label={`${rel ? `${rel}, ` : ""}${clock.dateLong(p.sunriseMs)}`}>
+            <div className="alm-hero__bar">
+              <div className="alm-hero__when">
+                <p className="v-eyebrow">
+                  Almanac{rel ? ` · ${rel}` : ""} <InfoDot id="panchang" />
+                </p>
+                <p className="alm-hero__date" aria-live="polite">
+                  {clock.dateLong(p.sunriseMs)}
+                </p>
+              </div>
+              <div className="alm-hero__nav">
+                <button type="button" className="v-iconbtn" aria-label="Previous day" onClick={() => step(-1)}>
+                  <ChevronLeft />
+                </button>
+                <button type="button" className="v-iconbtn" aria-label="Next day" onClick={() => step(1)}>
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            </div>
+            <div className="alm-hero__main">
+              <div className="alm-hero__text">
+                <h1 className="v-title">{tithiWords(p.tithi)}</h1>
+                <p className="alm-hero__small">
+                  {p.tithi.name} · Moon {lit}% lit <InfoDot id="tithi" />
+                </p>
+              </div>
               <span className="alm-hero__moon" role="img" aria-label={`The Moon: ${lit}% lit, ${waxing ? "growing" : "fading"}`}>
                 <MoonFace k={p.moonIllumination} waxing={waxing} south={south} />
               </span>
-              <div className="alm-hero__text">
-                <h2 id="alm-day-h" className="alm-hero__date">
-                  {rel ? <span className="v-eyebrow">{rel} </span> : null}
-                  <span>{clock.dateLong(p.sunriseMs)}</span>
-                </h2>
-                <p className="alm-hero__plain">{tithiWords(p.tithi)}</p>
-                <p className="alm-hero__small">
-                  {p.tithi.name} · {lit}% lit <InfoDot id="tithi" />
-                </p>
-              </div>
             </div>
-            <dl className="alm-hero__sun">
-              <div>
-                <dt>Sunrise</dt>
-                <dd>{clock.hm12(p.sunriseMs)}</dd>
-              </div>
-              <div>
-                <dt>Sunset</dt>
-                <dd>{clock.hm12(p.sunsetMs)}</dd>
-              </div>
-              <div>
-                <dt>Moon's star</dt>
-                <dd>{NAKSHATRA_NAMES[p.nakshatra.index] ?? p.nakshatra.name}</dd>
-              </div>
-            </dl>
-            <div className="alm-step">
-              <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={() => step(-1)}>
-                <ChevronLeft />
-                Previous day
+            <p className="alm-hero__sun">
+              <span>
+                <span>Sunrise</span> <b>{clock.hm12(p.sunriseMs)}</b>
+              </span>
+              <span>
+                <span>Sunset</span> <b>{clock.hm12(p.sunsetMs)}</b>
+              </span>
+              <span>
+                <span>Moon's star</span> <b>{NAKSHATRA_NAMES[p.nakshatra.index] ?? p.nakshatra.name}</b>
+              </span>
+            </p>
+            {offset !== 0 ? (
+              <button type="button" className="v-btn v-btn--ghost v-btn--sm alm-hero__back" onClick={() => step(-offset)}>
+                Back to today
               </button>
-              {offset !== 0 ? (
-                <button type="button" className="v-btn v-btn--quiet v-btn--sm" onClick={() => step(-offset)}>
-                  Back to today
-                </button>
-              ) : null}
-              <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={() => step(1)}>
-                Next day
-                <ChevronRight />
-              </button>
-            </div>
+            ) : null}
           </section>
 
           <div className="alm-where">
@@ -742,10 +729,7 @@ export default function TodayScreen() {
               <p className="v-small v-muted">
                 {!active ? (
                   <>
-                    No one saved yet.{" "}
-                    <Link className="alm-link" to="/leaf/new">
-                      Add a person
-                    </Link>{" "}
+                    No one saved yet. <Link to="/leaf/new">Add a person</Link>{" "}
                   </>
                 ) : null}
                 {offset !== 0 ? <>Read at sunrise, {clock.hm12(p.sunriseMs)}.</> : null}
@@ -767,21 +751,32 @@ export default function TodayScreen() {
                   <div className="v-stack">
                     <Section title="The five parts of the day" note="Tap a row for the exact times" />
                     <LimbRows rows={rows.limbs} onOpen={openFoot} label="The five parts of the day" />
-                    <Section title="Month and season" />
-                    <LimbRows rows={rows.season} onOpen={openFoot} label="Month and season" />
                   </div>
                   <div className="v-stack">
-                    <Section
-                      title="Times of day"
-                      note={
-                        <>
-                          What tradition avoids and favours <InfoDot id="rahu-kala" label="Rāhu Kāla" />
-                        </>
-                      }
-                    />
-                    <TimeRows rows={rows.times} onOpen={openFoot} />
+                    <Section title="Times of day" note="What tradition favours and what it sets aside" />
+                    <Windows tone="good" rows={good} clock={clock} onOpen={openFoot} />
+                    <Windows tone="avoid" rows={avoid} clock={clock} onOpen={openFoot} />
                   </div>
                 </div>
+                <details className="v-fold">
+                  <summary>
+                    <span>
+                      More about this day
+                      <span className="v-fold__s">Moonrise, the Hindu month and the season</span>
+                    </span>
+                  </summary>
+                  <div className="v-fold__body">
+                    <LimbRows rows={more} onOpen={openFoot} label="More about this day" plain />
+                  </div>
+                </details>
+                <SkyEvents
+                  nowMs={tickMs}
+                  place={{ lat: place.lat, lon: place.lon, name: city }}
+                  zone={place.zone}
+                  preset={preset}
+                  days={40}
+                  limit={3}
+                />
               </>
             ) : tab === "chog" ? (
               <ChoghadiyaPanel day={periods.chog.day} night={periods.chog.night} clock={clock} dayMs={p.sunriseMs} nowMs={nowMs} />
@@ -802,15 +797,6 @@ export default function TodayScreen() {
               />
             ) : null}
           </div>
-
-          <SkyEvents
-            nowMs={tickMs}
-            place={{ lat: place.lat, lon: place.lon, name: city }}
-            zone={place.zone}
-            preset={preset}
-            days={40}
-            limit={4}
-          />
 
           <details className="v-fold">
             <summary>
