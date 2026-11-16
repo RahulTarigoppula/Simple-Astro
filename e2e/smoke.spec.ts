@@ -42,7 +42,7 @@ test("home answers how the day is for the saved person", async ({ page }) => {
   await sealReferenceLeaf(page);
   await page.goto("#/");
   await expect(page.getByRole("heading", { name: /, Rahul$/ })).toBeVisible();
-  await expect(page.getByText("Your day", { exact: true })).toBeVisible();
+  await expect(page.getByText(/^Your day/)).toBeVisible();
   await expect(page.getByRole("heading", { name: "Good times today" })).toBeVisible();
   await page.getByRole("link", { name: "Week ahead" }).click();
   await expect(page.getByRole("tab", { name: "Week" })).toHaveAttribute("aria-selected", "true");

@@ -18,12 +18,13 @@ import { SkyEvents } from "../cosmic/SkyEvents";
 import { MoonDisc } from "./MoonDisc";
 import "./home.css";
 
-const TONE_WORD = { bright: "Bright", steady: "Steady", mixed: "Mixed", testing: "Quiet" } as const;
+// One scale of words everywhere: the day, a week, a life area.
+const TONE_WORD = { bright: "Strong", steady: "Good", mixed: "Mixed", testing: "Go gently" } as const;
 const TONE_HINT = {
   bright: "Most of the sky favours you",
   steady: "More help than hindrance",
   mixed: "Help and hindrance in balance",
-  testing: "Tradition advises patience",
+  testing: "A day for patience, not big starts",
 } as const;
 const AREA_WORD = { bright: "Strong", steady: "Good", mixed: "Mixed", testing: "Go gently" } as const;
 const areaTone = (s: number) => (s >= 0.35 ? "bright" : s >= 0 ? "steady" : s >= -0.35 ? "mixed" : "testing");
@@ -136,7 +137,7 @@ function Welcome() {
           <Row icon={<IconForecast />} tone="cyan" title="Your forecast" sub="Day, week, month and year" />
         </li>
         <li>
-          <Row icon={<IconMilan />} tone="rose" title="Partner Compatibility" sub="How two people fit, with a score" />
+          <Row icon={<IconMilan />} tone="rose" title="Partner match" sub="How two people fit, with a score" />
         </li>
         <li>
           <Row icon={<IconPalm />} tone="green" title="Palm reading" sub="A photo of your hand, read on this phone" />
@@ -220,7 +221,7 @@ function Day({ profile, patri, settings, now }: DayProps) {
         <div className="home-day__top">
           <DayRing score={f.score} word={word} />
           <div className="home-day__text">
-            <p className="v-eyebrow">Your day</p>
+            <p className="v-eyebrow">Your day · from the Moon</p>
             <h2 id="home-day-h" className="home-day__word">
               {word}
             </h2>
@@ -330,7 +331,8 @@ function Day({ profile, patri, settings, now }: DayProps) {
           ) : null}
 
           <Section
-            title="Your life today"
+            title="Your life these weeks"
+        note="From the slower planets, so it changes over weeks, not day to day."
             action={
               <Link to={`/forecast/${profile.id}`} className="v-link">
                 Why <ChevronRight size={16} />
