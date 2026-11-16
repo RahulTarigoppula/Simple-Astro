@@ -182,7 +182,7 @@ export default function CircleScreen() {
       <Link to="/leaf/new" className="v-btn v-btn--block" onClick={(e) => rememberOrigin(e.currentTarget)}>
         + Add a person
       </Link>
-      <p className="v-foot">Everyone here is kept on this device only. "More" has the encrypted backup and delete.</p>
+      <p className="v-foot">Everyone here is kept on this device only. The ⋯ button on a person has the encrypted backup and delete.</p>
 
       <Sheet open={sheet !== null && sheetProfile !== undefined} onClose={() => setSheet(null)} label={sheetProfile?.name ?? "Person"}>
         {sheet && sheetProfile ? (

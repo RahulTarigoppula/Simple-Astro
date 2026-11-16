@@ -291,9 +291,21 @@ export interface PalmReading {
 }
 
 // ─── settings ────────────────────────────────────────────────────────────────
+/** Where the reader is now: the place the day's hours and the almanac are worked out for. */
+export interface HerePlace {
+  name: string; // "Hyderabad, Telangana, IN"
+  lat: number;
+  lon: number;
+  zone: string; // IANA
+}
+
 export interface Settings {
   preset: EnginePreset;
-  theme: "auto" | "night" | "day"; // auto = by real sun altitude at the active place
+  theme: "auto" | "night" | "day"; // night = dark, day = light, auto = the device's own light/dark setting
+  /** Larger text across the app, for tired eyes. */
+  textSize: "normal" | "large" | "larger";
+  /** null = each person's birthplace is used for today's hours and the almanac. */
+  currentPlace: HerePlace | null;
   chartScript: "devanagari" | "latin";
   chartStyle: "north" | "south";
   devanagariDigits: boolean;
@@ -311,7 +323,9 @@ export interface Settings {
 export const DEFAULT_SETTINGS: Settings = {
   preset: DEFAULT_PRESET,
   theme: "auto",
-  chartScript: "devanagari",
+  textSize: "normal",
+  currentPlace: null,
+  chartScript: "latin",
   chartStyle: "north",
   devanagariDigits: false,
   language: "en",

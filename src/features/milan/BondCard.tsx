@@ -22,6 +22,8 @@ const BAND_WORD: Record<MilanResult["band"], string> = {
   acceptable: "Good",
   "not-recommended": "Needs work",
 };
+/** Said first when the traditional verdict is the lowest band, in place of a bare "not recommended". */
+export const FLAGGED_LEAD = "Tradition flags this pairing; many families then look at the exceptions below.";
 const scoreTone = (score: number): Tone => (score >= 69 ? "bright" : score >= 50 ? "steady" : "mixed");
 
 function Ring({ score, word }: { score: number; word: string }) {
@@ -96,6 +98,7 @@ export function BondCard({ r, pa, pb, patA, patB, onCopy }: BondProps) {
             <p className="mm-hero__hint">{b.headline}</p>
           </div>
         </div>
+        {r.band === "not-recommended" ? <p className="mm-hero__line">{FLAGGED_LEAD}</p> : null}
         <p className="mm-hero__line">{b.summary}</p>
         <p className="mm-hero__trad">
           Traditional score: <b>{fmtPts(r.total)} of 36</b> <span className="v-muted">(Guna Milan)</span> <InfoDot id="guna-milan" />
@@ -106,6 +109,9 @@ export function BondCard({ r, pa, pb, patA, patB, onCopy }: BondProps) {
           </button>
         </div>
       </section>
+      <p className="v-small v-muted mm-order">
+        Tradition reads the match from the first person toward the second, so swapping can change a few points.
+      </p>
 
       <div className="v-cols">
         <div className="v-stack">
@@ -115,7 +121,8 @@ export function BondCard({ r, pa, pb, patA, patB, onCopy }: BondProps) {
               <li key={p.id} data-tone={LEVEL_TONE[p.level]}>
                 <span className="mm-parts__l">{p.label}</span>
                 <span className="mm-parts__w">
-                  {LEVEL_WORD[p.level]} · {p.score}
+                  {LEVEL_WORD[p.level]}
+                  <span className="mm-parts__n">{p.score} of 100</span>
                 </span>
                 <span className="v-meter" role="img" aria-label={`${p.label}: ${LEVEL_WORD[p.level]}, ${p.score} out of 100`}>
                   <span style={{ width: `${Math.max(4, p.score)}%` }} />

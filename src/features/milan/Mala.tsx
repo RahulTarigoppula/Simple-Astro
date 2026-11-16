@@ -33,7 +33,11 @@ interface MalaProps {
 export function Mala({ result, onOpen }: MalaProps) {
   return (
     <div className="mm-mala">
-      <p className="mm-mala__sum">{`${fmtPts(result.total)} of 36 points: ${BAND_LABEL[result.band]}.`}</p>
+      <p className="mm-mala__sum">
+        {result.band === "not-recommended"
+          ? `${fmtPts(result.total)} of 36 points, under the traditional line of 18.`
+          : `${fmtPts(result.total)} of 36 points: ${BAND_LABEL[result.band]}.`}
+      </p>
       <p className="v-small v-muted">Eight tests, each worth more than the one before. Tap a test to see its rule.</p>
       <ul className="mm-kootas">
         {result.kootas.map((k) => (

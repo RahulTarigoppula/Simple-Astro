@@ -81,7 +81,7 @@ h3 {
 
 /* ── Glass panes ──────────────────────────────────────────────────────── */
 .paper {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.01)), var(--surface);
+  background: linear-gradient(180deg, rgba(var(--tint), 0.045), rgba(var(--tint), 0.01)), var(--surface);
   color: var(--ink);
   border: 1px solid var(--glass-edge);
   border-radius: var(--radius-lg);
@@ -168,7 +168,7 @@ h3 {
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 .stamp:disabled {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--tint), 0.04);
   color: var(--ink-muted);
   outline: 1px dashed var(--border-strong);
   box-shadow: none;
@@ -187,7 +187,7 @@ h3 {
   border: 1px solid rgba(180, 192, 255, 0.22);
   border-radius: var(--radius-sm);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(var(--tint), 0.1),
     0 8px 24px rgba(0, 0, 0, 0.3);
   color: var(--engraved);
   font-family: var(--font-mono);
@@ -241,7 +241,7 @@ h3 {
 }
 .ledge a:hover,
 .ledge button:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(var(--tint), 0.05);
   color: var(--ink);
 }
 .ledge [aria-current="page"] {
@@ -276,7 +276,7 @@ h3 {
   backdrop-filter: blur(16px);
 }
 dialog.sheet-dialog {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent), rgba(13, 16, 42, 0.92);
+  background: linear-gradient(180deg, rgba(var(--tint), 0.05), transparent), rgba(13, 16, 42, 0.92);
   border: 1px solid var(--glass-edge);
   border-bottom: 0;
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
@@ -304,7 +304,7 @@ dialog.sheet-dialog::backdrop {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-full);
   color: var(--ink-muted);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(var(--tint), 0.03);
   transition:
     background var(--dur-fast) var(--ease-out),
     color var(--dur-fast) var(--ease-out);
@@ -321,7 +321,7 @@ dialog.sheet-dialog::backdrop {
   box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
 }
 .switch {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(var(--tint), 0.1);
   box-shadow: inset 0 0 0 1px var(--border-strong);
 }
 .switch::after {
@@ -334,11 +334,11 @@ dialog.sheet-dialog::backdrop {
 
 /* Brass drums become glass dials */
 .drum {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, 0.3)), rgba(18, 22, 56, 0.85);
+  background: linear-gradient(180deg, rgba(var(--tint), 0.08), rgba(var(--tint), 0) 40%, rgba(0, 0, 0, 0.3)), rgba(18, 22, 56, 0.85);
   border: 1px solid var(--glass-edge-strong);
   border-radius: var(--radius-md);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 1px 0 rgba(var(--tint), 0.12),
     0 10px 28px rgba(0, 0, 0, 0.4);
 }
 .drum:focus-visible {
@@ -435,7 +435,7 @@ dialog.sheet-dialog::backdrop {
   font-variation-settings: normal;
 }
 .ledger tbody tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.025);
+  background: rgba(var(--tint), 0.025);
 }
 .ledger tbody tr.is-lit {
   background: rgba(245, 196, 107, 0.1);
@@ -447,7 +447,7 @@ dialog.sheet-dialog::backdrop {
 
 /* Daśā ribbon */
 .ribbon button {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--tint), 0.04);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
 }
@@ -494,7 +494,7 @@ dialog.sheet-dialog::backdrop {
 
 /* Mala beads */
 .beads i {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(var(--tint), 0.07);
   box-shadow: inset 0 0 0 1px var(--border-strong);
 }
 .beads i.on {
@@ -502,7 +502,7 @@ dialog.sheet-dialog::backdrop {
   box-shadow: 0 0 8px rgba(245, 196, 107, 0.6);
 }
 .beads i.half {
-  background: linear-gradient(90deg, var(--accent-2) 0 50%, rgba(255, 255, 255, 0.07) 50%);
+  background: linear-gradient(90deg, var(--accent-2) 0 50%, rgba(var(--tint), 0.07) 50%);
 }
 .beads i.dosha {
   background: var(--rose-glow);
@@ -594,7 +594,7 @@ body,
 }
 .sky-btn {
   border-color: var(--glass-edge-strong);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--tint), 0.04);
   color: var(--ink);
 }
 .sky-btn:hover {
@@ -758,7 +758,7 @@ body,
 
 /* Quiet labels: the old engraved brass plates become soft glass captions */
 .engraved {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--tint), 0.04);
   border: 1px solid var(--glass-edge);
   box-shadow: none;
   color: var(--ink-muted);

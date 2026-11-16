@@ -26,6 +26,13 @@ export const SPELL_LABEL: Record<SaturnSpell["kind"], string> = {
   ashtama: "Aṣṭama Śani",
 };
 
+/** The same seasons in plain words; the Sanskrit name follows as the small line. */
+export const SPELL_PLAIN: Record<SaturnSpell["kind"], string> = {
+  "sade-sati": "Long season",
+  kantaka: "Short season",
+  ashtama: "Short season",
+};
+
 interface SadeSatiRibbonProps {
   result: SadeSatiResult;
   birthMs: number;
@@ -121,26 +128,26 @@ export function SadeSatiRibbon({ result, birthMs, nowMs, zone }: SadeSatiRibbonP
 
       <ul className="gochar-rib__legend" aria-label="Ribbon key">
         <li>
-          <i className="sw is-rising" aria-hidden="true" /> Rising (12th)
+          <i className="sw is-rising" aria-hidden="true" /> Long season: rising
         </li>
         <li>
-          <i className="sw is-peak" aria-hidden="true" /> Peak (1st)
+          <i className="sw is-peak" aria-hidden="true" /> peak
         </li>
         <li>
-          <i className="sw is-setting" aria-hidden="true" /> Setting (2nd)
+          <i className="sw is-setting" aria-hidden="true" /> setting
         </li>
         <li>
-          <i className="sw sw--line is-kantaka" aria-hidden="true" /> Kaṇṭaka (4th)
+          <i className="sw sw--line is-kantaka" aria-hidden="true" /> Short season (Saturn 4th from the Moon)
         </li>
         <li>
-          <i className="sw sw--line is-ashtama" aria-hidden="true" /> Aṣṭama (8th)
+          <i className="sw sw--line is-ashtama" aria-hidden="true" /> Short season (8th)
         </li>
       </ul>
 
       {spells.length === 0 ? (
-        <p className="v-muted">Śani does not cross these signs inside the ninety years shown.</p>
+        <p className="v-muted">Saturn (Śani) does not cross these signs inside the ninety years shown.</p>
       ) : (
-        <div className="gochar-rib__tabs" role="tablist" aria-label="Śani's spells from the Moon sign">
+        <div className="gochar-rib__tabs" role="tablist" aria-label="Saturn's seasons, one by one">
           {spells.map((s, i) => {
             // A spell can be "running" while Śani has retrograded back out of its signs for a while.
             const inside = i === nowIdx && s.intervals.some((iv) => nowMs >= iv.startMs && nowMs < iv.endMs);
@@ -159,12 +166,13 @@ export function SadeSatiRibbon({ result, birthMs, nowMs, zone }: SadeSatiRibbonP
                 aria-controls="gochar-spell-panel"
                 tabIndex={i === sel ? 0 : -1}
                 className={inside ? "is-now" : undefined}
-                aria-label={`${SPELL_LABEL[s.kind]}, ${fmtDate(s.startMs, zone)} to ${fmtDate(s.endMs, zone)}${inside ? ", running now" : paused ? ", paused while Śani stepped back" : ""}`}
+                aria-label={`${SPELL_PLAIN[s.kind]}, ${SPELL_LABEL[s.kind]}, ${fmtDate(s.startMs, zone)} to ${fmtDate(s.endMs, zone)}${inside ? ", running now" : paused ? ", paused while Śani stepped back" : ""}`}
                 onClick={() => pick(i)}
                 onKeyDown={(e) => onKey(e, i)}
               >
-                <span className="l">{SPELL_LABEL[s.kind]}</span>
+                <span className="l">{SPELL_PLAIN[s.kind]}</span>
                 <span className="y">{yearSpan(s.startMs, s.endMs, zone)}</span>
+                <span className="y">{SPELL_LABEL[s.kind]}</span>
               </button>
             );
           })}
@@ -209,7 +217,12 @@ export function SadeSatiRibbon({ result, birthMs, nowMs, zone }: SadeSatiRibbonP
 function SpellFold({ spell, nowMs, zone }: { spell: SaturnSpell; nowMs: number; zone: string }) {
   const seen = new Set<SaturnPhase>();
   return (
-    <div className="gochar-fold" id="gochar-spell-panel" role="tabpanel" aria-label={`${SPELL_LABEL[spell.kind]} phases`}>
+    <div
+      className="gochar-fold"
+      id="gochar-spell-panel"
+      role="tabpanel"
+      aria-label={`${SPELL_PLAIN[spell.kind]} (${SPELL_LABEL[spell.kind]}): its dated parts`}
+    >
       <ul>
         {spell.intervals.map((iv) => {
           const again = seen.has(iv.phase);

@@ -5,8 +5,12 @@
    "surface" is now a glass pane, "ink" is starlight text, "brass" is the gold of instruments,
    "accent" is the nebula violet, "lac" is the doṣa rose.
    ========================================================================== */
-:root {
+:root,
+.v-night {
   color-scheme: dark;
+
+  /* tint: the colour that lifts a surface (white on dark, indigo on light); always used as rgba(var(--tint), a) */
+  --tint: 255, 255, 255;
 
   /* ── space ── */
   --bg: #04050d; /* the void behind everything */
@@ -140,16 +144,6 @@
   --ease-spring: linear(0, 0.36 10%, 0.78 21%, 1.02 34%, 1.06 42%, 1.01 58%, 0.99 74%, 1);
 }
 
-/* "Day" is a lighter twilight of the same sky, the app stays astral. */
-:root[data-theme="day"] {
-  --bg: #0b1033;
-  --bg-elevated: #141a48;
-  --void-0: #0b1033;
-  --void-1: #121a4a;
-  --void-2: #1b2563;
-  --ledge: rgba(18, 24, 66, 0.72);
-}
-
 @media (prefers-reduced-motion: reduce) {
   :root {
     --dur-draw: 240ms;
@@ -158,7 +152,8 @@
 }
 
 /* ── Instrument & art stops (old names kept so every SVG re-themes) ── */
-:root {
+:root,
+.v-night {
   --brass-hi: #ffe7a8;
   --brass-mid: #f5c46b;
   --brass-lo: #b7791f;
@@ -203,13 +198,15 @@
 }
 
 /* The rooftop sky is always the deepest night. */
-:root {
+:root,
+.v-night {
   --sky-cloth: #070a1c;
   --sky-cloth-deep: #04050d;
 }
 
 /* ── 2.0 "clear sky": calm solid surfaces, one scale, semantic tones ── */
-:root {
+:root,
+.v-night {
   --ink-muted: #b7bde2;
   --card: #10153a;
   --card-2: #171d4b;
@@ -231,8 +228,63 @@
   --page-pad: 16px;
   --ledge-height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
 }
+
+/* ── Light theme: paper-white pages, indigo ink. Star charts and sky art keep the night (.v-night). ── */
 :root[data-theme="day"] {
-  --card: #161d52;
-  --card-2: #1e2764;
-  --card-hi: #283275;
+  color-scheme: light;
+  --tint: 30, 36, 110;
+  --bg: #f3f4fb;
+  --bg-elevated: #ffffff;
+  --void-0: #f3f4fb;
+  --void-1: #eceefa;
+  --void-2: #e2e6f8;
+  --surface: #ffffff;
+  --surface-2: rgba(30, 36, 110, 0.06);
+  --surface-solid: #ffffff;
+  --glass-hi: rgba(30, 36, 110, 0.04);
+  --glass-edge: rgba(30, 36, 110, 0.14);
+  --glass-edge-strong: rgba(30, 36, 110, 0.28);
+  --ink: #171b40;
+  --ink-muted: #4b5282;
+  --ink-faint: #9299c2;
+  --accent: #6d3fe0;
+  --accent-text: #5a2fc9;
+  --accent-2: #8f5a00;
+  --cyan: #0b7285;
+  --success: #15803d;
+  --warning: #b45309;
+  --warning-text: #92400e;
+  --danger: #be123c;
+  --border: rgba(30, 36, 110, 0.14);
+  --border-strong: rgba(30, 36, 110, 0.3);
+  --focus: #0b7285;
+  --moon: #e7a81a;
+  --ledge: rgba(255, 255, 255, 0.9);
+  --engraved: #171b40;
+  --card: #ffffff;
+  --card-2: #f7f8ff;
+  --card-hi: #e8ebfa;
+  --card-edge: rgba(30, 36, 110, 0.13);
+  --card-edge-strong: rgba(30, 36, 110, 0.3);
+  --good: #15803d;
+  --good-soft: rgba(21, 128, 61, 0.11);
+  --calm: #0369a1;
+  --calm-soft: rgba(3, 105, 161, 0.1);
+  --mixed: #a15c07;
+  --mixed-soft: rgba(180, 83, 9, 0.11);
+  --care: #be123c;
+  --care-soft: rgba(190, 18, 60, 0.09);
+  --violet-soft: rgba(109, 63, 224, 0.1);
+  --gold-soft: rgba(180, 120, 10, 0.13);
+  --aurora-soft: linear-gradient(120deg, rgba(139, 92, 246, 0.14), rgba(34, 211, 238, 0.1));
+  --shadow-1: 0 2px 8px rgba(30, 36, 110, 0.1);
+  --shadow-2: 0 10px 30px rgba(30, 36, 110, 0.14), 0 0 0 1px var(--glass-edge);
+  --shadow-3: 0 20px 60px rgba(30, 36, 110, 0.2), 0 0 0 1px var(--glass-edge-strong);
+  --brass-plate: linear-gradient(120deg, rgba(139, 92, 246, 0.14), rgba(34, 211, 238, 0.1)), #ffffff;
+}
+/* A night panel inside the light theme: its own dark ground, so light strokes and stars read. */
+:root[data-theme="day"] .v-night {
+  color-scheme: dark;
+  background-color: var(--card);
+  color: var(--ink);
 }

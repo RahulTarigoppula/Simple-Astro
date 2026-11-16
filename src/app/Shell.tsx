@@ -19,6 +19,8 @@ export function Shell() {
   const settings = useSettings();
   const swUpdate = useUi((s) => s.desk.swUpdate);
   const fullBleed = /\/capture$|\/sky$|\/journey$/.test(loc.pathname);
+  // A form in progress has no tab bar under it: one way forward, one way back.
+  const noTabs = fullBleed || /^\/leaf\//.test(loc.pathname);
   // The opening journey plays once per visit when Vyomaphala opens on Home.
   const [journey, setJourney] = useState(() => loc.pathname === "/" && shouldPlayJourney());
 
@@ -68,7 +70,7 @@ export function Shell() {
         <Toasts />
       </div>
       <ExplainSheet />
-      {fullBleed ? null : <Ledge />}
+      {noTabs ? null : <Ledge />}
       {journey ? (
         <Journey
           onDone={() => {

@@ -3,6 +3,7 @@
 // assumed) and Check (everything read back, with the Moon sign, birth star and rising sign, so a wrong
 // am/pm, day or town is caught before it is saved). One tap on Save saves one person.
 // The step lives in the address (?step=2), so the Back button walks the steps and never drops what was typed.
+// What was typed is also kept as a draft for this tab (leafDraft.ts), so leaving the form or a reload loses nothing.
 import tzlookup from "@photostructure/tz-lookup";
 import * as A from "astronomy-engine";
 import { DateTime } from "luxon";
@@ -30,27 +31,12 @@ import { play } from "../../platform/sound";
 import { countEvent } from "../../platform/stats";
 import { toast } from "../../state/ui";
 import { DateFields, fieldsOfHour, hourOf, missingText, Readback, TimeFields } from "./BirthFields";
+import { clearDraft, type Draft, draftKey, freshDraft, readDraft, sameDraft, writeDraft } from "./leafDraft";
 import "./leaf.css";
 
 /** Where the hand-typed coordinates start before a place is chosen; nothing else uses this. */
 const SKY_FALLBACK: Place = { name: "Bengaluru", admin1: "Karnataka", country: "IN", lat: 12.9716, lon: 77.5946, source: "manual" };
 const BOMBAY_TIME = 291; // +04:51, not in the IANA database
-
-interface Draft {
-  name: string;
-  y: number; // 0 = unset
-  mo: number; // 0 = unset
-  d: number; // 0 = unset
-  hour12: number; // 0 = unset
-  ampm: "am" | "pm" | null; // never assumed
-  mi: number;
-  place: Place | null;
-  override: "none" | "bombay" | "manual";
-  manualOffsetMin: number;
-  handedness: "right" | "left";
-  timeUnknown: boolean;
-  tradition: Tradition;
-}
 
 function draftFromProfile(p: Profile): Draft {
   const b = p.birth;
@@ -71,29 +57,84 @@ function draftFromProfile(p: Profile): Draft {
   };
 }
 
-/** Nothing is assumed: the date, the hour and the place all start empty. */
-function freshDraft(): Draft {
-  return {
-    name: "",
-    y: 0,
-    mo: 0,
-    d: 0,
-    hour12: 0,
-    ampm: null,
-    mi: 0,
-    place: null,
-    override: "none",
-    manualOffsetMin: 330,
-    handedness: "right",
-    timeUnknown: false,
-    tradition: "north",
-  };
+/** Country codes as the names people say. Anything else is looked up, and failing that the code is shown. */
+const COUNTRY: Record<string, string> = {
+  IN: "India",
+  US: "United States",
+  GB: "United Kingdom",
+  AE: "United Arab Emirates",
+  SG: "Singapore",
+  AU: "Australia",
+  CA: "Canada",
+  LK: "Sri Lanka",
+  NP: "Nepal",
+  BD: "Bangladesh",
+  MY: "Malaysia",
+  DE: "Germany",
+  PK: "Pakistan",
+  NZ: "New Zealand",
+  ZA: "South Africa",
+  MU: "Mauritius",
+  FJ: "Fiji",
+  QA: "Qatar",
+  KW: "Kuwait",
+  OM: "Oman",
+  SA: "Saudi Arabia",
+  BH: "Bahrain",
+};
+let regionNames: Intl.DisplayNames | null | undefined;
+function countryName(code: string): string {
+  const c = code.trim().toUpperCase();
+  if (!c) return "";
+  const known = COUNTRY[c];
+  if (known) return known;
+  if (!/^[A-Z]{2}$/.test(c)) return code.trim(); // an online lookup may already give the name
+  if (regionNames === undefined) {
+    try {
+      regionNames = new Intl.DisplayNames(["en"], { type: "region" });
+    } catch {
+      regionNames = null;
+    }
+  }
+  try {
+    return regionNames?.of(c) ?? c;
+  } catch {
+    return c;
+  }
 }
 
-/** "Bengaluru, Karnataka, IN" (a name that already carries its region is left as it is). */
-const placeLabel = (p: Place) => (p.name.includes(",") ? p.name : [p.name, p.admin1, p.country].filter(Boolean).join(", "));
+/** "Andhra Pradesh, India": the line under a place's name. */
+const placeRegion = (p: Place) => [p.admin1, countryName(p.country)].filter(Boolean).join(", ");
+/** "Bengaluru, Karnataka, India" (a name that already carries its region is left as it is). */
+const placeLabel = (p: Place) => (p.name.includes(",") ? p.name : [p.name, placeRegion(p)].filter(Boolean).join(", "));
 const latLon = (p: Place) =>
   `${Math.abs(p.lat).toFixed(4)} ${p.lat >= 0 ? "N" : "S"} · ${Math.abs(p.lon).toFixed(4)} ${p.lon >= 0 ? "E" : "W"}`;
+
+const plain = (t: string) =>
+  t
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+
+/**
+ * The list as it is shown: the search's own order, minus the loose look-alikes that trail after the
+ * last place whose name really holds what was typed ("Vijayaw" shows Vijayawada, not seven near
+ * misses). When no name holds it (an old name such as "Madras"), the list is left exactly as found.
+ */
+function shownResults(q: string, found: Place[]): Place[] {
+  const want = plain(q);
+  if (!want) return found;
+  let last = -1;
+  found.forEach((p, i) => {
+    if (plain(p.name).includes(want)) last = i;
+  });
+  return last === -1 ? found : found.slice(0, last + 1);
+}
+
+/** Two places with the same name in the same state can only be told apart by where they are. */
+const roughly = (p: Place) =>
+  `near ${Math.abs(p.lat).toFixed(1)}° ${p.lat >= 0 ? "N" : "S"}, ${Math.abs(p.lon).toFixed(1)}° ${p.lon >= 0 ? "E" : "W"}`;
 
 const STEPS = [
   { label: "Who", title: "Who is this for?" },
@@ -139,7 +180,11 @@ export default function LeafScreen() {
   const navigate = useNavigate();
   const location = useLocation();
   const [params] = useSearchParams();
-  const [draft, setDraft] = useState<Draft>(freshDraft);
+  const key = draftKey(id);
+  // "Add a person" picks up the draft this tab was keeping, if there is one.
+  const [kept] = useState(() => (id ? null : readDraft(draftKey())));
+  const [draft, setDraft] = useState<Draft>(() => kept ?? freshDraft());
+  const [restored, setRestored] = useState(kept !== null);
   const [loadedFrom, setLoadedFrom] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Place[]>([]);
@@ -152,16 +197,20 @@ export default function LeafScreen() {
   const lastSign = useRef(-1);
   const body = useRef<HTMLFormElement>(null);
 
-  // Edit mode: load the person once. Leaving an edit for "Add a person" starts from an empty draft
-  // (both routes render this same screen, so React would otherwise keep the old state).
+  // Edit mode: load the person once (or the unsaved changes kept for them). Leaving an edit for
+  // "Add a person" starts from that flow's own draft, or an empty one (both routes render this same
+  // screen, so React would otherwise keep the old state).
   useEffect(() => {
     if (!id && loadedFrom !== null) {
-      setDraft(freshDraft());
+      const mine = readDraft(draftKey());
+      setDraft(mine ?? freshDraft());
+      setRestored(mine !== null);
       setLoadedFrom(null);
       return;
     }
     if (editing && loadedFrom !== editing.id) {
-      setDraft(draftFromProfile(editing));
+      setDraft(readDraft(draftKey(editing.id)) ?? draftFromProfile(editing));
+      setRestored(false);
       setLoadedFrom(editing.id);
     }
   }, [id, editing, loadedFrom]);
@@ -194,7 +243,7 @@ export default function LeafScreen() {
   useEffect(() => {
     if (!gazReady) return;
     const q = query.trim();
-    setResults(q.length >= 2 ? searchPlaces(q, 8) : []);
+    setResults(q.length >= 2 ? shownResults(q, searchPlaces(q, 8)) : []);
   }, [query, gazReady]);
 
   const set = useCallback(<K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v })), []);
@@ -295,7 +344,15 @@ export default function LeafScreen() {
   const problem = step < LAST ? (problems[step] ?? null) : resolved.m ? null : (problems[2] ?? "These birth details cannot be saved yet.");
   const trail = (location.state ?? {}) as Trail;
   const depth = trail.depth ?? 0;
-  const ready = !id || loadedFrom === id;
+  const ready = id ? loadedFrom === id : loadedFrom === null;
+
+  // Keep the draft as it changes. A form with nothing new in it keeps nothing.
+  useEffect(() => {
+    if (!ready || leaving) return;
+    const untouched = id ? (editing ? draftFromProfile(editing) : null) : freshDraft();
+    if (untouched && sameDraft(draft, untouched)) clearDraft(key);
+    else writeDraft(key, draft);
+  }, [draft, key, ready, leaving, id, editing]);
 
   // The address always names the step that is on screen (a reload on a later step with an empty form
   // shows the first one), so Back never lands on a step that was never really reached.
@@ -314,6 +371,9 @@ export default function LeafScreen() {
     if (problem) {
       setTried(true);
       play("dull");
+      // On When the sentence under the fields says what is missing: bring it into view.
+      const read = step === 1 ? body.current?.querySelector<HTMLElement>(".bf-read") : null;
+      if (read && typeof read.scrollIntoView === "function") read.scrollIntoView({ block: "nearest" });
       return;
     }
     goTo(step + 1);
@@ -382,6 +442,7 @@ export default function LeafScreen() {
       haptics.impact("medium");
       toast(`Saved ${name}. Their birth chart is ready.`);
       countEvent(editing ? "person-edited" : "person-added");
+      clearDraft(key);
       setLeaving(`/patri/${profile.id}`); // stays "saving": this screen is on its way out
       if (depth > 0) navigate(-depth);
     } catch (e) {
@@ -427,7 +488,22 @@ export default function LeafScreen() {
     haptics.selection();
   };
 
+  /** Throw the kept draft away and begin with an empty form. */
+  const startAgain = () => {
+    clearDraft(key);
+    setDraft(freshDraft());
+    setRestored(false);
+    setTried(false);
+    setQuery("");
+    setResults([]);
+    setManual(false);
+    setAdvOpen(false);
+    play("tick");
+  };
+
   const fillExample = () => {
+    // The example replaces whatever draft was being kept.
+    setRestored(false);
     setDraft(draftFromProfile(REFERENCE_PROFILE));
     play("tick");
     goTo(LAST);
@@ -531,6 +607,14 @@ export default function LeafScreen() {
 
         {step === 0 ? (
           <>
+            {restored && !id ? (
+              <div className="v-note leaf-kept" role="status">
+                <span>Carrying on where you left off.</span>
+                <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={startAgain}>
+                  Start again
+                </button>
+              </div>
+            ) : null}
             <p className="v-muted">Four short steps, about a minute. Everything stays on this device.</p>
             <div className="v-field">
               <label className="v-label" htmlFor="leaf-name">
@@ -668,19 +752,21 @@ export default function LeafScreen() {
             </div>
             {results.length ? (
               <ul className="v-list leaf-results" aria-label="Places found">
-                {results.map((p) => (
-                  <li key={`${p.geonameId ?? ""}-${p.lat}-${p.lon}`}>
-                    <button type="button" className="v-row" onClick={() => choosePlace(p)}>
-                      <span className="v-row__body">
-                        <span className="v-row__t">{p.name}</span>
-                        <span className="v-row__s">
-                          {[p.admin1, p.country].filter(Boolean).join(", ")}
-                          <span className="leaf-ll leaf-ll--after">{latLon(p)}</span>
+                {results.map((p) => {
+                  const region = placeRegion(p);
+                  const twin = results.some((o) => o !== p && o.name === p.name && placeRegion(o) === region);
+                  const sub = [region, twin ? roughly(p) : ""].filter(Boolean).join(" · ");
+                  return (
+                    <li key={`${p.geonameId ?? ""}-${p.lat}-${p.lon}`}>
+                      <button type="button" className="v-row" onClick={() => choosePlace(p)}>
+                        <span className="v-row__body">
+                          <span className="v-row__t">{p.name}</span>
+                          {sub ? <span className="v-row__s">{sub}</span> : null}
                         </span>
-                      </span>
-                    </button>
-                  </li>
-                ))}
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             ) : null}
             {query.trim().length >= 2 && results.length === 0 ? (
@@ -701,7 +787,7 @@ export default function LeafScreen() {
                 </div>
               </div>
             ) : null}
-            <div className={`leaf-chosen${draft.place ? " is-set" : ""}`} id="leaf-place-chosen" aria-live="polite">
+            <div className={`leaf-chosen${draft.place ? " is-set" : tried ? " is-missing" : ""}`} id="leaf-place-chosen" aria-live="polite">
               {draft.place ? (
                 <>
                   <span className="leaf-chosen__tick">
@@ -709,11 +795,11 @@ export default function LeafScreen() {
                   </span>
                   <span className="leaf-chosen__body">
                     <span className="leaf-chosen__t">{placeLabel(draft.place)}</span>
-                    <span className="leaf-ll">{latLon(draft.place)}</span>
+                    {draft.place.source === "manual" ? <span className="leaf-ll">{latLon(draft.place)}</span> : null}
                   </span>
                 </>
               ) : (
-                <span>Not chosen yet.</span>
+                <span>{tried ? "Not chosen yet." : "The place you pick will show here."}</span>
               )}
             </div>
 
@@ -806,6 +892,7 @@ export default function LeafScreen() {
                 <div className="v-field">
                   <span className="v-label">Coordinates</span>
                   <span className="v-hint">For a village that is not in the list, type its latitude and longitude.</span>
+                  {draft.place ? <span className="leaf-ll">Now: {latLon(draft.place)}</span> : null}
                   {manual ? (
                     <ManualPlace
                       initial={draft.place ?? SKY_FALLBACK}
@@ -922,7 +1009,7 @@ export default function LeafScreen() {
                       <dt>Birth star (nakṣatra)</dt>
                       <dd>
                         {nakBoth(check.nak, draft.tradition)}
-                        <small>pada {check.pada}</small>
+                        <small>Quarter (pada) {check.pada}</small>
                       </dd>
                     </div>
                     <div>
@@ -965,37 +1052,17 @@ export default function LeafScreen() {
                   <span className="v-fold__s">Time zone, clock offset and Julian Day, as worked out.</span>
                 </span>
               </summary>
-              <div className="v-fold__body">{stripEl}</div>
+              <div className="v-fold__body">
+                {stripEl}
+                {draft.place ? <p className="leaf-ll leaf-coords">Coordinates: {latLon(draft.place)}</p> : null}
+              </div>
             </details>
           </>
         ) : null}
 
-        {/* On When the sentence under the fields already says what is missing. */}
-        {tried && problem && step !== 1 ? (
-          <p className="v-error leaf-problem" role="alert">
-            {problem}
-          </p>
-        ) : null}
-
-        <div className="leaf-foot">
-          {step > 0 ? (
-            <button type="button" className="v-btn v-btn--ghost" onClick={back}>
-              Back
-            </button>
-          ) : null}
-          {step === LAST ? (
-            <button type="submit" className="v-btn leaf-foot__go" disabled={!resolved.m}>
-              {id ? "Save changes" : "Save"}
-            </button>
-          ) : (
-            <button type="submit" className="v-btn leaf-foot__go">
-              Next
-            </button>
-          )}
-        </div>
         {step === LAST ? <p className="v-small v-muted leaf-foot__note">Nothing leaves this device.</p> : null}
 
-        {step === 0 && !id && !draft.name && !draft.d && !draft.place ? (
+        {step === 0 && !id && (restored || (!draft.name && !draft.d && !draft.place)) ? (
           <div className="leaf-example">
             <p className="v-small v-muted">Just looking around?</p>
             <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={fillExample}>
@@ -1003,6 +1070,32 @@ export default function LeafScreen() {
             </button>
           </div>
         ) : null}
+
+        {/* The way forward stays in reach: this bar is pinned to the bottom of the scrolling page. */}
+        <div className="leaf-foot" data-testid="leaf-actions">
+          {/* On When the sentence under the fields already says what is missing. */}
+          {tried && problem && step !== 1 ? (
+            <p className="v-error leaf-problem" role="alert">
+              {problem}
+            </p>
+          ) : null}
+          <div className="leaf-foot__row">
+            {step > 0 ? (
+              <button type="button" className="v-btn v-btn--ghost" onClick={back}>
+                Back
+              </button>
+            ) : null}
+            {step === LAST ? (
+              <button type="submit" className="v-btn leaf-foot__go" disabled={!resolved.m}>
+                {id ? "Save changes" : "Save"}
+              </button>
+            ) : (
+              <button type="submit" className="v-btn leaf-foot__go">
+                Next
+              </button>
+            )}
+          </div>
+        </div>
       </form>
 
       <Sheet open={online === "asking"} onClose={() => setOnline("idle")} label="Search online?">

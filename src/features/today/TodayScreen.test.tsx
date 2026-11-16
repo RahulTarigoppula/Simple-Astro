@@ -80,7 +80,8 @@ describe("TodayScreen", { timeout: 60_000 }, () => {
     expect(
       await screen.findByRole("heading", { level: 2, name: /^Today\s*\w+day, \d+ \w+ \d{4}$/ }, { timeout: 5000 }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/the almanac is for Bengaluru/)).toBeInTheDocument();
+    expect(screen.getByText(/^Times are for/).closest("p")).toHaveTextContent(/^Times are for Bengaluru\. Change/);
+    expect(screen.getByRole("link", { name: "Add a person" })).toHaveAttribute("href", "/leaf/new");
     // The answer first: the lunar day as a sentence, the Moon, sunrise and sunset.
     expect(screen.getByText(/day of the (growing|fading) Moon$|^(Full|New) Moon day$/)).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /^The Moon: \d+% lit, (growing|fading)$/ })).toBeInTheDocument();

@@ -55,7 +55,7 @@ export function moonDaySentence(dawn: Moon | null, dusk: Moon | null, noon: Moon
   if (dawn.sign !== dusk.sign || dawn.nakshatra !== dusk.nakshatra) {
     return `The Moon moved that day from ${star(dawn.nakshatra)} in ${sign(dawn.sign)} to ${star(dusk.nakshatra)} in ${sign(dusk.sign)}, so even its nakṣatra is uncertain.`;
   }
-  return `The Moon stayed in ${star(noon.nakshatra)} (${sign(noon.sign)}) all day, so the Moon sign, nakṣatra and Partner Compatibility hold.`;
+  return `The Moon stayed in ${star(noon.nakshatra)} (${sign(noon.sign)}) all day, so the Moon sign, nakṣatra and Partner match hold.`;
 }
 
 export function TimeUnknownNote({ profile, patri }: { profile: Profile; patri: Patri }) {

@@ -1,6 +1,6 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
-import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { Page } from "../../components/ui/Page";
 import { db } from "../../data/db";
 import { saveSettings, upsertProfile } from "../../data/repo";
@@ -9,6 +9,17 @@ import { DEFAULT_PRESET, type Profile } from "../../engine/types";
 import HomeScreen from "./HomeScreen";
 import { MoonDisc } from "./MoonDisc";
 
+// The built-in place index is a large file fetched at run time; the sheet only needs "a list to pick from".
+vi.mock("../../data/places", async (original) => ({
+  ...(await original<typeof import("../../data/places")>()),
+  loadGazetteer: () => Promise.resolve({}),
+  searchPlaces: (q: string) =>
+    q.toLowerCase().startsWith("lon")
+      ? [{ name: "London", admin1: "England", country: "GB", lat: 51.5085, lon: -0.1257, timezone: "Europe/London", source: "bundle" }]
+      : [],
+}));
+
+const HYDERABAD = { name: "Hyderabad, Telangana, IN", lat: 17.385, lon: 78.4867, zone: "Asia/Kolkata" };
 const ID = REFERENCE_PROFILE.id;
 const SECOND: Profile = { ...REFERENCE_PROFILE, id: "second-person", name: "Priya" };
 
@@ -74,6 +85,80 @@ describe("Today, the home screen", () => {
     const areas = screen.getAllByRole("img", { name: /: (Strong|Good|Mixed|Go gently)$/ });
     expect(areas).toHaveLength(7);
     expect(screen.getByRole("link", { name: "Open today's almanac" })).toHaveAttribute("href", "/today");
+  });
+
+  it("says which place the times are for, and lets you change it without touching the person", async () => {
+    await upsertProfile(REFERENCE_PROFILE);
+    await saveSettings({ activeProfileId: ID, preset: DEFAULT_PRESET });
+    const before = await db.profiles.get(ID);
+    const birthTown = REFERENCE_PROFILE.birth.place.name.split(",")[0] as string;
+    renderAt();
+    const hoursOf = () => screen.getByRole("heading", { name: "Good times today" }).closest("section") as HTMLElement;
+    await screen.findByRole("heading", { name: "Good times today" }, { timeout: 8000 });
+    // the birthplace stands in until a place is set
+    expect(
+      within(hoursOf())
+        .getByText(/^Times are for/)
+        .closest("p"),
+    ).toHaveTextContent(`Times are for ${birthTown}, where Rahul was born. Live somewhere else? Change`);
+    const sunriseAtBirthplace = /Sunrise (\d{1,2}:\d\d [ap]m)/.exec(hoursOf().textContent ?? "")?.[1];
+
+    // pick a town in the sheet: saved as the app's place, sheet closed, the card re-read for it
+    fireEvent.click(within(hoursOf()).getByRole("button", { name: /^Change/ }));
+    const dlg = await screen.findByRole("dialog", { name: "Where are you now?" });
+    expect(within(dlg).getByText(/Your birth chart never changes\./)).toBeInTheDocument();
+    fireEvent.change(within(dlg).getByRole("searchbox", { name: "Find your town or city" }), { target: { value: "lond" } });
+    const row = await within(dlg).findByRole("button", { name: /London/ });
+    expect(row).toHaveTextContent("England, United Kingdom");
+    expect(row.textContent).not.toMatch(/\d+\.\d+/); // no raw coordinates
+    fireEvent.click(row);
+    await waitFor(async () =>
+      expect((await db.settings.get("app"))?.value.currentPlace).toEqual({
+        name: "London, England, GB",
+        lat: 51.5085,
+        lon: -0.1257,
+        zone: "Europe/London",
+      }),
+    );
+    await waitFor(() =>
+      expect(
+        within(hoursOf())
+          .getByText(/^Times are for/)
+          .closest("p"),
+      ).toHaveTextContent(/^Times are for London\. Change/),
+    );
+    expect(/Sunrise (\d{1,2}:\d\d [ap]m)/.exec(hoursOf().textContent ?? "")?.[1]).not.toBe(sunriseAtBirthplace);
+    expect(screen.queryByRole("dialog", { name: "Where are you now?" })).toBeNull();
+
+    // and back to the birthplace
+    fireEvent.click(within(hoursOf()).getByRole("button", { name: /^Change/ }));
+    const again = await screen.findByRole("dialog", { name: "Where are you now?" });
+    fireEvent.click(within(again).getByRole("button", { name: (n) => n.startsWith(`Use Rahul's birthplace (${birthTown})`) }));
+    await waitFor(async () => expect((await db.settings.get("app"))?.value.currentPlace).toBeNull());
+    await waitFor(() =>
+      expect(
+        within(hoursOf())
+          .getByText(/^Times are for/)
+          .closest("p"),
+      ).toHaveTextContent(/where Rahul was born/),
+    );
+    // the person's stored birth details were never written to
+    expect(await db.profiles.get(ID)).toEqual(before);
+  });
+
+  it("with a place already set, the hours are for that place", async () => {
+    await upsertProfile(REFERENCE_PROFILE);
+    await saveSettings({ activeProfileId: ID, preset: DEFAULT_PRESET, currentPlace: HYDERABAD });
+    renderAt();
+    const hours = (await screen.findByRole("heading", { name: "Good times today" }, { timeout: 8000 })).closest("section") as HTMLElement;
+    await waitFor(() =>
+      expect(
+        within(hours)
+          .getByText(/^Times are for/)
+          .closest("p"),
+      ).toHaveTextContent(/^Times are for Hyderabad\. Change/),
+    );
+    expect(hours).toHaveTextContent(/Sunrise \d{1,2}:\d\d am/);
   });
 
   it("the person chip names the person on screen and switches to another", async () => {

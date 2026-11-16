@@ -41,9 +41,11 @@ interface HoursProps {
   sun: { riseMs: number; setMs: number } | null;
   /** The present moment when the day shown is today, else null. */
   now: number | null;
+  /** A closing line inside the card (which place the times are for). */
+  children?: React.ReactNode;
 }
 
-export function HoursCard({ g, zone, sun, now }: HoursProps) {
+export function HoursCard({ g, zone, sun, now, children }: HoursProps) {
   const span = sun ? Math.max(1, sun.setMs - sun.riseMs) : 1;
   const at = (ms: number) => (sun ? Math.min(100, Math.max(0, ((ms - sun.riseMs) / span) * 100)) : 0);
   const inAvoid = now !== null && now >= g.avoid[0] && now < g.avoid[1];
@@ -122,6 +124,7 @@ export function HoursCard({ g, zone, sun, now }: HoursProps) {
           </dd>
         </div>
       </dl>
+      {children}
     </section>
   );
 }

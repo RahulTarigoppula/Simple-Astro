@@ -1,3 +1,4 @@
+// One scale of words everywhere (the same four as Home): Strong, Good, Mixed, Go gently.
 // Small shared helpers for the Forecast screens: dates in the person's zone, tones and their words.
 import { GRAHA_LORE } from "../../data/lore";
 import { safeZone } from "../../engine/time";
@@ -7,7 +8,7 @@ export const DAY = 86_400_000;
 export const HALF_DAY = DAY / 2;
 
 export type Tone = "bright" | "steady" | "mixed" | "testing";
-export const TONE_WORD: Record<Tone, string> = { bright: "Bright", steady: "Steady", mixed: "Mixed", testing: "Quiet" };
+export const TONE_WORD: Record<Tone, string> = { bright: "Strong", steady: "Good", mixed: "Mixed", testing: "Go gently" };
 export const TONE_HINT: Record<Tone, string> = {
   bright: "Most of the sky favours you",
   steady: "More help than hindrance",

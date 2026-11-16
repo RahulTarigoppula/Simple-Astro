@@ -27,7 +27,7 @@ test("zero leakage across a full session", async ({ page, baseURL }) => {
   await page.getByRole("button", { name: /^save/i }).click();
   await page.waitForURL(/#\/patri\//);
   const id = (page.url().split("#/patri/")[1] ?? "").split("?")[0] ?? "";
-  await page.getByRole("tab", { name: "Chart", exact: true }).click();
+  await page.getByRole("tab", { name: "Planets", exact: true }).click();
   await page.getByText("Divisional charts").click();
   await page.getByRole("tab", { name: /^D2,/ }).click();
   for (const route of [

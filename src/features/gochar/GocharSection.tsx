@@ -1,6 +1,7 @@
-// The "Now" view of a birth chart: where the nine planets are today, counted from the birth Moon
-// (and the rising sign), Saturn's long seasons on a 90-year ribbon, and a few calm
-// "Tradition says…" sentences, each with its source.
+// The "Now" view of a birth chart, after the day's answer: Saturn's long seasons in plain words (which
+// season, since when, until when, what tradition says) over the 90-year ribbon, then a closed fold with
+// where the nine planets are today (counted from the birth Moon and the rising sign) and the cited
+// "Tradition says…" sentences.
 import { useEffect, useMemo, useState } from "react";
 import { InfoDot } from "../../components/ui/Explain";
 import { GRAHA_ENGLISH, GRAHA_NAMES, ORDINAL, SIGN_NAMES } from "../../data/tables/names";
@@ -67,6 +68,8 @@ export interface GocharSectionProps {
   nowMs: number;
   /** IANA zone every date is printed in (the birth zone on the Patri scroll). */
   zone: string;
+  /** Open the planets fold (print lays everything out). */
+  forceOpen?: boolean;
 }
 
 interface Reading {
@@ -131,107 +134,91 @@ export function gocharReadings(report: GocharReport, ss: SadeSatiResult | null, 
   return out;
 }
 
-export function GocharSection({ patri, nowMs, zone }: GocharSectionProps) {
+/** Saturn's season now, in plain words: which, since when, until when, and tradition's one line. */
+export interface SeasonNow {
+  /** What is running, as a sentence. */
+  title: string;
+  /** Since when, until when. */
+  when: string;
+  /** What tradition says, in one line. */
+  says: string;
+  /** The Sanskrit name, shown small (the long season's name is in the line under it, with its ⓘ). */
+  term: string | null;
+  cite: Citation;
+}
+
+/** Read the running (or next) season from Śani's spells. Exported for tests. */
+export function seasonNow(ss: SadeSatiResult, nowMs: number, zone: string): SeasonNow {
+  const on = (s: { startMs: number; endMs: number }): boolean => nowMs >= s.startMs && nowMs < s.endMs;
+  const sade = ss.spells.filter((s) => s.kind === "sade-sati");
+  const long = sade.find(on);
+  if (long) {
+    const iv = long.intervals.find(on);
+    const back = iv ? undefined : long.intervals.find((i) => i.startMs > nowMs);
+    const part = iv
+      ? ` You are in its ${PHASE_LABEL[iv.phase].toLowerCase()} part, with Saturn in ${SIGN_NAMES[iv.sign]}, until ${fmtDate(iv.endMs, zone)}.`
+      : back
+        ? ` Saturn has stepped back for a while and returns to ${SIGN_NAMES[back.sign]} on ${fmtDate(back.startMs, zone)}.`
+        : " Saturn has stepped back for a while.";
+    return {
+      title: "You are in Saturn's long season, about seven and a half years.",
+      when: `It began in ${fmtMonthYear(long.startMs, zone)} and closes around ${fmtMonthYear(long.endMs, zone)}.${part}`,
+      says: "Tradition says this is a season that asks for patience and steady, unhurried effort.",
+      term: null,
+      cite: long.citation,
+    };
+  }
+  const short = ss.spells.find((s) => s.kind !== "sade-sati" && on(s));
+  if (short) {
+    return {
+      title: "You are in one of Saturn's shorter seasons, about two and a half years.",
+      when: `It began in ${fmtMonthYear(short.startMs, zone)} and is read until about ${fmtMonthYear(short.endMs, zone)}.`,
+      says: "Tradition says it is a shorter stretch of the same patient tone.",
+      term: `${short.kind === "kantaka" ? "Kaṇṭaka Śani" : "Aṣṭama Śani"}: Saturn in the ${short.kind === "kantaka" ? "4th" : "8th"} from the Moon`,
+      cite: short.citation,
+    };
+  }
+  const next = sade.find((s) => s.startMs > nowMs);
+  const last = [...sade].reverse().find((s) => s.endMs <= nowMs);
+  return {
+    title: "None of Saturn's seasons is running now.",
+    when: next
+      ? `The next long season begins around ${fmtMonthYear(next.startMs, zone)}${last ? `; the last one closed in ${fmtMonthYear(last.endMs, zone)}` : ""}.`
+      : "No long season falls inside the years shown.",
+    says: "Tradition says Saturn's long season, when it comes, rewards patience.",
+    term: null,
+    cite: CITE.sadeSati,
+  };
+}
+
+export function GocharSection({ patri, nowMs, zone, forceOpen }: GocharSectionProps) {
   const report = useMemo(() => gocharReport(patri, nowMs), [patri, nowMs]);
   const birthMs = Math.round(jdToMs(patri.jdUt));
   const ss = useSadeSati(patri);
   const readings = useMemo(() => gocharReadings(report, ss, nowMs, zone), [report, ss, nowMs, zone]);
+  const season = useMemo(() => (ss ? seasonNow(ss, nowMs, zone) : null), [ss, nowMs, zone]);
   const moon = report.moonSign;
 
   return (
     <section className="gochar" aria-labelledby="gochar-h">
       <div className="v-card gochar__card">
         <h2 id="gochar-h" className="v-card__title">
-          Where the planets are now
+          Saturn's long seasons
         </h2>
-        <p className="v-card__sub">
-          {fmtDate(nowMs, zone)} · Sanskrit: Gochar (transits) <InfoDot id="gochar" label="Gochar" />
-        </p>
-        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard-reachable (WCAG 2.1.1) */}
-        <div className="gochar__scroll" role="region" aria-label="Planets today, house by house" tabIndex={0}>
-          <table className="ledger gochar__ledger">
-            <caption className="vh">
-              Houses counted from the birth Moon in {SIGN_NAMES[moon]} (Candra-lagna) and from the rising sign,{" "}
-              {SIGN_NAMES[report.lagnaSign]}.
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">Planet</th>
-                <th scope="col">Now in</th>
-                <th scope="col">
-                  House <span className="gochar__sk">from Moon · rising</span>
-                </th>
-                <th scope="col">Reads</th>
-              </tr>
-            </thead>
-            <tbody>
-              {report.entries.map((e) => {
-                const t = e.transit;
-                const showRetro = t.retrograde && e.id !== "RA" && e.id !== "KE";
-                return (
-                  <tr key={e.id} className={e.effective ? "is-fav" : undefined}>
-                    <td>
-                      {GRAHA_ENGLISH[e.id]}
-                      {showRetro ? (
-                        <span className="retro" title="retrograde">
-                          {" "}
-                          ℞<span className="vh"> retrograde</span>
-                        </span>
-                      ) : null}
-                      <span className="gochar__sk">{GRAHA_NAMES[e.id]}</span>
-                    </td>
-                    <td>
-                      {SIGN_NAMES[t.sign]} <span className="num pd">{Math.floor(t.degInSign)}°</span>
-                    </td>
-                    <td className="num">
-                      {e.houseFromMoon}
-                      <span className="vh"> from the Moon, </span>
-                      <span className="pd" aria-hidden="true">
-                        {" · "}
-                      </span>
-                      <span className="pd">{e.houseFromLagna}</span>
-                      <span className="vh"> from the rising sign</span>
-                    </td>
-                    <td className="gochar__reads">
-                      {e.favourable ? (
-                        <>
-                          <span className="gochar__mark" aria-hidden="true">
-                            ✓
-                          </span>{" "}
-                          <span className="gochar__word">favourable</span>
-                          {e.vedha && e.vedha.by.length > 0 ? (
-                            <span className="gochar__vedha">
-                              blocked (vedha) · {e.vedha.by.map((g) => GRAHA_ENGLISH[g]).join(", ")} in {ORDINAL(e.vedha.house)}
-                            </span>
-                          ) : null}
-                        </>
-                      ) : (
-                        <span className="pd">
-                          <span className="gochar__mark" aria-hidden="true">
-                            ·
-                          </span>
-                          <span className="vh">not among the favourable houses</span>
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        <p className="gochar__note">
-          Houses are counted from your birth Moon in {SIGN_NAMES[moon]} and from your rising sign, {SIGN_NAMES[report.lagnaSign]}. ✓ marks a
-          house the tradition lists as favourable from the Moon; · one it does not. Blocking (vedha) is checked for the seven planets only;
-          Rāhu and Ketu neither give nor receive it in the classical table.
-        </p>
-      </div>
-
-      <div className="v-card gochar__card">
-        <h3 className="v-card__title">Saturn's long seasons</h3>
-        <p className="v-card__sub">
-          Sanskrit: Sāḍe-sātī <InfoDot id="sade-sati" label="Sāḍe-sātī" /> · Saturn (Śani) passing over {SIGN_NAMES[(moon + 11) % 12]},{" "}
-          {SIGN_NAMES[moon]} and {SIGN_NAMES[(moon + 1) % 12]}, the signs around your Moon. Dates in {zone}.
+        {season ? (
+          <div className="gochar-season">
+            <p className="gochar-season__t">{season.title}</p>
+            <p>{season.when}</p>
+            <p>{season.says}</p>
+            <p className="gochar__src">
+              {season.term ? `Sanskrit: ${season.term} · ` : ""}
+              Source: {season.cite.text}, {season.cite.ref}
+            </p>
+          </div>
+        ) : null}
+        <p className="v-card__sub gochar__about">
+          A long season is Saturn (Śani) passing over {SIGN_NAMES[(moon + 11) % 12]}, {SIGN_NAMES[moon]} and {SIGN_NAMES[(moon + 1) % 12]},
+          the signs around your Moon. Sanskrit: Sāḍe-sātī <InfoDot id="sade-sati" label="Sāḍe-sātī" /> · dates in {zone}.
         </p>
         {ss ? (
           <SadeSatiRibbon key={ssKey(patri)} result={ss} birthMs={birthMs} nowMs={nowMs} zone={zone} />
@@ -243,26 +230,115 @@ export function GocharSection({ patri, nowMs, zone }: GocharSectionProps) {
               <span className="gochar-rib__end gochar-rib__end--r">+{RIBBON_YEARS} y</span>
             </div>
             <p className="v-muted" role="status">
-              Reckoning Śani's spells…
+              Working out Saturn's seasons…
             </p>
             <div className="ink-wait" aria-hidden="true" />
           </div>
         )}
       </div>
 
-      <div className="v-card gochar__card">
-        <h3 className="v-card__title">What tradition says</h3>
-        <div className="gochar__readings">
-          {readings.map((r) => (
-            <p key={r.key} className="gochar__reading">
-              {r.text}
-              <span className="gochar__src">
-                {r.cite.text} {r.cite.ref}
-              </span>
-            </p>
-          ))}
+      <details className="v-fold gochar__fold" open={forceOpen || undefined}>
+        <summary>
+          <span>
+            Where the planets are now
+            <span className="v-fold__s">The nine planets today, house by house · Gochar (transits)</span>
+          </span>
+        </summary>
+        <div className="v-fold__body">
+          <p className="gochar__src">
+            {fmtDate(nowMs, zone)} · Sanskrit: Gochar (transits) <InfoDot id="gochar" label="Gochar" />
+          </p>
+          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard-reachable (WCAG 2.1.1) */}
+          <div className="gochar__scroll" role="region" aria-label="Planets today, house by house" tabIndex={0}>
+            <table className="ledger gochar__ledger">
+              <caption className="vh">
+                Houses counted from the birth Moon in {SIGN_NAMES[moon]} (Candra-lagna) and from the rising sign,{" "}
+                {SIGN_NAMES[report.lagnaSign]}.
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Planet</th>
+                  <th scope="col">Now in</th>
+                  <th scope="col">
+                    House <span className="gochar__sk">from Moon · rising</span>
+                  </th>
+                  <th scope="col">Reads</th>
+                </tr>
+              </thead>
+              <tbody>
+                {report.entries.map((e) => {
+                  const t = e.transit;
+                  const showRetro = t.retrograde && e.id !== "RA" && e.id !== "KE";
+                  return (
+                    <tr key={e.id} className={e.effective ? "is-fav" : undefined}>
+                      <td>
+                        {GRAHA_ENGLISH[e.id]}
+                        {showRetro ? (
+                          <span className="retro" title="retrograde">
+                            {" "}
+                            ℞<span className="vh"> retrograde</span>
+                          </span>
+                        ) : null}
+                        <span className="gochar__sk">{GRAHA_NAMES[e.id]}</span>
+                      </td>
+                      <td>
+                        {SIGN_NAMES[t.sign]} <span className="num pd">{Math.floor(t.degInSign)}°</span>
+                      </td>
+                      <td className="num">
+                        {e.houseFromMoon}
+                        <span className="vh"> from the Moon, </span>
+                        <span className="pd" aria-hidden="true">
+                          {" · "}
+                        </span>
+                        <span className="pd">{e.houseFromLagna}</span>
+                        <span className="vh"> from the rising sign</span>
+                      </td>
+                      <td className="gochar__reads">
+                        {e.favourable ? (
+                          <>
+                            <span className="gochar__mark" aria-hidden="true">
+                              ✓
+                            </span>{" "}
+                            <span className="gochar__word">favourable</span>
+                            {e.vedha && e.vedha.by.length > 0 ? (
+                              <span className="gochar__vedha">
+                                blocked (vedha) · {e.vedha.by.map((g) => GRAHA_ENGLISH[g]).join(", ")} in {ORDINAL(e.vedha.house)}
+                              </span>
+                            ) : null}
+                          </>
+                        ) : (
+                          <span className="pd">
+                            <span className="gochar__mark" aria-hidden="true">
+                              ·
+                            </span>
+                            <span className="vh">not among the favourable houses</span>
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="gochar__note">
+            Houses are counted from your birth Moon in {SIGN_NAMES[moon]} and from your rising sign, {SIGN_NAMES[report.lagnaSign]}. ✓ marks
+            a house the tradition lists as favourable from the Moon; · one it does not. Blocking (vedha) is checked for the seven planets
+            only; Rāhu and Ketu neither give nor receive it in the classical table.
+          </p>
+          <h3 className="gochar__h3">What tradition says</h3>
+          <div className="gochar__readings">
+            {readings.map((r) => (
+              <p key={r.key} className="gochar__reading">
+                {r.text}
+                <span className="gochar__src">
+                  {r.cite.text} {r.cite.ref}
+                </span>
+              </p>
+            ))}
+          </div>
         </div>
-      </div>
+      </details>
     </section>
   );
 }

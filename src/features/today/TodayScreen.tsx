@@ -1,9 +1,10 @@
-// Today's almanac: the Hindu calendar (pañcāṅga) at the chosen person's birthplace, never GPS,
+// Today's almanac: the Hindu calendar (pañcāṅga) for where the reader is now (the place set in
+// Settings, else the chosen person's birthplace, else Bengaluru), never GPS,
 // computed on the device. The day in plain words first, then the five limbs, the times of day,
 // the good and bad slots, the planet hours and the month.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
-import { useActiveProfile, useSettings } from "../../app/hooks";
+import { useActiveProfile, useHere, useSettings } from "../../app/hooks";
 import { useNowMs } from "../../app/useNow";
 import { DISCLAIMER } from "../../components/ui/Colophon";
 import { InfoDot } from "../../components/ui/Explain";
@@ -16,11 +17,12 @@ import type { CalendarPlace } from "../../engine/calendar";
 import { ASTRONOMY_ENGINE_VERSION } from "../../engine/ephemeris";
 import { brahmaMuhurta, choghadiya, godhuli, horas, MUHURTA_KALA_CITATION } from "../../engine/muhurta";
 import { angasAt, computePanchang } from "../../engine/panchang";
-import { type EnginePreset, type Panchang, PRESET_HASH, type Profile, type SunriseMode } from "../../engine/types";
+import { type EnginePreset, type Panchang, PRESET_HASH, type SunriseMode } from "../../engine/types";
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
 import { useUi } from "../../state/ui";
 import { SkyEvents } from "../cosmic/SkyEvents";
+import { HereLine } from "../here/HereSheet";
 import { ayanaDev, ayanaLatin, karanaDev, masaDev, rituDev, tithiDev, yogaDev } from "./dev";
 import { MonthGrid, type Ymd } from "./MonthGrid";
 import { MoonFace } from "./moon";
@@ -37,30 +39,6 @@ interface DeskPlace {
   lon: number;
   elevation?: number;
   zone: string;
-  whose: string | null;
-}
-
-export const BENGALURU: DeskPlace = {
-  name: "Bengaluru, Karnataka, IN",
-  lat: 12.9716,
-  lon: 77.5946,
-  elevation: 920,
-  zone: "Asia/Kolkata",
-  whose: null,
-};
-
-function placeOf(p: Profile | null): DeskPlace {
-  if (!p) return BENGALURU;
-  const pl = p.birth.place;
-  const name = [pl.name, pl.admin1, pl.country].filter(Boolean).join(", ");
-  return {
-    name,
-    lat: pl.lat,
-    lon: pl.lon,
-    ...(pl.elevation !== undefined ? { elevation: pl.elevation } : {}),
-    zone: p.birth.zone,
-    whose: p.name,
-  };
 }
 
 export const SUNRISE_LABEL: Record<SunriseMode, string> = {
@@ -588,8 +566,17 @@ export default function TodayScreen() {
   const setExplain = useUi((s) => s.setExplain);
   const [tab, setTab] = useState<Tab>("day");
 
-  const place = useMemo(() => (active === undefined ? null : placeOf(active)), [active]);
-  const clock = zoneClock(place?.zone ?? BENGALURU.zone);
+  // Where the reader is now: the place set in Settings, else the person's birthplace, else Bengaluru.
+  const { name: hereName, lat: hereLat, lon: hereLon, zone: hereZone, birthplace } = useHere(active);
+  const loading = active === undefined;
+  // The birthplace's own height above the sea is kept while the birthplace stands in.
+  const elevation = birthplace ? active?.birth.place.elevation : undefined;
+  const place = useMemo<DeskPlace | null>(
+    () =>
+      loading ? null : { name: hereName, lat: hereLat, lon: hereLon, zone: hereZone, ...(elevation !== undefined ? { elevation } : {}) },
+    [loading, hereName, hereLat, hereLon, hereZone, elevation],
+  );
+  const clock = zoneClock(hereZone);
   const calPlace = useMemo<CalendarPlace | null>(
     () =>
       place
@@ -622,7 +609,7 @@ export default function TodayScreen() {
     if (offset === 0 && nextSunriseMs !== null && tickMs >= nextSunriseMs) setBaseMs(tickMs);
   }, [offset, nextSunriseMs, tickMs]);
 
-  // A different person or preset starts again from today.
+  // A different person, place or preset starts again from today.
   const placeKey = place ? `${place.lat}|${place.lon}|${place.zone}` : "";
   const lastPlaceKey = useRef("");
   useEffect(() => {
@@ -698,7 +685,7 @@ export default function TodayScreen() {
         <div className="v-skel">Reading the sky…</div>
       ) : !p || !periods || !rows ? (
         <div className="v-note v-note--warn" role="status">
-          The almanac could not be read. Check the date and the birthplace.
+          The almanac could not be read for this place.
         </div>
       ) : (
         <>
@@ -749,21 +736,22 @@ export default function TodayScreen() {
             </div>
           </section>
 
-          <p className="v-small v-muted alm-where">
-            {place.whose ? (
-              <>
-                For {city}, where {place.whose} was born. An almanac belongs to a place.{" "}
-              </>
-            ) : (
-              <>
-                No one saved yet, so the almanac is for Bengaluru.{" "}
-                <Link className="alm-link" to="/leaf/new">
-                  Add a person
-                </Link>{" "}
-              </>
-            )}
-            Times are {clock.zone} ({clock.offset(p.sunriseMs)}).{offset !== 0 ? <> Read at sunrise, {clock.hm12(p.sunriseMs)}.</> : null}
-          </p>
+          <div className="alm-where">
+            <HereLine profile={active} />
+            {!active || offset !== 0 ? (
+              <p className="v-small v-muted">
+                {!active ? (
+                  <>
+                    No one saved yet.{" "}
+                    <Link className="alm-link" to="/leaf/new">
+                      Add a person
+                    </Link>{" "}
+                  </>
+                ) : null}
+                {offset !== 0 ? <>Read at sunrise, {clock.hm12(p.sunriseMs)}.</> : null}
+              </p>
+            ) : null}
+          </div>
 
           <Tabs tab={tab} onTab={setTab} />
           <div className="alm-panel" role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
@@ -841,7 +829,10 @@ export default function TodayScreen() {
                 </div>
                 <div>
                   <dt>Zone</dt>
-                  <dd>{clock.zone} (the birthplace's, not this device's)</dd>
+                  <dd>
+                    {clock.zone} · {clock.offset(p.sunriseMs)} ({birthplace && active ? "the birthplace's" : "this place's"}, not this
+                    device's)
+                  </dd>
                 </div>
                 <div>
                   <dt>Sunrise</dt>

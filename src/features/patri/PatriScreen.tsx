@@ -1,6 +1,6 @@
 // The Chart tab, #/patri/:id. Four views so it is never one endless scroll:
-//   About you (the reading in simple words) · Life chapters (daśā) · Chart (the kundli, the planet
-//   table and folds for the deep material) · Now (today's strengths and transits).
+//   About you (the reading in simple words) · Life chapters (daśā) · Planets (the kundli, the planet
+//   table and folds for the deep material; ?v=chart) · Now (today in one sentence, Saturn's seasons).
 // The view lives in the URL (?v=). Nothing is computed until its view, or its fold, is opened.
 import { useEffect, useId, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
@@ -51,7 +51,7 @@ const drawn = new Set<string>(); // charts already drawn this session: a revisit
 const VIEWS = [
   ["about", "About you"],
   ["chapters", "Life chapters"],
-  ["chart", "Chart"],
+  ["chart", "Planets"], // the URL value stays ?v=chart
   ["now", "Now"],
 ] as const;
 type View = (typeof VIEWS)[number][0];
@@ -373,7 +373,7 @@ function ViewBody(p: ViewProps) {
       return (
         <>
           <DailyStrengthCard patri={p.patri} nowMs={p.nowMs} zone={zone} />
-          <GocharSection patri={p.patri} nowMs={p.nowMs} zone={zone} />
+          <GocharSection patri={p.patri} nowMs={p.nowMs} zone={zone} forceOpen={!!p.printing} />
           <Link to={`/forecast/${p.profile.id}`} className="v-card pt-next">
             <span>
               <span className="v-card__title">What this means for your days</span>
@@ -440,8 +440,7 @@ function ChartView({ profile, patri, settings, printing, onRecompute, onPrint }:
             The nine planets <InfoDot id="graha" label="graha" />
           </h2>
           <p className="v-card__sub">Sign, exact degree and star for each. Tap a row to light it on the chart.</p>
-          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard-reachable (WCAG 2.1.1) */}
-          <div className="pt-scroll" role="region" aria-label="Planet positions" tabIndex={0}>
+          <div className="pt-scroll">
             <GrahaLedger
               devDigits={settings.devanagariDigits}
               tradition={tradition}

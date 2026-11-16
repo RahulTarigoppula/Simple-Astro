@@ -9,13 +9,25 @@ import { GRAHA_LORE, RASHI_LORE } from "../../data/lore";
 import { type SkyEvent, skyEvents } from "../../engine/events";
 import type { EnginePreset } from "../../engine/types";
 import "./cosmic.css";
-import { safeZone } from "../../engine/time";
+import { formatClock12, safeZone } from "../../engine/time";
 
 const HOUR = 3_600_000;
 
+/** "7:43 pm" in the zone: the 12-hour clock the rest of the app uses. */
+export function clock12(ms: number, zone: string): string {
+  const ps = new Intl.DateTimeFormat("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    timeZone: safeZone(zone),
+  }).formatToParts(ms);
+  const get = (t: string): number => Number(ps.find((p) => p.type === t)?.value ?? 0);
+  return formatClock12(get("hour"), get("minute"));
+}
+
 function when(ms: number, zone: string, nowMs: number): { day: string; time: string; rel: string } {
   const d = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: safeZone(zone) }).format(ms);
-  const time = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: safeZone(zone) }).format(ms);
+  const time = clock12(ms, zone);
   const days = Math.round((ms - nowMs) / (24 * HOUR));
   const rel = days <= 0 ? "today" : days === 1 ? "tomorrow" : `in ${days} days`;
   return { day: d, time, rel };

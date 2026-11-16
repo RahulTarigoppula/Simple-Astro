@@ -10,6 +10,7 @@ import { computePatri, REFERENCE_PROFILE } from "../../engine/patri";
 import { resolveBirthMoment } from "../../engine/time";
 import { DEFAULT_PRESET, type KootaResult, type Profile } from "../../engine/types";
 import { BANNED_WORDS } from "../../test/banned-words";
+import { BondCard, FLAGGED_LEAD } from "./BondCard";
 import { beadsOf } from "./Mala";
 import MilanScreen from "./MilanScreen";
 import { BAND_LABEL, fmtPts } from "./rules";
@@ -106,6 +107,54 @@ describe("MilanScreen", () => {
     expect(screen.getByText(bond.manglik)).toBeInTheDocument();
     // The technical material is folded away until asked for.
     expect(screen.queryByRole("img", { name: /^Nāḍī:/ })).not.toBeInTheDocument();
+    // One name for the screen, and a quiet line on why swapping the two can move the score.
+    expect(screen.getByRole("main", { name: "Partner match" })).toBeInTheDocument();
+    expect(screen.queryByText(/Partner Compatibility/)).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/reads the match from the first person toward the second, so swapping can change a few points/),
+    ).toBeInTheDocument();
+    // A part shows its level word, with the points as small text beside it.
+    const parts = document.querySelectorAll(".mm-parts__w");
+    expect(parts).toHaveLength(bond.parts.length);
+    bond.parts.forEach((p, i) => {
+      expect(parts[i]?.querySelector(".mm-parts__n")).toHaveTextContent(`${p.score} of 100`);
+      expect(parts[i]?.textContent).not.toContain("·");
+    });
+    // Not the lowest band, so no flag sentence leads the answer.
+    expect(want.band).not.toBe("not-recommended");
+    expect(screen.queryByText(FLAGGED_LEAD)).not.toBeInTheDocument();
+  });
+
+  it("the engine reads first toward second, so the two orders can differ (Varṇa, Vaśya and Gaṇa are one-way tables)", () => {
+    const ab = engineResult(REFERENCE_PROFILE, PRIYA);
+    const ba = engineResult(PRIYA, REFERENCE_PROFILE);
+    const oneWay = ab.kootas.filter((k, i) => k.score !== ba.kootas[i]?.score).map((k) => k.id);
+    for (const id of oneWay) expect(["varna", "vashya", "gana"]).toContain(id);
+    for (const id of ["tara", "yoni", "maitri", "bhakoot", "nadi"] as const) {
+      expect(ab.kootas.find((k) => k.id === id)?.score).toBe(ba.kootas.find((k) => k.id === id)?.score);
+    }
+  });
+
+  it("in the lowest band, leads with a respectful sentence and softens a zero", () => {
+    const want = engineResult(REFERENCE_PROFILE, PRIYA);
+    // Only the presentation is under test: the same engine rows, shown as the lowest band would be.
+    const low = { ...want, band: "not-recommended" as const };
+    const pa = computePatri(REFERENCE_PROFILE, DEFAULT_PRESET, 0);
+    const pb = computePatri(PRIYA, DEFAULT_PRESET, 0);
+    const router = createMemoryRouter(
+      [{ path: "/", element: <BondCard r={low} pa={REFERENCE_PROFILE} pb={PRIYA} patA={pa} patB={pb} onCopy={() => {}} /> }],
+      { initialEntries: ["/"] },
+    );
+    const { container } = render(<RouterProvider router={router} />);
+    const lines = container.querySelectorAll(".mm-hero__line");
+    expect(lines[0]).toHaveTextContent(FLAGGED_LEAD);
+    expect(container.textContent).not.toMatch(/not recommended/i);
+    const bond = bondReading(low, "Rahul", "Priya");
+    const zero = bond.parts.findIndex((p) => p.score === 0);
+    expect(zero).toBeGreaterThanOrEqual(0); // Nāḍī doṣa: Family scores nothing for this pair
+    const cell = container.querySelectorAll(".mm-parts__w")[zero];
+    expect(cell?.firstChild?.textContent).toBe("Needs care");
+    expect(cell?.querySelector(".mm-parts__n")).toHaveTextContent("0 of 100");
   });
 
   it("strings exactly milan()'s output on the mala, every row, the total and the band", async () => {

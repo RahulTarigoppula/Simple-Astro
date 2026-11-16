@@ -837,7 +837,7 @@ button.cite:hover {
   border-radius: 50%;
   pointer-events: none;
   background:
-    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 42%),
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.32), rgba(var(--tint), 0) 42%),
     radial-gradient(circle, transparent 82%, rgba(255, 255, 255, 0.3) 88%, rgba(0, 0, 0, 0.34) 100%);
 }
 .readout {

@@ -49,7 +49,7 @@ import {
 import "./milan.css";
 
 const VERDICT: Record<string, string> = {
-  "not-recommended": "tradition does not recommend this match",
+  "not-recommended": "under the traditional line of 18. Tradition flags this pairing; many families then look at the exceptions",
   acceptable: "an acceptable match by tradition",
   "very-good": "a very good match by tradition",
   excellent: "an excellent match by tradition",
@@ -267,7 +267,7 @@ function MilanScreen() {
 
   return (
     <Page
-      label="Partner Compatibility"
+      label="Partner match"
       title="Partner match"
       lede={matched ? undefined : "How two people fit, read the traditional way from their two Moons."}
       wide={matched}
@@ -355,7 +355,11 @@ function MilanScreen() {
 
                 <Section title="Full detail" note="The astrology behind the answer. Open what you want to check." />
 
-                <Fold title="The 36-point score" sub={`Guna Milan: ${fmtPts(r.total)} of 36, ${BAND_LABEL[r.band]}`} lazy>
+                <Fold
+                  title="The 36-point score"
+                  sub={`Guna Milan: ${fmtPts(r.total)} of 36, ${r.band === "not-recommended" ? "under the traditional line of 18" : BAND_LABEL[r.band]}`}
+                  lazy
+                >
                   <Mala result={r} onOpen={(k) => setSheet({ kind: "koota", k })} />
                   <p>
                     {pa.name} and {pb.name}: <strong>{fmtPts(r.total)} of 36</strong>: {VERDICT[r.band]}.

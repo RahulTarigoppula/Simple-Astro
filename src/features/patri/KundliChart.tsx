@@ -1,8 +1,7 @@
 // North Indian diamond and South Indian grid, drawn in ink. Both expose a visually hidden <table>
 // twin (graha / sign / degree / nakshatra-pada) wired by aria-describedby.
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef } from "react";
-import { useInkDraw } from "../../components/ui/useInkDraw";
-import { GRAHA_ABBR_DEV, GRAHA_ABBR_LAT, GRAHA_ENGLISH, NAKSHATRA_NAMES, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
+import { GRAHA_ABBR_DEV, GRAHA_ENGLISH, NAKSHATRA_NAMES, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
 import { GRAHA_IDS, type GrahaId, type SignIdx } from "../../engine/types";
 import { layoutChips, NORTH_ANCHOR, SOUTH_CELL, signInHouse, tilakPath } from "./geometry";
 
@@ -23,7 +22,7 @@ export interface KundliProps {
   bodies: ChartBody[];
   showDegrees?: boolean;
   lit?: GrahaId | null;
-  /** Change to replay the ink-draw; `skip` renders the finished drawing at once. */
+  /** Identifies a drawing: a new key fades the figure in once (240 ms); `skipInk` shows it at once. */
   inkKey?: string;
   skipInk?: boolean;
   static?: boolean;
@@ -41,7 +40,23 @@ export interface KundliHandle {
   chips: ChipPos[];
 }
 
-const abbr = (id: GrahaId, script: "devanagari" | "latin") => (script === "devanagari" ? GRAHA_ABBR_DEV[id] : GRAHA_ABBR_LAT[id]);
+/** The two-letter English labels on the figure: readable by anyone, and spelled out in the key under it. */
+export const GRAHA_ABBR_EN: Record<GrahaId, string> = {
+  SU: "Su",
+  MO: "Mo",
+  MA: "Ma",
+  ME: "Me",
+  JU: "Ju",
+  VE: "Ve",
+  SA: "Sa",
+  RA: "Ra",
+  KE: "Ke",
+};
+
+/** A planet's label on the figure: Devanagari only when the person chose it in Settings. */
+export const grahaAbbr = (id: GrahaId, script: "devanagari" | "latin"): string =>
+  script === "devanagari" ? GRAHA_ABBR_DEV[id] : GRAHA_ABBR_EN[id];
+const abbr = grahaAbbr;
 
 export const KundliChart = forwardRef<KundliHandle, KundliProps>(function KundliChart(
   {
@@ -87,7 +102,6 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
           y={y}
           textAnchor="middle"
           style={{ fontSize: size }}
-          data-settle=""
           lang={script === "devanagari" ? "hi" : undefined}
         >
           {abbr(b.id, script)}
@@ -106,16 +120,16 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
     };
 
     if (style === "north") {
-      out.push(<path key="frame" className="stroke" data-ink="1600" d="M2 2H398V398H2Z" />);
-      out.push(<path key="d1" className="stroke" data-ink="1130" d="M2 2L398 398" />);
-      out.push(<path key="d2" className="stroke" data-ink="1130" d="M398 2L2 398" />);
-      out.push(<path key="dia" className="stroke" data-ink="1130" d="M200 2L398 200L200 398L2 200Z" />);
+      out.push(<path key="frame" className="stroke" d="M2 2H398V398H2Z" />);
+      out.push(<path key="d1" className="stroke" d="M2 2L398 398" />);
+      out.push(<path key="d2" className="stroke" d="M398 2L2 398" />);
+      out.push(<path key="dia" className="stroke" d="M200 2L398 200L200 398L2 200Z" />);
       for (let h = 1; h <= 12; h++) {
         const a = NORTH_ANCHOR[h];
         if (!a) continue;
         const sign = signInHouse(lagnaSign, h);
         out.push(
-          <text key={`n-${h}`} className="signnum" x={a.n[0]} y={a.n[1]} textAnchor="middle" dominantBaseline="middle" data-settle="">
+          <text key={`n-${h}`} className="signnum" x={a.n[0]} y={a.n[1]} textAnchor="middle" dominantBaseline="middle">
             {sign + 1}
           </text>,
         );
@@ -134,15 +148,15 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
       if (n1) out.push(<path key="tilak" className="tilak" data-tilak="" d={tilakPath(n1.n[0], n1.n[1] - 30, 9)} />);
     } else {
       // South: 4 × 4 grid, centre 2 × 2 blank; signs fixed, Lagna marked by a diagonal tick.
-      out.push(<path key="frame" className="stroke" data-ink="1600" d="M2 2H398V398H2Z" />);
-      out.push(<path key="h1" className="stroke" data-ink="400" d="M2 100H398" />);
-      out.push(<path key="h3" className="stroke" data-ink="400" d="M2 300H398" />);
-      out.push(<path key="v1" className="stroke" data-ink="400" d="M100 2V398" />);
-      out.push(<path key="v3" className="stroke" data-ink="400" d="M300 2V398" />);
-      out.push(<path key="h2a" className="stroke" data-ink="100" d="M2 200H100" />);
-      out.push(<path key="h2b" className="stroke" data-ink="100" d="M300 200H398" />);
-      out.push(<path key="v2a" className="stroke" data-ink="100" d="M200 2V100" />);
-      out.push(<path key="v2b" className="stroke" data-ink="100" d="M200 300V398" />);
+      out.push(<path key="frame" className="stroke" d="M2 2H398V398H2Z" />);
+      out.push(<path key="h1" className="stroke" d="M2 100H398" />);
+      out.push(<path key="h3" className="stroke" d="M2 300H398" />);
+      out.push(<path key="v1" className="stroke" d="M100 2V398" />);
+      out.push(<path key="v3" className="stroke" d="M300 2V398" />);
+      out.push(<path key="h2a" className="stroke" d="M2 200H100" />);
+      out.push(<path key="h2b" className="stroke" d="M300 200H398" />);
+      out.push(<path key="v2a" className="stroke" d="M200 2V100" />);
+      out.push(<path key="v2b" className="stroke" d="M200 300V398" />);
       SOUTH_CELL.forEach(([row, col], sign) => {
         const x0 = col * 100;
         const y0 = row * 100;
@@ -154,14 +168,13 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
             x={x0 + 96}
             y={y0 + 94}
             textAnchor="end"
-            data-settle=""
             lang={script === "devanagari" ? "hi" : undefined}
           >
             {script === "devanagari" ? SIGN_DEV[sign] : SIGN_NAMES[sign]}
           </text>,
         );
         if (sign === lagnaSign) {
-          out.push(<path key="lt" className="lagna-tick" d={`M${x0 + 4} ${y0 + 22}L${x0 + 22} ${y0 + 4}`} data-ink="40" />);
+          out.push(<path key="lt" className="lagna-tick" d={`M${x0 + 4} ${y0 + 22}L${x0 + 22} ${y0 + 4}`} />);
           out.push(<path key="tilak" className="tilak" data-tilak="" d={tilakPath(x0 + 84, y0 + 16, 7)} />);
         }
         const here = bySign.get(sign) ?? [];
@@ -177,7 +190,7 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
         });
       });
       out.push(
-        <text key="centre" className="signname" x="200" y="196" textAnchor="middle" data-settle="" style={{ fontSize: 13 }}>
+        <text key="centre" className="signname" x="200" y="196" textAnchor="middle" style={{ fontSize: 13 }}>
           {script === "devanagari" ? "राशि" : "Rāśi"}
         </text>,
       );
@@ -188,10 +201,9 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
   useImperativeHandle(ref, () => ({ svg: svgRef.current, chips }), [chips]);
   useEffect(() => onChips?.(chips), [chips, onChips]);
 
-  useInkDraw(svgRef, [inkKey, style, script], { skip: skipInk || isStatic });
-
-  // The Lagna receives its sindoor tilak last (tilak-dab), after the frame has drawn.
-  const tilakDelay = skipInk || isStatic ? 0 : 1500;
+  // The whole figure, planets included, is there at once: at most one short fade (none on a revisit,
+  // in print, or with reduced motion). No staggered drawing.
+  const fade = !(skipInk || isStatic);
 
   return (
     <>
@@ -203,8 +215,7 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
         aria-hidden={isStatic || undefined}
         aria-labelledby={isStatic ? undefined : titleId}
         aria-describedby={isStatic ? undefined : tableId}
-        style={{ "--tilak-delay": `${tilakDelay}ms` } as React.CSSProperties}
-        data-tilak-anim={skipInk || isStatic ? "off" : "on"}
+        data-fade={fade ? "on" : undefined}
         key={isStatic ? undefined : `${inkKey}-${style}`}
       >
         {isStatic ? null : <title id={titleId}>{title}</title>}

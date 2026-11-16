@@ -1,7 +1,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { useActiveProfile, useSettings } from "../../app/hooks";
+import { useActiveProfile, useHere, useSettings } from "../../app/hooks";
 import { InfoDot } from "../../components/ui/Explain";
 import { HoldStamp } from "../../components/ui/HoldStamp";
 import { Page, Row, Section } from "../../components/ui/Page";
@@ -19,6 +19,7 @@ import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
 import { setStatsOn, statsOn } from "../../platform/stats";
 import { toast } from "../../state/ui";
+import { HereSheet } from "../here/HereSheet";
 import { journeyAtStart, setJourneyAtStart } from "../journey/Journey";
 import { zoneClock } from "../today/zone";
 import "./drawer.css";
@@ -213,6 +214,8 @@ export default function DrawerScreen() {
   const [busy, setBusy] = useState(false);
   const [warm, setWarm] = useState<string>("");
   const fileInput = useRef<HTMLInputElement>(null);
+  const here = useHere(active);
+  const [hereOpen, setHereOpen] = useState(false);
 
   useEffect(() => {
     void storageEstimate().then(setEst);
@@ -320,14 +323,41 @@ export default function DrawerScreen() {
       <Section title="Look" id="set-look" />
       <ul className="v-list" aria-labelledby="set-look">
         <li>
+          <Row
+            title="Where you are now"
+            sub={
+              <>
+                <span className="set-here">
+                  {here.birthplace ? "Each person's birthplace" : here.name.split(",").slice(0, 2).join(",")}
+                </span>
+                <span className="set-here__s">Today's hours, sunrise and the almanac are worked out for this place.</span>
+              </>
+            }
+            onClick={() => setHereOpen(true)}
+          />
+        </li>
+        <li>
+          <Radio
+            label="Text size"
+            help="Makes the words bigger on every screen."
+            value={settings.textSize}
+            options={[
+              ["normal", "Normal"],
+              ["large", "Large"],
+              ["larger", "Larger"],
+            ]}
+            onChange={(v) => set({ textSize: v })}
+          />
+        </li>
+        <li>
           <Radio
             label="Theme"
-            help="Auto follows the real Sun where the chosen person was born."
+            help="Auto follows your phone's light or dark setting."
             value={settings.theme}
             options={[
               ["auto", "Auto"],
-              ["night", "Night"],
-              ["day", "Day"],
+              ["night", "Dark"],
+              ["day", "Light"],
             ]}
             onChange={(v) => set({ theme: v })}
           />
@@ -581,6 +611,7 @@ export default function DrawerScreen() {
       </details>
       <p className="v-foot">For reflection, not advice.</p>
 
+      <HereSheet open={hereOpen} onClose={() => setHereOpen(false)} profile={active} here={here} />
       <Sheet open={mode !== "none"} onClose={closeSheet} label={mode === "export" ? "Create an encrypted backup" : "Restore from a backup"}>
         {mode === "export" ? (
           <form

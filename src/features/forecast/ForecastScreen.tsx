@@ -2,7 +2,7 @@
 // Moon, Tārā/Candra-bala, the running daśā). The answer comes first; the astrology is folded below.
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
-import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
+import { useActiveProfile, useHere, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { useNowMs } from "../../app/useNow";
 import { ChevronLeft, ChevronRight, Page } from "../../components/ui/Page";
 import { RASHI_LORE } from "../../data/lore";
@@ -15,6 +15,7 @@ import { personalYear } from "../../engine/profile";
 import { safeZone } from "../../engine/time";
 import { countEvent } from "../../platform/stats";
 import { IconForecast } from "../chowki/icons";
+import { HereLine } from "../here/HereSheet";
 import { ContactsFold, DashaFold, EventsFold, MethodFold, SaturnFold, StrengthFold, saturnName, TransitsFold } from "./Folds";
 import { MonthGrid, MonthRows, WeekStrip } from "./PeriodViews";
 import { AreasCard, DoCards, HoursCard, MoonCard } from "./PersonalSections";
@@ -162,10 +163,9 @@ export default function ForecastScreen() {
   }, [urlPeriod, period, setSearch]);
 
   const [at, setAt] = useState<number | null>(null);
-  const zone = profile?.birth.zone ?? "Asia/Kolkata";
+  // Period bounds, labels, the day's hours and events follow where the reader is now; the chart stays the person's.
+  const { zone, lat, lon } = useHere(profile);
   const atMs = at ?? nowMs;
-  const lat = profile?.birth.place.lat ?? 12.97;
-  const lon = profile?.birth.place.lon ?? 77.59;
 
   const show = (p: Period, when: number | null) => {
     setPeriod(p);
@@ -278,7 +278,9 @@ export default function ForecastScreen() {
                     zone={zone}
                     sun={sky ? { riseMs: sky.riseMs, setMs: sky.setMs } : null}
                     now={isNow ? nowMs : null}
-                  />
+                  >
+                    <HereLine profile={profile} />
+                  </HoursCard>
                 ) : null}
               </div>
               {personal ? <AreasCard r={personal.r} title={AREAS_TITLE.day} split /> : null}

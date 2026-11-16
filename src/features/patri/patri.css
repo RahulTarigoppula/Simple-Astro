@@ -1,34 +1,19 @@
-.chart[data-tilak-anim="on"] .tilak {
-  animation: tilak-dab 240ms var(--ease-out) var(--tilak-delay, 1500ms) both;
+/* The figure is whole at once: one short fade for a newly worked-out chart, none with reduced motion. */
+.chart[data-fade="on"] {
+  animation: pt-chart-in 240ms var(--ease-out) both;
 }
 .chart .tilak {
   transform-box: fill-box;
   transform-origin: center;
 }
-@keyframes tilak-dab {
-  0% {
+@keyframes pt-chart-in {
+  from {
     opacity: 0;
-    transform: scale(0.7);
-  }
-  33% {
-    opacity: 1;
-  }
-  55% {
-    transform: scale(1.06);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .chart[data-tilak-anim="on"] .tilak {
-    animation: tilak-fade 240ms linear 240ms both;
-  }
-}
-@keyframes tilak-fade {
-  from {
-    opacity: 0;
+  .chart[data-fade="on"] {
+    animation: none;
   }
 }
 
@@ -157,13 +142,54 @@
   display: flex;
   justify-content: center;
 }
+/* Sign numbers and degrees are drawn in chart units; these keep them readable on a small figure. */
+.pt .chart .signnum {
+  font-size: 17px;
+  font-weight: 600;
+}
+.pt .chart .grahadeg {
+  font-size: 13px;
+}
+.pt .chart .signname {
+  font-size: 13.5px;
+}
+@media (max-width: 359px) {
+  .pt .pt-fig .chart-wrap {
+    padding: 2px;
+  }
+  .pt .chart .signnum {
+    font-size: 20px;
+  }
+  .pt .chart .grahadeg {
+    font-size: 15px;
+  }
+  .pt .chart .signname {
+    font-size: 15px;
+  }
+}
+/* The key under the figure: what each two-letter label stands for */
+.pt-key {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 12px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+.pt-key b {
+  color: var(--ink);
+  font-weight: 600;
+}
 
 /* ── Tables ────────────────────────────────────────────────────────────── */
 .pt-scroll {
   position: relative;
   margin: 0 -18px;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
+  min-width: 0;
 }
 .ledger-sk {
   display: block;
@@ -197,6 +223,9 @@
   vertical-align: baseline;
   white-space: nowrap;
 }
+.ledger--grahas td:last-child {
+  overflow-wrap: anywhere;
+}
 .ledger--grahas th:first-child,
 .ledger--grahas td:first-child {
   padding-left: 18px;
@@ -206,27 +235,63 @@
   padding-right: 18px;
   text-align: left;
 }
-@media (max-width: 359px) {
-  .ledger--grahas {
-    font-size: 0.8125rem;
+/* Narrow phones: three columns (planet, sign, degree) and the star with its lord on a line of its
+   own under them, so no name is cut and the table never scrolls sideways. */
+@media (max-width: 419px) {
+  .ledger--grahas,
+  .ledger--grahas thead,
+  .ledger--grahas tbody {
+    display: block;
   }
+  .ledger--grahas tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    column-gap: 8px;
+    padding: 8px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .ledger--grahas thead tr {
+    border-bottom-color: var(--border-strong);
+  }
+  .ledger--grahas th,
   .ledger--grahas td,
-  .ledger--grahas tbody th {
-    padding-left: 3px;
-    padding-right: 3px;
-    font-size: 0.8125rem;
-  }
+  .ledger--grahas tbody th,
   .ledger--grahas th:first-child,
-  .ledger--grahas td:first-child {
-    padding-left: 14px;
+  .ledger--grahas td:first-child,
+  .ledger--grahas th:last-child,
+  .ledger--grahas td:last-child {
+    padding: 0;
+    border-bottom: 0;
+    white-space: normal;
+  }
+  .ledger--grahas th:nth-child(3),
+  .ledger--grahas td:nth-child(3) {
+    text-align: right;
   }
   .ledger--grahas th:last-child,
   .ledger--grahas td:last-child {
-    padding-right: 10px;
+    grid-column: 1 / -1;
+    margin-top: 2px;
+    color: var(--ink-muted);
   }
-  /* arc-seconds give way on the narrowest phones; the readout under the chart keeps them */
-  .ledger--grahas .deg-s {
-    display: none;
+  .ledger--grahas td:last-child::before {
+    content: "Star: ";
+  }
+  .ledger--grahas thead th:last-child .ledger-sk,
+  .ledger--grahas td:last-child .ledger-sk {
+    display: inline;
+  }
+  .ledger--grahas td:last-child .ledger-sk::before {
+    content: " · ";
+  }
+  .ledger--grahas .num {
+    font-size: 0.875rem;
+  }
+}
+@media (max-width: 359px) {
+  .ledger--grahas tr {
+    padding-left: 14px;
+    padding-right: 12px;
   }
 }
 .ledger--grahas tbody tr[data-graha]:focus-visible {

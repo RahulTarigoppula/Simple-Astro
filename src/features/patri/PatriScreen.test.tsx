@@ -64,7 +64,7 @@ describe("the Chart tab", () => {
     expect(head).toHaveTextContent("14 March 1994 · 7:25 am (07:25) · Bengaluru, Karnataka, IN");
     expect(within(head).getByRole("link", { name: "Edit birth details" })).toHaveAttribute("href", `/leaf/${ID}/edit`);
     const tabs = screen.getAllByRole("tab");
-    expect(tabs.map((t) => t.textContent)).toEqual(["About you", "Life chapters", "Chart", "Now"]);
+    expect(tabs.map((t) => t.textContent)).toEqual(["About you", "Life chapters", "Planets", "Now"]);
     expect(tabs[0]).toHaveAttribute("aria-selected", "true");
     expect(screen.getByRole("tabpanel")).toHaveAccessibleName("About you");
     // nothing of the other views is built yet
@@ -83,7 +83,7 @@ describe("the Chart tab", () => {
     expect(screen.queryByRole("heading", { name: /this is you/ })).toBeNull();
     fireEvent.keyDown(screen.getByRole("tab", { name: "Life chapters" }), { key: "ArrowRight" });
     expect(router.state.location.search).toBe("?v=chart");
-    expect(screen.getByRole("tab", { name: "Chart" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "Planets" })).toHaveAttribute("aria-selected", "true");
     fireEvent.click(screen.getByRole("tab", { name: "About you" }));
     expect(router.state.location.search).toBe("");
   });
@@ -101,7 +101,7 @@ describe("the Chart tab", () => {
     expect(within(screen.getByRole("list", { name: /pratyantardaśās/ })).getAllByRole("listitem")).toHaveLength(9);
   });
 
-  it("Chart shows the kundli and the planet table; the deep material waits in closed folds", async () => {
+  it("Planets shows the kundli and the planet table; the deep material waits in closed folds", async () => {
     const { container } = renderChart(`/patri/${ID}?v=chart`);
     expect(await screen.findByRole("heading", { level: 2, name: /^Birth chart/ }, { timeout: 8000 })).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Rāśi chart D1/ })).toBeInTheDocument();
@@ -110,6 +110,22 @@ describe("the Chart tab", () => {
     expect(ledger).toHaveTextContent("15°39′25″"); // the rising degree, Mīna
     expect(within(ledger).getByRole("row", { name: /^Moon, Mīna/ })).toHaveTextContent("Revatī 1lord Mercury");
     expect(screen.getByRole("button", { name: "Show South Indian style" })).toBeInTheDocument();
+    // the figure is whole at once (one short fade, no staggered drawing), in Latin letters with a key under it
+    const fig = container.querySelector("svg.chart:not(.loupe svg)") as SVGElement;
+    expect(fig.querySelectorAll("[data-ink], [data-settle]")).toHaveLength(0);
+    expect(
+      Array.from(fig.querySelectorAll("text.graha"))
+        .map((t) => t.firstChild?.textContent)
+        .sort(),
+    ).toEqual(["Ju", "Ke", "Ma", "Me", "Mo", "Ra", "Sa", "Su", "Ve"]);
+    expect(fig.querySelector('[lang="hi"]')).toBeNull();
+    const key = screen.getByRole("list", { name: "Chart key" });
+    expect(key).toHaveTextContent("Su Sun");
+    expect(key).toHaveTextContent("Ra Rahu (north node)");
+    expect(key).toHaveTextContent("Ke Ketu (south node)");
+    expect(key).toHaveTextContent("℞ moving backwards");
+    expect(within(key).getAllByRole("listitem")).toHaveLength(10);
+    expect(screen.queryByRole("region", { name: "Planet positions" })).toBeNull(); // the table no longer scrolls sideways
 
     const folds = Array.from(container.querySelectorAll("details.v-fold"));
     expect(folds.map((f) => f.querySelector("summary")?.firstElementChild?.firstChild?.textContent)).toEqual([
@@ -151,10 +167,33 @@ describe("the Chart tab", () => {
     expect(within(sheet).queryByRole("heading")).toBeNull();
   });
 
-  it("Now shows today's strengths and where the planets are", async () => {
-    renderChart(`/patri/${ID}?v=now`);
-    expect(await screen.findByRole("region", { name: "Today's strengths" }, { timeout: 8000 })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 2, name: "Where the planets are now" })).toBeInTheDocument();
+  it("honours Devanagari on the figure when it was chosen in Settings", async () => {
+    await saveSettings({ chartScript: "devanagari" });
+    const { container } = renderChart(`/patri/${ID}?v=chart`);
+    await screen.findByRole("heading", { level: 2, name: /^Birth chart/ }, { timeout: 8000 });
+    const fig = container.querySelector("svg.chart:not(.loupe svg)") as SVGElement;
+    expect(fig.querySelectorAll('text.graha[lang="hi"]')).toHaveLength(9);
+    expect(screen.getByRole("list", { name: "Chart key" })).toHaveTextContent("Sun");
+  });
+
+  it("Now answers first: one sentence for today, Saturn's season, and the planet table folded away", async () => {
+    const { container } = renderChart(`/patri/${ID}?v=now`);
+    const hero = await screen.findByRole("region", { name: "Today for this chart" }, { timeout: 8000 });
+    expect(within(hero).getByRole("heading", { level: 2 })).toHaveTextContent(/^Today the Moon is in your \d+(st|nd|rd|th) area: /);
+    expect(hero.querySelectorAll(".v-chip").length).toBeLessThanOrEqual(3);
+    expect(screen.getByRole("heading", { level: 2, name: "Saturn's long seasons" })).toBeInTheDocument();
+    const fold = screen.getByText("Where the planets are now").closest("details") as HTMLDetailsElement;
+    expect(fold).toHaveClass("v-fold");
+    expect(fold.open).toBe(false);
+    expect(fold.querySelector("table.gochar__ledger")).not.toBeNull();
+    // order on the page: today, Saturn, the folded table, then the door to the Forecast
+    const order = [hero, screen.getByRole("heading", { name: "Saturn's long seasons" }), fold];
+    for (let i = 1; i < order.length; i++) {
+      expect(
+        (order[i - 1] as HTMLElement).compareDocumentPosition(order[i] as HTMLElement) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    }
+    expect(container.querySelector('[lang="hi"]')).toBeNull();
     expect(screen.getByRole("link", { name: /What this means for your days/ })).toHaveAttribute("href", `/forecast/${ID}`);
   });
 

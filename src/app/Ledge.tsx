@@ -36,7 +36,7 @@ export function Ledge() {
     {
       to: active && second ? `/milan/${active.id}/${second.id}` : "/milan",
       label: "Match",
-      name: "Partner Compatibility",
+      name: "Partner match",
       icon: <IconMilan />,
       on: /^\/milan/,
     },

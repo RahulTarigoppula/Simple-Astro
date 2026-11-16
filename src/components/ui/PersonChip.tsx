@@ -116,9 +116,10 @@ export function PersonChip() {
           <button type="button" className="v-btn v-btn--block" onClick={() => go("/leaf/new")}>
             + Add a person
           </button>
+          <p className="v-people__more">More</p>
           <div className="v-people__links">
             <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={() => go("/circle")}>
-              Manage people
+              People
             </button>
             <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={() => go("/drawer")}>
               Settings

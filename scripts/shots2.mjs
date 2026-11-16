@@ -31,47 +31,59 @@ for (const tag of sizes.split("")) {
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
   await page.goto(base);
   await page.waitForTimeout(800);
-  const ids = await page.evaluate(async (n) => {
-    const { resolveBirthMoment } = await import("/src/engine/time.ts");
-    const { upsertProfile, saveSettings } = await import("/src/data/repo.ts");
-    const mk = async (name, y, mo, d, h, mi, place, tradition) => {
-      const birth = resolveBirthMoment({ localY: y, localMo: mo, localD: d, localH: h, localMi: mi, place, zoneOverride: "Asia/Kolkata" });
-      const now = Date.now();
-      const p = await upsertProfile({
-        id: crypto.randomUUID(),
-        name,
-        birth,
-        handedness: "right",
-        tradition,
-        createdAt: now,
-        updatedAt: now,
-      });
-      return p.id;
-    };
-    const out = [];
-    const blr = {
-      name: "Bengaluru, Karnataka, IN",
-      admin1: "Karnataka",
-      country: "IN",
-      lat: 12.9716,
-      lon: 77.5946,
-      timezone: "Asia/Kolkata",
-      source: "bundle",
-    };
-    const hyd = {
-      name: "Hyderabad, Telangana, IN",
-      admin1: "Telangana",
-      country: "IN",
-      lat: 17.385,
-      lon: 78.4867,
-      timezone: "Asia/Kolkata",
-      source: "bundle",
-    };
-    if (n >= 2) out.push(await mk("Priya", 1996, 8, 22, 18, 40, hyd, "telugu"));
-    if (n >= 1) out.unshift(await mk("Rahul", 1994, 3, 14, 7, 25, blr, "north"));
-    if (out[0]) await saveSettings({ activeProfileId: out[0] });
-    return out;
-  }, Number(people));
+  const ids = await page.evaluate(
+    async ([n, theme]) => {
+      const { resolveBirthMoment } = await import("/src/engine/time.ts");
+      const { upsertProfile, saveSettings } = await import("/src/data/repo.ts");
+      const mk = async (name, y, mo, d, h, mi, place, tradition) => {
+        const birth = resolveBirthMoment({
+          localY: y,
+          localMo: mo,
+          localD: d,
+          localH: h,
+          localMi: mi,
+          place,
+          zoneOverride: "Asia/Kolkata",
+        });
+        const now = Date.now();
+        const p = await upsertProfile({
+          id: crypto.randomUUID(),
+          name,
+          birth,
+          handedness: "right",
+          tradition,
+          createdAt: now,
+          updatedAt: now,
+        });
+        return p.id;
+      };
+      const out = [];
+      const blr = {
+        name: "Bengaluru, Karnataka, IN",
+        admin1: "Karnataka",
+        country: "IN",
+        lat: 12.9716,
+        lon: 77.5946,
+        timezone: "Asia/Kolkata",
+        source: "bundle",
+      };
+      const hyd = {
+        name: "Hyderabad, Telangana, IN",
+        admin1: "Telangana",
+        country: "IN",
+        lat: 17.385,
+        lon: 78.4867,
+        timezone: "Asia/Kolkata",
+        source: "bundle",
+      };
+      if (n >= 2) out.push(await mk("Priya", 1996, 8, 22, 18, 40, hyd, "telugu"));
+      if (n >= 1) out.unshift(await mk("Rahul", 1994, 3, 14, 7, 25, blr, "north"));
+      if (out[0]) await saveSettings({ activeProfileId: out[0] });
+      if (theme) await saveSettings({ theme });
+      return out;
+    },
+    [Number(people), process.env.THEME ?? ""],
+  );
   for (const spec of routes) {
     const cut = spec.lastIndexOf("=");
     const r0 = cut < 0 ? spec : spec.slice(0, cut);

@@ -71,6 +71,20 @@ export function missingText(v: BirthFieldValues, timeUnknown: boolean): string |
   return null;
 }
 
+/** What the read-back says before anything has been filled in. */
+export const READBACK_HINT = "Your date and time will be read back here.";
+
+/** True while nothing at all has been entered on the When step. */
+export const nothingEntered = (v: BirthFieldValues, timeUnknown: boolean): boolean =>
+  !timeUnknown && !(v.d > 0) && !(v.mo > 0) && !(v.y > 0) && !(v.hour12 > 0) && v.ampm === null && !(v.mi > 0);
+
+/** True when what was entered is wrong (not merely unfinished): a day, month or year that cannot be. */
+export function enteredWrong(v: Pick<BirthFieldValues, "y" | "mo" | "d">): boolean {
+  if (v.d > 31) return true;
+  if (v.y >= 1000 && (v.y < YEAR_MIN || v.y > YEAR_MAX)) return true;
+  return v.d > 0 && v.mo > 0 && v.y >= YEAR_MIN && v.y <= YEAR_MAX && !isValidCivil(v.y, v.mo, v.d, 0, 0);
+}
+
 const show = (n: number) => (n > 0 ? String(n) : "");
 
 /** A number box that keeps what is being typed and commits only whole numbers (0 otherwise). */
@@ -230,7 +244,11 @@ export function TimeFields({
   );
 }
 
-/** The sentence that reads the date and time back, or says what is still missing. */
+/**
+ * The sentence that reads the date and time back, or says what is still missing.
+ * It only turns to the warning colour once Next was pressed or something entered is wrong; before
+ * anything is typed it is a plain hint, and while the fields are being filled it calmly names the next one.
+ */
 export function Readback({
   y,
   mo,
@@ -244,17 +262,19 @@ export function Readback({
   const v: BirthFieldValues = { y, mo, d, hour12, ampm, mi };
   const h = hourOf(v);
   const missing = missingText(v, timeUnknown);
+  const pristine = missing !== null && !urgent && nothingEntered(v, timeUnknown);
+  const warn = missing !== null && (urgent === true || enteredWrong(v));
   const dateText = dateFilled(v) ? `${d} ${MONTH_NAMES[mo - 1]} ${y}` : "";
   const timeText = timeUnknown ? "time of birth not known, noon is used" : h >= 0 ? clockWords(h, mi) : "";
   return (
     <p
-      className={`bf-read${missing ? " is-missing" : ""}${missing && urgent ? " is-urgent" : ""}`}
+      className={`bf-read${warn ? " is-missing" : missing ? " is-hint" : ""}${missing && urgent ? " is-urgent" : ""}`}
       role={missing && urgent ? "alert" : undefined}
       aria-live={missing && urgent ? undefined : "polite"}
       data-testid="birth-readback"
     >
       {missing ? (
-        <span>{missing}</span>
+        <span>{pristine ? READBACK_HINT : missing}</span>
       ) : (
         <>
           <b>{dateText}</b>

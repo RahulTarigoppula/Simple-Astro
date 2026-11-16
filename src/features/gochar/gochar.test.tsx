@@ -1,12 +1,14 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeAll, describe, expect, it } from "vitest";
-import { gocharReport, sadeSati } from "../../engine/gochar";
+import { ORDINAL } from "../../data/tables/names";
+import { HOUSE_THEME } from "../../engine/ashtakavarga";
+import { chandraBala, gocharReport, moonTransitAt, sadeSati, taraBala } from "../../engine/gochar";
 import { MS_PER_DAY } from "../../engine/math";
 import { computePatri, REFERENCE_PROFILE } from "../../engine/patri";
 import { DEFAULT_PRESET, type Patri } from "../../engine/types";
 import { BANNED_WORDS } from "../../test/banned-words";
 import { fmtDate, yearSpan } from "./format";
-import { forgetSadeSati } from "./GocharSection";
+import { forgetSadeSati, seasonNow } from "./GocharSection";
 import { DailyStrengthCard, GocharSection, gocharReadings } from "./index";
 
 const NOW = Date.UTC(2026, 9, 12, 6); // 12 Oct 2026, 11:30 IST
@@ -37,7 +39,7 @@ describe("GocharSection", () => {
   it("reckons Śani's spells after first paint, with an ink line meanwhile", async () => {
     forgetSadeSati();
     const { container } = render(<GocharSection patri={patri} nowMs={NOW} zone="Asia/Kolkata" />);
-    expect(screen.getByRole("status")).toHaveTextContent(/Reckoning Śani's spells/);
+    expect(screen.getByRole("status")).toHaveTextContent(/Working out Saturn's seasons/);
     expect(container.querySelector(".ink-wait")).not.toBeNull();
     expect(screen.queryAllByRole("tab")).toHaveLength(0);
     expect(await screen.findAllByRole("tab", {}, { timeout: 5000 })).not.toHaveLength(0);
@@ -49,15 +51,56 @@ describe("GocharSection", () => {
     expect(screen.getAllByRole("tab").length).toBeGreaterThan(0);
   });
 
-  it("renders a plain heading, a nine-row table with text marks, and cited readings", async () => {
+  it("says Saturn's season in plain words first: which, since when, until when, and tradition's line", async () => {
+    const { container } = render(<GocharSection patri={patri} nowMs={NOW} zone="Asia/Kolkata" />);
+    await screen.findAllByRole("tab", {}, { timeout: 5000 });
+    const season = container.querySelector(".gochar-season") as HTMLElement;
+    expect(season).toHaveTextContent("You are in Saturn's long season, about seven and a half years.");
+    expect(season).toHaveTextContent("It began in Apr 2022 and closes around");
+    expect(season).toHaveTextContent("You are in its peak part, with Saturn in Mīna, until 3 Jun 2027.");
+    expect(season).toHaveTextContent(/Tradition says this is a season that asks for patience/);
+    expect(season).toHaveTextContent(/Source: .+, Sāḍe-sātī/);
+    // the plain words come before the ribbon and the folded table
+    const fold = container.querySelector("details.v-fold") as HTMLDetailsElement;
+    expect(fold.open).toBe(false);
+    expect(season.compareDocumentPosition(fold) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(fold).getByText("Where the planets are now").closest("summary")).not.toBeNull();
+    // the season tabs read plain first, the Sanskrit name small
+    const sel = screen.getAllByRole("tab").find((t) => t.getAttribute("aria-selected") === "true");
+    expect(sel).toHaveTextContent("Long season");
+    expect(sel).toHaveTextContent("Sāḍe-sātī");
+  });
+
+  it("seasonNow covers a short season, a stepped-back Saturn, and no season at all", () => {
+    const birth = REFERENCE_PROFILE.birth.utcMs;
+    const ss = sadeSati(patri, birth - 3 * YEAR, birth + 92 * YEAR);
+    const short = seasonNow(ss, Date.UTC(2013, 0, 1), "UTC");
+    expect(short.title).toMatch(/shorter seasons/);
+    expect(short.term).toMatch(/^Aṣṭama Śani: Saturn in the 8th from the Moon$/);
+    expect(short.when).toMatch(/^It began in \w{3} 20\d\d and is read until about \w{3} 20\d\d\.$/);
+    const none = seasonNow(ss, Date.UTC(2015, 0, 1), "Asia/Kolkata");
+    expect(none.title).toBe("None of Saturn's seasons is running now.");
+    expect(none.when).toMatch(/The next long season begins around Apr 2022/);
+    expect(none.cite).toEqual({ text: "Later tradition", ref: "Sāḍe-sātī" });
+    const back = seasonNow(ss, Date.UTC(2022, 8, 1), "Asia/Kolkata");
+    expect(back.when).toMatch(/Saturn has stepped back for a while and returns to Kumbha on \d{1,2} \w{3} 2023\./);
+  });
+
+  it("opens the planets fold when asked to (print)", () => {
+    const { container } = render(<GocharSection patri={patri} nowMs={NOW} zone="Asia/Kolkata" forceOpen />);
+    expect((container.querySelector("details.v-fold") as HTMLDetailsElement).open).toBe(true);
+  });
+
+  it("keeps the nine-row table with text marks and the cited readings, inside the fold", async () => {
     const { container } = render(<GocharSection patri={patri} nowMs={NOW} zone="Asia/Kolkata" />);
     await screen.findAllByRole("tab", {}, { timeout: 5000 });
     // plain English heads the section; the Sanskrit terms follow in small text, each with its ⓘ
-    expect(screen.getByRole("heading", { level: 2, name: "Where the planets are now" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 3, name: "Saturn's long seasons" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Saturn's long seasons" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3, name: "What tradition says" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /What is Gochar/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /What is Sāḍe-sātī/ })).toBeInTheDocument();
-    const table = screen.getByRole("table");
+    const table = container.querySelector("details.v-fold table.gochar__ledger") as HTMLElement;
+    expect(table).not.toBeNull();
     expect(within(table).getByRole("row", { name: /^Saturn/ })).toHaveTextContent("Śani");
     expect(within(table).getAllByText(/^from the rising sign$/)).toHaveLength(9);
     const rows = within(table).getAllByRole("row");
@@ -177,17 +220,29 @@ describe("SadeSatiRibbon", () => {
 });
 
 describe("DailyStrengthCard", () => {
-  it("shows Tārā-bala, Candra-bala and the running daśā with a progress rule", () => {
+  it("answers in one plain sentence, then three plain chips with the Sanskrit small and a progress rule", () => {
     const { container } = render(<DailyStrengthCard patri={patri} nowMs={NOW} zone="Asia/Kolkata" />);
-    const card = screen.getByRole("region", { name: "Today's strengths" });
+    const card = screen.getByRole("region", { name: "Today for this chart" });
     expect(card).toHaveTextContent("Today · 12 Oct");
-    expect(within(card).getByRole("heading", { level: 2 })).toBeInTheDocument();
-    expect(container.textContent).toMatch(/Star strength Tārā-bala/);
-    expect(container.textContent).toMatch(/Tārā \d \S+/);
-    expect(container.textContent).toMatch(/Moon strength Candra-bala/);
-    expect(container.textContent).toMatch(/Today's Moon is in the \d+(st|nd|rd|th) sign from yours/);
-    expect(container.textContent).toMatch(/(kind|asks care|mixed)/);
-    expect(container.textContent).toMatch(/(supportive|quiet)/);
+    const moonNow = moonTransitAt(NOW, patri.preset);
+    const chandra = chandraBala(patri.grahas.MO.sign, moonNow.sign);
+    const tara = taraBala(patri.grahas.MO.nakshatra, moonNow.nakshatra);
+    const h = within(card).getByRole("heading", { level: 2 });
+    expect(h).toHaveTextContent(
+      new RegExp(`^Today the Moon is in your ${ORDINAL(chandra.house)} area: ${HOUSE_THEME[chandra.house - 1]}\\. The day's star `),
+    );
+    expect(h.textContent).not.toMatch(/Tārā|bala|Janma|daśā/); // no jargon in the answer
+    const chips = Array.from(card.querySelectorAll(".v-chip")).map((c) => c.textContent?.replace(/^[✓·~] /, ""));
+    expect(chips).toEqual([
+      `Moon's support: ${chandra.favourable ? "good" : "quiet"}`,
+      `Day's star: ${{ kind: "kind", unkind: "asks care", mixed: "mixed" }[tara.tone]}`,
+      expect.stringMatching(/^Life chapter: \w+$/),
+    ]);
+    expect(container.textContent).toContain(`Tārā-bala · Tārā ${tara.tara} ${tara.name}`);
+    expect(container.textContent).toMatch(/Candra-bala · today's Moon is in the \d+(st|nd|rd|th) sign from yours/);
+    expect(container.textContent).toMatch(/Daśā · \w+ · \w+ · \w+/);
+    expect(screen.getByRole("button", { name: /What is Candra-bala/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /What is daśā/ })).toBeInTheDocument();
     expect(container.textContent).toMatch(/runs until \d{1,2} \w{3} 20\d\d/);
     expect(screen.getByRole("button", { name: /What is Tārā-bala/ })).toBeInTheDocument();
     const bar = screen.getByRole("progressbar");

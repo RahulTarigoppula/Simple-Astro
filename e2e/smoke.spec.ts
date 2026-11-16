@@ -23,7 +23,7 @@ test("saving casts the chart with the golden numbers", async ({ page }) => {
   // Simple words come first; the chart and its detail sit behind the Chart view.
   await expect(page.getByRole("heading", { name: /this is you/i })).toBeVisible();
   await expect(page.locator(".life")).toContainText("Revatī");
-  await page.getByRole("tab", { name: "Chart", exact: true }).click();
+  await page.getByRole("tab", { name: "Planets", exact: true }).click();
   const ledger = page.locator("table.ledger--grahas");
   await expect(ledger.locator("tbody tr")).toHaveCount(10); // Lagna + nine grahas
   await expect(ledger).toContainText("15°39′25″"); // Lagna, Mīna

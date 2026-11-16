@@ -260,3 +260,14 @@
   font: inherit;
   cursor: pointer;
 }
+
+/* Where you are now: the chosen place reads as the value, the explanation as the small line */
+.set-here {
+  display: block;
+  font-size: 0.9375rem;
+  color: var(--accent-text);
+}
+.set-here__s {
+  display: block;
+  margin-top: 2px;
+}

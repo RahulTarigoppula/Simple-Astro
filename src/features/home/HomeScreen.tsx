@@ -2,7 +2,7 @@
 // everything else. With nobody added yet it is a short welcome with one thing to do.
 import { useMemo } from "react";
 import { Link } from "react-router";
-import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
+import { useActiveProfile, useHere, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { useNowMs } from "../../app/useNow";
 import { InfoDot } from "../../components/ui/Explain";
 import { ChevronRight, Page, Row, Section } from "../../components/ui/Page";
@@ -11,10 +11,10 @@ import { nakBoth } from "../../data/regional";
 import { forecast, periodBounds } from "../../engine/forecast";
 import { computePanchang } from "../../engine/panchang";
 import { type AreaReading, dayGuide, personalReading } from "../../engine/personal";
-import { safeZone } from "../../engine/time";
 import type { Patri, Profile, Settings } from "../../engine/types";
 import { IconChart, IconForecast, IconMilan, IconNumbers, IconPalm, IconSky, IconStory, IconToday } from "../chowki/icons";
 import { SkyEvents } from "../cosmic/SkyEvents";
+import { HereLine, townOf } from "../here/HereSheet";
 import { MoonDisc } from "./MoonDisc";
 import "./home.css";
 
@@ -169,9 +169,8 @@ interface DayProps {
 }
 
 function Day({ profile, patri, settings, now }: DayProps) {
-  const zone = safeZone(profile.birth.zone);
-  const lat = profile.birth.place.lat;
-  const lon = profile.birth.place.lon;
+  // Where the reader is now (the birthplace until they say otherwise): never the chart's own place.
+  const { lat, lon, zone, name: placeName } = useHere(profile);
   const [dayStart] = periodBounds("day", now, zone);
 
   const day = useMemo(() => {
@@ -327,12 +326,13 @@ function Day({ profile, patri, settings, now }: DayProps) {
                   </dd>
                 </div>
               </dl>
+              <HereLine profile={profile} />
             </section>
           ) : null}
 
           <Section
             title="Your life these weeks"
-        note="From the slower planets, so it changes over weeks, not day to day."
+            note="From the slower planets, so it changes over weeks, not day to day."
             action={
               <Link to={`/forecast/${profile.id}`} className="v-link">
                 Why <ChevronRight size={16} />
@@ -391,7 +391,7 @@ function Day({ profile, patri, settings, now }: DayProps) {
             <Shortcut to="/story" icon={<IconStory />} title="Stories" sub="How it all began" />
           </nav>
 
-          <SkyEvents nowMs={now} place={{ lat, lon, name: profile.birth.place.name }} zone={zone} preset={settings.preset} limit={3} />
+          <SkyEvents nowMs={now} place={{ lat, lon, name: townOf(placeName) }} zone={zone} preset={settings.preset} limit={3} />
         </div>
       </div>
     </>
@@ -404,11 +404,11 @@ export default function HomeScreen() {
   const settings = useSettings();
   const now = useNowMs(60_000);
   const { patri, error } = usePatri(active, settings.preset);
+  const { zone } = useHere(active);
 
   if (profiles === undefined) return <Page label="Vyomaphala home">{null}</Page>;
   if (!active) return <Welcome />;
 
-  const zone = safeZone(active.birth.zone);
   const ready = patri && patri.profileId === active.id;
   return (
     <Page
@@ -434,10 +434,7 @@ export default function HomeScreen() {
       <div className="home-trust">
         <Trust />
       </div>
-      <p className="v-foot">
-        A traditional reading for reflection, never a prediction or advice. Times are for {active.birth.place.name.split(",")[0]}, where{" "}
-        {active.name} was born.
-      </p>
+      <p className="v-foot">A traditional reading for reflection, never a prediction or advice.</p>
     </Page>
   );
 }

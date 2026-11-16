@@ -55,10 +55,34 @@
 }
 
 /* ── One step ──────────────────────────────────────────────────────────── */
+/* The page fills the screen so the action bar sits at its bottom even on a short step; a field
+   that takes focus is scrolled clear of the bar (scroll-padding), keyboard up or not. */
+.leafscreen {
+  --leaf-pad: var(--page-pad);
+  scroll-padding-bottom: 112px;
+}
+.leafscreen .v-page {
+  min-height: 100%;
+  padding-bottom: 0;
+}
+@media (min-width: 900px) {
+  .leafscreen {
+    --leaf-pad: 32px;
+  }
+}
 .leaf-form {
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+.leaf-kept {
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.leaf-kept .v-btn {
+  min-height: 44px;
 }
 .leaf-q {
   margin: 4px 0 -6px;
@@ -209,6 +233,11 @@
 .bf-read b {
   font-weight: 600;
 }
+.bf-read.is-hint {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--card-edge-strong);
+  color: var(--ink-muted);
+}
 .bf-read.is-missing {
   background: var(--mixed-soft);
   color: var(--warning-text);
@@ -278,8 +307,11 @@
   color: var(--ink-muted);
   white-space: nowrap;
 }
-.leaf-ll--after::before {
-  content: " · ";
+.leaf-coords {
+  margin-top: 8px;
+}
+.leaf-results .v-row__s {
+  font-size: 0.9375rem;
 }
 .leaf-online {
   display: flex;
@@ -295,6 +327,12 @@
   border: 1px dashed var(--card-edge-strong);
   border-radius: var(--radius-md);
   color: var(--ink-muted);
+}
+.leaf-chosen.is-missing {
+  border-color: var(--warning-text);
+  background: var(--mixed-soft);
+  color: var(--warning-text);
+  font-weight: 600;
 }
 .leaf-chosen.is-set {
   border: 1px solid rgba(74, 222, 128, 0.4);
@@ -432,7 +470,21 @@
   font-size: 0.9375rem;
   font-weight: 600;
 }
+/* Pinned to the bottom of the scrolling page (sticky, never fixed: it rides above the keyboard with
+   the page and cannot sit on top of the field being typed in). Solid behind the buttons, with a
+   short fade above so the content slides under it instead of being cut. */
 .leaf-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: auto calc(-1 * var(--leaf-pad)) 0;
+  padding: 22px var(--leaf-pad) calc(12px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to bottom, transparent, var(--void-0) 16px);
+}
+.leaf-foot__row {
   display: flex;
   gap: 10px;
 }
@@ -440,15 +492,22 @@
   flex: 1;
 }
 .leaf-foot__note {
-  margin-top: -8px;
   text-align: center;
+}
+@media (max-height: 480px) {
+  .leafscreen {
+    scroll-padding-bottom: 92px;
+  }
+  .leaf-foot {
+    padding-top: 16px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
 }
 .leaf-example {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
-  margin-top: 6px;
   padding-top: 16px;
   border-top: 1px solid var(--card-edge);
 }

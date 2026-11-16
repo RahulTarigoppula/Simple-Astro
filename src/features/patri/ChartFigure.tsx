@@ -8,7 +8,7 @@ import { GRAHA_IDS } from "../../engine/types";
 import { haptics } from "../../platform/haptics";
 import { reducedMotion } from "../../platform/native";
 import { play } from "../../platform/sound";
-import { type ChartBody, type ChipPos, KundliChart, type KundliHandle } from "./KundliChart";
+import { type ChartBody, type ChipPos, grahaAbbr, KundliChart, type KundliHandle } from "./KundliChart";
 
 const Z = 2.4;
 const R = 53; // glass radius (118 px loupe − 6 px rim)
@@ -56,17 +56,14 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
     return () => ro.disconnect();
   }, []);
 
-  // Tilak haptic: impact Medium when the dab lands, once per ink-draw.
+  // One soft tap as a newly worked-out chart appears.
   // biome-ignore lint/correctness/useExhaustiveDependencies: inkKey identifies a new drawing
   useEffect(() => {
     if (skipInk) return;
-    const t = window.setTimeout(
-      () => {
-        haptics.impact("medium");
-        play("pat");
-      },
-      reducedMotion() ? 240 : 1500,
-    );
+    const t = window.setTimeout(() => {
+      haptics.impact("medium");
+      play("pat");
+    }, 240);
     return () => clearTimeout(t);
   }, [inkKey, skipInk]);
 
@@ -259,6 +256,17 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
           <span className="v-muted">Touch a planet on the chart to read it.</span>
         )}
       </p>
+      <ul className="pt-key" aria-label="Chart key">
+        {GRAHA_IDS.map((id) => (
+          <li key={id}>
+            <b lang={script === "devanagari" ? "hi" : undefined}>{grahaAbbr(id, script)}</b> {GRAHA_ENGLISH[id]}
+            {id === "RA" ? " (north node)" : id === "KE" ? " (south node)" : ""}
+          </li>
+        ))}
+        <li>
+          <b>℞</b> moving backwards
+        </li>
+      </ul>
       <div className="pt-charttools">
         <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={flip}>
           {style === "north" ? "Show South Indian style" : "Show North Indian style"}

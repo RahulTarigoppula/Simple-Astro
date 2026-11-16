@@ -481,3 +481,7 @@
 .alm-foot .v-actions {
   justify-content: flex-end;
 }
+
+.alm-where p {
+  margin: 0;
+}

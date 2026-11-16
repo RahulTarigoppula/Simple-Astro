@@ -19,7 +19,7 @@ const STEPS: Array<{ title: string; body: string; to: string; cta: string }> = [
     title: "Read the birth chart",
     body: "See where the Sun, Moon and planets were at that moment, the life-chapter timeline (daśā), and classical patterns (yogas), each with a plain explanation.",
     to: "/circle",
-    cta: "Open People",
+    cta: "Choose a person",
   },
   {
     title: "See your forecast",
@@ -40,10 +40,10 @@ const STEPS: Array<{ title: string; body: string; to: string; cta: string }> = [
     cta: "Open Explore",
   },
   {
-    title: "Partner Compatibility, or read a palm",
-    body: "Partner Compatibility shows how two people fit: understanding, companionship, trust, closeness and family, with a score out of 100 from the traditional 36-point Guna Milan. The palm reader photographs your hand and describes its lines, on your device only.",
+    title: "Partner match, or read a palm",
+    body: "Partner match shows how two people fit: understanding, companionship, trust, closeness and family, with a score out of 100 from the traditional 36-point Guna Milan. The palm reader photographs your hand and describes its lines, on your device only.",
     to: "/milan",
-    cta: "Open Partner Compatibility",
+    cta: "Open Partner match",
   },
 ];
 
