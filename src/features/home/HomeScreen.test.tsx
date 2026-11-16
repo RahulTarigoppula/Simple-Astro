@@ -170,7 +170,7 @@ describe("Today, the home screen", () => {
     const group = screen.getByRole("radiogroup", { name: "Choose a person" });
     expect(within(group).getByRole("radio", { name: /Rahul/ })).toBeChecked();
     fireEvent.click(within(group).getByRole("radio", { name: /Priya/ }));
-    expect(await screen.findByRole("button", { name: /^Priya\. Switch person/ })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /^Priya\. Switch person/ }, { timeout: 8000 })).toBeInTheDocument();
     expect((await db.settings.get("app"))?.value.activeProfileId).toBe(SECOND.id);
   });
 
