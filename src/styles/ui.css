@@ -1027,3 +1027,11 @@ dialog.sheet-dialog {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+/* On a desk every page starts at the same left edge, whatever its width. */
+@media (min-width: 900px) {
+  .v-page {
+    margin-left: max(0px, calc((100% - 1080px) / 2));
+    margin-right: auto;
+  }
+}

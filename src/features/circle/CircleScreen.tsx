@@ -194,6 +194,7 @@ export default function CircleScreen() {
             setMode={(mode) => setSheet({ id: sheetProfile.id, mode })}
             onPalm={() => {
               setSheet(null);
+              void saveSettings({ activeProfileId: sheetProfile.id });
               navigate(`/hast/${sheetProfile.id}`);
             }}
             onPair={(o) => {

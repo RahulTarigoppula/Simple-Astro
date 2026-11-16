@@ -276,7 +276,7 @@ function buildRows(leaf: DayLeaf, clock: ZoneClock, preset: EnginePreset): { lim
     {
       id: "sun",
       k: "Sunrise and sunset",
-      plain: `Daylight here: ${Math.floor(lightMs / 3_600_000)} h ${String(Math.round((lightMs % 3_600_000) / 60_000)).padStart(2, "0")} min`,
+      plain: `Daylight here: ${Math.floor(Math.round(lightMs / 60_000) / 60)} h ${String(Math.round(lightMs / 60_000) % 60).padStart(2, "0")} min`,
       ...timed([p.sunriseMs, p.sunsetMs]),
       foot: range(
         "Sunrise and sunset",

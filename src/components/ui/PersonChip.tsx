@@ -35,13 +35,14 @@ export function PersonChip() {
 
   if (profiles === undefined) return null;
 
+  // A screen that is about one person (its id is in the address) names that person, and follows a switch.
+  const m = /^\/(patri|forecast|hast)\/([^/]+)(\/.*)?$/.exec(loc.pathname);
+  const shown = (m ? profiles.find((p) => p.id === m[2]) : undefined) ?? active;
+
   const choose = (p: Profile) => {
     setOpen(false);
-    if (p.id === active?.id) return;
-    void saveSettings({ activeProfileId: p.id });
-    // A screen that is about one person follows the switch.
-    const m = /^\/(patri|forecast|hast)\/([^/]+)(\/.*)?$/.exec(loc.pathname);
-    if (m) navigate(`/${m[1]}/${p.id}${m[1] === "hast" ? "" : (m[3] ?? "")}`, { replace: true });
+    if (p.id !== active?.id) void saveSettings({ activeProfileId: p.id });
+    if (m && p.id !== m[2]) navigate(`/${m[1]}/${p.id}${m[1] === "hast" ? "" : (m[3] ?? "") + loc.search}`, { replace: true });
   };
   const go = (to: string) => {
     setOpen(false);
@@ -54,11 +55,11 @@ export function PersonChip() {
         type="button"
         className="v-person"
         aria-haspopup="dialog"
-        aria-label={active ? `${active.name}. Switch person, people and settings` : "People and settings"}
+        aria-label={shown ? `${shown.name}. Switch person, people and settings` : "People and settings"}
         onClick={() => setOpen(true)}
       >
-        {active ? <Avatar name={active.name} /> : null}
-        <span className="v-person__name">{active ? active.name : "Menu"}</span>
+        {shown ? <Avatar name={shown.name} /> : null}
+        <span className="v-person__name">{shown ? shown.name : "Menu"}</span>
         <svg
           width="14"
           height="14"
@@ -82,7 +83,7 @@ export function PersonChip() {
                   key={p.id}
                   type="button"
                   role="radio"
-                  aria-checked={p.id === active?.id}
+                  aria-checked={p.id === shown?.id}
                   className="v-people__one"
                   onClick={() => choose(p)}
                 >
@@ -91,7 +92,7 @@ export function PersonChip() {
                     <span className="t">{p.name}</span>
                     <span className="s">{birthLine(p)}</span>
                   </span>
-                  {p.id === active?.id ? (
+                  {p.id === shown?.id ? (
                     <svg
                       className="tick"
                       width="20"

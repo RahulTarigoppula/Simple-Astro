@@ -247,16 +247,6 @@ a {
   position: relative;
   z-index: 1;
 }
-.paper--cut {
-  border-top: 1px solid color-mix(in oklch, var(--border-strong), transparent 60%);
-}
-.sheet-col {
-  margin: var(--space-3) auto var(--space-8);
-  width: calc(100% - var(--space-6));
-  max-width: 560px;
-  border-radius: var(--radius-md);
-  padding-bottom: var(--space-6);
-}
 
 .band {
   display: flex;
@@ -405,32 +395,6 @@ button.cite:hover {
   color: var(--accent);
   font-weight: 700;
 }
-.note-haldi {
-  display: flex;
-  gap: var(--space-2);
-  align-items: flex-start;
-  margin: var(--space-3) var(--paper-margin) 0;
-  padding: 8px 10px;
-  background: color-mix(in oklch, var(--haldi), var(--paper) 74%);
-  border-left: 3px solid var(--haldi);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-size: var(--text-sm);
-  color: var(--ink);
-  line-height: 1.45;
-}
-.note-lac {
-  display: flex;
-  gap: var(--space-2);
-  align-items: flex-start;
-  margin: var(--space-3) var(--paper-margin) 0;
-  padding: 8px 10px;
-  background: color-mix(in oklch, var(--danger), var(--paper) 88%);
-  border-left: 3px solid var(--danger);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-size: var(--text-sm);
-  color: var(--ink);
-  line-height: 1.45;
-}
 .p {
   margin: var(--space-3) var(--paper-margin) 0;
   font-size: var(--text-base);
@@ -498,9 +462,6 @@ button.cite:hover {
 }
 .linkish:disabled {
   color: var(--ink-muted);
-}
-.danger-text {
-  color: var(--danger);
 }
 
 /* engraved brass strip, the contract with reality */
@@ -608,12 +569,6 @@ button.cite:hover {
 }
 
 /* ── Sheets & dialogs (FootnoteSheet / Drawer) ────────────────────────── */
-.scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  background: color-mix(in oklch, var(--ink), transparent 75%);
-}
 .sheet-dialog {
   position: fixed;
   left: 0;
@@ -634,13 +589,6 @@ button.cite:hover {
   border-radius: 2px;
   background: var(--border-strong);
   margin: 10px auto 4px;
-}
-.sheet-close {
-  min-height: 44px;
-  min-width: 44px;
-  display: inline-grid;
-  place-items: center;
-  color: var(--ink);
 }
 
 /* ── Home: parapet, greeting, cloth, desk objects ─────────────────────── */
@@ -693,84 +641,9 @@ button.cite:hover {
   place-items: center;
   min-height: 0;
 }
-.deskobj {
-  display: grid;
-  place-items: center;
-  gap: 6px;
-  padding: 6px;
-  border-radius: var(--radius-md);
-  min-width: 56px;
-  min-height: 56px;
-  color: var(--cloth-ink);
-  position: relative;
-  text-decoration: none;
-  transition: transform var(--dur-fast) var(--ease-out);
-  -webkit-user-select: none;
-  user-select: none;
-}
-.deskobj:hover,
-.deskobj:focus-visible {
-  transform: translate(-1px, -2px);
-}
-.deskobj:active {
-  transform: translate(0, 1px) scale(0.985);
-}
-.deskobj svg {
-  display: block;
-  filter: drop-shadow(var(--shadow-2));
-  max-width: 100%;
-  height: auto;
-}
-.deskobj .lbl {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-variation-settings:
-    "wdth" 87,
-    "wght" 500;
-  opacity: 0.85;
-  text-align: center;
-}
-.deskobj .lbl .dev {
-  text-transform: none;
-  font-size: 11px;
-  letter-spacing: 0;
-}
-.deskobj .tip {
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  translate: -50% 100%;
-  background: var(--ledge);
-  color: var(--cloth-ink);
-  border: 1px solid var(--brass);
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
-  white-space: nowrap;
-  z-index: 3;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  opacity: 0;
-  transition: opacity var(--dur-fast) var(--ease-out);
-  pointer-events: none;
-}
-.deskobj.is-labelled .tip {
-  opacity: 1;
-}
-.deskobj--patri {
-  grid-column: 1 / -1;
-}
 .flame {
   transform-origin: 50% 100%;
   transform-box: fill-box;
-}
-.diya-glow {
-  opacity: calc(0.5 + var(--flame-k, 0) * 0.5);
-}
-:root[data-theme="day"] .diya-glow {
-  opacity: 0.18;
 }
 
 /* ── Janam Patri: rollers, scrollport, seal, charts, loupe, ledger ───── */
@@ -790,75 +663,10 @@ button.cite:hover {
   display: grid;
   place-items: center;
 }
-.roller--top {
-  top: 0;
-}
-.roller--bot {
-  bottom: 0;
-}
-.roller__body {
-  width: 100%;
-  height: 18px;
-  transform-origin: center;
-  background: var(--brass-cyl-v);
-  box-shadow: var(--brass-edge), var(--shadow-2);
-  position: relative;
-  overflow: hidden;
-  will-change: transform;
-}
-.roller--top .roller__body {
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-}
-.roller--bot .roller__body {
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-.roller__curl {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 34%;
-  background: linear-gradient(90deg, transparent, rgba(255, 246, 230, 0.42), transparent);
-  transform: translateX(-40%);
-  will-change: transform;
-}
-.roller__cap {
-  position: absolute;
-  top: 50%;
-  width: 12px;
-  height: 26px;
-  translate: 0 -50%;
-  background: linear-gradient(90deg, var(--brass-dark), var(--brass-hi) 45%, var(--brass-lo));
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-1);
-}
-.roller__cap--l {
-  left: 4px;
-}
-.roller__cap--r {
-  right: 4px;
-}
-.scrollport {
-  position: absolute;
-  inset: 20px 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
-  scrollbar-width: none;
-  padding: 0 var(--space-3);
-}
-.scrollport::-webkit-scrollbar {
-  width: 0;
-}
 .sheet {
   max-width: 560px;
   margin: 0 auto;
   will-change: transform;
-}
-.seal-slot {
-  height: 96px;
-  margin-top: -96px;
-  display: grid;
-  place-items: center;
 }
 .seal {
   width: 74px;
@@ -896,44 +704,6 @@ button.cite:hover {
 .seal.is-cracked {
   background: radial-gradient(circle at 62% 68%, var(--danger), var(--lac-dark));
 }
-.seal__tab {
-  position: absolute;
-  right: -46px;
-  top: 50%;
-  translate: 0 -50%;
-  background: var(--haldi);
-  color: var(--ink);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 3px 6px;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  box-shadow: var(--shadow-1);
-}
-.patri-head {
-  padding: var(--space-5) var(--paper-margin) var(--space-4);
-}
-.patri-head h1 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: var(--text-2xl);
-  line-height: var(--leading-tight);
-  color: var(--ink);
-}
-.patri-head h1 .dev {
-  font-family: var(--font-display);
-  line-height: var(--leading-tight);
-}
-.patri-head .birthline {
-  margin: 8px 0 0;
-  font-size: var(--text-base);
-  color: var(--ink);
-}
-.patri-head .engraved {
-  margin-top: var(--space-3);
-}
 .figure {
   padding: var(--space-5) var(--paper-margin) var(--space-2);
 }
@@ -946,7 +716,6 @@ button.cite:hover {
 }
 .chart-wrap,
 .loupe,
-.printframe,
 .seal,
 .ribbon {
   -webkit-user-select: none;
@@ -964,9 +733,6 @@ button.cite:hover {
   stroke-width: var(--stroke-chart);
   shape-rendering: geometricPrecision;
   stroke-linecap: square;
-}
-.chart .stroke--faint {
-  stroke: var(--ink-faint);
 }
 .chart .signnum {
   fill: var(--ink-muted);
@@ -1015,11 +781,6 @@ button.cite:hover {
   font-size: var(--text-sm);
   color: var(--ink-muted);
   line-height: 1.45;
-}
-.flip-card {
-  position: relative;
-  transform-style: preserve-3d;
-  will-change: transform;
 }
 .loupe {
   position: absolute;
@@ -1089,26 +850,6 @@ button.cite:hover {
 }
 .readout .engraved {
   flex: 1;
-}
-.badge-bound {
-  background: var(--accent);
-  color: var(--accent-ink);
-  border-radius: var(--radius-sm);
-  padding: 3px 7px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-variation-settings:
-    "wdth" 87,
-    "wght" 600;
-}
-.chart-tools {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-4);
-  flex-wrap: wrap;
-  margin: var(--space-2) var(--paper-margin) 0;
 }
 
 .ledger {
@@ -1250,54 +991,6 @@ button.cite:hover {
 }
 .fold {
   margin: 0 var(--paper-margin);
-}
-.fold-in {
-  background: color-mix(in oklch, var(--surface-2), transparent 40%);
-  border-left: 3px solid var(--brass);
-  padding: 9px 11px;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-}
-.fold-in ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 2px;
-}
-.fold-in li {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 var(--space-3);
-  font-size: var(--text-sm);
-  color: var(--ink);
-  align-items: baseline;
-}
-.fold-in li > button {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 var(--space-3);
-  width: 100%;
-  text-align: left;
-  min-height: 32px;
-  align-items: baseline;
-}
-.fold-in li .n {
-  flex: 1;
-}
-.fold-in li .mono {
-  color: var(--ink-muted);
-  font-size: 10.5px;
-  white-space: nowrap;
-}
-.fold-in li.is-now,
-.fold-in li.is-now .mono {
-  color: var(--accent-text);
-}
-.fold-in .pd-list {
-  width: 100%;
-  margin: 4px 0 6px 12px;
-  border-left: 1px solid var(--border-strong);
-  padding-left: 10px;
 }
 
 /* yogas */
@@ -1476,91 +1169,6 @@ button.cite:hover {
     transform: translateY(2px);
   }
 }
-.drum__win {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: inherit;
-}
-.drum__strip {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  will-change: transform;
-}
-.drum__cell {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 26px;
-  margin-top: -13px;
-  display: grid;
-  place-items: center;
-  font-family: var(--font-mono);
-  font-size: 19px;
-  color: var(--engraved);
-  font-variation-settings:
-    "wdth" 87,
-    "wght" 600;
-  font-variant-numeric: tabular-nums;
-}
-.drum__shade {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  background: linear-gradient(180deg, rgba(20, 10, 4, 0.55), rgba(20, 10, 4, 0) 26%, rgba(20, 10, 4, 0) 74%, rgba(20, 10, 4, 0.55));
-}
-.drum__detent {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 28px;
-  margin-top: -14px;
-  border-top: 1px solid rgba(0, 0, 0, 0.35);
-  border-bottom: 1px solid rgba(255, 246, 230, 0.35);
-  pointer-events: none;
-}
-.drum__lbl {
-  position: absolute;
-  bottom: -17px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  z-index: 2;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  font-variation-settings:
-    "wdth" 87,
-    "wght" 500;
-}
-.drum__input {
-  position: absolute;
-  inset: 18px 4px;
-  width: calc(100% - 8px);
-  text-align: center;
-  font-family: var(--font-mono);
-  font-size: 18px;
-  background: var(--paper);
-  color: var(--ink);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  z-index: 3;
-}
-.sealbtn-wrap {
-  padding: var(--space-5) var(--paper-margin) var(--space-6);
-  display: grid;
-  gap: var(--space-3);
-}
-.sealbtn {
-  width: 100%;
-  min-height: 52px;
-}
 .results {
   list-style: none;
   margin: 0;
@@ -1597,36 +1205,6 @@ button.cite:hover {
 }
 
 /* ── Hast Rekha ────────────────────────────────────────────────────────── */
-.printframe {
-  position: relative;
-  margin: var(--space-4) auto 0;
-  aspect-ratio: 1 / 1;
-  width: calc(100% - 2 * var(--paper-margin));
-  max-width: 380px;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  background: var(--print-ground);
-  box-shadow:
-    inset 0 0 0 1px var(--border-strong),
-    var(--shadow-1);
-  touch-action: none;
-}
-.printframe.is-empty {
-  background: none;
-  outline: 1px dashed var(--ink-faint);
-  outline-offset: -1px;
-  box-shadow: none;
-  display: grid;
-  place-items: center;
-}
-.printframe canvas,
-.printframe img.print {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: grayscale(0.35) contrast(1.15);
-}
 .print-lines {
   position: absolute;
   inset: 0;
@@ -1664,28 +1242,6 @@ button.cite:hover {
   fill: var(--accent-2);
   stroke: var(--ink);
   stroke-width: 0.6;
-}
-.empty-note {
-  display: grid;
-  gap: 6px;
-  place-items: center;
-  color: var(--ink-muted);
-  text-align: center;
-  padding: var(--space-5);
-}
-.empty-note b {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: var(--text-xl);
-  color: var(--ink);
-}
-.burnedge {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  opacity: 0;
-  background: radial-gradient(120% 120% at 50% 50%, transparent 32%, rgba(127, 22, 15, 0.55) 62%, var(--lac-dark) 100%);
 }
 .tools {
   display: flex;
@@ -1736,26 +1292,6 @@ button.cite:hover {
 .gauge.is-low i.on {
   background: var(--haldi);
 }
-.confbar {
-  display: inline-block;
-  width: 44px;
-  height: 6px;
-  border-radius: 3px;
-  background: color-mix(in oklch, var(--ink-faint), transparent 55%);
-  vertical-align: middle;
-  overflow: hidden;
-}
-.confbar i {
-  display: block;
-  height: 100%;
-  background: var(--ink);
-}
-.confbar.is-low i {
-  background: var(--haldi);
-}
-.confbar.is-good i {
-  background: var(--tulsi);
-}
 
 /* ── Guna Milan, the 36-bead mala ────────────────────────────────────── */
 .pair {
@@ -1764,36 +1300,6 @@ button.cite:hover {
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-4) var(--paper-margin) 0;
-}
-.pair__scroll {
-  background: var(--surface-2);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  padding: 8px 6px;
-  text-align: center;
-  box-shadow: var(--shadow-1);
-  min-height: 72px;
-  display: grid;
-  align-content: center;
-}
-.pair__scroll b {
-  display: block;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: var(--text-lg);
-  line-height: 1.2;
-}
-.pair__scroll span {
-  display: block;
-  font-size: var(--text-sm);
-  color: var(--ink-muted);
-  line-height: 1.6;
-}
-.pair__scroll--empty {
-  background: none;
-  border: 1px dashed var(--ink-faint);
-  box-shadow: none;
-  color: var(--ink-muted);
 }
 .mauli {
   width: 46px;
@@ -1814,19 +1320,6 @@ button.cite:hover {
   font-weight: 400;
   font-variant-numeric: lining-nums tabular-nums;
 }
-.stampband {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 3px 12px;
-  border: 1.5px solid var(--lac);
-  border-radius: var(--radius-full);
-  color: var(--lac);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: var(--tracking-mono);
-  text-transform: uppercase;
-  rotate: -2.5deg;
-}
 .beads {
   list-style: none;
   margin: var(--space-4) 0 0;
@@ -1837,20 +1330,6 @@ button.cite:hover {
 }
 .beads li:nth-child(even) {
   background: color-mix(in oklch, var(--surface-2), transparent 50%);
-}
-.beads .krow {
-  display: grid;
-  grid-template-columns: 76px 1fr auto;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 6px var(--paper-margin);
-  min-height: 44px;
-  width: 100%;
-  text-align: left;
-  color: var(--ink);
-}
-.beads .kname {
-  font-size: var(--text-sm);
 }
 .beads .brow {
   display: flex;
@@ -1875,42 +1354,8 @@ button.cite:hover {
 .beads i.dosha {
   background: radial-gradient(circle at 34% 30%, color-mix(in oklch, var(--lac), white 18%), var(--lac) 70%, var(--lac-dark));
 }
-.beads .kscore {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: var(--text-sm);
-  color: var(--ink-muted);
-  white-space: nowrap;
-}
-.beads .knote {
-  padding: 0 var(--paper-margin) 8px calc(var(--paper-margin) + 76px + var(--space-2));
-  font-size: var(--text-sm);
-  color: var(--ink-muted);
-  line-height: 1.45;
-}
 
 /* ── Forms on paper: radios, toggles ──────────────────────────────────── */
-.radio-row,
-.toggle-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 10px var(--paper-margin);
-  border-bottom: 1px solid var(--border);
-  min-height: 48px;
-  color: var(--ink);
-}
-.toggle-row .v,
-.radio-row .v {
-  flex: 1;
-}
-.toggle-row .help,
-.radio-row .help {
-  display: block;
-  font-size: var(--text-sm);
-  color: var(--ink-muted);
-  line-height: 1.4;
-}
 .seg {
   display: inline-flex;
   flex-wrap: wrap;
@@ -1970,7 +1415,6 @@ button.cite:hover {
   .setting.is-set > i {
     animation: none !important;
   }
-  .deskobj,
   .stamp,
   .ribbon button,
   .switch::after {
@@ -1984,16 +1428,6 @@ button.cite:hover {
 }
 
 /* Radio rows wrap their segmented control under the label on narrow paper. */
-.radio-row,
-.toggle-row {
-  flex-wrap: wrap;
-}
-.radio-row .v {
-  flex: 1 1 12em;
-}
-.radio-row .seg {
-  flex: 0 1 auto;
-}
 
 /* Native <dialog> sheets rise from the bottom edge; the desk behind dims with ink at 25 %. */
 dialog.sheet-dialog {
@@ -2091,8 +1525,7 @@ dialog.sheet-dialog::backdrop {
   .desk,
   .screens,
   .screen,
-  .patri,
-  .scrollport {
+  .patri {
     position: static !important;
     height: auto !important;
     overflow: visible !important;
@@ -2102,17 +1535,12 @@ dialog.sheet-dialog::backdrop {
   .desk::after,
   .ledge,
   .roller,
-  .seal-slot,
   .loupe,
   .readout,
-  .chart-tools,
-  .varga-pager,
   .ribbon,
   .fold,
-  .patri-links,
   .toast-wrap,
   .sw-tab,
-  .note-haldi:not(.note--keep),
   .hit-layer,
   .desk__top {
     display: none !important;

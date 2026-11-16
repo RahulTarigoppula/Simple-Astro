@@ -297,6 +297,14 @@ export default function LeafScreen() {
   const depth = trail.depth ?? 0;
   const ready = !id || loadedFrom === id;
 
+  // The address always names the step that is on screen (a reload on a later step with an empty form
+  // shows the first one), so Back never lands on a step that was never really reached.
+  const stale = ready && !leaving && params.has("step") && wanted !== step;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only the mismatch itself re-runs this
+  useEffect(() => {
+    if (stale) navigate({ search: `?step=${step + 1}` }, { replace: true, state: location.state });
+  }, [stale, step]);
+
   const goTo = (i: number) => {
     if (i === step) return;
     setTried(false);

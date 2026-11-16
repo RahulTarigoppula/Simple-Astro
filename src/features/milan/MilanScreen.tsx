@@ -235,8 +235,8 @@ function MilanScreen() {
     const nextB = side === "a" ? nextOther : p;
     haptics.selection();
     // A new pair is a new screen (the route is keyed by the pair), so the sheet goes with the old one.
-    if (nextA && nextB && nextA.id !== nextB.id) return go(nextA, nextB, matched);
     setSheet(null);
+    if (nextA && nextB && nextA.id !== nextB.id) return go(nextA, nextB, matched);
     setPick({ a: nextA?.id ?? null, b: nextB?.id ?? null });
   };
 

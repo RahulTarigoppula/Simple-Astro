@@ -90,14 +90,6 @@ h3 {
 .paper::before {
   display: none;
 }
-.paper--cut {
-  border-top: 1px solid var(--glass-edge);
-}
-.sheet-col {
-  margin-top: var(--space-4);
-  padding-bottom: var(--space-6);
-  overflow: hidden;
-}
 
 /* Section heads: a quiet title with an aurora bar */
 .band {
@@ -159,21 +151,6 @@ h3 {
   color: var(--accent-2);
 }
 
-.note-haldi {
-  background: rgba(251, 191, 36, 0.08);
-  border: 1px solid rgba(251, 191, 36, 0.28);
-  border-left: 3px solid var(--warning);
-  border-radius: var(--radius-sm);
-  color: var(--ink);
-}
-.note-lac {
-  background: rgba(251, 113, 133, 0.08);
-  border: 1px solid rgba(251, 113, 133, 0.3);
-  border-left: 3px solid var(--danger);
-  border-radius: var(--radius-sm);
-  color: var(--ink);
-}
-
 /* Buttons */
 .stamp {
   background: var(--aurora);
@@ -202,9 +179,6 @@ h3 {
 .linkish {
   color: var(--accent-text);
   background-image: var(--aurora);
-}
-.danger-text {
-  color: var(--danger);
 }
 
 /* Instrument plates (the old engraved brass) */
@@ -320,7 +294,6 @@ dialog.sheet-dialog::backdrop {
 
 /* ── Forms ────────────────────────────────────────────────────────────── */
 .field input,
-.drawer-pass input,
 .leaf-manual input {
   color: var(--ink);
 }
@@ -368,25 +341,6 @@ dialog.sheet-dialog::backdrop {
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
     0 10px 28px rgba(0, 0, 0, 0.4);
 }
-.drum__cell {
-  color: var(--ink);
-  font-family: var(--font-mono);
-  font-variation-settings: normal;
-  font-weight: 600;
-}
-.drum__shade {
-  background: linear-gradient(180deg, rgba(7, 9, 26, 0.9), rgba(7, 9, 26, 0) 32%, rgba(7, 9, 26, 0) 68%, rgba(7, 9, 26, 0.9));
-}
-.drum__detent {
-  border-top: 1px solid rgba(167, 139, 250, 0.55);
-  border-bottom: 1px solid rgba(103, 232, 249, 0.4);
-  box-shadow: 0 0 16px rgba(139, 92, 246, 0.18);
-}
-.drum__lbl {
-  font-family: var(--font-body);
-  color: var(--ink-muted);
-  letter-spacing: 0.04em;
-}
 .drum:focus-visible {
   box-shadow: 0 0 0 2px var(--focus);
 }
@@ -395,10 +349,6 @@ dialog.sheet-dialog::backdrop {
 .chart .stroke {
   stroke: rgba(196, 205, 255, 0.78);
   filter: drop-shadow(0 0 3px rgba(139, 92, 246, 0.55));
-}
-.chart .stroke--faint {
-  stroke: var(--ink-faint);
-  filter: none;
 }
 .chart .signnum {
   fill: var(--accent-text);
@@ -452,20 +402,6 @@ dialog.sheet-dialog::backdrop {
 }
 
 /* The patri's rollers become two luminous horizons */
-.roller__body {
-  height: 3px;
-  background: var(--aurora);
-  box-shadow: 0 0 18px rgba(139, 92, 246, 0.7);
-  border-radius: 3px;
-}
-.roller--top .roller__body,
-.roller--bot .roller__body {
-  border-radius: 3px;
-}
-.roller__curl,
-.roller__cap {
-  display: none;
-}
 
 /* The seal: a violet orb */
 .seal {
@@ -480,11 +416,6 @@ dialog.sheet-dialog::backdrop {
 }
 .seal.is-cracked {
   background: var(--rose-glow);
-}
-.seal__tab {
-  background: var(--warning);
-  color: var(--bg);
-  border-radius: var(--radius-sm);
 }
 
 /* Ledgers */
@@ -543,15 +474,6 @@ dialog.sheet-dialog::backdrop {
 .ribbon button[aria-expanded="true"] {
   background: rgba(139, 92, 246, 0.16);
 }
-.fold-in {
-  background: rgba(255, 255, 255, 0.03);
-  border-left: 2px solid var(--accent);
-  border-radius: var(--radius-sm);
-}
-.fold-in li.is-now,
-.fold-in li.is-now .mono {
-  color: var(--accent-2);
-}
 
 /* Yogas & colophon */
 .yoga h3 {
@@ -586,12 +508,6 @@ dialog.sheet-dialog::backdrop {
   background: var(--rose-glow);
   box-shadow: 0 0 8px rgba(251, 113, 133, 0.6);
 }
-.stampband {
-  border-color: var(--accent-2);
-  color: var(--accent-2);
-  rotate: 0deg;
-  box-shadow: var(--glow-gold);
-}
 .score b {
   font-family: var(--font-display);
   font-weight: 700;
@@ -602,20 +518,8 @@ dialog.sheet-dialog::backdrop {
   background: var(--aurora);
   box-shadow: var(--glow-violet);
 }
-.pair__scroll {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--glass-edge-strong);
-  border-radius: var(--radius-md);
-}
 
 /* Palm */
-.printframe {
-  background: var(--print-ground);
-  border-radius: var(--radius-md);
-  box-shadow:
-    inset 0 0 0 1px var(--glass-edge-strong),
-    0 0 40px rgba(99, 102, 241, 0.18);
-}
 .print-lines .ln {
   stroke: var(--cyan);
   filter: drop-shadow(0 0 4px rgba(103, 232, 249, 0.8));
@@ -635,12 +539,6 @@ dialog.sheet-dialog::backdrop {
 .gauge i.on {
   background: var(--cyan);
 }
-.confbar i {
-  background: var(--aurora);
-}
-.confbar.is-good i {
-  background: var(--success);
-}
 
 /* Parapet sky strip */
 .sky {
@@ -659,34 +557,17 @@ dialog.sheet-dialog::backdrop {
 /* ── Starlight text where the old system drew cream "paper" on indigo cloth ── */
 body,
 .greet h1,
-.ledge a,
-.ledge .lbl-tip {
+.ledge a {
   color: var(--ink);
 }
 .rooftop {
   /* the sky screen reads "surface" as its light ink */
   --surface: var(--ink);
 }
-.today__cloth {
-  --cloth-text: var(--ink);
-  background-color: transparent;
-  background-image:
-    radial-gradient(420px 160px at 30% 0%, rgba(139, 92, 246, 0.22), transparent 70%),
-    radial-gradient(360px 160px at 80% 100%, rgba(34, 211, 238, 0.14), transparent 70%);
-  border: 1px solid var(--glass-edge);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-.capture__outline path {
-  stroke: var(--ink);
-}
-.pknot__ring {
-  fill: var(--surface-solid);
-}
 
 /* ── Moonsteel: every instrument (dial, scrub ring, ayanāṃśa ruler) in cool starlight ── */
 .dial,
-.scrub,
-.dial-seg {
+.scrub {
   --brass-hi: #c7d2fe;
   --brass-mid: #818cf8;
   --brass-lo: #4f46e5;
@@ -826,36 +707,6 @@ body,
 }
 
 /* gloss rows */
-.today-gloss {
-  display: block;
-  font-size: 11.5px;
-  line-height: 1.3;
-  margin-top: 1px;
-}
-.footnote__plain,
-.kootasheet__plain {
-  margin-top: 12px;
-  padding: 12px 14px;
-  border-radius: var(--radius-md);
-  background: var(--aurora-soft);
-  border: 1px solid rgba(196, 181, 253, 0.28);
-  color: var(--ink);
-  line-height: 1.55;
-}
-.footnote__plain p {
-  margin: 0 0 6px;
-}
-.kname__plain {
-  display: block;
-  font-size: 11px;
-  line-height: 1.25;
-}
-
-.ledger-gloss {
-  display: block;
-  font-size: 11px;
-  line-height: 1.2;
-}
 .ledger th .gloss {
   display: block;
   font-size: 10px;
@@ -947,20 +798,6 @@ body,
   display: none;
 }
 /* Today: inauspicious times in warm text instead of yellow marker strokes */
-.haldi-band,
-.haldi-band--thin {
-  background: none;
-  padding: 0;
-  color: var(--warning-text);
-}
 /* the forecast hint reads as a line, not a fragment */
-.fc-tone span::before {
-  content: none;
-}
 
 /* Today: the dial and Moon sit on open sky, not in a box */
-.today__cloth {
-  border: 0;
-  box-shadow: none;
-  background: radial-gradient(420px 180px at 50% 50%, rgba(139, 92, 246, 0.16), transparent 70%);
-}

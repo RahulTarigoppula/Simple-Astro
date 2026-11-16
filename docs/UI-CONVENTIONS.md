@@ -1,3 +1,5 @@
+> **Superseded on 2026-11-16 by [DESIGN-V2.md](DESIGN-V2.md).** New screens use `Page`, `Section`, `Row` and the `.v-*` classes in `src/styles/ui.css`. The notes below describe the 1.x kit that still styles a few inner pieces (chart figure, ledgers, sheets).
+
 # UI conventions (for everyone writing screens)
 
 - **Visual contract:** `design/preview.html`. `src/styles/kit.css` is a port of its CSS with the same class

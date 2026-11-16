@@ -133,6 +133,12 @@ export default function HastScreen() {
   const [tracing, setTracing] = useState(params.get("trace") === "1");
   const [live, setLive] = useState<Array<[number, number]>>([]);
   const [selected, setSelected] = useState<PalmLineId>("life");
+  // Tracing belongs to one person's photo: switching person with the chip puts the pencil down.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the person in the address changes
+  useEffect(() => {
+    setTracing(params.get("trace") === "1");
+    setLive([]);
+  }, [id]);
 
   useEffect(() => {
     let revoke: string | null = null;
@@ -281,7 +287,7 @@ export default function HastScreen() {
                     </span>
                   </li>
                 </ol>
-                <Link className="v-btn v-btn--block" to={captureTo} onClick={() => countEvent("palm-camera")}>
+                <Link className="v-btn v-btn--block" to={captureTo} replace onClick={() => countEvent("palm-camera")}>
                   Open the camera
                 </Link>
                 <p className="v-small v-muted">The photo stays on this device. It is never uploaded, and you can delete it any time.</p>
@@ -411,7 +417,7 @@ export default function HastScreen() {
                       </ul>
                     ) : null}
                     <div className="v-actions">
-                      <Link className="v-btn v-btn--sm" to={captureTo}>
+                      <Link className="v-btn v-btn--sm" to={captureTo} replace>
                         Retake the photo
                       </Link>
                       {reading ? (

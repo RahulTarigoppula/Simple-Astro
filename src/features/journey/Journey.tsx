@@ -105,6 +105,8 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Space on a focused button presses that button; it only turns the page from anywhere else.
+      if (e.key === " " && e.target instanceof HTMLElement && e.target.closest("button, a")) return;
       if (e.key === "ArrowRight" || e.key === " ") {
         e.preventDefault();
         go(atRef.current + 1);
@@ -204,7 +206,7 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
                     <b>50</b> charts checked
                   </li>
                   <li>
-                    <b>753</b> tests
+                    <b>758</b> tests
                   </li>
                 </ul>
               </section>

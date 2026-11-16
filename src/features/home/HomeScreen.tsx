@@ -184,9 +184,18 @@ function Day({ profile, patri, settings, now }: DayProps) {
     }
   }, [patri, dayStart, zone, settings.preset, lat, lon]);
 
-  const hourKey = Math.floor(now / 3_600_000);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the almanac is re-read once an hour, not every minute
+  // The almanac of today's civil day (read at local noon), so its sunrise and sunset match the hours above
+  // even between midnight and sunrise.
   const p = useMemo(() => {
+    try {
+      return computePanchang(dayStart + 43_200_000, { lat, lon }, settings.preset);
+    } catch {
+      return null;
+    }
+  }, [dayStart, lat, lon, settings.preset]);
+  const hourKey = Math.floor(now / 3_600_000);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the Moon's lunar day and star are re-read once an hour, not every minute
+  const moon = useMemo(() => {
     try {
       return computePanchang(now, { lat, lon }, settings.preset);
     } catch {
@@ -344,7 +353,7 @@ function Day({ profile, patri, settings, now }: DayProps) {
           </ul>
         </div>
         <div className="v-stack">
-          {p ? (
+          {moon ? (
             <>
               <Section
                 title="Today's almanac"
@@ -355,15 +364,15 @@ function Day({ profile, patri, settings, now }: DayProps) {
                 }
               />
               <Link to="/today" className="v-card home-alm" aria-label="Open today's almanac">
-                <MoonDisc elongation={p.elongation} />
+                <MoonDisc elongation={moon.elongation} />
                 <span className="home-alm__body">
                   <span className="home-alm__t">
-                    {p.tithi.paksha === "shukla" ? "Growing Moon" : "Fading Moon"}, {Math.round(p.moonIllumination * 100)}% lit
+                    {moon.tithi.paksha === "shukla" ? "Growing Moon" : "Fading Moon"}, {Math.round(moon.moonIllumination * 100)}% lit
                   </span>
                   <span className="home-alm__s">
-                    Lunar day {((p.tithi.index - 1) % 15) + 1} of 15 · {p.tithi.name}
+                    Lunar day {((moon.tithi.index - 1) % 15) + 1} of 15 · {moon.tithi.name}
                   </span>
-                  <span className="home-alm__s">Moon's star today: {nakBoth(p.nakshatra.index, profile.tradition)}</span>
+                  <span className="home-alm__s">Moon's star today: {nakBoth(moon.nakshatra.index, profile.tradition)}</span>
                 </span>
                 <ChevronRight />
               </Link>
@@ -392,7 +401,7 @@ export default function HomeScreen() {
   const active = useActiveProfile();
   const settings = useSettings();
   const now = useNowMs(60_000);
-  const { patri } = usePatri(active, settings.preset);
+  const { patri, error } = usePatri(active, settings.preset);
 
   if (profiles === undefined) return <Page label="Vyomaphala home">{null}</Page>;
   if (!active) return <Welcome />;
@@ -406,7 +415,20 @@ export default function HomeScreen() {
       eyebrow={fmt(now, zone, { weekday: "long", day: "numeric", month: "long" })}
       title={`${greeting(hourIn(now, zone))}, ${active.name}`}
     >
-      {ready ? <Day profile={active} patri={patri} settings={settings} now={now} /> : <div className="v-skel">Reading the sky…</div>}
+      {ready ? (
+        <Day profile={active} patri={patri} settings={settings} now={now} />
+      ) : error ? (
+        <div className="v-card v-empty">
+          <p>
+            The chart for {active.name} could not be worked out ({error.message}). Check the birth details and try again.
+          </p>
+          <Link to={`/leaf/${active.id}/edit`} className="v-btn v-btn--sm">
+            Check birth details
+          </Link>
+        </div>
+      ) : (
+        <div className="v-skel">Reading the sky…</div>
+      )}
       <div className="home-trust">
         <Trust />
       </div>

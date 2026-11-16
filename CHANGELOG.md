@@ -1,5 +1,45 @@
 # Changelog
 
+## 2.0.0 (2026-11-16)
+
+A redesign of the whole app for people who have never used an astrology app. 1.x opened on a list of features, had six tabs that overlapped, long screens of equal-weight cards with Sanskrit in the headings, and a form that was saved by holding a seal. 2.0 answers first, in plain words, and keeps the astrology one tap behind. The engine, the numbers and everything saved on the device are unchanged. The design is written down in docs/DESIGN-V2.md.
+
+### One way around the app
+- **Five tabs:** Today, Chart, Forecast, Match, Explore. A docked bar on phones, a labelled rail on a desk.
+- **One person in view.** A chip at the top right of every screen names the person. Tap it to switch person, add one, or open People, Settings, How to use and About. Screens about a person follow the switch.
+- Every other screen has a Back button in the same place. Tap is the only gesture; holding is kept only for deleting.
+- The intro's Skip and its last slide go straight into the app.
+
+### Today (the new home)
+- Opens on **your day**: a score out of 100 with one word (Bright, Steady, Mixed, Quiet) and one sentence.
+- Good for / Go easy on, **good times today** on a sunrise-to-sunset bar with the best hours and the time to pause new starts, your life areas as seven short meters, the Moon and lunar day, shortcuts, and what is coming up in the sky.
+- With nobody saved it is a short welcome with one button, what you get, and three things to look at first.
+
+### Add a person
+- **Four short steps** (Who, When, Where, Check) with one question group each, a progress bar, and a plain **Save** button. Everything the old form guarded is kept: am or pm never assumed, the time read back in words, a place that must be picked, the Moon sign, birth star and rising sign shown before saving, clock-change warnings, unknown time, editing.
+- The example person fills all four steps and opens the last one.
+
+### Chart
+- Four views instead of one long page: **About you** (three key facts, plus points and what to watch, love and work, the chapter you are in), **Life chapters** (the one running now, then all nine), **Chart** (the figure, the nine planets, then folds for the almanac at birth, divisional charts, patterns, strength points and house cusps), **Now** (today for this chart, where the planets are, Saturn's long seasons).
+
+### Forecast
+- Day, Week, Month, Quarter and Year open on the same answer card. Week is a tappable strip of days, Month a calendar of small bars with the best days named, Quarter and Year a row per month. Life areas open to say why. The astrology behind it is folded under "The astrology behind this".
+
+### Partner match, Palm reading, People
+- **Match:** two person slots, then the score out of 100 with a verdict, the five things people ask, what is strongest and what to work on, the signs of marriage. The 36 points, Porutham, schools and both charts are folds.
+- **Palm reading:** three steps and one button before a photo; after it, one card per line with how clearly it was seen.
+- **People:** a card per person with Chart, Forecast, Match and Edit; backup and delete under More.
+
+### Almanac, Explore, Settings, Guide, About
+- **Almanac** (opened from Today): the day in plain words first, then Day, Good & bad slots, Planet hours and Month; 12-hour times; previous and next day buttons.
+- **Explore** is a directory: Planets, Signs, Stars, Numbers, Chinese zodiac, the story, the almanac, the guide, then your own Moon sign, birth star and rising sign. The sky wheel has its own page.
+- **Settings** in four groups (Look, Your data, Advanced, About) with a line under each setting saying what it does.
+- **Guide** as six steps, **About** with the numbers as a grid and the detail in folds. Rahul's own words are unchanged.
+
+### Under the hood
+- One style layer (src/styles/ui.css) and one page frame (src/components/ui/Page.tsx) for every screen; 114 unused rules removed from the old sheets; the old home, brass dial, drums and ring carousel are deleted.
+- 758 automated tests and 24 browser tests (the browser tests now walk the new flows, the four chart views and the person chip). Settings shows version 2.0.0.
+
 ## 1.3.0 (2026-10-19)
 
 ### The Android app
