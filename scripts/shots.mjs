@@ -15,14 +15,13 @@ for (const [tag, viewport] of [
   const page = await browser.newPage({ viewport, reducedMotion: "reduce" });
   await page.goto(`${base}#/leaf/new`);
   await page.getByRole("button", { name: /fill in an example/i }).click();
-  const seal = page.getByRole("button", { name: /hold to save/i });
-  await seal.scrollIntoViewIfNeeded();
-  const box = await seal.boundingBox();
-  if (!box) throw new Error("no seal");
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.mouse.down();
-  await page.waitForTimeout(1200);
-  await page.mouse.up();
+  // The example opens the last step, "Check and save"; one tap on Save finishes.
+  await page
+    .locator(".leaf-check")
+    .getByText(/Revatī/)
+    .waitFor();
+  await page.screenshot({ path: `${out}/${tag}-leaf-check.png` });
+  await page.getByRole("button", { name: /^save/i }).click();
   await page.waitForURL(/#\/patri\//);
   const id = page.url().split("#/patri/")[1]?.split("/")[0] ?? "";
   const routes = {

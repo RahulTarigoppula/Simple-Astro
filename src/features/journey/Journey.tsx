@@ -19,14 +19,14 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
   const prev = useRef<{ i: number; t: number } | null>(null);
   const reduce = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   const [paused, setPaused] = useState(false);
-  // After the story: one short "how to use" card, then Home.
-  const [howto, setHowto] = useState(false);
   const pausedRef = useRef(false);
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
   pausedRef.current = paused || reduce;
 
   const go = useCallback((i: number) => {
     if (i >= BEATS.length) {
-      setHowto(true);
+      onDoneRef.current();
       return;
     }
     const k = Math.max(0, i);
@@ -160,40 +160,14 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
           className="journey__skip"
           onClick={() => {
             countEvent("intro-skipped");
-            setHowto(true);
+            onDone();
           }}
         >
           Skip ›
         </button>
       </header>
 
-      {howto ? (
-        <section className="journey__text journey__howto" aria-labelledby="howto-h">
-          <h2 id="howto-h" className="journey__say journey__say--narr">
-            How to use Vyomaphala
-          </h2>
-          <p className="journey__meaning">
-            <span lang="hi">व्योमफल</span> Vyomaphala is Sanskrit for the fruit of the sky: vyoma, the heavens, and phala, what they yield.
-          </p>
-          <ol className="journey__steps">
-            <li>
-              <b>Add yourself.</b> Your name, birth date, time and place of birth. It takes about a minute.
-            </li>
-            <li>
-              <b>Tap a card.</b> Your life in simple words, Partner Compatibility, your forecast and more. All in plain words first.
-            </li>
-            <li>
-              <b>Tap ⓘ on any word</b> you don't know. It explains it in simple words.
-            </li>
-          </ol>
-          <p className="journey__steps-note">Everything stays on this device. Nothing to sign up for.</p>
-          <div className="journey__cta">
-            <button type="button" className="stamp" onClick={onDone}>
-              <span>Start</span>
-            </button>
-          </div>
-        </section>
-      ) : beat ? (
+      {beat ? (
         <section
           key={beat.id}
           className={`journey__text journey__text--${beat.scene}${beat.quote ? " journey__text--maker" : ""}`}
@@ -230,13 +204,17 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
                     <b>50</b> charts checked
                   </li>
                   <li>
-                    <b>717</b> tests
+                    <b>753</b> tests
                   </li>
                 </ul>
               </section>
+              <p className="journey__meaning">
+                <span lang="hi">व्योमफल</span> Vyomaphala is Sanskrit for the fruit of the sky: vyoma, the heavens, and phala, what they
+                yield.
+              </p>
               <div className="journey__cta">
-                <button type="button" className="stamp" onClick={() => setHowto(true)}>
-                  <span>How to use it</span>
+                <button type="button" className="stamp" onClick={onDone}>
+                  <span>Start</span>
                 </button>
                 <button type="button" className="journey__ghost" onClick={onAbout}>
                   How Vyomaphala was made
@@ -255,13 +233,7 @@ export function Journey({ onDone, onAbout }: { onDone: () => void; onAbout: () =
           {paused || reduce ? "▶" : "❚❚"}
           <span className="vh">{paused || reduce ? "Play" : "Pause"}</span>
         </button>
-        <button
-          type="button"
-          className="journey__btn journey__btn--next"
-          onClick={() => (howto ? onDone() : go(at + 1))}
-          aria-label={howto ? "Start" : last ? "How to use it" : "Next"}
-          hidden={howto}
-        >
+        <button type="button" className="journey__btn journey__btn--next" onClick={() => go(at + 1)} aria-label={last ? "Start" : "Next"}>
           {last ? "✓" : "→"}
         </button>
       </footer>

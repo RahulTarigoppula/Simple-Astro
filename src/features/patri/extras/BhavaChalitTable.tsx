@@ -1,8 +1,9 @@
-// Bhāva Chalit (Śrīpati): the twelve bhāvas as start-madhya-end sidereal degrees, and the grahas
-// whose bhāva differs from their whole-sign house. A table only, the Rāśi chart stays whole-sign.
-import { useId, useMemo } from "react";
-import { TurmericBand } from "../../../components/ui/TurmericBand";
-import { GRAHA_ABBR_DEV, GRAHA_NAMES, ORDINAL, SIGN_NAMES } from "../../../data/tables/names";
+// House cusps (Bhāva Chalit, Śrīpati): the twelve houses as start, middle and end sidereal degrees,
+// and the planets whose house differs from their whole-sign house. A table only: the birth chart
+// stays whole-sign.
+import { useMemo } from "react";
+import { InfoDot } from "../../../components/ui/Explain";
+import { GRAHA_ENGLISH, GRAHA_NAMES, ORDINAL, SIGN_NAMES } from "../../../data/tables/names";
 import { bhavaChalit, bhavaOf } from "../../../engine/lagna";
 import { GRAHA_IDS, type GrahaId, type PatriCore } from "../../../engine/types";
 import "./extras.css";
@@ -56,20 +57,21 @@ function SidDeg({ lon }: { lon: number }) {
 export function BhavaChalitTable({ patri }: BhavaChalitTableProps) {
   const rows = useMemo(() => bhavaChalit(patri.lagna.lonSidereal, patri.mc.lonSidereal), [patri]);
   const shifts = useMemo(() => bhavaShifts(patri), [patri]);
-  const headId = useId();
 
   return (
-    <section className="bc" aria-labelledby={headId}>
-      <TurmericBand id={headId} dev="भाव चलित" title="Bhāva Chalit · houses" explain="bhava" meta="Śrīpati · sidereal" />
+    <section className="bc" aria-label="House cusps (Bhāva Chalit)">
+      <p className="pt-term">
+        Sanskrit: Bhāva Chalit <InfoDot id="bhava" label="Bhāva" /> · Śrīpati method, sidereal
+      </p>
       {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard-reachable (WCAG 2.1.1) */}
       <div className="av-scroll" role="region" aria-label="Bhāva Chalit cusps" tabIndex={0}>
         <table className="ledger bc-table">
           <caption className="vh">Bhāva Chalit: start, madhya (mid-point) and end of each bhāva, sidereal</caption>
           <thead>
             <tr>
-              <th scope="col">Bhāva</th>
+              <th scope="col">House</th>
               <th scope="col">Start</th>
-              <th scope="col">Madhya</th>
+              <th scope="col">Middle</th>
               <th scope="col">End</th>
             </tr>
           </thead>
@@ -93,23 +95,20 @@ export function BhavaChalitTable({ patri }: BhavaChalitTableProps) {
       </div>
 
       {shifts.length > 0 ? (
-        <ul className="bc-shifts" aria-label="Grahas that change house in Bhāva Chalit">
+        <ul className="bc-shifts" aria-label="Planets that change house in Bhāva Chalit">
           {shifts.map((s) => (
             <li key={s.id}>
-              <span lang="hi" className="dev" aria-hidden="true">
-                {GRAHA_ABBR_DEV[s.id]}
-              </span>{" "}
-              {GRAHA_NAMES[s.id]}: whole-sign house {s.house}, <strong>shifts to bhāva {s.bhava}</strong>
+              {GRAHA_ENGLISH[s.id]} ({GRAHA_NAMES[s.id]}): whole-sign house {s.house}, <strong>shifts to bhāva {s.bhava}</strong>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="p p--muted">Every graha keeps its whole-sign house in Bhāva Chalit.</p>
+        <p className="v-muted">Every planet keeps its whole-sign house in Bhāva Chalit.</p>
       )}
 
-      <p className="note-haldi note--keep">
+      <p className="v-note note--keep">
         <span aria-hidden="true">⚑</span>
-        <span>The Rāśi chart stays whole-sign; Bhāva Chalit is shown here as a table only.</span>
+        <span>The birth chart stays whole-sign; Bhāva Chalit is shown here as a table only.</span>
       </p>
     </section>
   );

@@ -1,7 +1,8 @@
 // Date and time of birth, written the way people say them: day, month by name, year; then the hour
 // on a 12-hour clock with am/pm chosen by hand. Under the fields a plain sentence reads the time
 // back ("7:25 in the morning (07:25)") so an evening birth never slips through as a morning one.
-// Unset fields are 0 (date) and -1 (hour); the screen refuses to save until every one is filled.
+// Unset fields are 0 and am/pm is null; the flow refuses to go on until every one is filled.
+// Three pieces, so the When step and the review can each use what they need: DateFields, TimeFields, Readback.
 import { useEffect, useRef, useState } from "react";
 import { clockWords, daysInMonth, isValidCivil } from "../../engine/time";
 
@@ -72,22 +73,20 @@ export function missingText(v: BirthFieldValues, timeUnknown: boolean): string |
 
 const show = (n: number) => (n > 0 ? String(n) : "");
 
-/** A number box that keeps what is being typed and commits only whole numbers inside its range (0 otherwise). */
+/** A number box that keeps what is being typed and commits only whole numbers (0 otherwise). */
 function NumberBox({
   id,
-  label,
   value,
   max,
-  width,
   placeholder,
+  autoFocus,
   onCommit,
 }: {
   id: string;
-  label: string;
   value: number;
   max: number;
-  width: string;
   placeholder: string;
+  autoFocus?: boolean;
   onCommit: (n: number) => void;
 }) {
   const [text, setText] = useState(() => show(value));
@@ -99,16 +98,15 @@ function NumberBox({
   return (
     <input
       id={id}
-      className="bf__num"
-      style={{ width }}
+      className="v-input bf-num"
       type="text"
       inputMode="numeric"
       pattern="[0-9]*"
       autoComplete="off"
-      aria-label={label}
       placeholder={placeholder}
       value={text}
       maxLength={String(max).length}
+      data-autofocus={autoFocus ? "" : undefined}
       onFocus={(e) => {
         focused.current = true;
         e.currentTarget.select();
@@ -127,29 +125,29 @@ function NumberBox({
   );
 }
 
-export function BirthFields({ y, mo, d, hour12, ampm, mi, timeUnknown, onChange }: Props) {
-  const v: BirthFieldValues = { y, mo, d, hour12, ampm, mi };
-  const h = hourOf(v);
-  const missing = missingText(v, timeUnknown);
-  const dateOk = dateFilled(v);
-  const dateText = dateOk ? `${d} ${MONTH_NAMES[mo - 1]} ${y}` : "";
-  const timeText = timeUnknown ? "time of birth unknown, cast for noon" : h >= 0 ? clockWords(h, mi) : "";
+type Change = (patch: Partial<BirthFieldValues>) => void;
 
+/** Day, month by name, year. */
+export function DateFields({ y, mo, d, onChange }: Pick<BirthFieldValues, "y" | "mo" | "d"> & { onChange: Change }) {
   return (
-    <div className="bf">
-      <div className="bf__row" role="group" aria-label="Date of birth">
-        <span className="bf__k">Date of birth</span>
-        <div className="bf__fields">
-          <NumberBox id="bf-day" label="Day" value={d} max={31} width="3.4em" placeholder="DD" onCommit={(n) => onChange({ d: n })} />
+    <fieldset className="bf-group">
+      <legend className="v-label">Date of birth</legend>
+      <div className="bf-row bf-row--date">
+        <div className="bf-cell">
+          <label htmlFor="bf-day">Day</label>
+          <NumberBox id="bf-day" value={d} max={31} placeholder="14" autoFocus onCommit={(n) => onChange({ d: n })} />
+        </div>
+        <div className="bf-cell">
+          <label htmlFor="bf-month">Month</label>
           <select
             id="bf-month"
-            className="bf__select bf__select--month"
-            aria-label="Month"
+            className="v-select bf-select"
+            autoComplete="off"
             value={mo > 0 ? mo : ""}
             onChange={(e) => onChange({ mo: Number(e.target.value) || 0 })}
           >
             <option value="" disabled>
-              Month
+              Choose
             </option>
             {MONTH_NAMES.map((m, i) => (
               <option key={m} value={i + 1}>
@@ -157,31 +155,39 @@ export function BirthFields({ y, mo, d, hour12, ampm, mi, timeUnknown, onChange 
               </option>
             ))}
           </select>
-          <NumberBox
-            id="bf-year"
-            label="Year"
-            value={y}
-            max={YEAR_MAX}
-            width="4.6em"
-            placeholder="YYYY"
-            onCommit={(n) => onChange({ y: n })}
-          />
+        </div>
+        <div className="bf-cell">
+          <label htmlFor="bf-year">Year</label>
+          <NumberBox id="bf-year" value={y} max={YEAR_MAX} placeholder="1994" onCommit={(n) => onChange({ y: n })} />
         </div>
       </div>
+    </fieldset>
+  );
+}
 
-      <div className={`bf__row${timeUnknown ? " is-off" : ""}`} role="group" aria-label="Time of birth">
-        <span className="bf__k">Time of birth</span>
-        <div className="bf__fields">
+/** Hour and minute on a 12-hour clock; am or pm must be tapped, it is never assumed. */
+export function TimeFields({
+  hour12,
+  ampm,
+  mi,
+  timeUnknown,
+  onChange,
+}: Pick<BirthFieldValues, "hour12" | "ampm" | "mi"> & { timeUnknown: boolean; onChange: Change }) {
+  return (
+    <fieldset className={`bf-group${timeUnknown ? " is-off" : ""}`} disabled={timeUnknown}>
+      <legend className="v-label">Time of birth</legend>
+      <div className="bf-row bf-row--time">
+        <div className="bf-cell">
+          <label htmlFor="bf-hour">Hour</label>
           <select
             id="bf-hour"
-            className="bf__select"
-            aria-label="Hour"
+            className="v-select bf-select"
+            autoComplete="off"
             value={hour12 || ""}
-            disabled={timeUnknown}
             onChange={(e) => onChange({ hour12: Number(e.target.value) || 0 })}
           >
             <option value="" disabled>
-              Hour
+              --
             </option>
             {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
               <option key={n} value={n}>
@@ -189,15 +195,14 @@ export function BirthFields({ y, mo, d, hour12, ampm, mi, timeUnknown, onChange 
               </option>
             ))}
           </select>
-          <span className="bf__colon" aria-hidden="true">
-            :
-          </span>
+        </div>
+        <div className="bf-cell">
+          <label htmlFor="bf-minute">Minute</label>
           <select
             id="bf-minute"
-            className="bf__select"
-            aria-label="Minute"
+            className="v-select bf-select"
+            autoComplete="off"
             value={mi}
-            disabled={timeUnknown}
             onChange={(e) => onChange({ mi: Number(e.target.value) || 0 })}
           >
             {Array.from({ length: 60 }, (_, i) => i).map((n) => (
@@ -206,31 +211,60 @@ export function BirthFields({ y, mo, d, hour12, ampm, mi, timeUnknown, onChange 
               </option>
             ))}
           </select>
-          <span className="seg bf__ampm" role="radiogroup" aria-label="am or pm">
-            <button type="button" role="radio" aria-checked={ampm === "am"} disabled={timeUnknown} onClick={() => onChange({ ampm: "am" })}>
+        </div>
+        <div className="bf-cell">
+          <span id="bf-ampm-l" className="bf-cell__l">
+            am or pm
+          </span>
+          <div className="v-seg bf-ampm" role="radiogroup" aria-labelledby="bf-ampm-l">
+            <button type="button" role="radio" aria-checked={ampm === "am"} onClick={() => onChange({ ampm: "am" })}>
               am
             </button>
-            <button type="button" role="radio" aria-checked={ampm === "pm"} disabled={timeUnknown} onClick={() => onChange({ ampm: "pm" })}>
+            <button type="button" role="radio" aria-checked={ampm === "pm"} onClick={() => onChange({ ampm: "pm" })}>
               pm
             </button>
-          </span>
+          </div>
         </div>
       </div>
+    </fieldset>
+  );
+}
 
-      <p className={`bf__read${missing ? " is-missing" : ""}`} aria-live="polite" data-testid="birth-readback">
-        {missing ? (
-          <span>{missing}</span>
-        ) : (
-          <>
-            <b>{dateText}</b>
-            {timeText ? (
-              <>
-                , <b>{timeText}</b>
-              </>
-            ) : null}
-          </>
-        )}
-      </p>
-    </div>
+/** The sentence that reads the date and time back, or says what is still missing. */
+export function Readback({
+  y,
+  mo,
+  d,
+  hour12,
+  ampm,
+  mi,
+  timeUnknown,
+  urgent,
+}: Omit<Props, "onChange"> & { /** Next was pressed with something missing: say it as an alert. */ urgent?: boolean }) {
+  const v: BirthFieldValues = { y, mo, d, hour12, ampm, mi };
+  const h = hourOf(v);
+  const missing = missingText(v, timeUnknown);
+  const dateText = dateFilled(v) ? `${d} ${MONTH_NAMES[mo - 1]} ${y}` : "";
+  const timeText = timeUnknown ? "time of birth not known, noon is used" : h >= 0 ? clockWords(h, mi) : "";
+  return (
+    <p
+      className={`bf-read${missing ? " is-missing" : ""}${missing && urgent ? " is-urgent" : ""}`}
+      role={missing && urgent ? "alert" : undefined}
+      aria-live={missing && urgent ? undefined : "polite"}
+      data-testid="birth-readback"
+    >
+      {missing ? (
+        <span>{missing}</span>
+      ) : (
+        <>
+          <b>{dateText}</b>
+          {timeText ? (
+            <>
+              , <b>{timeText}</b>
+            </>
+          ) : null}
+        </>
+      )}
+    </p>
   );
 }

@@ -1,14 +1,17 @@
-// "Your life in simple words": the first thing on a person's chart. Who you are at heart (Moon sign),
-// your birth star, your numbers, plus and minus points, love and work, and the life chapter you are in
-// now. Plain sentences from src/data/traits.ts; the full chart sits behind "Full detail (astro tech)".
+// "In simple words": the first thing on a person's chart. One short answer (who you are at heart),
+// the three key signs as cards, plus and minus points, love and work, the life chapter running now,
+// then the doors onward. Plain sentences from src/data/traits.ts; the chart itself is another view.
 import { useMemo } from "react";
 import { Link } from "react-router";
-import { GRAHA_LORE, NAKSHATRA_LORE, RASHI_LORE } from "../../data/lore";
-import { nakBoth, rashiBoth } from "../../data/regional";
+import { ChevronRight, Row, Section } from "../../components/ui/Page";
+import { GRAHA_LORE, RASHI_LORE } from "../../data/lore";
+import { rashiBoth } from "../../data/regional";
 import { CHAPTER_PLAIN, CHAPTER_SHORT, MOON_TRAITS, NAK_TRAITS, NUMBER_TRAITS } from "../../data/traits";
 import { currentDasha } from "../../engine/dasha";
 import { birthNumbers } from "../../engine/profile";
 import type { GrahaId, Patri, Profile } from "../../engine/types";
+import { IconForecast, IconMilan, IconPalm, IconSky } from "../chowki/icons";
+import { CosmicProfile, KeyFacts } from "./CosmicProfile";
 import "./cosmic.css";
 import { safeZone } from "../../engine/time";
 
@@ -74,13 +77,20 @@ function uniq(xs: string[], n: number): string[] {
   return out;
 }
 
-export function LifeReading({ profile, patri, nowMs }: { profile: Profile; patri: Patri; nowMs: number }) {
+interface LifeReadingProps {
+  profile: Profile;
+  patri: Patri;
+  nowMs: number;
+  /** Opens the Life chapters view; without it the chapter card only links to the forecast. */
+  onChapters?: () => void;
+}
+
+export function LifeReading({ profile, patri, nowMs, onChapters }: LifeReadingProps) {
   const r = useMemo(() => {
     const b = profile.birth;
     const mo = patri.grahas.MO;
     const moon = MOON_TRAITS[mo.sign];
     const nak = NAK_TRAITS[mo.nakshatra];
-    const nl = NAKSHATRA_LORE[mo.nakshatra];
     const n = birthNumbers(b.localY, b.localMo, b.localD);
     const root = NUMBER_TRAITS[n.root];
     const dest = NUMBER_TRAITS[n.destiny];
@@ -91,11 +101,8 @@ export function LifeReading({ profile, patri, nowMs }: { profile: Profile; patri
     return {
       first: profile.name.split(/\s+/)[0] ?? profile.name,
       moonSign: rashiBoth(mo.sign, profile.tradition),
-      moonWest: RASHI_LORE[mo.sign]?.western ?? "",
-      star: nakBoth(mo.nakshatra, profile.tradition),
       moon,
       nak,
-      nl,
       n,
       root,
       dest,
@@ -118,92 +125,126 @@ export function LifeReading({ profile, patri, nowMs }: { profile: Profile; patri
   }, [profile, patri, nowMs]);
 
   return (
-    <section className="cosmic-card life" aria-labelledby="life-h">
-      <p className="life__kicker">In simple words</p>
-      <h2 id="life-h" className="life__h">
-        {r.first}, this is you
-      </h2>
-      <p className="life__lead">
-        You were born on a {r.day?.[0]}, {dayOf(r.day?.[1] ?? "SU")}, under a {r.waxing ? "growing" : "fading"} Moon. Your Moon sign is{" "}
-        <b>{r.moonSign}</b> ({r.moonWest}) and your birth star is <b>{r.star}</b>. {r.moon?.plain}
-        {r.lg
-          ? r.lgSame
-            ? ` Your rising sign is also ${r.moonSign}, so the person others meet is the person you are inside.`
-            : ` Your rising sign is ${r.lgName}: people first see you as ${r.lg.nature}.`
-          : ""}
-      </p>
+    <div className="life">
+      <section className="v-card v-card--hero life__hero" aria-labelledby="life-h">
+        <p className="v-eyebrow">In simple words</p>
+        <h2 id="life-h" className="life__h">
+          {r.first}, this is you
+        </h2>
+        <p className="life__lead">
+          {r.moon?.plain}
+          {r.lg
+            ? r.lgSame
+              ? ` Your rising sign is also ${r.moonSign}, so the person others meet is the person you are inside.`
+              : ` Your rising sign is ${r.lgName}: people first see you as ${r.lg.nature}.`
+            : ""}
+        </p>
+        <p className="life__born">
+          You were born on a {r.day?.[0]}, {dayOf(r.day?.[1] ?? "SU")}, under a {r.waxing ? "growing" : "fading"} Moon. {r.nak?.plain}
+        </p>
+      </section>
 
-      <div className="life__grid">
-        <div className="life__card">
-          <p className="life__k">Your heart · Moon sign</p>
-          <p className="life__v">{r.moonSign}</p>
-          <p className="life__p">
-            The sign of {RASHI_LORE[patri.grahas.MO.sign]?.symbol}. In three words: {RASHI_LORE[patri.grahas.MO.sign]?.nature}.
-          </p>
-        </div>
-        <div className="life__card">
-          <p className="life__k">Your birth star</p>
-          <p className="life__v">{r.star}</p>
-          <p className="life__p">
-            {r.nak?.plain} Its name means “{r.nl?.meaning}”.
-          </p>
-        </div>
-        <div className="life__card">
-          <p className="life__k">Your numbers</p>
-          <p className="life__v">
-            {r.n.root} · {r.n.destiny}
-          </p>
-          <p className="life__p">
-            Born on the {ordinal(r.d)}: number {r.n.root}, {r.root?.word}. {r.root?.plain} Your whole birth date adds up to {r.n.destiny},{" "}
-            {r.dest?.word}: what your life tends to grow towards.
-          </p>
-        </div>
-      </div>
+      <KeyFacts profile={profile} patri={patri} />
 
-      <div className="life__pm">
-        <div className="life__plus">
-          <p className="life__k">Plus</p>
+      <div className="v-grid2 life__pm">
+        <section className="v-card" aria-labelledby="life-plus-h">
+          <h3 id="life-plus-h" className="life__k life__k--plus">
+            Plus points
+          </h3>
           <ul>
             {r.plus.map((x) => (
               <li key={x}>{x}</li>
             ))}
           </ul>
-        </div>
-        <div className="life__minus">
-          <p className="life__k">Watch out for</p>
+        </section>
+        <section className="v-card" aria-labelledby="life-minus-h">
+          <h3 id="life-minus-h" className="life__k life__k--minus">
+            Watch out for
+          </h3>
           <ul>
             {r.minus.map((x) => (
               <li key={x}>{x}</li>
             ))}
           </ul>
-        </div>
+        </section>
       </div>
 
-      <dl className="life__dl">
-        <div>
-          <dt>In love</dt>
-          <dd>{r.moon?.love}</dd>
-        </div>
-        <div>
-          <dt>At work</dt>
-          <dd>{r.moon?.work}</dd>
-        </div>
+      <div className="v-cols">
+        <section className="v-card" aria-label="In love and at work">
+          <dl className="life__dl">
+            <div>
+              <dt>In love</dt>
+              <dd>{r.moon?.love}</dd>
+            </div>
+            <div>
+              <dt>At work</dt>
+              <dd>{r.moon?.work}</dd>
+            </div>
+          </dl>
+        </section>
         {r.cur ? (
-          <div>
-            <dt>Right now</dt>
-            <dd>
+          <section className="v-card life__now" aria-labelledby="life-now-h">
+            <p className="life__k">Right now</p>
+            <h3 id="life-now-h" className="v-card__title">
+              Your {lore(r.cur.md.lord)?.english} chapter
+            </h3>
+            <p className="life__p">
               You are in your <b>{lore(r.cur.md.lord)?.english}</b> chapter until {monthYear(r.cur.md.endMs, r.zone)}:{" "}
               {CHAPTER_PLAIN[r.cur.md.lord]} Inside it, a shorter <b>{lore(r.cur.ad.lord)?.english}</b> stretch runs until{" "}
-              {monthYear(r.cur.ad.endMs, r.zone)}, bringing {CHAPTER_SHORT[r.cur.ad.lord]} to the front.{" "}
-              <Link to={`/forecast/${profile.id}`}>See your forecast</Link>
-            </dd>
-          </div>
+              {monthYear(r.cur.ad.endMs, r.zone)}, bringing {CHAPTER_SHORT[r.cur.ad.lord]} to the front.
+            </p>
+            <div className="v-actions">
+              {onChapters ? (
+                <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={onChapters}>
+                  All life chapters
+                </button>
+              ) : null}
+              <Link to={`/forecast/${profile.id}`} className="v-link life__fc">
+                See your forecast <ChevronRight size={16} />
+              </Link>
+            </div>
+          </section>
         ) : null}
-      </dl>
+      </div>
 
-      <p className="life__note">
-        This is what the tradition says, in simple words. It isn't a fact about you. Your choices write the rest.
-      </p>
-    </section>
+      <Section title="Go further" />
+      <ul className="v-list">
+        <li>
+          <Row
+            to={`/forecast/${profile.id}`}
+            icon={<IconForecast />}
+            tone="cyan"
+            title="Forecast"
+            sub="Your day, week, month and year ahead"
+          />
+        </li>
+        <li>
+          <Row to={`/hast/${profile.id}`} icon={<IconPalm />} tone="green" title="Palm reading" sub="From a photo of your hand" />
+        </li>
+        <li>
+          <Row to={`/patri/${profile.id}/sky`} icon={<IconSky />} title="Sky at birth" sub="The real stars at the moment of birth" />
+        </li>
+        <li>
+          <Row to="/milan" icon={<IconMilan />} tone="rose" title="Partner match" sub="How two people fit, with a score" />
+        </li>
+      </ul>
+
+      <Section title="Your birth in other traditions" />
+      <div className="v-cols">
+        <section className="v-card" aria-labelledby="life-num-h">
+          <p className="life__k">Your numbers</p>
+          <h3 id="life-num-h" className="v-card__title">
+            {r.n.root} · {r.n.destiny}
+          </h3>
+          <p className="life__p">
+            Born on the {ordinal(r.d)}: number {r.n.root}, {r.root?.word}. {r.root?.plain} Your whole birth date adds up to {r.n.destiny},{" "}
+            {r.dest?.word}: what your life tends to grow towards.
+          </p>
+        </section>
+        <CosmicProfile profile={profile} patri={patri} />
+      </div>
+
+      <p className="v-foot">This is what the tradition says, in simple words. It isn't a fact about you. Your choices write the rest.</p>
+    </div>
   );
 }

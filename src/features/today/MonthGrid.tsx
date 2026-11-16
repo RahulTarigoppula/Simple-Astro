@@ -2,13 +2,13 @@
 // sunrise tithi, a small Moon, and marks for Ekādaśī, Pūrṇimā, Amāvasyā and saṅkrānti. A grid in
 // the ARIA sense: one tab stop, arrows move a day or a week, PageUp/PageDown turn the month.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { TurmericBand } from "../../components/ui/TurmericBand";
+import { ChevronLeft, ChevronRight } from "../../components/ui/Page";
 import { NAKSHATRA_DEV, NAKSHATRA_NAMES, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
 import { type CalendarPlace, monthCalendar } from "../../engine/calendar";
 import { tithiOf } from "../../engine/panchang";
 import { daysInMonth } from "../../engine/time";
 import type { CalendarDay, EnginePreset, MonthCalendar } from "../../engine/types";
-import { litPath } from "./MoonPager";
+import { MoonFace } from "./moon";
 import type { ZoneClock } from "./zone";
 
 export interface Ymd {
@@ -17,25 +17,11 @@ export interface Ymd {
   d: number;
 }
 
-const DIGITS = "०१२३४५६७८९";
-export const devDigits = (n: number): string =>
-  String(n)
-    .split("")
-    .map((c) => DIGITS[Number(c)] ?? c)
-    .join("");
-
-/** "शु ५", "कृ ११", "पू", "अ", the tithi at sunrise, short. */
 /** "5↑", "11↓", "Full", "New": the tithi at sunrise, in plain words. */
 export function tithiPlain(index: number): string {
   if (index === 15) return "Full";
   if (index === 30) return "New";
   return `${((index - 1) % 15) + 1}${index < 15 ? "↑" : "↓"}`;
-}
-
-export function tithiShort(index: number): string {
-  if (index === 15) return "पू";
-  if (index === 30) return "अ";
-  return `${index < 15 ? "शु" : "कृ"} ${devDigits(((index - 1) % 15) + 1)}`;
 }
 
 const WEEK = [
@@ -60,25 +46,14 @@ export function shiftMonth(y: number, m: number, delta: number): { y: number; m:
   return { y: Math.floor(i / 12), m: (((i % 12) + 12) % 12) + 1 };
 }
 
-function MoonGlyph({ k, waxing, south }: { k: number; waxing: boolean; south: boolean }) {
-  const d = litPath(k, waxing, south);
-  return (
-    <svg className="mglyph" viewBox="0 0 100 100" aria-hidden="true" data-decorative="true">
-      <circle className="mglyph__dark" cx="50" cy="50" r="46" />
-      {d ? <path className="mglyph__lit" d={d} /> : null}
-      <circle className="mglyph__rim" cx="50" cy="50" r="46" />
-    </svg>
-  );
-}
-
 const MARK_TEXT = { ekadashi: "Ekādaśī", purnima: "Pūrṇimā", amavasya: "Amāvasyā", sankranti: "Saṅkrānti" } as const;
 
 function dayLabel(c: MonthCalendar, d: CalendarDay, clock: ZoneClock): string {
-  const parts = [dateLong(c.year, c.month, d.day), `${d.tithi.name} at sunrise ${clock.hm(d.sunriseMs)}`];
+  const parts = [dateLong(c.year, c.month, d.day), `${d.tithi.name} at sunrise ${clock.hm12(d.sunriseMs)}`];
   if (d.kshaya) parts.push(`then ${d.kshaya.map((t) => tithiOf((t - 0.5) * 12).name).join(", ")}`);
   parts.push(`Moon in ${NAKSHATRA_NAMES[d.nakshatra] ?? ""}`);
   for (const m of d.marks) if (m !== "sankranti") parts.push(MARK_TEXT[m]);
-  if (d.sankranti) parts.push(`the Sun enters ${SIGN_NAMES[d.sankranti.sign]} at ${clock.hm(d.sankranti.ms)}`);
+  if (d.sankranti) parts.push(`the Sun enters ${SIGN_NAMES[d.sankranti.sign]} at ${clock.hm12(d.sankranti.ms)}`);
   return parts.join("; ");
 }
 
@@ -187,16 +162,19 @@ export function MonthGrid({ place, preset, clock, ym, onMonth, today, selected, 
 
   return (
     <section className="month" aria-labelledby="month-h">
-      <TurmericBand id="month-h" plain level={2} dev="मास" title="Month" meta={clock.zone} />
+      <h2 id="month-h" className="alm-h">
+        The month
+        <span className="alm-h__note">Tap a date to read that day</span>
+      </h2>
       <div className="month__nav">
-        <button type="button" className="month__step" aria-label="Previous month" onClick={() => onMonth(shiftMonth(ym.y, ym.m, -1))}>
-          ‹
+        <button type="button" className="v-iconbtn" aria-label="Previous month" onClick={() => onMonth(shiftMonth(ym.y, ym.m, -1))}>
+          <ChevronLeft />
         </button>
         <p className="month__title" id="month-title" aria-live="polite">
           {title}
         </p>
-        <button type="button" className="month__step" aria-label="Next month" onClick={() => onMonth(shiftMonth(ym.y, ym.m, 1))}>
-          ›
+        <button type="button" className="v-iconbtn" aria-label="Next month" onClick={() => onMonth(shiftMonth(ym.y, ym.m, 1))}>
+          <ChevronRight />
         </button>
       </div>
       {cal ? (
@@ -229,8 +207,8 @@ export function MonthGrid({ place, preset, clock, ym, onMonth, today, selected, 
                     }}
                     onFocus={() => setFocusDay(c.day)}
                   >
-                    <span className="mcell__d mono">{c.day}</span>
-                    <MoonGlyph k={c.moonK} waxing={c.elongation < 180} south={south} />
+                    <span className="mcell__d">{c.day}</span>
+                    <MoonFace className="mcell__moon" k={c.moonK} waxing={c.elongation < 180} south={south} />
                     <span className="mcell__t">{tithiPlain(c.tithi.index)}</span>
                     <span className="mcell__m">
                       {c.marks.includes("purnima") && c.tithi.index !== 15 ? <i className="mmark">Full</i> : null}
@@ -248,12 +226,12 @@ export function MonthGrid({ place, preset, clock, ym, onMonth, today, selected, 
           ))}
         </div>
       ) : (
-        <p className="note-haldi" role="status">
+        <p className="v-note v-note--warn" role="status">
           The month could not be read for this place.
         </p>
       )}
       <p className="month__legend">
-        <span>Number = lunar day (tithi) at sunrise; ↑ waxing, ↓ waning</span>
+        <span>Small number = lunar day (tithi) at sunrise; ↑ growing, ↓ fading</span>
         <span>
           <i className="mmark">Ek</i> Ekādaśī (fasting day)
         </span>
@@ -262,27 +240,27 @@ export function MonthGrid({ place, preset, clock, ym, onMonth, today, selected, 
         </span>
       </p>
       {picked && cal ? (
-        <div className="month__pick" aria-live="polite">
-          <p className="month__pick-h">{dateLong(cal.year, cal.month, picked.day)}</p>
-          <p className="month__pick-v">
+        <div className="v-card month__pick" aria-live="polite">
+          <p className="v-card__title">{dateLong(cal.year, cal.month, picked.day)}</p>
+          <p className="v-card__sub">
             {picked.tithi.name} · Moon in {NAKSHATRA_NAMES[picked.nakshatra]}{" "}
-            <span lang="hi" className="dev today-dev">
+            <span lang="hi" className="alm-dev">
               {NAKSHATRA_DEV[picked.nakshatra]}
             </span>{" "}
-            · sunrise <span className="mono today-num">{clock.hm(picked.sunriseMs)}</span>
+            · sunrise {clock.hm12(picked.sunriseMs)}
             {picked.sankranti ? (
               <>
                 {" "}
                 · the Sun enters {SIGN_NAMES[picked.sankranti.sign]}{" "}
-                <span lang="hi" className="dev today-dev">
+                <span lang="hi" className="alm-dev">
                   {SIGN_DEV[picked.sankranti.sign]}
                 </span>{" "}
-                at <span className="mono today-num">{clock.hm(picked.sankranti.ms)}</span>
+                at {clock.hm12(picked.sankranti.ms)}
               </>
             ) : null}
           </p>
           {onOpenLeaf ? (
-            <button type="button" className="linkish month__open" onClick={onOpenLeaf}>
+            <button type="button" className="v-btn v-btn--ghost v-btn--sm month__open" onClick={onOpenLeaf}>
               Read this day in full
             </button>
           ) : null}

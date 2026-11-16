@@ -1,5 +1,4 @@
 import { expect, test } from "@playwright/test";
-import { hold } from "./helpers";
 
 // P-1 Zero leakage: a full session issues no request to any origin but our own.
 test("zero leakage across a full session", async ({ page, baseURL }) => {
@@ -13,18 +12,34 @@ test("zero leakage across a full session", async ({ page, baseURL }) => {
 
   await page.goto("./");
   await page.goto("#/leaf/new");
-  const place = page.getByRole("searchbox", { name: "Place" });
+  await page.getByRole("textbox", { name: "Name" }).fill("Asha");
+  await page.getByRole("button", { name: "Next" }).click();
+  await page.getByRole("textbox", { name: "Day" }).fill("14");
+  await page.getByRole("combobox", { name: "Month" }).selectOption("3");
+  await page.getByRole("textbox", { name: "Year" }).fill("1994");
+  await page.getByRole("switch", { name: "I don't know the time" }).click();
+  await page.getByRole("button", { name: "Next" }).click();
+  const place = page.getByRole("searchbox", { name: "Place of birth" });
   await place.click();
   await place.pressSequentially("Madurai", { delay: 60 });
-  await page.waitForTimeout(800);
-  await place.fill("");
-  await page.getByRole("button", { name: /fill in an example/i }).click();
-  await hold(page, /hold to save/i);
+  await page.getByRole("list", { name: "Places found" }).getByRole("button").first().click();
+  await page.getByRole("button", { name: "Next" }).click();
+  await page.getByRole("button", { name: /^save/i }).click();
   await page.waitForURL(/#\/patri\//);
-  const id = page.url().split("#/patri/")[1] ?? "";
-  await page.getByText("Full detail (astro tech)").click();
-  await page.getByRole("tab", { name: "D2" }).click();
-  for (const route of ["#/today", "#/circle", `#/milan/${id}/${id}`, "#/drawer", `#/hast/${id}`, `#/patri/${id}/sky`]) {
+  const id = (page.url().split("#/patri/")[1] ?? "").split("?")[0] ?? "";
+  await page.getByRole("tab", { name: "Chart", exact: true }).click();
+  await page.getByText("Divisional charts").click();
+  await page.getByRole("tab", { name: /^D2,/ }).click();
+  for (const route of [
+    "#/today",
+    "#/circle",
+    `#/forecast/${id}`,
+    `#/milan/${id}/${id}`,
+    "#/drawer",
+    "#/explore",
+    `#/hast/${id}`,
+    `#/patri/${id}/sky`,
+  ]) {
     await page.goto(route);
     await page.waitForTimeout(800);
   }

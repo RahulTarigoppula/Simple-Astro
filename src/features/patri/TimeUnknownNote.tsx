@@ -61,11 +61,11 @@ export function moonDaySentence(dawn: Moon | null, dusk: Moon | null, noon: Moon
 export function TimeUnknownNote({ profile, patri }: { profile: Profile; patri: Patri }) {
   const { dawn, dusk } = useMemo(() => moonAcrossDay(profile, patri.preset), [profile, patri.preset]);
   return (
-    <p className="note-haldi note--keep" role="note" style={{ margin: "var(--space-3) 0 0" }}>
+    <p className="v-note v-note--warn note--keep" role="note">
       <span aria-hidden="true">⚑</span>
       <span>
-        Birth time unknown, so the chart is cast for local noon. The Lagna, houses, Navāṃśa and daśā dates are not reliable.{" "}
-        {moonDaySentence(dawn, dusk, patri.grahas.MO, profile.tradition)}
+        Birth time unknown, so the chart is cast for local noon. The rising sign (Lagna), houses, Navāṃśa and life-chapter (daśā) dates are
+        not reliable. {moonDaySentence(dawn, dusk, patri.grahas.MO, profile.tradition)}
       </span>
     </p>
   );

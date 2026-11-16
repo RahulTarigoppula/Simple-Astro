@@ -317,3 +317,34 @@
 .home-made .v-link {
   margin: 4px 0 -8px;
 }
+.home-trust {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+@media (min-width: 900px) {
+  .home-trust {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: stretch;
+  }
+  .home-trust .v-sec {
+    grid-column: 1 / -1;
+  }
+  .v-cols > .v-stack > .v-sec:first-child {
+    margin-top: 0;
+  }
+  .home-day {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px 28px;
+  }
+  .home-day__line {
+    flex: 1 1 380px;
+  }
+  .home-day .v-actions {
+    flex-basis: 100%;
+  }
+}

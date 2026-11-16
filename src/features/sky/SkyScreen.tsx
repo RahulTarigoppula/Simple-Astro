@@ -5,9 +5,10 @@
 
 import { DateTime } from "luxon";
 import { Component, lazy, type ReactNode, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { useProfile, useSettings } from "../../app/hooks";
 import { DigitSet } from "../../components/ui/DigitSet";
+import { ChevronLeft } from "../../components/ui/Page";
 import { Screen } from "../../components/ui/Screen";
 import { GRAHA_DEV, GRAHA_NAMES, NAKSHATRA_NAMES, NAKSHATRA_SHORT, SIGN_DEV, SIGN_ENGRAVED, SIGN_NAMES } from "../../data/tables/names";
 import { formatDms } from "../../engine/math";
@@ -271,10 +272,15 @@ export default function SkyScreen() {
     return (
       <Screen label="Rooftop sky" className="sky-screen">
         <div className="rooftop rooftop--missing">
-          <p>This person is not saved on this device.</p>
-          <button type="button" className="sky-btn" onClick={() => navigate("/")}>
-            ← Back
-          </button>
+          <section className="v-card v-empty" aria-labelledby="sky-missing-h">
+            <h1 id="sky-missing-h" className="v-title">
+              Person not found
+            </h1>
+            <p className="v-lede">This person is not saved on this device.</p>
+            <Link to="/" className="v-btn">
+              Go to Today
+            </Link>
+          </section>
         </div>
       </Screen>
     );
@@ -293,10 +299,17 @@ export default function SkyScreen() {
     <Screen label={`Rooftop sky of ${profile.name}`} className="sky-screen">
       <div className="rooftop" style={{ "--moon-k": sky.moonK.toFixed(3) } as React.CSSProperties} {...swipeHandlers}>
         <header className="sky-head">
-          <h1 className="display">{profile.name}</h1>
-          <p>
-            <span lang="hi">आकाश</span> · the sky over {place}, {birth.localD} {MONTHS[birth.localMo - 1]} {birth.localY}
-          </p>
+          <Link to={`/patri/${profile.id}`} className="v-back">
+            <ChevronLeft />
+            Back
+          </Link>
+          <div className="sky-head__text">
+            <p className="v-eyebrow">Sky at birth</p>
+            <h1 className="v-title">{profile.name}</h1>
+            <p className="sky-head__sub">
+              The sky over {place.split(",")[0]}, {birth.localD} {MONTHS[birth.localMo - 1]} {birth.localY}
+            </p>
+          </div>
         </header>
 
         <div className={`sky-stage${domeReady ? " has-dome" : ""}`}>
@@ -352,9 +365,6 @@ export default function SkyScreen() {
             />
             <div className="sky-actions">
               <PosterAction make={makePoster} />
-              <button type="button" className="sky-btn sky-btn--desk" onClick={back}>
-                ← Back
-              </button>
             </div>
           </div>
           {fallback ? <p className="sky-note">{FALLBACK_NOTE[fallback]}</p> : null}

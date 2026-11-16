@@ -1,8 +1,7 @@
-// The D1 figure: the ink-drawn Kundli, the brass loupe that rises under the finger and snaps
-// planet to planet (loupe-rise), the engraved readout, and the North ⇄ South paper flip.
+// The D1 figure: the drawn Kundli, the loupe that rises under the finger and snaps planet to
+// planet, a plain-words readout of the planet in view, and a button for North or South style.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { DigitSet } from "../../components/ui/DigitSet";
-import { GRAHA_CODE, GRAHA_ENGLISH, GRAHA_NAMES, NAKSHATRA_NAMES, SIGN_NAMES } from "../../data/tables/names";
+import { GRAHA_ENGLISH, NAKSHATRA_NAMES, SIGN_NAMES } from "../../data/tables/names";
 import { formatArcmin, formatDms } from "../../engine/math";
 import type { GrahaId, Patri } from "../../engine/types";
 import { GRAHA_IDS } from "../../engine/types";
@@ -43,7 +42,6 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
   const [chips, setChips] = useState<ChipPos[]>([]);
   const [width, setWidth] = useState(320);
   const active = useRef(false);
-  const swipe = useRef<{ x: number; y: number; t: number } | null>(null);
   const hideTimer = useRef(0);
   const bodies = useMemo(() => bodiesOf(patri), [patri]);
 
@@ -178,7 +176,6 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
         ref={wrap}
         onPointerDown={(e) => {
           if (e.pointerType === "mouse" && e.button !== 0) return;
-          swipe.current = { x: e.clientX, y: e.clientY, t: performance.now() };
           active.current = true;
           const r = e.currentTarget.getBoundingClientRect();
           raise(e.clientX - r.left, e.clientY - r.top);
@@ -191,14 +188,7 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
         onPointerUp={(e) => {
           if (!active.current) return;
           active.current = false;
-          const s = swipe.current;
-          swipe.current = null;
           const r = e.currentTarget.getBoundingClientRect();
-          if (s && Math.abs(e.clientX - s.x) > 90 && Math.abs(e.clientY - s.y) < 40 && performance.now() - s.t < 500) {
-            setUp(false);
-            flip();
-            return;
-          }
           read(Math.max(0, Math.min(r.width, e.clientX - r.left)), Math.max(0, Math.min(r.height, e.clientY - r.top)), true);
           lower(2600);
         }}
@@ -253,34 +243,26 @@ export function ChartFigure({ patri, style, script, inkKey, skipInk, lit, onLit,
           <div className="loupe__flare" />
         </div>
       </div>
-      <div className="chart-tools">
-        <button type="button" className="linkish" onClick={flip}>
-          {style === "north" ? "Turn the paper: South grid ⇄" : "Turn the paper: North diamond ⇄"}
-        </button>
-      </div>
-      <div className="readout" aria-live="polite">
-        <div className="engraved">
-          {g && lit ? (
-            <>
-              <b>{GRAHA_CODE[lit]}</b>
-              <DigitSet text={formatDms(g.degInSign)} />
-              <span className="sep">·</span>
-              <span>
-                {(NAKSHATRA_NAMES[g.nakshatra] ?? "").toUpperCase()} {g.pada}
+      <p className="pt-readout" aria-live="polite">
+        {g && lit ? (
+          <>
+            <b>{GRAHA_ENGLISH[lit]}</b> at {formatDms(g.degInSign)} of {SIGN_NAMES[g.sign]} · star {NAKSHATRA_NAMES[g.nakshatra]}, quarter{" "}
+            {g.pada} · star lord {GRAHA_ENGLISH[g.nakshatraLord]}
+            {g.retrograde ? " · retrograde ℞" : ""}
+            {g.boundary ? (
+              <span className="v-chip v-chip--mixed">
+                within 2′ · {formatArcmin(g.boundary.arcminutesTo)} to {g.boundary.otherSide}
               </span>
-              <span className="sep">·</span>
-              <span>LORD {(GRAHA_NAMES[g.nakshatraLord] ?? "").toUpperCase()}</span>
-              {g.retrograde ? <span>℞</span> : null}
-              {g.boundary ? (
-                <span className="badge-bound">
-                  ≤2′ · {formatArcmin(g.boundary.arcminutesTo)} to {g.boundary.otherSide}
-                </span>
-              ) : null}
-            </>
-          ) : (
-            <span className="loupe-hint">Touch a graha to raise the loupe</span>
-          )}
-        </div>
+            ) : null}
+          </>
+        ) : (
+          <span className="v-muted">Touch a planet on the chart to read it.</span>
+        )}
+      </p>
+      <div className="pt-charttools">
+        <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={flip}>
+          {style === "north" ? "Show South Indian style" : "Show North Indian style"}
+        </button>
       </div>
     </>
   );

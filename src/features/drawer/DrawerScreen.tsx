@@ -1,11 +1,11 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { useActiveProfile, useSettings } from "../../app/hooks";
 import { InfoDot } from "../../components/ui/Explain";
 import { HoldStamp } from "../../components/ui/HoldStamp";
+import { Page, Row, Section } from "../../components/ui/Page";
 import { Sheet } from "../../components/ui/Sheet";
-import { TurmericBand } from "../../components/ui/TurmericBand";
 import attribution from "../../data/attribution.json";
 import { envelopeFileName, exportEnvelope, ImportError, importEnvelope } from "../../data/crypto";
 import { db } from "../../data/db";
@@ -38,29 +38,48 @@ interface Credit {
   use?: string;
 }
 
+/** One setting: its name, one plain line of what it does, and the control on the right. */
+function Setting({ label, help, children }: { label: React.ReactNode; help?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="set-row">
+      <span className="set-row__body">
+        <span className="set-row__t">{label}</span>
+        {help ? <span className="set-row__s">{help}</span> : null}
+      </span>
+      <span className="set-row__end">{children}</span>
+    </div>
+  );
+}
+
 function Toggle({
   label,
+  info,
   help,
   on,
   onChange,
   disabled,
 }: {
   label: string;
+  info?: React.ReactNode;
   help?: string;
   on: boolean;
   onChange: (v: boolean) => void;
   disabled?: boolean;
 }) {
   return (
-    <div className="toggle-row">
-      <span className="v">
-        {label}
-        {help ? <span className="help">{help}</span> : null}
-      </span>
+    <Setting
+      label={
+        <>
+          {label}
+          {info}
+        </>
+      }
+      help={help}
+    >
       <button
         type="button"
         role="switch"
-        className="switch"
+        className="set-switch"
         aria-checked={on}
         aria-label={label}
         disabled={disabled}
@@ -69,8 +88,13 @@ function Toggle({
           play("tick");
           haptics.selection();
         }}
-      />
-    </div>
+      >
+        <span className="set-switch__track" aria-hidden="true" />
+        <span className="set-switch__word" aria-hidden="true">
+          {on ? "On" : "Off"}
+        </span>
+      </button>
+    </Setting>
   );
 }
 
@@ -88,12 +112,8 @@ function Radio<T extends string | number>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="radio-row" role="radiogroup" aria-label={label}>
-      <span className="v">
-        {label}
-        {help ? <span className="help">{help}</span> : null}
-      </span>
-      <span className="seg">
+    <Setting label={label} help={help}>
+      <span className="v-seg set-seg" role="radiogroup" aria-label={label}>
         {options.map(([v, text, disabled]) => (
           <button
             key={String(v)}
@@ -111,7 +131,7 @@ function Radio<T extends string | number>({
           </button>
         ))}
       </span>
-    </div>
+    </Setting>
   );
 }
 
@@ -136,95 +156,47 @@ function StatsToggle() {
 function JourneyToggle() {
   const [on, setOn] = useState(journeyAtStart);
   return (
-    <Radio
+    <Toggle
       label="Opening journey"
       help="The intro (from the universe to why Vyomaphala exists) plays when Vyomaphala opens."
-      value={on ? "on" : "off"}
-      options={[
-        ["on", "Play"],
-        ["off", "Skip"],
-      ]}
+      on={on}
       onChange={(v) => {
-        setJourneyAtStart(v === "on");
-        setOn(v === "on");
+        setJourneyAtStart(v);
+        setOn(v);
       }}
     />
   );
 }
 
-function DialSegment({ jdTt, value, onChange }: { jdTt: number; value: AyanamsaPreset; onChange: (p: AyanamsaPreset) => void }) {
+/** The three ayanāṃśa presets, each with its value at the chart's date and its distance from the reference. */
+function AyanamsaChoice({ jdTt, value, onChange }: { jdTt: number; value: AyanamsaPreset; onChange: (p: AyanamsaPreset) => void }) {
   const vals = useMemo(() => AYANAMSA_PRESETS.map((p) => [p, ayanamsa(jdTt, p)] as const), [jdTt]);
-  const lo = Math.min(...vals.map((v) => v[1]));
-  const hi = Math.max(...vals.map((v) => v[1]));
-  const span = Math.max(hi - lo, 1e-6);
   const ref = vals.find((v) => v[0] === "se-true")?.[1] ?? 0;
-  const x = (a: number) => 60 + ((a - lo) / span) * 300;
   return (
-    <div className="dial-seg">
-      <svg viewBox="0 0 420 120" aria-hidden="true" data-decorative="true">
-        <defs>
-          <linearGradient id="dial-brass" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="var(--brass-hi)" />
-            <stop offset=".5" stopColor="var(--brass-mid)" />
-            <stop offset="1" stopColor="var(--brass-lo)" />
-          </linearGradient>
-        </defs>
-        <path d="M10 100 Q210 10 410 100 L410 118 Q210 28 10 118Z" fill="url(#dial-brass)" />
-        {Array.from({ length: 41 }, (_, i) => {
-          const t = i / 40;
-          const xx = 10 + t * 400;
-          const yy = 100 - Math.sin(t * Math.PI) * 45;
-          return (
-            <path key={xx} d={`M${xx} ${yy}v${i % 5 === 0 ? 9 : 5}`} stroke="var(--brass-shadow)" strokeWidth={i % 5 === 0 ? 1.4 : 0.8} />
-          );
-        })}
-        {vals.map(([p, a]) => {
-          const xx = x(a);
-          const t = (xx - 10) / 400;
-          const yy = 100 - Math.sin(t * Math.PI) * 45;
-          return (
-            <g key={p}>
-              <path
-                d={`M${xx} ${yy - 30}L${xx} ${yy + 12}`}
-                stroke={p === value ? "var(--accent)" : "var(--brass-ink)"}
-                strokeWidth={p === value ? 3 : 1.6}
-              />
-              <text
-                x={xx}
-                y={yy - 36}
-                textAnchor="middle"
-                style={{ fontFamily: "var(--font-mono)", fontSize: 12, fill: "var(--ink-muted)" }}
-              >
-                {p === "se-true" ? "SE-true" : p === "se-mean" ? "SE-mean" : "Drik"}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
-      <div className="dial-list" role="radiogroup" aria-label="Ayanāṃśa preset">
-        {vals.map(([p, a]) => {
-          const d = (a - ref) * 3600;
-          return (
-            <button
-              key={p}
-              type="button"
-              role="radio"
-              aria-checked={value === p}
-              aria-label={`${PRESET_NAME[p]}, ${formatDms(a)}, ${d === 0 ? "reference" : `${d > 0 ? "plus" : "minus"} ${Math.abs(d).toFixed(1)} arcseconds`}`}
-              onClick={() => {
-                onChange(p);
-                play("tick");
-                haptics.selection();
-              }}
-            >
-              <span>{PRESET_NAME[p]}</span>
-              <span className="delta">
-                {formatDms(a)} · {d === 0 ? "ref" : `${d > 0 ? "+" : "−"}${Math.abs(d).toFixed(1)}″`}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+    <div className="set-dial" role="radiogroup" aria-label="Ayanāṃśa preset">
+      {vals.map(([p, a]) => {
+        const d = (a - ref) * 3600;
+        return (
+          <button
+            key={p}
+            type="button"
+            role="radio"
+            aria-checked={value === p}
+            aria-label={`${PRESET_NAME[p]}, ${formatDms(a)}, ${d === 0 ? "reference" : `${d > 0 ? "plus" : "minus"} ${Math.abs(d).toFixed(1)} arcseconds`}`}
+            onClick={() => {
+              onChange(p);
+              play("tick");
+              haptics.selection();
+            }}
+          >
+            <span className="set-dial__mark" aria-hidden="true" />
+            <span className="set-dial__t">{PRESET_NAME[p]}</span>
+            <span className="set-dial__s">
+              {formatDms(a)} · {d === 0 ? "ref" : `${d > 0 ? "+" : "−"}${Math.abs(d).toFixed(1)}″`}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -336,26 +308,21 @@ export default function DrawerScreen() {
     ...((attribution as { services?: Credit[] }).services ?? []),
   ];
 
-  return (
-    <main className="screen settings-screen" aria-label="Settings">
-      <div className="settings">
-        <header className="settings-head">
-          <h1>Settings</h1>
-          <button
-            type="button"
-            className="settings-close"
-            aria-label="Close settings"
-            onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/"))}
-          >
-            ✕
-          </button>
-        </header>
-        <p className="settings-lede">The defaults are right for almost everyone.</p>
+  const closeSheet = () => {
+    setMode("none");
+    setPass("");
+    setPass2("");
+    setFile(null);
+  };
 
-        <section className="settings-card" aria-labelledby="set-look">
-          <h2 id="set-look">Look &amp; feel</h2>
+  return (
+    <Page label="Settings" title="Settings" lede="The defaults are right for almost everyone." back noPerson className="set">
+      <Section title="Look" id="set-look" />
+      <ul className="v-list" aria-labelledby="set-look">
+        <li>
           <Radio
             label="Theme"
+            help="Auto follows the real Sun where the chosen person was born."
             value={settings.theme}
             options={[
               ["auto", "Auto"],
@@ -364,6 +331,8 @@ export default function DrawerScreen() {
             ]}
             onChange={(v) => set({ theme: v })}
           />
+        </li>
+        <li>
           <Radio
             label="Chart style"
             help="How birth charts are drawn."
@@ -374,228 +343,331 @@ export default function DrawerScreen() {
             ]}
             onChange={(v) => set({ chartStyle: v })}
           />
-          <Toggle label="Sound" on={settings.sound} onChange={(v) => set({ sound: v })} />
-          <JourneyToggle />
-          <p className="settings-link">
-            <Link to="/journey">▶ Play the intro now</Link>
-          </p>
-        </section>
-
-        <section className="settings-card" aria-labelledby="set-data">
-          <h2 id="set-data">Your data</h2>
-          <div className="toggle-row">
-            <span className="v">
-              Prepare for offline
-              <span className="help">
-                {warm || "Downloads the palm and sky models (about 30 MB) so every screen works without internet."}
-              </span>
-            </span>
-            <button type="button" className="linkish" onClick={() => void prepareOffline()}>
-              Download now
-            </button>
-          </div>
-
-          <p className="settings-note">Everything stays on this device. A backup is encrypted with a passphrase only you know.</p>
-          <BackupAge zone={active?.birth.zone ?? null} />
-          <div className="settings-actions">
-            <button type="button" className="settings-btn" onClick={() => setMode("export")}>
-              Create a backup
-            </button>
-            <button type="button" className="settings-btn settings-btn--ghost" onClick={() => setMode("import")}>
-              Restore a backup
-            </button>
-          </div>
-        </section>
-
-        <section className="settings-card" aria-labelledby="set-priv">
-          <h2 id="set-priv">What Vyomaphala keeps, and where</h2>
-          <p className="settings-note">
-            Only in this browser, on this device. Vyomaphala has no server and no account, so there is no copy anywhere else.
-          </p>
-          <ul className="settings-list">
-            <li>The people you add: name, birth date, time and place.</li>
-            <li>Palm photos, only if you take one.</li>
-            <li>Your settings, and charts it has already worked out (to open faster).</li>
-            <li>Place names you searched online, for up to 90 days.</li>
-          </ul>
-          <p className="settings-note">Clearing this site's data in your browser removes all of it too.</p>
-          <StatsToggle />
-          <HoldStamp
-            className="settings-wipe"
-            ms={1500}
-            ariaLabel="Delete everything Vyomaphala keeps on this device. Hold to confirm"
-            label={<span>Hold to delete everything</span>}
-            onFire={() => {
-              void wipeEverything().then(() => {
-                toast("Everything is deleted from this device.", "danger");
-                navigate("/");
-              });
-            }}
+        </li>
+        <li>
+          <Toggle label="Sound" help="Soft sounds when you tap and save." on={settings.sound} onChange={(v) => set({ sound: v })} />
+        </li>
+        <li>
+          <Toggle
+            label="Haptics"
+            help="A small buzz on taps, on phones that can."
+            on={settings.haptics}
+            onChange={(v) => set({ haptics: v })}
           />
-        </section>
-        <details className="settings-card settings-more">
-          <summary>
-            <span>Advanced</span>
-            <span className="settings-more__hint">for people who know Jyotiṣa</span>
-          </summary>
-          <h3>
-            Ayanāṃśa <InfoDot id="ayanamsha" />
-          </h3>
-          <DialSegment jdTt={jdTt} value={settings.preset.ayanamsa} onChange={(p) => setPreset({ ayanamsa: p })} />
-          <Radio
-            label="Rāhu / Ketu"
-            help="True or mean node. They are up to 1.7° apart."
-            value={settings.preset.node}
-            options={[
-              ["true", "true"],
-              ["mean", "mean"],
-            ]}
-            onChange={(v) => setPreset({ node: v })}
-          />
-          <Radio
-            label="Daśā year"
-            value={settings.preset.dashaYearDays}
-            options={[
-              [365.25, "365.25 d"],
-              [360, "360 d"],
-            ]}
-            onChange={(v) => setPreset({ dashaYearDays: v })}
-          />
-          <Radio
-            label="Sunrise"
-            value={settings.preset.sunrise}
-            options={[
-              ["upper-limb-refracted", "upper limb"],
-              ["disc-centre", "disc centre"],
-            ]}
-            onChange={(v) => setPreset({ sunrise: v })}
-          />
-          <Radio
-            label="Guna Milan tables"
-            value={settings.ashtakootaSchool}
-            options={[
-              ["north-common", "North Indian"],
-              ["pyjhora", "PyJHora"],
-            ]}
-            onChange={(v) => set({ ashtakootaSchool: v })}
-          />
-          <Toggle label="Bhakūṭa cancellation" on={settings.bhakootCancellation} onChange={(v) => set({ bhakootCancellation: v })} />
-          <Radio
-            label="Chart script"
-            value={settings.chartScript}
-            options={[
-              ["devanagari", "देव"],
-              ["latin", "Latin"],
-            ]}
-            onChange={(v) => set({ chartScript: v })}
-          />
+        </li>
+        <li>
+          <Toggle label="Calm mode" help="Less motion and no sounds." on={settings.calmDesk} onChange={(v) => set({ calmDesk: v })} />
+        </li>
+        <li>
           <Toggle
             label="Devanagari digits"
             help="In the chart figure and the planet ledger only."
             on={settings.devanagariDigits}
             onChange={(v) => set({ devanagariDigits: v })}
           />
-          <Radio
-            label="Palm framing"
-            value={settings.handFraming}
-            options={[
-              ["dominant", "dominant"],
-              ["classical", "classical"],
-            ]}
-            onChange={(v) => set({ handFraming: v })}
-          />
-          <Toggle label="Haptics" on={settings.haptics} onChange={(v) => set({ haptics: v })} />
-          <Toggle label="Calm mode" help="Less motion and no sounds." on={settings.calmDesk} onChange={(v) => set({ calmDesk: v })} />
-          {est ? <p className="settings-note">Using {(est.usage / 1e6).toFixed(1)} MB on this device.</p> : null}
-        </details>
+        </li>
+        <li>
+          <JourneyToggle />
+        </li>
+        <li>
+          <Row to="/journey" title="Play the intro now" sub="From the universe to why Vyomaphala exists" />
+        </li>
+      </ul>
 
-        <details className="settings-card settings-more">
-          <summary>
-            <span>About Vyomaphala</span>
-            <span className="settings-more__hint">version {__APP_VERSION__} · credits</span>
-          </summary>
-          <p className="settings-note">
-            Planet positions by astronomy-engine {__ENGINE_BUILD__}, computed on this device. For reflection, not advice.{" "}
-            <Link to="/guide">Read the guide</Link>.
-          </p>
-          <p className="settings-link">
-            <Link to="/about">How Vyomaphala was made: sources, methods and checks →</Link>
-          </p>
-          <ul className="credits">
+      <Section title="Your data" id="set-data" />
+      <section className="v-card set-backup" aria-label="Backup">
+        <h3 className="v-card__title">Backup</h3>
+        <p className="v-card__sub">Everything stays on this device. A backup is encrypted with a passphrase only you know.</p>
+        <BackupAge zone={active?.birth.zone ?? null} />
+        <div className="v-actions">
+          <button type="button" className="v-btn v-btn--sm" onClick={() => setMode("export")}>
+            Create a backup
+          </button>
+          <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={() => setMode("import")}>
+            Restore a backup
+          </button>
+        </div>
+      </section>
+      <ul className="v-list" aria-labelledby="set-data">
+        <li>
+          <Setting
+            label="Prepare for offline"
+            help={
+              <span aria-live="polite">
+                {warm || "Downloads the palm and sky models (about 30 MB) so every screen works without internet."}
+              </span>
+            }
+          >
+            <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={() => void prepareOffline()}>
+              Download now
+            </button>
+          </Setting>
+        </li>
+        <li>
+          <StatsToggle />
+        </li>
+      </ul>
+      <details className="v-fold">
+        <summary>
+          <span>
+            What Vyomaphala keeps, and where
+            <span className="v-fold__s">Only in this browser, on this device</span>
+          </span>
+        </summary>
+        <div className="v-fold__body">
+          <p>Only in this browser, on this device. Vyomaphala has no server and no account, so there is no copy anywhere else.</p>
+          <ul className="set-kept">
+            <li>The people you add: name, birth date, time and place.</li>
+            <li>Palm photos, only if you take one.</li>
+            <li>Your settings, and charts it has already worked out (to open faster).</li>
+            <li>Place names you searched online, for up to 90 days.</li>
+          </ul>
+          <p>Clearing this site's data in your browser removes all of it too.</p>
+          {est ? <p className="v-small v-muted">Using {(est.usage / 1e6).toFixed(1)} MB on this device.</p> : null}
+        </div>
+      </details>
+      <section className="v-card set-danger" aria-label="Delete everything">
+        <h3 className="v-card__title">Delete everything</h3>
+        <p className="v-card__sub">
+          Removes every person, palm photo, chart and setting from this device. It cannot be undone, so the button must be held down.
+        </p>
+        <HoldStamp
+          className="set-wipe"
+          ms={1500}
+          ariaLabel="Delete everything Vyomaphala keeps on this device. Hold to confirm"
+          label={<span>Hold to delete everything</span>}
+          onFire={() => {
+            void wipeEverything().then(() => {
+              toast("Everything is deleted from this device.", "danger");
+              navigate("/");
+            });
+          }}
+        />
+      </section>
+
+      <Section title="Advanced" />
+      <details className="v-fold">
+        <summary>
+          <span>
+            Calculation choices
+            <span className="v-fold__s">For people who know Jyotiṣa. Changing these changes every chart.</span>
+          </span>
+        </summary>
+        <div className="v-fold__body set-adv">
+          <div>
+            <h3 className="set-h3">
+              Zodiac starting point <span className="v-muted">(Ayanāṃśa)</span> <InfoDot id="ayanamsha" />
+            </h3>
+            <AyanamsaChoice jdTt={jdTt} value={settings.preset.ayanamsa} onChange={(p) => setPreset({ ayanamsa: p })} />
+          </div>
+          <ul className="v-list">
+            <li>
+              <Radio
+                label="Rāhu / Ketu"
+                help="True or mean node. They are up to 1.7° apart."
+                value={settings.preset.node}
+                options={[
+                  ["true", "true"],
+                  ["mean", "mean"],
+                ]}
+                onChange={(v) => setPreset({ node: v })}
+              />
+            </li>
+            <li>
+              <Radio
+                label="Daśā year"
+                help="The length of a year in the life chapters."
+                value={settings.preset.dashaYearDays}
+                options={[
+                  [365.25, "365.25 d"],
+                  [360, "360 d"],
+                ]}
+                onChange={(v) => setPreset({ dashaYearDays: v })}
+              />
+            </li>
+            <li>
+              <Radio
+                label="Sunrise"
+                help="Which part of the Sun marks sunrise."
+                value={settings.preset.sunrise}
+                options={[
+                  ["upper-limb-refracted", "upper limb"],
+                  ["disc-centre", "disc centre"],
+                ]}
+                onChange={(v) => setPreset({ sunrise: v })}
+              />
+            </li>
+            <li>
+              <Radio
+                label="Guna Milan tables"
+                help="Which school's tables the match score uses."
+                value={settings.ashtakootaSchool}
+                options={[
+                  ["north-common", "North Indian"],
+                  ["pyjhora", "PyJHora"],
+                ]}
+                onChange={(v) => set({ ashtakootaSchool: v })}
+              />
+            </li>
+            <li>
+              <Toggle
+                label="Bhakūṭa cancellation"
+                help="Apply the classical exception in the match score."
+                on={settings.bhakootCancellation}
+                onChange={(v) => set({ bhakootCancellation: v })}
+              />
+            </li>
+            <li>
+              <Radio
+                label="Chart script"
+                help="The letters inside the chart figure."
+                value={settings.chartScript}
+                options={[
+                  ["devanagari", "देव"],
+                  ["latin", "Latin"],
+                ]}
+                onChange={(v) => set({ chartScript: v })}
+              />
+            </li>
+            <li>
+              <Radio
+                label="Palm framing"
+                help="Which hand the palm reading treats as the main one."
+                value={settings.handFraming}
+                options={[
+                  ["dominant", "dominant"],
+                  ["classical", "classical"],
+                ]}
+                onChange={(v) => set({ handFraming: v })}
+              />
+            </li>
+          </ul>
+        </div>
+      </details>
+
+      <Section title="About" />
+      <ul className="v-list">
+        <li>
+          <Row
+            title="Version"
+            sub={`Planet positions by astronomy-engine ${__ENGINE_BUILD__}, computed on this device.`}
+            end={__APP_VERSION__}
+          />
+        </li>
+        <li>
+          <Row to="/about" title="How Vyomaphala was made" sub="Sources, methods and checks" />
+        </li>
+        <li>
+          <Row to="/guide" title="How to use Vyomaphala" sub="Read the guide" />
+        </li>
+      </ul>
+      <details className="v-fold">
+        <summary>
+          <span>
+            Credits and licences
+            <span className="v-fold__s">The open work Vyomaphala is built on</span>
+          </span>
+        </summary>
+        <div className="v-fold__body">
+          <ul className="set-credits">
             {credits.map((c) => (
               <li key={c.name}>
-                <b style={{ fontWeight: 500 }}>{c.name}</b>
-                {c.author ? `, ${c.author}` : ""} <span className="lic">{c.licence}</span>
+                <b>{c.name}</b>
+                {c.author ? `, ${c.author}` : ""} <span className="v-chip">{c.licence}</span>
               </li>
             ))}
           </ul>
-        </details>
-      </div>
-      <Sheet
-        open={mode !== "none"}
-        onClose={() => {
-          setMode("none");
-          setPass("");
-          setPass2("");
-          setFile(null);
-        }}
-        label={mode === "export" ? "Create an encrypted backup" : "Restore from a backup"}
-      >
+        </div>
+      </details>
+      <p className="v-foot">For reflection, not advice.</p>
+
+      <Sheet open={mode !== "none"} onClose={closeSheet} label={mode === "export" ? "Create an encrypted backup" : "Restore from a backup"}>
         {mode === "export" ? (
           <form
-            className="drawer-pass"
+            className="set-sheet"
             onSubmit={(e) => {
               e.preventDefault();
               void doExport();
             }}
           >
-            <TurmericBand title="Create an encrypted backup" level={2} />
-            <label className="help">
-              Passphrase (6+ characters)
-              <input type="password" autoComplete="new-password" value={pass} onChange={(e) => setPass(e.target.value)} />
+            <h2>Create an encrypted backup</h2>
+            <p className="v-muted">Choose a passphrase. Without it the backup cannot be opened, and it cannot be recovered.</p>
+            <label className="v-field">
+              <span className="v-label">Passphrase (6+ characters)</span>
+              <input
+                className="v-input"
+                type="password"
+                autoComplete="new-password"
+                value={pass}
+                onChange={(e) => setPass(e.target.value)}
+              />
             </label>
-            <label className="help">
-              Once more
-              <input type="password" autoComplete="new-password" value={pass2} onChange={(e) => setPass2(e.target.value)} />
+            <label className="v-field">
+              <span className="v-label">Once more</span>
+              <input
+                className="v-input"
+                type="password"
+                autoComplete="new-password"
+                value={pass2}
+                onChange={(e) => setPass2(e.target.value)}
+              />
             </label>
             {pass2 && pass !== pass2 ? (
-              <p className="note-haldi" style={{ margin: 0 }}>
+              <p className="v-error" role="alert">
                 The two passphrases differ.
               </p>
             ) : null}
-            <button type="submit" className="stamp" disabled={busy || pass.length < 6 || pass !== pass2}>
-              <span>{busy ? "encrypting…" : "Encrypt and save"}</span>
-            </button>
+            <div className="v-actions">
+              <button type="submit" className="v-btn" disabled={busy || pass.length < 6 || pass !== pass2}>
+                {busy ? "encrypting…" : "Encrypt and save"}
+              </button>
+              <button type="button" className="v-btn v-btn--quiet" onClick={closeSheet}>
+                Cancel
+              </button>
+            </div>
           </form>
         ) : mode === "import" ? (
           <form
-            className="drawer-pass"
+            className="set-sheet"
             onSubmit={(e) => {
               e.preventDefault();
               void doImport();
             }}
           >
-            <TurmericBand title="Restore from a backup" level={2} />
-            <p className="note-lac" style={{ margin: 0 }}>
-              Restoring replaces everything in Vyomaphala on this device with the backup's contents.
-            </p>
-            <input
-              ref={fileInput}
-              type="file"
-              accept=".chowki,application/octet-stream"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            />
-            <label className="help">
-              Passphrase
-              <input type="password" autoComplete="current-password" value={pass} onChange={(e) => setPass(e.target.value)} />
+            <h2>Restore from a backup</h2>
+            <p className="v-note v-note--care">Restoring replaces everything in Vyomaphala on this device with the backup's contents.</p>
+            <label className="v-field">
+              <span className="v-label">Backup file</span>
+              <input
+                ref={fileInput}
+                className="set-file"
+                type="file"
+                accept=".chowki,application/octet-stream"
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              />
             </label>
-            <button type="submit" className="stamp" disabled={busy || !file || !pass}>
-              <span>{busy ? "restoring…" : "Restore"}</span>
-            </button>
+            <label className="v-field">
+              <span className="v-label">Passphrase</span>
+              <input
+                className="v-input"
+                type="password"
+                autoComplete="current-password"
+                value={pass}
+                onChange={(e) => setPass(e.target.value)}
+              />
+            </label>
+            <div className="v-actions">
+              <button type="submit" className="v-btn" disabled={busy || !file || !pass}>
+                {busy ? "restoring…" : "Restore"}
+              </button>
+              <button type="button" className="v-btn v-btn--quiet" onClick={closeSheet}>
+                Cancel
+              </button>
+            </div>
           </form>
         ) : null}
       </Sheet>
-    </main>
+    </Page>
   );
 }
 
@@ -623,11 +695,11 @@ function BackupAge({ zone }: { zone: string | null }) {
   if (last === undefined || !count) return null;
   const { days, text } = backupAge(count, last, Date.now(), zone ?? Intl.DateTimeFormat().resolvedOptions().timeZone);
   return days === null || days > 30 ? (
-    <p className="note-haldi">
+    <p className="v-note v-note--warn">
       <span aria-hidden="true">⚑</span>
       <span>{text} A phone can be lost; an encrypted backup kept elsewhere cannot be read without your passphrase.</span>
     </p>
   ) : (
-    <p className="p p--muted">{text}</p>
+    <p className="v-small v-muted">{text}</p>
   );
 }

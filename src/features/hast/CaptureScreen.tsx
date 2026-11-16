@@ -1,8 +1,10 @@
-// Hast Rekha, capture (§4.7): live camera with a chalk hand outline, sharpness and exposure
-// gauges, a shutter enabled only for a palm-facing hand in focus, and the gallery as a fallback.
+// Palm capture: a full-bleed camera with a hand outline, sharpness and light gauges, a round shutter
+// that is enabled only for a palm-facing hand in focus, and "upload a photo" as the way out when
+// there is no camera or it was not allowed.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import { useProfile, useSettings } from "../../app/hooks";
+import { ChevronLeft } from "../../components/ui/Page";
 import { Screen } from "../../components/ui/Screen";
 import { savePalmCapture, saveReading } from "../../data/repo";
 import { GATE_COPY, gateHand } from "../../engine/palm/landmarks";
@@ -23,14 +25,14 @@ type Detection = { landmarks: Landmark[]; worldLandmarks: Landmark[]; score: num
 
 function Gauge({ label, pips, low, value }: { label: string; pips: number; low: boolean; value: string }) {
   return (
-    <div className={`gauge${low ? " is-low" : ""}`} role="img" aria-label={`${label} ${value}${low ? ", low" : ", good"}`}>
+    <div className={`cap__gauge${low ? " is-low" : ""}`} role="img" aria-label={`${label} ${value}${low ? ", low" : ", good"}`}>
       <span>{label}</span>
-      {[0, 1, 2, 3, 4].map((i) => (
-        <i key={i} className={i < pips ? "on" : undefined} />
-      ))}
-      <span className="mono" style={{ fontSize: 10 }}>
-        {value}
+      <span className="cap__pips">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <i key={i} className={i < pips ? "on" : undefined} />
+        ))}
       </span>
+      <span>{value}</span>
     </div>
   );
 }
@@ -142,7 +144,7 @@ export default function CaptureScreen() {
   const process = useCallback(
     async (canvas: HTMLCanvasElement) => {
       if (!profile) return;
-      setBusy("finding the hand…");
+      setBusy("Finding the hand…");
       try {
         const d = await detectHand(canvas);
         if (!d.ok) {
@@ -160,9 +162,9 @@ export default function CaptureScreen() {
         if (!image) throw new Error("the photo could not be read");
         const q = assessQuality(image, palmRoi(d.landmarks));
         const captureId = crypto.randomUUID();
-        setBusy("sharpening the stylus…");
+        setBusy("Getting ready to trace…");
         const out = await extractLines(image, d.landmarks, hand, (s) =>
-          setBusy(s === "loading-cv" ? "sharpening the stylus…" : "tracing the lines in ink…"),
+          setBusy(s === "loading-cv" ? "Getting ready to trace…" : "Tracing the lines…"),
         );
         const rect = document.createElement("canvas");
         rect.width = out.rectified.width;
@@ -197,7 +199,7 @@ export default function CaptureScreen() {
         if (out.suggestTrace) haptics.notify("warning");
         navigate(`/hast/${profile.id}?hand=${hand}${out.suggestTrace ? "&trace=1" : ""}`, { replace: true });
       } catch (e) {
-        toast(`The print would not take: ${e instanceof Error ? e.message : String(e)}`, "danger");
+        toast(`The photo could not be read: ${e instanceof Error ? e.message : String(e)}`, "danger");
       } finally {
         setBusy(null);
       }
@@ -245,104 +247,129 @@ export default function CaptureScreen() {
   const sharpOk = quality?.sharpness.ok ?? false;
   const expOk = quality?.exposure.ok ?? false;
   const canShoot = camera === "live" && model === "ready" && !busy && shutterEnabled(gate.ok, sharpOk, expOk);
+  const back = () => navigate(`/hast/${id ?? ""}?hand=${hand}`, { replace: true });
+  const hint =
+    model === "loading"
+      ? "Getting ready to find your hand…"
+      : model === "failed"
+        ? "The hand finder could not open. Use Prepare for offline in Settings, or try again online."
+        : gate.ok
+          ? sharpOk && expOk
+            ? "Hold still. Ready: take the photo."
+            : !sharpOk
+              ? "Hold still, or move to the window: the picture is soft."
+              : "Move to even light: the palm is too dark or too bright."
+          : `${gate.copy[0]?.toUpperCase() ?? ""}${gate.copy.slice(1)}.`;
 
   return (
-    <Screen className="capture" label="Palm capture">
-      <div className="engraved capture__strip" aria-live="polite">
-        <b>FILL THE FRAME</b>
-        <span className="sep">·</span>
-        <span>PALM FLAT</span>
-        <span className="sep">·</span>
-        <span>EVEN LIGHT</span>
-      </div>
+    <Screen className="cap" label="Palm capture">
+      <header className="cap__top">
+        <button type="button" className="cap__back" onClick={back}>
+          <ChevronLeft />
+          Back
+        </button>
+        <h1 className="cap__title">Photograph your {hand} palm</h1>
+      </header>
 
-      <div className="capture__frame">
-        <video ref={video} playsInline muted aria-label="Camera preview">
+      <div className="cap__frame">
+        <video ref={video} playsInline muted aria-label="Camera preview" hidden={camera !== "live"}>
           <track kind="captions" />
         </video>
-        <svg
-          className={`capture__outline${gate.ok ? " is-ok" : ""}`}
-          viewBox="0 0 100 120"
-          preserveAspectRatio="xMidYMid meet"
-          aria-hidden="true"
-        >
-          <path d="M30 118c-8-14-12-26-12-34V56a5 5 0 0 1 10 0v14V30a5 5 0 0 1 10 0v34V22a5 5 0 0 1 10 0v40V28a5 5 0 0 1 10 0v38V42a5 5 0 0 1 10 0v34c0 18-4 30-10 42" />
-        </svg>
-        {camera !== "live" ? (
-          <div className="empty-note" style={{ position: "absolute", inset: 0, color: "var(--surface)" }}>
-            <b style={{ color: "var(--cloth-ink)" }}>{camera === "starting" ? "Opening the camera…" : "Gallery only"}</b>
-            <span style={{ fontSize: "var(--text-sm)" }}>
+        {camera === "live" ? (
+          <>
+            <svg
+              className={`cap__outline${gate.ok ? " is-ok" : ""}`}
+              viewBox="0 0 100 120"
+              preserveAspectRatio="xMidYMid meet"
+              aria-hidden="true"
+            >
+              <path d="M30 118c-8-14-12-26-12-34V56a5 5 0 0 1 10 0v14V30a5 5 0 0 1 10 0v34V22a5 5 0 0 1 10 0v40V28a5 5 0 0 1 10 0v38V42a5 5 0 0 1 10 0v34c0 18-4 30-10 42" />
+            </svg>
+            <p className="cap__tips">Fill the outline · palm flat · even light</p>
+            <p className="cap__hint" aria-live="polite">
+              {hint}
+            </p>
+          </>
+        ) : camera === "starting" ? (
+          <div className="cap__state" role="status">
+            <h2>Opening the camera…</h2>
+            <p>If the browser asks, allow the camera. The picture never leaves this device.</p>
+          </div>
+        ) : (
+          <div className="cap__state">
+            <h2>{camera === "denied" ? "The camera is switched off for this app" : "No camera was found"}</h2>
+            <p>
               {camera === "denied"
-                ? "The camera was not allowed. Pick a photo of your palm instead. It never leaves this device."
-                : camera === "none"
-                  ? "No camera here. Pick a photo of your palm instead. It never leaves this device."
-                  : ""}
-            </span>
+                ? "You can allow the camera in the browser or phone settings and come back. Or use a photo you already have: a clear picture of an open palm."
+                : "You can still get a reading from a photo you already have: a clear picture of an open palm."}{" "}
+              It never leaves this device.
+            </p>
+            <div className="cap__state-actions">
+              <button type="button" className="v-btn" onClick={() => void pick()} disabled={!!busy || model !== "ready"}>
+                Upload a photo instead
+              </button>
+              <button type="button" className="v-btn v-btn--ghost" onClick={back}>
+                Back
+              </button>
+            </div>
+            {model !== "ready" ? (
+              <p className="cap__small" aria-live="polite">
+                {hint}
+              </p>
+            ) : null}
+          </div>
+        )}
+        {busy ? (
+          <div className="cap__busy" role="status">
+            <span className="cap__spin" aria-hidden="true" />
+            {busy}
           </div>
         ) : null}
       </div>
 
-      <div className="paper capture__sheet">
-        {busy ? (
-          <>
-            <p className="p" role="status" style={{ marginTop: 0 }}>
-              {busy}
-            </p>
-            <div className="ink-wait" aria-hidden="true" />
-          </>
-        ) : null}
-        <div className="tools">
-          <Gauge
-            label="sharpness"
-            pips={quality ? sharpnessPips(quality.sharpness.value) : 0}
-            low={!sharpOk}
-            value={quality ? quality.sharpness.value.toFixed(0) : "-"}
-          />
-          <Gauge
-            label="exposure"
-            pips={quality ? exposurePips(quality.exposure.score) : 0}
-            low={!expOk}
-            value={quality ? quality.exposure.label : "-"}
-          />
-        </div>
-        <p className="p p--muted" style={{ marginTop: 6 }} aria-live="polite">
-          {model === "loading"
-            ? "Opening the hand model…"
-            : model === "failed"
-              ? "The hand model could not open. Use Prepare for offline in Settings, or try again online."
-              : camera === "live"
-                ? gate.ok
-                  ? sharpOk && expOk
-                    ? "Hold still. The shutter is ready."
-                    : !sharpOk
-                      ? "Hold still, or move to the window: the print is soft."
-                      : "Move to even light: the palm is too dark or too bright."
-                  : `${gate.copy[0]?.toUpperCase() ?? ""}${gate.copy.slice(1)}.`
-                : "Pick a clear photo of an open palm."}
-        </p>
-        <div className="radio-row" role="radiogroup" aria-label="Which hand">
-          <span className="v">
-            {hand === "right" ? "Right" : "Left"} hand · {profile && hand === profile.handedness ? "dominant" : "non-dominant"}
-          </span>
-          <span className="seg">
+      <div className="cap__panel">
+        <div className="cap__row">
+          <span className="cap__small">{profile && hand === profile.handedness ? "Dominant hand" : "Non-dominant hand"}</span>
+          <div className="v-seg cap__seg" role="radiogroup" aria-label="Which hand">
             {(["right", "left"] as const).map((h) => (
               <button key={h} type="button" role="radio" aria-checked={hand === h} onClick={() => setHand(h)}>
-                {h}
+                {h === "right" ? "Right" : "Left"}
               </button>
             ))}
-          </span>
+          </div>
         </div>
-        <div className="tools">
-          <button type="button" className="stamp shutter" disabled={!canShoot} onClick={shoot} aria-label="Shutter">
-            <span>◉ &nbsp;shutter</span>
-          </button>
-          <button type="button" className="linkish" onClick={() => void pick()} disabled={!!busy}>
-            Pick from gallery
-          </button>
-          <button type="button" className="linkish" onClick={() => navigate(`/hast/${id ?? ""}`)}>
-            Cancel
-          </button>
-        </div>
+        {camera === "live" ? (
+          <>
+            <div className="cap__row">
+              <Gauge
+                label="Sharpness"
+                pips={quality ? sharpnessPips(quality.sharpness.value) : 0}
+                low={!sharpOk}
+                value={quality ? (sharpOk ? "good" : "low") : "-"}
+              />
+              <Gauge
+                label="Light"
+                pips={quality ? exposurePips(quality.exposure.score) : 0}
+                low={!expOk}
+                value={quality ? quality.exposure.label : "-"}
+              />
+            </div>
+            <div className="cap__controls">
+              <button type="button" className="cap__side" onClick={() => void pick()} disabled={!!busy}>
+                Upload photo
+              </button>
+              <button type="button" className="cap__shutter" disabled={!canShoot} onClick={shoot} aria-label="Take the photo">
+                <span aria-hidden="true" />
+              </button>
+              <button type="button" className="cap__side" onClick={back}>
+                Cancel
+              </button>
+            </div>
+            <p className="cap__small cap__center">
+              {canShoot ? "Tap the round button to take the photo" : "The round button lights up when the palm is clear"}
+            </p>
+          </>
+        ) : null}
         <input
           ref={fileInput}
           type="file"

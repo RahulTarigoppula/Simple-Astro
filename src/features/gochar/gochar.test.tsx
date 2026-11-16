@@ -49,11 +49,17 @@ describe("GocharSection", () => {
     expect(screen.getAllByRole("tab").length).toBeGreaterThan(0);
   });
 
-  it("renders the band, a nine-row ledger with text marks, and cited readings", async () => {
+  it("renders a plain heading, a nine-row table with text marks, and cited readings", async () => {
     const { container } = render(<GocharSection patri={patri} nowMs={NOW} zone="Asia/Kolkata" />);
     await screen.findAllByRole("tab", {}, { timeout: 5000 });
-    expect(screen.getByRole("heading", { name: /Transits now/ })).toBeInTheDocument();
+    // plain English heads the section; the Sanskrit terms follow in small text, each with its ⓘ
+    expect(screen.getByRole("heading", { level: 2, name: "Where the planets are now" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3, name: "Saturn's long seasons" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /What is Gochar/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /What is Sāḍe-sātī/ })).toBeInTheDocument();
     const table = screen.getByRole("table");
+    expect(within(table).getByRole("row", { name: /^Saturn/ })).toHaveTextContent("Śani");
+    expect(within(table).getAllByText(/^from the rising sign$/)).toHaveLength(9);
     const rows = within(table).getAllByRole("row");
     expect(rows).toHaveLength(10); // header + nine grahas
     const report = gocharReport(patri, NOW);
@@ -69,7 +75,7 @@ describe("GocharSection", () => {
     }
     const text = (container.textContent ?? "").toLowerCase();
     for (const w of BANNED_WORDS) expect(text).not.toContain(w);
-    for (const el of container.querySelectorAll("[lang]")) expect(["hi", "sa"]).toContain(el.getAttribute("lang"));
+    expect(container.querySelectorAll("[lang]")).toHaveLength(0); // no Devanagari-first headings
   });
 
   it("opens on the running Sāḍe-sātī and its tabs are keyboard-navigable", async () => {
@@ -173,11 +179,17 @@ describe("SadeSatiRibbon", () => {
 describe("DailyStrengthCard", () => {
   it("shows Tārā-bala, Candra-bala and the running daśā with a progress rule", () => {
     const { container } = render(<DailyStrengthCard patri={patri} nowMs={NOW} zone="Asia/Kolkata" />);
-    expect(screen.getByRole("region", { name: "Today's strengths" })).toBeInTheDocument();
-    expect(container.querySelector(".engraved")?.textContent).toMatch(/12 OCT/);
-    expect(container.textContent).toMatch(/Tārā\s*\d \S+/);
-    expect(container.textContent).toMatch(/Candra\s*\d+(st|nd|rd|th)/);
-    expect(container.textContent).toMatch(/until \d{1,2} \w{3} 20\d\d/);
+    const card = screen.getByRole("region", { name: "Today's strengths" });
+    expect(card).toHaveTextContent("Today · 12 Oct");
+    expect(within(card).getByRole("heading", { level: 2 })).toBeInTheDocument();
+    expect(container.textContent).toMatch(/Star strength Tārā-bala/);
+    expect(container.textContent).toMatch(/Tārā \d \S+/);
+    expect(container.textContent).toMatch(/Moon strength Candra-bala/);
+    expect(container.textContent).toMatch(/Today's Moon is in the \d+(st|nd|rd|th) sign from yours/);
+    expect(container.textContent).toMatch(/(kind|asks care|mixed)/);
+    expect(container.textContent).toMatch(/(supportive|quiet)/);
+    expect(container.textContent).toMatch(/runs until \d{1,2} \w{3} 20\d\d/);
+    expect(screen.getByRole("button", { name: /What is Tārā-bala/ })).toBeInTheDocument();
     const bar = screen.getByRole("progressbar");
     const v = Number(bar.getAttribute("aria-valuenow"));
     expect(v).toBeGreaterThanOrEqual(0);

@@ -1,10 +1,9 @@
-// What a leaf shows on its face: the Moon's nakṣatra at birth and the birth line. The Moon comes from
+// What a person's card shows: the Moon's sign and nakṣatra at birth. The Moon comes from
 // the same longitude function the Patri uses (EclipticGeoMoon − ayanāṃśa), so a leaf never disagrees
 // with its chart, without casting twelve charts to draw a bundle.
 import { NAKSHATRA_DEV, NAKSHATRA_NAMES, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
 import { signOf } from "../../engine/nakshatra";
 import { angasAt } from "../../engine/panchang";
-import { formatClock12 } from "../../engine/time";
 import type { AyanamsaPreset, Profile, SignIdx } from "../../engine/types";
 
 export interface LeafMoon {
@@ -42,12 +41,4 @@ export function leafMoon(p: Profile, ayanamsa: AyanamsaPreset): LeafMoon | null 
   if (memo.size > 64) memo.clear();
   memo.set(key, out);
   return out;
-}
-
-const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
-/** "14 Mar 1994 · 7:25 am · Bengaluru", as written on the leaf, in the birthplace's own clock. */
-export function birthLine(p: Profile): string {
-  const b = p.birth;
-  const time = p.timeUnknown ? "time unknown" : formatClock12(b.localH, b.localMi);
-  return `${b.localD} ${MON[b.localMo - 1] ?? ""} ${b.localY} · ${time} · ${b.place.name}`;
 }

@@ -22,8 +22,11 @@ describe("AshtakavargaSection", () => {
       const av = ashtakavarga(core);
       const { container } = render(<AshtakavargaSection patri={core} script="latin" style={style} skipInk />);
 
-      expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("अष्टकवर्ग · Aṣṭakavarga");
-      expect(container.querySelector('[lang="hi"]')).toHaveTextContent("अष्टकवर्ग");
+      // plain English names the section; the Sanskrit term follows in small text with its ⓘ
+      const section = screen.getByRole("region", { name: "Strength points (Aṣṭakavarga)" });
+      expect(within(section).getByText(/Sanskrit: Aṣṭakavarga/)).toBeInTheDocument();
+      expect(within(section).getByRole("button", { name: /What is Aṣṭakavarga/ })).toBeInTheDocument();
+      expect(screen.queryByRole("heading")).toBeNull(); // the fold that holds it carries the heading
 
       const img = screen.getByRole("img", { name: /Sarvāṣṭakavarga/ });
       const nums = Array.from(img.querySelectorAll("text.av-num")).map((t) => Number(t.textContent));
@@ -39,6 +42,15 @@ describe("AshtakavargaSection", () => {
       const table = within(region).getByRole("table");
       const body = table.querySelectorAll("tbody tr");
       expect(body).toHaveLength(7);
+      expect(Array.from(body).map((r) => r.querySelector("th")?.textContent)).toEqual([
+        "Sun",
+        "Moon",
+        "Mars",
+        "Mercury",
+        "Jupiter",
+        "Venus",
+        "Saturn",
+      ]);
       const totals = Array.from(body).map((r) => r.querySelector("td:last-child")?.textContent);
       expect(totals).toEqual(["48", "49", "39", "54", "56", "52", "39"]);
       expect(table.querySelector("tfoot td:last-child")).toHaveTextContent("337");
@@ -75,8 +87,10 @@ describe("BhavaChalitTable", () => {
 
   it("renders 12 bhāva rows with start-madhya-end and the shift notes", () => {
     const { container } = render(<BhavaChalitTable patri={core} />);
-    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("भाव चलित · Bhāva Chalit");
-    const region = screen.getByRole("region", { name: /cusps/ });
+    const section = screen.getByRole("region", { name: "House cusps (Bhāva Chalit)" });
+    expect(within(section).getByText(/Sanskrit: Bhāva Chalit/)).toBeInTheDocument();
+    expect(container.querySelector('[lang="hi"]')).toBeNull(); // no Devanagari-first heading
+    const region = screen.getByRole("region", { name: "Bhāva Chalit cusps" });
     const rows = within(region).getByRole("table").querySelectorAll("tbody tr");
     expect(rows).toHaveLength(12);
     const first = rows[0];
@@ -85,7 +99,7 @@ describe("BhavaChalitTable", () => {
     expect(first?.querySelectorAll("td")[2]).toHaveTextContent("Vṛṣ 10°00′");
     const list = screen.getByRole("list", { name: /change house/ });
     expect(within(list).getByText(/Sūrya/).closest("li")).toHaveTextContent("shifts to bhāva 12");
-    expect(container.querySelector(".note-haldi")).toHaveTextContent("stays whole-sign");
+    expect(container.querySelector(".v-note")).toHaveTextContent("stays whole-sign");
   });
 
   it("says nothing shifts when every graha sits mid-house", () => {

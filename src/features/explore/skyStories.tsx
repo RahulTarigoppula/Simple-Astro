@@ -17,7 +17,10 @@ const dm = (x: number) => `${Math.floor(x % 30)}°${String(Math.round(((x % 30) 
 
 export interface Panel {
   kicker: string;
+  /** The English name where there is one. */
   title: string;
+  /** The Sanskrit name, shown small beside the title. */
+  small?: string | undefined;
   dev?: string | undefined;
   tagline: string;
   art: React.ReactNode;
@@ -37,10 +40,11 @@ export function panelFor(sel: WheelSel, sky: Record<GrahaId, TransitGraha>, patr
     const ex = EXALTATION[sel.id];
     const mine = patri?.grahas[sel.id];
     return {
-      kicker: `Graha · ${g?.title ?? ""}`,
-      title: g?.name ?? "",
+      kicker: `Planet · ${g?.title ?? ""}`,
+      title: g?.english ?? "",
+      small: g?.name,
       dev: g?.dev,
-      tagline: `${g?.english}: ${g?.signifies}`,
+      tagline: `${cap(g?.signifies ?? "")}.`,
       art: (
         <div className="panel-glyph">
           <span className="panel-glyph__orbit" />
@@ -72,10 +76,11 @@ export function panelFor(sel: WheelSel, sky: Record<GrahaId, TransitGraha>, patr
     const mineHere = patri ? GRAHA_IDS.filter((g) => patri.grahas[g].sign === sel.i) : [];
     const naks = Array.from({ length: 27 }, (_, k) => k).filter((k) => k * SPAN < (sel.i + 1) * 30 && (k + 1) * SPAN > sel.i * 30);
     return {
-      kicker: `Rāśi ${sel.i + 1} of 12 · ${r?.element} · ${r?.quality}`,
-      title: r?.name ?? "",
+      kicker: `Sign ${sel.i + 1} of 12 · ${r?.element} · ${r?.quality}`,
+      title: r?.western ?? "",
+      small: r?.name,
       dev: r?.dev,
-      tagline: `${r?.western} · ${r?.symbol}: ${r?.nature}`,
+      tagline: `${cap(r?.symbol ?? "")}: ${r?.nature}.`,
       art: <StarPatch from={sel.i * 30} span={30} lat={24} label={`The real stars of ${r?.name}`} />,
       story: `${r?.name}, ${r?.symbol}, is ${r?.element === "Air" || r?.element === "Earth" ? "an" : "a"} ${r?.element.toLowerCase()} sign ruled by ${lore(r?.ruler ?? "SU")?.english} (${lore(r?.ruler ?? "SU")?.name}). In the body of the cosmic person, Kāla-puruṣa, it is the ${r?.body}. Its nakṣatras are ${naks.map((k) => NAKSHATRA_NAMES[k]).join(", ")}.`,
       facts: [
@@ -99,7 +104,7 @@ export function panelFor(sel: WheelSel, sky: Record<GrahaId, TransitGraha>, patr
   const a = sel.i * SPAN;
   const mineMoon = patri?.grahas.MO.nakshatra === sel.i;
   return {
-    kicker: `Nakṣatra ${sel.i + 1} of 27 · “${n?.meaning}”`,
+    kicker: `Birth star ${sel.i + 1} of 27 · “${n?.meaning}”`,
     title: NAKSHATRA_NAMES[sel.i] ?? "",
     dev: NAKSHATRA_DEV[sel.i],
     tagline: `${cap(n?.symbol ?? "")} · deity ${n?.deity}`,
@@ -127,8 +132,8 @@ export function slidesFor(sel: WheelSel, p: Panel): Slide[] {
   const id = sel.kind === "graha" ? sel.id : `${sel.kind}${sel.i}`;
   const factLine = p.facts.map(([k, v]) => `${k}: ${v}`).join(" · ");
   return [
-    { id: `${id}-a`, kicker: p.kicker, title: p.title, dev: p.dev, body: [p.tagline], art: p.art, tone: "sky" },
-    { id: `${id}-b`, kicker: "The story", title: p.title, dev: p.dev, body: [p.story], tone: "myth" },
+    { id: `${id}-a`, kicker: p.kicker, title: p.small ?? p.title, dev: p.dev, body: [p.tagline], art: p.art, tone: "sky" },
+    { id: `${id}-b`, kicker: "The story", title: p.small ?? p.title, dev: p.dev, body: [p.story], tone: "myth" },
     { id: `${id}-c`, kicker: "What the tradition says", title: "At a glance", body: [factLine], tone: "idea" },
     {
       id: `${id}-d`,

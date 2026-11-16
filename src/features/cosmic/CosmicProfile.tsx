@@ -1,36 +1,37 @@
-// A person at a glance, across traditions: Lagna, Moon sign, Janma nakṣatra (deity and symbol), Sun
-// sign (sidereal and Western), the Chinese year, and numerology, each card opens its lore.
+// A person at a glance. `KeyFacts` is the three things everyone asks first (Moon sign, birth star,
+// rising sign) as compact cards; `CosmicProfile` is the same birth read by other traditions (Sun
+// sign, the Chinese year, numbers). Every card opens its story in Explore.
 import { useMemo } from "react";
 import { Link } from "react-router";
+import { InfoDot } from "../../components/ui/Explain";
 import { GrahaGlyph } from "../../components/ui/GrahaGlyph";
+import { ChevronRight, Row } from "../../components/ui/Page";
 import { GRAHA_LORE, NAKSHATRA_LORE, RASHI_LORE } from "../../data/lore";
-import { NAK_LORDS, NAKSHATRA_DEV, NAKSHATRA_NAMES, SIGN_NAMES } from "../../data/tables/names";
+import { nakBoth, nakName, rashiBoth, rashiName } from "../../data/regional";
+import { NAK_LORDS, NAKSHATRA_NAMES, SIGN_NAMES } from "../../data/tables/names";
 import { birthNumbers, chineseZodiac, NUMBER_GRAHA, tropicalSunSign } from "../../engine/profile";
 import type { Patri, Profile } from "../../engine/types";
 import "./cosmic.css";
-import { nakBoth, nakName, rashiBoth, rashiName } from "../../data/regional";
 
-interface Item {
+interface Fact {
   key: string;
+  /** Plain name, then the Sanskrit term that the ⓘ explains. */
   k: string;
+  term: string;
+  explain: string;
   v: string;
-  dev?: string | undefined;
   s: string;
   to: string;
-  glyph?: React.ReactNode;
+  glyph: React.ReactNode;
   warn?: string;
 }
 
-export function CosmicProfile({ profile, patri, compact = false }: { profile: Profile; patri: Patri; compact?: boolean }) {
-  const items = useMemo<Item[]>(() => {
+export function KeyFacts({ profile, patri }: { profile: Profile; patri: Patri }) {
+  const facts = useMemo<Fact[]>(() => {
     const L = patri.lagna.sign;
     const mo = patri.grahas.MO;
-    const su = patri.grahas.SU;
     const nak = mo.nakshatra;
     const lore = NAKSHATRA_LORE[nak];
-    const west = tropicalSunSign(profile.birth.utcMs);
-    const cz = chineseZodiac(profile.birth.utcMs);
-    const n = birthNumbers(profile.birth.localY, profile.birth.localMo, profile.birth.localD);
     const r = (i: number) => RASHI_LORE[i];
     const regional = profile.tradition && profile.tradition !== "north";
     const sk = (s: number) => (regional && rashiBoth(s, profile.tradition) !== SIGN_NAMES[s] ? `${SIGN_NAMES[s]} in Sanskrit · ` : "");
@@ -47,56 +48,90 @@ export function CosmicProfile({ profile, patri, compact = false }: { profile: Pr
         : undefined;
     return [
       {
-        key: "lagna",
-        k: "Rising sign · Lagna",
-        v: rashiName(L, profile.tradition),
-        dev: r(L)?.dev,
-        s: `${sk(L)}${r(L)?.western} rising: how you meet the world`,
-        to: `/explore/rashi/${L}`,
-        glyph: <span className="cp-sign">{L + 1}</span>,
-        ...(profile.timeUnknown ? { warn: "birth time unknown, so uncertain" } : {}),
-      },
-      {
         key: "moon",
-        k: "Moon sign · Rāśi",
+        k: "Moon sign",
+        term: "Rāśi",
+        explain: "rashi",
         v: rashiName(mo.sign, profile.tradition),
-        dev: r(mo.sign)?.dev,
-        s: `${sk(mo.sign)}${r(mo.sign)?.western}: your sign in Indian astrology`,
+        s: `${sk(mo.sign)}${r(mo.sign)?.western}, the sign of ${r(mo.sign)?.symbol}. In three words: ${r(mo.sign)?.nature}.`,
         to: `/explore/rashi/${mo.sign}`,
-        glyph: <GrahaGlyph id="MO" size={38} />,
+        glyph: <GrahaGlyph id="MO" size={40} />,
       },
       {
         key: "nak",
-        k: "Birth star · Nakṣatra",
+        k: "Birth star",
+        term: "Nakṣatra",
+        explain: "nakshatra",
         v: nakName(nak, profile.tradition),
-        dev: NAKSHATRA_DEV[nak],
-        s: `${skN(nak)}pada ${mo.pada} · ${lore?.symbol} · deity ${lore?.deity.split(",")[0]}`,
+        s: `${skN(nak)}Its name means “${lore?.meaning}”. Quarter (pada) ${mo.pada} · ${lore?.symbol} · deity ${lore?.deity.split(",")[0]}`,
         ...(edge ? { warn: edge } : {}),
         to: `/explore/nakshatra/${nak}`,
-        glyph: <GrahaGlyph id={NAK_LORDS[nak % 9] ?? "KE"} size={38} />,
+        glyph: <GrahaGlyph id={NAK_LORDS[nak % 9] ?? "KE"} size={40} />,
       },
       {
+        key: "lagna",
+        k: "Rising sign",
+        term: "Lagna",
+        explain: "lagna",
+        v: rashiName(L, profile.tradition),
+        s: `${sk(L)}${r(L)?.western} rising: how you meet the world.`,
+        to: `/explore/rashi/${L}`,
+        glyph: <span className="cp-sign">{L + 1}</span>,
+        ...(profile.timeUnknown ? { warn: "Birth time unknown, so this is uncertain." } : {}),
+      },
+    ];
+  }, [patri, profile]);
+
+  return (
+    <ul className="kf" aria-label="Your three key signs">
+      {facts.map((f) => (
+        <li key={f.key} className="kf__card" data-fact={f.key}>
+          <span className="kf__glyph" aria-hidden="true">
+            {f.glyph}
+          </span>
+          <div className="kf__body">
+            <p className="kf__k">
+              {f.k} <span className="kf__term">{f.term}</span> <InfoDot id={f.explain} label={f.term} />
+            </p>
+            <Link to={f.to} className="kf__v" aria-label={`${f.k}: ${f.v}. Read its story`}>
+              {f.v}
+              <ChevronRight size={16} />
+            </Link>
+            <p className="kf__s">{f.s}</p>
+            {f.warn ? <p className="kf__warn">{f.warn}</p> : null}
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** The same birth in other traditions: Sun sign (Indian and Western), the Chinese year, numbers. */
+export function CosmicProfile({ profile, patri }: { profile: Profile; patri: Patri }) {
+  const rows = useMemo(() => {
+    const su = patri.grahas.SU;
+    const west = tropicalSunSign(profile.birth.utcMs);
+    const cz = chineseZodiac(profile.birth.utcMs);
+    const n = birthNumbers(profile.birth.localY, profile.birth.localMo, profile.birth.localD);
+    return [
+      {
         key: "sun",
-        k: "Sun sign",
-        v: rashiName(su.sign, profile.tradition),
-        dev: r(su.sign)?.dev,
-        s: `Indian (sidereal) · Western: ${r(west)?.western}`,
+        title: `Sun sign: ${rashiName(su.sign, profile.tradition)}`,
+        sub: `Indian (sidereal) · Western: ${RASHI_LORE[west]?.western}`,
         to: `/explore/rashi/${su.sign}`,
-        glyph: <GrahaGlyph id="SU" size={38} />,
+        glyph: <GrahaGlyph id="SU" size={40} />,
       },
       {
         key: "chinese",
-        k: "Chinese zodiac",
-        v: `${cz.element} ${cz.animal}`,
-        s: `${cz.yin ? "Yin" : "Yang"} · lunar year ${cz.year}`,
+        title: `Chinese zodiac: ${cz.element} ${cz.animal}`,
+        sub: `${cz.yin ? "Yin" : "Yang"} · lunar year ${cz.year}`,
         to: "/explore/chinese",
         glyph: <span className="cp-sign cp-sign--cn">{cz.animal.slice(0, 2)}</span>,
       },
       {
         key: "numbers",
-        k: "Numbers · Aṅka",
-        v: `${n.root} · ${n.destiny}`,
-        s: `root ${n.root} · ${GRAHA_LORE.find((g) => g.id === NUMBER_GRAHA[n.root as 1])?.english ?? ""} · destiny ${n.destiny}`,
+        title: `Numbers: ${n.root} and ${n.destiny}`,
+        sub: `Root ${n.root} · ${GRAHA_LORE.find((g) => g.id === NUMBER_GRAHA[n.root as 1])?.english ?? ""} · destiny ${n.destiny}`,
         to: "/explore/numbers",
         glyph: <span className="cp-sign cp-sign--num">{n.root}</span>,
       },
@@ -104,34 +139,12 @@ export function CosmicProfile({ profile, patri, compact = false }: { profile: Pr
   }, [patri, profile]);
 
   return (
-    <section className={`cosmic-card cosmic-profile${compact ? " cosmic-profile--compact" : ""}`} aria-labelledby="cp-h">
-      <header className="cosmic-card__head">
-        <h2 id="cp-h">
-          {profile.name}'s cosmic profile <span className="gloss">tap any card for its story</span>
-        </h2>
-      </header>
-      <ul className="cp-grid">
-        {items.map((it) => (
-          <li key={it.key}>
-            <Link to={it.to} className="cp-card">
-              <span className="cp-card__glyph" aria-hidden="true">
-                {it.glyph}
-              </span>
-              <span className="cp-card__k">{it.k}</span>
-              <span className="cp-card__v">
-                {it.v}{" "}
-                {it.dev ? (
-                  <span lang="hi" className="cp-card__dev">
-                    {it.dev}
-                  </span>
-                ) : null}
-              </span>
-              <span className="cp-card__s">{it.s}</span>
-              {it.warn ? <span className="cp-card__warn">{it.warn}</span> : null}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <ul className="v-list cosmic-profile" aria-label={`${profile.name} in other traditions`}>
+      {rows.map((r) => (
+        <li key={r.key}>
+          <Row to={r.to} icon={<span aria-hidden="true">{r.glyph}</span>} title={r.title} sub={r.sub} />
+        </li>
+      ))}
+    </ul>
   );
 }

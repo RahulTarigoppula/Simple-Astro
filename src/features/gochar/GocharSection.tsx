@@ -1,9 +1,9 @@
-// "गोचर · Transits now", a section for the Janam Patri scroll: where the nine grahas walk today,
-// counted from the natal Moon (and Lagna), Śani's spells on a 90-year ribbon, and a few calm
+// The "Now" view of a birth chart: where the nine planets are today, counted from the birth Moon
+// (and the rising sign), Saturn's long seasons on a 90-year ribbon, and a few calm
 // "Tradition says…" sentences, each with its source.
 import { useEffect, useMemo, useState } from "react";
-import { TurmericBand } from "../../components/ui/TurmericBand";
-import { GRAHA_DEV, GRAHA_NAMES, ORDINAL, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
+import { InfoDot } from "../../components/ui/Explain";
+import { GRAHA_ENGLISH, GRAHA_NAMES, ORDINAL, SIGN_NAMES } from "../../data/tables/names";
 import { CITE } from "../../engine/citations";
 import { type GocharReport, gocharReport, type SadeSatiResult, sadeSati } from "../../engine/gochar";
 import { jdToMs, MS_PER_DAY } from "../../engine/math";
@@ -24,7 +24,8 @@ export function forgetSadeSati(): void {
   SS_CACHE.clear();
 }
 
-function reckonSadeSati(patri: Patri): SadeSatiResult {
+/** Reckon Śani's spells now (cached). The chart screen calls this before printing every view. */
+export function reckonSadeSati(patri: Patri): SadeSatiResult {
   const key = ssKey(patri);
   const hit = SS_CACHE.get(key);
   if (hit) return hit;
@@ -139,118 +140,128 @@ export function GocharSection({ patri, nowMs, zone }: GocharSectionProps) {
 
   return (
     <section className="gochar" aria-labelledby="gochar-h">
-      <TurmericBand id="gochar-h" dev="गोचर" title="Transits now" explain="gochar" meta={fmtDate(nowMs, zone)} />
-
-      <table className="ledger gochar__ledger">
-        <caption>
-          Houses counted from the natal Moon in {SIGN_NAMES[moon]} (Candra-lagna) and from the Lagna in {SIGN_NAMES[report.lagnaSign]}. ✓
-          marks a house the tradition lists as favourable from the Moon; · one it does not.
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col">Graha</th>
-            <th scope="col">Transit</th>
-            <th scope="col">
-              <abbr title="House from the natal Moon">Moon</abbr>
-            </th>
-            <th scope="col">
-              <abbr title="House from the Lagna">Lagna</abbr>
-            </th>
-            <th scope="col">Reads</th>
-          </tr>
-        </thead>
-        <tbody>
-          {report.entries.map((e) => {
-            const t = e.transit;
-            const showRetro = t.retrograde && e.id !== "RA" && e.id !== "KE";
-            return (
-              <tr key={e.id} className={e.effective ? "is-fav" : undefined}>
-                <td>
-                  <span lang="hi" className="dev gochar__dev">
-                    {GRAHA_DEV[e.id]}
-                  </span>{" "}
-                  {GRAHA_NAMES[e.id]}
-                  {showRetro ? (
-                    <span className="retro" title="retrograde">
-                      {" "}
-                      ℞<span className="vh"> retrograde</span>
-                    </span>
-                  ) : null}
-                </td>
-                <td>
-                  {SIGN_NAMES[t.sign]} <span className="num pd">{Math.floor(t.degInSign)}°</span>
-                </td>
-                <td className="num">{e.houseFromMoon}</td>
-                <td className="num pd">{e.houseFromLagna}</td>
-                <td className="gochar__reads">
-                  {e.favourable ? (
-                    <>
-                      <span className="gochar__mark" aria-hidden="true">
-                        ✓
-                      </span>{" "}
-                      favourable
-                      {e.vedha && e.vedha.by.length > 0 ? (
-                        <span className="gochar__vedha">
-                          vedha · {e.vedha.by.map((g) => GRAHA_NAMES[g]).join(", ")} in {ORDINAL(e.vedha.house)}
+      <div className="v-card gochar__card">
+        <h2 id="gochar-h" className="v-card__title">
+          Where the planets are now
+        </h2>
+        <p className="v-card__sub">
+          {fmtDate(nowMs, zone)} · Sanskrit: Gochar (transits) <InfoDot id="gochar" label="Gochar" />
+        </p>
+        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard-reachable (WCAG 2.1.1) */}
+        <div className="gochar__scroll" role="region" aria-label="Planets today, house by house" tabIndex={0}>
+          <table className="ledger gochar__ledger">
+            <caption className="vh">
+              Houses counted from the birth Moon in {SIGN_NAMES[moon]} (Candra-lagna) and from the rising sign,{" "}
+              {SIGN_NAMES[report.lagnaSign]}.
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Planet</th>
+                <th scope="col">Now in</th>
+                <th scope="col">
+                  House <span className="gochar__sk">from Moon · rising</span>
+                </th>
+                <th scope="col">Reads</th>
+              </tr>
+            </thead>
+            <tbody>
+              {report.entries.map((e) => {
+                const t = e.transit;
+                const showRetro = t.retrograde && e.id !== "RA" && e.id !== "KE";
+                return (
+                  <tr key={e.id} className={e.effective ? "is-fav" : undefined}>
+                    <td>
+                      {GRAHA_ENGLISH[e.id]}
+                      {showRetro ? (
+                        <span className="retro" title="retrograde">
+                          {" "}
+                          ℞<span className="vh"> retrograde</span>
                         </span>
                       ) : null}
-                    </>
-                  ) : (
-                    <span className="pd">
-                      <span className="gochar__mark" aria-hidden="true">
-                        ·
+                      <span className="gochar__sk">{GRAHA_NAMES[e.id]}</span>
+                    </td>
+                    <td>
+                      {SIGN_NAMES[t.sign]} <span className="num pd">{Math.floor(t.degInSign)}°</span>
+                    </td>
+                    <td className="num">
+                      {e.houseFromMoon}
+                      <span className="vh"> from the Moon, </span>
+                      <span className="pd" aria-hidden="true">
+                        {" · "}
                       </span>
-                      <span className="vh">not among the favourable houses</span>
-                    </span>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <p className="gochar__note">
-        Vedha is checked for the seven planets only; Rāhu and Ketu neither give nor receive it in the classical table.
-      </p>
-
-      <h3 className="gochar__h">
-        <span lang="hi" className="dev">
-          साढ़े साती
-        </span>{" "}
-        · Sāḍe-sātī and Śani from the Moon
-      </h3>
-      <p className="gochar__sub">
-        Śani over {SIGN_NAMES[(moon + 11) % 12]}, {SIGN_NAMES[moon]}{" "}
-        <span lang="hi" className="dev">
-          {SIGN_DEV[moon]}
-        </span>{" "}
-        and {SIGN_NAMES[(moon + 1) % 12]}; dates in {zone}.
-      </p>
-      {ss ? (
-        <SadeSatiRibbon key={ssKey(patri)} result={ss} birthMs={birthMs} nowMs={nowMs} zone={zone} />
-      ) : (
-        <div className="gochar-rib">
-          <div className="gochar-rib__track" aria-hidden="true" data-decorative="true">
-            <div className="gochar-rib__rule" />
-            <span className="gochar-rib__end gochar-rib__end--l">birth</span>
-            <span className="gochar-rib__end gochar-rib__end--r">+{RIBBON_YEARS} y</span>
-          </div>
-          <p className="p p--muted" role="status">
-            Reckoning Śani's spells…
-          </p>
-          <div className="ink-wait" aria-hidden="true" />
+                      <span className="pd">{e.houseFromLagna}</span>
+                      <span className="vh"> from the rising sign</span>
+                    </td>
+                    <td className="gochar__reads">
+                      {e.favourable ? (
+                        <>
+                          <span className="gochar__mark" aria-hidden="true">
+                            ✓
+                          </span>{" "}
+                          <span className="gochar__word">favourable</span>
+                          {e.vedha && e.vedha.by.length > 0 ? (
+                            <span className="gochar__vedha">
+                              blocked (vedha) · {e.vedha.by.map((g) => GRAHA_ENGLISH[g]).join(", ")} in {ORDINAL(e.vedha.house)}
+                            </span>
+                          ) : null}
+                        </>
+                      ) : (
+                        <span className="pd">
+                          <span className="gochar__mark" aria-hidden="true">
+                            ·
+                          </span>
+                          <span className="vh">not among the favourable houses</span>
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-      )}
+        <p className="gochar__note">
+          Houses are counted from your birth Moon in {SIGN_NAMES[moon]} and from your rising sign, {SIGN_NAMES[report.lagnaSign]}. ✓ marks a
+          house the tradition lists as favourable from the Moon; · one it does not. Blocking (vedha) is checked for the seven planets only;
+          Rāhu and Ketu neither give nor receive it in the classical table.
+        </p>
+      </div>
 
-      <div className="gochar__readings">
-        {readings.map((r) => (
-          <p key={r.key} className="gochar__reading">
-            {r.text}
-            <span className="gochar__src">
-              {r.cite.text} {r.cite.ref}
-            </span>
-          </p>
-        ))}
+      <div className="v-card gochar__card">
+        <h3 className="v-card__title">Saturn's long seasons</h3>
+        <p className="v-card__sub">
+          Sanskrit: Sāḍe-sātī <InfoDot id="sade-sati" label="Sāḍe-sātī" /> · Saturn (Śani) passing over {SIGN_NAMES[(moon + 11) % 12]},{" "}
+          {SIGN_NAMES[moon]} and {SIGN_NAMES[(moon + 1) % 12]}, the signs around your Moon. Dates in {zone}.
+        </p>
+        {ss ? (
+          <SadeSatiRibbon key={ssKey(patri)} result={ss} birthMs={birthMs} nowMs={nowMs} zone={zone} />
+        ) : (
+          <div className="gochar-rib">
+            <div className="gochar-rib__track" aria-hidden="true" data-decorative="true">
+              <div className="gochar-rib__rule" />
+              <span className="gochar-rib__end gochar-rib__end--l">birth</span>
+              <span className="gochar-rib__end gochar-rib__end--r">+{RIBBON_YEARS} y</span>
+            </div>
+            <p className="v-muted" role="status">
+              Reckoning Śani's spells…
+            </p>
+            <div className="ink-wait" aria-hidden="true" />
+          </div>
+        )}
+      </div>
+
+      <div className="v-card gochar__card">
+        <h3 className="v-card__title">What tradition says</h3>
+        <div className="gochar__readings">
+          {readings.map((r) => (
+            <p key={r.key} className="gochar__reading">
+              {r.text}
+              <span className="gochar__src">
+                {r.cite.text} {r.cite.ref}
+              </span>
+            </p>
+          ))}
+        </div>
       </div>
     </section>
   );

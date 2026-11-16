@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 
-/** Hold a button for `ms` (the seal, the burn) with a real pointer. */
+/** Hold a button for `ms` (deleting a person) with a real pointer. */
 export async function hold(page: Page, name: RegExp | string, ms = 800): Promise<void> {
   const btn = page.getByRole("button", { name });
   await btn.scrollIntoViewIfNeeded();
@@ -12,15 +12,16 @@ export async function hold(page: Page, name: RegExp | string, ms = 800): Promise
   await page.mouse.up();
 }
 
-/** Write and seal the house example leaf (Rahul · 14 Mar 1994 · 07:25 · Bengaluru); returns its id. */
+/** Add the house example person (Rahul · 14 Mar 1994 · 07:25 · Bengaluru) and save; returns the new id. */
 export async function sealReferenceLeaf(page: Page): Promise<string> {
   await page.goto("#/leaf/new");
+  // The example fills every step and opens the last one, "Check and save".
   await page.getByRole("button", { name: /fill in an example/i }).click();
   await page
     .locator(".leaf-check")
     .getByText(/Revatī/)
     .waitFor();
-  await hold(page, /hold to save/i);
+  await page.getByRole("button", { name: /^save/i }).click();
   await page.waitForURL(/#\/patri\//);
-  return page.url().split("#/patri/")[1] ?? "";
+  return (page.url().split("#/patri/")[1] ?? "").split("?")[0] ?? "";
 }

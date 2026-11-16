@@ -1,8 +1,8 @@
-// The Sāḍe-sātī ribbon: a 90-year rule from birth with Śani's spells laid on it, brass for the
-// three phases of the Sāḍe-sātī, a haldi underline for Kaṇṭaka and Aṣṭama, a brass "now" clip,
+// The Sāḍe-sātī ribbon: a 90-year rule from birth with Śani's spells laid on it, gold for the
+// three phases of the Sāḍe-sātī, an amber underline for Kaṇṭaka and Aṣṭama, a "now" marker,
 // and a row of spell tabs (the keyboard path) that open each spell's dated phases.
 import { type KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
-import { ORDINAL, SIGN_DEV, SIGN_NAMES } from "../../data/tables/names";
+import { ORDINAL, SIGN_NAMES } from "../../data/tables/names";
 import { PHASE_HOUSE, type SadeSatiResult, type SaturnPhase, type SaturnSpell } from "../../engine/gochar";
 import { MS_PER_DAY } from "../../engine/math";
 import { haptics } from "../../platform/haptics";
@@ -138,9 +138,9 @@ export function SadeSatiRibbon({ result, birthMs, nowMs, zone }: SadeSatiRibbonP
       </ul>
 
       {spells.length === 0 ? (
-        <p className="p p--muted">Śani does not cross these signs inside the ninety years shown.</p>
+        <p className="v-muted">Śani does not cross these signs inside the ninety years shown.</p>
       ) : (
-        <div className="ribbon gochar-rib__tabs" role="tablist" aria-label="Śani's spells from the Moon sign">
+        <div className="gochar-rib__tabs" role="tablist" aria-label="Śani's spells from the Moon sign">
           {spells.map((s, i) => {
             // A spell can be "running" while Śani has retrograded back out of its signs for a while.
             const inside = i === nowIdx && s.intervals.some((iv) => nowMs >= iv.startMs && nowMs < iv.endMs);
@@ -163,9 +163,7 @@ export function SadeSatiRibbon({ result, birthMs, nowMs, zone }: SadeSatiRibbonP
                 onClick={() => pick(i)}
                 onKeyDown={(e) => onKey(e, i)}
               >
-                <span className="l" style={{ fontSize: "var(--text-sm)" }}>
-                  {SPELL_LABEL[s.kind]}
-                </span>
+                <span className="l">{SPELL_LABEL[s.kind]}</span>
                 <span className="y">{yearSpan(s.startMs, s.endMs, zone)}</span>
               </button>
             );
@@ -211,36 +209,30 @@ export function SadeSatiRibbon({ result, birthMs, nowMs, zone }: SadeSatiRibbonP
 function SpellFold({ spell, nowMs, zone }: { spell: SaturnSpell; nowMs: number; zone: string }) {
   const seen = new Set<SaturnPhase>();
   return (
-    <div className="fold" id="gochar-spell-panel" role="tabpanel" aria-label={`${SPELL_LABEL[spell.kind]} phases`}>
-      <div className="fold-in">
-        <ul>
-          {spell.intervals.map((iv) => {
-            const again = seen.has(iv.phase);
-            seen.add(iv.phase);
-            const on = nowMs >= iv.startMs && nowMs < iv.endMs;
-            const house = PHASE_HOUSE[iv.phase];
-            return (
-              <li key={iv.startMs} className={`gochar-fold__li${on ? " is-now" : ""}`}>
-                <span className="n">
-                  <i className={`sw${spell.kind === "sade-sati" ? "" : " sw--line"} is-${iv.phase}`} aria-hidden="true" />
-                  {PHASE_LABEL[iv.phase]}
-                  {again ? " again" : ""} · {SIGN_NAMES[iv.sign]}{" "}
-                  <span lang="hi" className="dev">
-                    {SIGN_DEV[iv.sign]}
-                  </span>{" "}
-                  <span className="gochar-fold__h">({ORDINAL(house)} from the Moon)</span>
-                  {on ? " · now" : ""}
-                </span>
-                <span className="mono">
-                  {iv.startClipped ? "before " : ""}
-                  {fmtDate(iv.startMs, zone)} → {iv.endClipped ? "beyond " : ""}
-                  {fmtDate(iv.endMs, zone)}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+    <div className="gochar-fold" id="gochar-spell-panel" role="tabpanel" aria-label={`${SPELL_LABEL[spell.kind]} phases`}>
+      <ul>
+        {spell.intervals.map((iv) => {
+          const again = seen.has(iv.phase);
+          seen.add(iv.phase);
+          const on = nowMs >= iv.startMs && nowMs < iv.endMs;
+          const house = PHASE_HOUSE[iv.phase];
+          return (
+            <li key={iv.startMs} className={`gochar-fold__li${on ? " is-now" : ""}`}>
+              <span className="n">
+                <i className={`sw${spell.kind === "sade-sati" ? "" : " sw--line"} is-${iv.phase}`} aria-hidden="true" />
+                {PHASE_LABEL[iv.phase]}
+                {again ? " again" : ""} · {SIGN_NAMES[iv.sign]} <span className="gochar-fold__h">({ORDINAL(house)} from the Moon)</span>
+                {on ? " · now" : ""}
+              </span>
+              <span className="when">
+                {iv.startClipped ? "before " : ""}
+                {fmtDate(iv.startMs, zone)} → {iv.endClipped ? "beyond " : ""}
+                {fmtDate(iv.endMs, zone)}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

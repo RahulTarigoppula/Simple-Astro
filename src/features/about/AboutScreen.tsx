@@ -1,7 +1,7 @@
 // About Vyomaphala: how it was made. Every data source, what we did to it, every algorithm, and how it was
 // checked. Facts here mirror src/data/attribution.json and docs/VERIFICATION-LOG.md.
 import { Link } from "react-router";
-import { Screen } from "../../components/ui/Screen";
+import { ChevronRight, Page, Section } from "../../components/ui/Page";
 import "./about.css";
 
 const NUMBERS: Array<[string, string]> = [
@@ -10,7 +10,7 @@ const NUMBERS: Array<[string, string]> = [
   ["82,505", "places, offline"],
   ["9,096", "real stars"],
   ["50", "charts checked against Swiss Ephemeris"],
-  ["717", "automated tests"],
+  ["753", "automated tests"],
   ["0", "bytes of your data uploaded"],
 ];
 
@@ -120,93 +120,121 @@ const CHECKS: string[] = [
   "Almanac names and end times compared with Drik Panchang on 6 days across 3 cities (Bengaluru, Chennai, New Delhi): names exact, times within 2 minutes.",
   "Guna Milan compared with PyJHora on all 11,664 possible pairings.",
   "Every published table checked by hand against the classical texts.",
-  "717 automated tests and 22 browser tests run on every change, on a phone-sized and a desktop screen.",
+  "753 automated tests and 24 browser tests run on every change, on a phone-sized and a desktop screen.",
   "A privacy test watches every network request in a full session and fails if any of your data leaves.",
 ];
 
+function Fold({ title, sub, children }: { title: string; sub: string; children: React.ReactNode }) {
+  return (
+    <details className="v-fold">
+      <summary>
+        <span>
+          {title}
+          <span className="v-fold__s">{sub}</span>
+        </span>
+      </summary>
+      <div className="v-fold__body">{children}</div>
+    </details>
+  );
+}
+
 export default function AboutScreen() {
   return (
-    <Screen className="about-screen" label="About Vyomaphala">
-      <article className="about">
-        <header className="about-hero">
-          <p className="about-kicker">About Vyomaphala · व्योमफल · the fruit of the sky</p>
-          <h1>How Vyomaphala was made</h1>
-          <blockquote className="about-quote">
-            <p>It took almost 18 weeks of extensive planning, development, data gathering and cleaning. This is the result: Vyomaphala.</p>
-            <footer>Rahul (RT), who made Vyomaphala</footer>
-          </blockquote>
-          <p className="about-hours">
-            <b>18 weeks × 7 days × 2 hours = 252 hours</b> of work and dedication.
-          </p>
-        </header>
+    <Page
+      label="About Vyomaphala"
+      eyebrow={
+        <>
+          About Vyomaphala · <span lang="hi">व्योमफल</span> · the fruit of the sky
+        </>
+      }
+      title="How Vyomaphala was made"
+      back
+      className="about"
+    >
+      <section className="v-card v-card--hero about-hero" aria-label="From the maker">
+        <blockquote className="about-quote">
+          <p>It took almost 18 weeks of extensive planning, development, data gathering and cleaning. This is the result: Vyomaphala.</p>
+          <footer>Rahul (RT), who made Vyomaphala</footer>
+        </blockquote>
+        <p className="about-hours">
+          <b>18 weeks × 7 days × 2 hours = 252 hours</b> of work and dedication.
+        </p>
+      </section>
 
-        <ul className="about-numbers" aria-label="Vyomaphala in numbers">
-          {NUMBERS.map(([n, l]) => (
-            <li key={l}>
-              <span className="about-numbers__n">{n}</span>
-              <span className="about-numbers__l">{l}</span>
+      <Section title="In numbers" />
+      <ul className="about-numbers" aria-label="Vyomaphala in numbers">
+        {NUMBERS.map(([n, l]) => (
+          <li key={l}>
+            <span className="about-numbers__n">{n}</span>
+            <span className="about-numbers__l">{l}</span>
+          </li>
+        ))}
+      </ul>
+
+      <Section title="The detail" note="Open any part" />
+      <Fold title="Where the data comes from" sub={`${SOURCES.length} open, credited sources`}>
+        <p>Every source below is open and credited, and the app works only from them.</p>
+        <ul className="about-sources">
+          {SOURCES.map((s) => (
+            <li key={s.name}>
+              <h3>{s.name}</h3>
+              <p className="about-by">{s.by}</p>
+              <p>{s.used}</p>
+              {s.cleaned ? (
+                <p className="about-clean">
+                  <strong>How we cleaned it: </strong>
+                  {s.cleaned}
+                </p>
+              ) : null}
             </li>
           ))}
         </ul>
-
-        <section className="about-sec" aria-labelledby="ab-src">
-          <h2 id="ab-src">Where the data comes from</h2>
-          <p className="about-p">Every source below is open and credited, and the app works only from them.</p>
-          <ul className="about-sources">
-            {SOURCES.map((s) => (
-              <li key={s.name}>
-                <div className="about-sources__top">
-                  <h3>{s.name}</h3>
-                  <span className="about-lic">{s.licence}</span>
-                </div>
-                <p className="about-by">{s.by}</p>
-                <p>{s.used}</p>
-                {s.cleaned ? (
-                  <p className="about-clean">
-                    <strong>How we cleaned it: </strong>
-                    {s.cleaned}
-                  </p>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="about-sec" aria-labelledby="ab-alg">
-          <h2 id="ab-alg">How it works out the answers</h2>
-          <dl className="about-alg">
-            {ALGORITHMS.map(([k, v]) => (
-              <div key={k}>
-                <dt>{k}</dt>
-                <dd>{v}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-
-        <section className="about-sec" aria-labelledby="ab-chk">
-          <h2 id="ab-chk">How we checked it</h2>
-          <ul className="about-checks">
-            {CHECKS.map((c) => (
-              <li key={c}>{c}</li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="about-sec about-private" aria-labelledby="ab-priv">
-          <h2 id="ab-priv">Your privacy</h2>
-          <p className="about-p">
-            Everything is calculated on your device. Birth details and palm photos stay there. There are no accounts. The only thing
-            Vyomaphala counts is anonymous: which screens are opened and which buttons are tapped, through GoatCounter, with no cookies, no
-            names, no birth details and no ids. You can switch even that off in Settings. Backups are encrypted with a passphrase only you
-            know.
-          </p>
-        </section>
-
-        <p className="about-foot">
-          Questions about any of this? <Link to="/guide">Read the plain-English guide</Link>
+      </Fold>
+      <Fold title="How it works out the answers" sub="The method behind each screen">
+        <dl className="about-alg">
+          {ALGORITHMS.map(([k, v]) => (
+            <div key={k}>
+              <dt>{k}</dt>
+              <dd>{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </Fold>
+      <Fold title="How we checked it" sub="Against the professional references">
+        <ul className="v-ticks">
+          {CHECKS.map((c) => (
+            <li key={c}>{c}</li>
+          ))}
+        </ul>
+      </Fold>
+      <Fold title="Licences" sub="Who made each source and how it may be used">
+        <ul className="about-lics">
+          {SOURCES.map((s) => (
+            <li key={s.name}>
+              <span>
+                <b>{s.name}</b>
+                <span className="about-by">{s.by}</span>
+              </span>
+              <span className="v-chip">{s.licence}</span>
+            </li>
+          ))}
+        </ul>
+      </Fold>
+      <Fold title="Your privacy" sub="Everything is calculated on your device">
+        <p>
+          Everything is calculated on your device. Birth details and palm photos stay there. There are no accounts. The only thing
+          Vyomaphala counts is anonymous: which screens are opened and which buttons are tapped, through GoatCounter, with no cookies, no
+          names, no birth details and no ids. You can switch even that off in Settings. Backups are encrypted with a passphrase only you
+          know.
         </p>
-      </article>
-    </Screen>
+      </Fold>
+
+      <p className="v-foot about-foot">
+        Questions about any of this?{" "}
+        <Link to="/guide" className="v-link">
+          Read the plain-English guide <ChevronRight size={16} />
+        </Link>
+      </p>
+    </Page>
   );
 }

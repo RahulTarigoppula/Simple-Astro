@@ -1,9 +1,10 @@
-// Aṣṭakavarga: the Sarvāṣṭakavarga drawn on the Rāśi-chart geometry (numbers in place of grahas),
-// the Bhinnāṣṭakavarga matrix (rows grahas, columns signs from Meṣa) and 2-3 cited readings.
+// Strength points (Aṣṭakavarga): the Sarvāṣṭakavarga drawn on the birth-chart geometry (numbers in
+// place of planets), the Bhinnāṣṭakavarga matrix (rows planets, columns signs from Meṣa) and 2-3
+// cited readings.
 import { useId, useMemo, useRef } from "react";
-import { TurmericBand } from "../../../components/ui/TurmericBand";
+import { InfoDot } from "../../../components/ui/Explain";
 import { useInkDraw } from "../../../components/ui/useInkDraw";
-import { GRAHA_ABBR_DEV, GRAHA_ABBR_LAT, GRAHA_ENGLISH, ORDINAL, SIGN_DEV, SIGN_NAMES } from "../../../data/tables/names";
+import { GRAHA_ENGLISH, ORDINAL, SIGN_DEV, SIGN_NAMES } from "../../../data/tables/names";
 import { AV_GRAHAS, ashtakavarga, ashtakavargaReadings, SAV_STRONG, TRANSIT_SMOOTH } from "../../../engine/ashtakavarga";
 import type { PatriCore } from "../../../engine/types";
 import { NORTH_ANCHOR, SOUTH_CELL, signInHouse, tilakPath } from "../geometry";
@@ -162,32 +163,31 @@ export function AshtakavargaSection({ patri, script, style, skipInk = false }: A
   const av = useMemo(() => ashtakavarga(patri), [patri]);
   const readings = useMemo(() => ashtakavargaReadings(av), [av]);
   const lagnaSign = av.lagnaSign;
-  const headId = useId();
   const sum = (a: readonly number[]) => a.reduce((x, y) => x + y, 0);
 
   return (
-    <section className="av" aria-labelledby={headId}>
-      <TurmericBand id={headId} dev="अष्टकवर्ग" title="Aṣṭakavarga · strength points" explain="ashtakavarga" meta="BPHS ch. 66" />
+    <section className="av" aria-label="Strength points (Aṣṭakavarga)">
+      <p className="pt-term">
+        Sanskrit: Aṣṭakavarga <InfoDot id="ashtakavarga" label="Aṣṭakavarga" /> · source BPHS ch. 66
+      </p>
 
-      <div className="figure">
-        <div className="chart-wrap av-wrap">
-          <SavChart sav={av.sav} lagnaSign={lagnaSign} style={style} script={script} skipInk={skipInk} />
-        </div>
+      <div className="chart-wrap av-wrap">
+        <SavChart sav={av.sav} lagnaSign={lagnaSign} style={style} script={script} skipInk={skipInk} />
       </div>
-      <p className="figcap">
-        Sarvāṣṭakavarga: the bindus of all seven grahas in each house ({sum(av.sav)} in all). A dot marks {SAV_STRONG} or more; the tilak
-        marks the Lagna in {SIGN_NAMES[lagnaSign]}.
+      <p className="pt-cap">
+        Points (bindus) from all seven planets in each house, {sum(av.sav)} in all (Sarvāṣṭakavarga). A dot marks {SAV_STRONG} or more; the
+        gold mark is the rising sign, {SIGN_NAMES[lagnaSign]}.
       </p>
 
       {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard-reachable (WCAG 2.1.1) */}
-      <div className="av-scroll" role="region" aria-label="Bhinnāṣṭakavarga bindus by graha and sign" tabIndex={0}>
+      <div className="av-scroll" role="region" aria-label="Bhinnāṣṭakavarga bindus by planet and sign" tabIndex={0}>
         <table className="ledger av-matrix">
           <caption className="vh">
-            Bhinnāṣṭakavarga: bindus each graha receives in each sign, from Meṣa; four or more are marked with a dot
+            Bhinnāṣṭakavarga: bindus each planet receives in each sign, from Meṣa; four or more are marked with a dot
           </caption>
           <thead>
             <tr>
-              <th scope="col">Graha</th>
+              <th scope="col">Planet</th>
               {SHORT.map((s, i) => (
                 <th key={s} scope="col" className={i === lagnaSign ? "is-lagna" : undefined}>
                   <abbr title={SIGN_NAMES[i]}>{s}</abbr>
@@ -205,13 +205,7 @@ export function AshtakavargaSection({ patri, script, style, skipInk = false }: A
           <tbody>
             {AV_GRAHAS.map((g) => (
               <tr key={g}>
-                <th scope="row">
-                  <span lang="hi" className="dev" aria-hidden="true">
-                    {GRAHA_ABBR_DEV[g]}
-                  </span>{" "}
-                  <span aria-hidden="true">{GRAHA_ABBR_LAT[g]}</span>
-                  <span className="vh">{GRAHA_ENGLISH[g]}</span>
-                </th>
+                <th scope="row">{GRAHA_ENGLISH[g]}</th>
                 {av.bav[g].map((n, s) => (
                   <td key={SHORT[s]} className={`num${n >= TRANSIT_SMOOTH ? " is-four" : ""}`}>
                     {n}
@@ -229,7 +223,7 @@ export function AshtakavargaSection({ patri, script, style, skipInk = false }: A
           </tbody>
           <tfoot>
             <tr>
-              <th scope="row">SAV</th>
+              <th scope="row">All</th>
               {av.sav.map((n, s) => (
                 <td key={SHORT[s]} className="num av-sav">
                   {n}
@@ -240,16 +234,16 @@ export function AshtakavargaSection({ patri, script, style, skipInk = false }: A
           </tfoot>
         </table>
       </div>
-      <p className="p p--muted av-legend">
-        <span className="av-dot" aria-hidden="true" /> {TRANSIT_SMOOTH} or more bindus: a sign tradition reads as smoother for that graha's
+      <p className="pt-cap av-legend">
+        <span className="av-dot" aria-hidden="true" /> {TRANSIT_SMOOTH} or more bindus: a sign tradition reads as smoother for that planet's
         transit.
       </p>
 
-      <div className="yoga av-readings">
+      <div className="av-readings">
         {readings.map((r) => (
           <div key={r.id} className="av-reading">
             <p>{r.text}</p>
-            <p className="src">
+            <p className="pt-src">
               {r.citation.text} {r.citation.ref}
             </p>
           </div>

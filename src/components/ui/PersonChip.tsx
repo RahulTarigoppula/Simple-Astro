@@ -78,7 +78,6 @@ export function PersonChip() {
           {profiles.length ? (
             <div className="v-people__list" role="radiogroup" aria-label="Choose a person">
               {profiles.map((p) => (
-                // biome-ignore lint/a11y/useSemanticElements: a radio row with two lines of text
                 <button
                   key={p.id}
                   type="button"

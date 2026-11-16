@@ -1,14 +1,18 @@
-// The ⋯ sheet for one leaf: open, edit, Partner Compatibility with…, palm, the wax envelope, and Burn (hold).
+// "More" for one person: the rare things. Palm reading, choosing a partner for a match, the
+// encrypted backup, and delete (a hold, with the person's name on the button).
 import { useState } from "react";
+import { Link } from "react-router";
+import { Row } from "../../components/ui/Page";
+import { birthLine } from "../../components/ui/PersonChip";
 import { envelopeFileName, exportEnvelope } from "../../data/crypto";
+import { nakBoth } from "../../data/regional";
 import { setMeta } from "../../data/repo";
 import type { Profile } from "../../engine/types";
 import { saveFile } from "../../platform/files";
 import { play } from "../../platform/sound";
 import { toast } from "../../state/ui";
 import { BurnHold } from "./BurnHold";
-import type { LeafTool } from "./Leaf";
-import { birthLine, leafMoon } from "./leafFacts";
+import { leafMoon } from "./leafFacts";
 
 export type SheetMode = "menu" | "milan" | "export";
 
@@ -18,11 +22,9 @@ interface LeafSheetProps {
   mode: SheetMode;
   ayanamsa: Parameters<typeof leafMoon>[1];
   setMode: (m: SheetMode) => void;
-  onOpen: () => void;
-  onTool: (t: LeafTool) => void;
+  onPalm: () => void;
   onPair: (other: Profile) => void;
   onBurn: () => void;
-  onBurnProgress: (k: number) => void;
   onClose: () => void;
 }
 
@@ -31,98 +33,72 @@ const MIN_PASS = 6;
 export function LeafSheet(props: LeafSheetProps) {
   const { profile, others, mode } = props;
   const name = profile.name || "Unnamed person";
-  const moon = leafMoon(profile, props.ayanamsa);
 
   return (
-    <div className="leafsheet">
-      <header className="leafsheet__head">
-        <h2 className="leafsheet__h">{name}</h2>
-        <p className="leafsheet__sub">
-          {moon ? (
-            <>
-              <span lang="hi" className="dev">
-                {moon.nakDev}
-              </span>{" "}
-              · {moon.nakName} · {birthLine(profile)}
-            </>
-          ) : (
-            birthLine(profile)
-          )}
-        </p>
+    <div className="ppl-sheet">
+      <header>
+        <h2 className="ppl-sheet__h">{mode === "milan" ? `Match ${name} with…` : mode === "export" ? "Encrypted backup" : name}</h2>
+        {mode === "menu" ? <p className="ppl-sheet__sub">{birthLine(profile)}</p> : null}
       </header>
 
       {mode === "menu" ? (
-        <ul className="leafsheet__list">
-          <li>
-            <button type="button" className="leafsheet__row" onClick={props.onOpen}>
-              Open the birth chart
-            </button>
-          </li>
-          <li>
-            <button type="button" className="leafsheet__row" onClick={() => props.onTool("edit")}>
-              Edit birth details
-            </button>
-          </li>
-          <li>
-            <button type="button" className="leafsheet__row" onClick={() => props.setMode("milan")}>
-              Partner Compatibility with…
-            </button>
-          </li>
-          <li>
-            <button type="button" className="leafsheet__row" onClick={() => props.onTool("palm")}>
-              Palm · <span lang="hi">हस्त रेखा</span>
-            </button>
-          </li>
-          <li>
-            <button type="button" className="leafsheet__row" onClick={() => props.setMode("export")}>
-              Create an encrypted backup
-            </button>
-          </li>
-          <li>
+        <>
+          <ul className="v-list">
+            <li>
+              <Row title="Palm reading" sub="From a photo of the hand" onClick={props.onPalm} />
+            </li>
+            <li>
+              <Row title="Match with…" sub="Choose the partner to compare with" onClick={() => props.setMode("milan")} />
+            </li>
+            <li>
+              <Row title="Back up" sub="An encrypted file with everyone saved here" onClick={() => props.setMode("export")} />
+            </li>
+          </ul>
+          <div className="ppl-sheet__danger">
             <BurnHold
-              className="leafsheet__row leafsheet__burn"
-              label="Hold to delete"
+              className="v-btn v-btn--danger v-btn--block"
+              label={`Hold to delete ${name}`}
               ariaLabel={`Delete ${name}, hold to delete them and their palm photos from this device`}
-              onProgress={props.onBurnProgress}
               onBurn={props.onBurn}
             />
-          </li>
-        </ul>
+            <p className="v-small v-muted">
+              Press and hold. This removes {name} and their palm photos from this device and cannot be undone.
+            </p>
+          </div>
+        </>
       ) : null}
 
       {mode === "milan" ? (
-        <div className="leafsheet__pick">
-          <p className="p p--muted">
-            First person: <b>{name}</b>. Choose their partner.
-          </p>
+        <>
           {others.length === 0 ? (
-            <p className="p">There is no one else saved yet. Add another person first.</p>
+            <>
+              <p>There is no one else saved yet. Add the partner first, then match the two.</p>
+              <Link to="/leaf/new" className="v-btn">
+                Add a person
+              </Link>
+            </>
           ) : (
-            <ul className="leafsheet__list">
+            <ul className="v-list">
               {others.map((o) => {
                 const m = leafMoon(o, props.ayanamsa);
                 return (
                   <li key={o.id}>
-                    <button type="button" className="leafsheet__row" onClick={() => props.onPair(o)}>
-                      {o.name}
-                      {m ? (
-                        <span className="leafsheet__muted">
-                          {" "}
-                          · <span lang="hi">{m.nakDev}</span> · {m.nakName}
-                        </span>
-                      ) : null}
-                    </button>
+                    <Row
+                      title={o.name}
+                      sub={m ? `Birth star ${nakBoth(m.nak, o.tradition)}` : birthLine(o)}
+                      onClick={() => props.onPair(o)}
+                    />
                   </li>
                 );
               })}
             </ul>
           )}
-          <p className="leafsheet__back">
-            <button type="button" className="linkish" onClick={() => props.setMode("menu")}>
-              ‹ Back
+          <div>
+            <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={() => props.setMode("menu")}>
+              Back
             </button>
-          </p>
-        </div>
+          </div>
+        </>
       ) : null}
 
       {mode === "export" ? <ExportForm onDone={props.onClose} onBack={() => props.setMode("menu")} /> : null}
@@ -161,42 +137,65 @@ function ExportForm({ onDone, onBack }: { onDone: () => void; onBack: () => void
 
   return (
     <form
-      className="leafsheet__export"
+      className="ppl-sheet__form"
       onSubmit={(e) => {
         e.preventDefault();
         void seal();
       }}
     >
-      <p className="p p--muted">
+      <p className="v-muted">
         The backup holds every person, chart and palm photo, locked with your passphrase. Nothing is sent anywhere; the file is handed to
         you. If you forget the passphrase, nobody can open the file.
       </p>
-      <div className="field">
-        <label htmlFor="env-pass">Passphrase</label>
-        <input id="env-pass" type="password" autoComplete="new-password" value={pass} onChange={(e) => setPass(e.target.value)} />
+      <div className="v-field">
+        <label className="v-label" htmlFor="env-pass">
+          Passphrase
+        </label>
+        <input
+          id="env-pass"
+          className="v-input"
+          type="password"
+          autoComplete="new-password"
+          aria-describedby="env-pass-hint"
+          value={pass}
+          onChange={(e) => setPass(e.target.value)}
+        />
+        <span id="env-pass-hint" className={short ? "v-error" : "v-hint"} aria-live="polite">
+          At least {MIN_PASS} characters.
+        </span>
       </div>
-      <div className="field">
-        <label htmlFor="env-pass2">Again</label>
-        <input id="env-pass2" type="password" autoComplete="new-password" value={pass2} onChange={(e) => setPass2(e.target.value)} />
+      <div className="v-field">
+        <label className="v-label" htmlFor="env-pass2">
+          Passphrase again
+        </label>
+        <input
+          id="env-pass2"
+          className="v-input"
+          type="password"
+          autoComplete="new-password"
+          value={pass2}
+          onChange={(e) => setPass2(e.target.value)}
+        />
+        <span className="v-error" aria-live="polite">
+          {mismatch ? "The two passphrases differ." : ""}
+        </span>
       </div>
-      {short ? <div className="note-haldi">At least {MIN_PASS} characters.</div> : null}
-      {mismatch ? <div className="note-haldi">The two passphrases differ.</div> : null}
       {err ? (
-        <div className="note-lac" role="alert">
+        <p className="v-note v-note--care" role="alert">
           {err}
-        </div>
+        </p>
       ) : null}
       {busy ? (
-        <p className="p p--muted" role="status">
+        <p className="v-muted" role="status">
           Encrypting…
         </p>
       ) : null}
-      <div className="leafsheet__actions">
-        <button type="button" className="linkish" onClick={onBack}>
-          ‹ Back
+      <div className="v-actions">
+        <button type="button" className="v-btn v-btn--ghost" onClick={onBack}>
+          Back
         </button>
-        <button type="submit" className="stamp" disabled={!ok}>
-          <span>Create an encrypted backup</span>
+        <button type="submit" className="v-btn" disabled={!ok}>
+          Create the backup
         </button>
       </div>
     </form>

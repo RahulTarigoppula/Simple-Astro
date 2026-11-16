@@ -41,10 +41,10 @@ export function yearIn(ms: number, zone: string): number {
   return parts(ms, zone).y;
 }
 
-/** "12 OCT", for engraved strips. */
-export function fmtDayMonthEngraved(ms: number, zone: string): string {
+/** "12 Oct". */
+export function fmtDayMonth(ms: number, zone: string): string {
   const p = parts(ms, zone);
-  return `${p.d} ${(MON[p.m - 1] ?? "").toUpperCase()}`;
+  return `${p.d} ${MON[p.m - 1] ?? ""}`;
 }
 
 /** "2022-30" style span. */

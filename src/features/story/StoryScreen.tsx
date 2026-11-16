@@ -1,78 +1,77 @@
-// Roots: the history of Jyotiṣa, palmistry and numerology, through the
-// gods, the ṛṣis, the Greeks and the astronomers to the epilogue, played as full-screen stories.
+// Roots: the history of Jyotiṣa, palmistry and numerology, through the gods, the ṛṣis, the Greeks
+// and the astronomers to the epilogue. This page is the way in: start from the top, or pick a
+// chapter. The stories themselves play full-screen in the story player.
 import { useMemo, useState } from "react";
-import { Screen } from "../../components/ui/Screen";
+import { ChevronRight, Page, Section } from "../../components/ui/Page";
 import { StoryPlayer } from "../../components/ui/StoryPlayer";
 import { STORY } from "../../data/story";
+import { countEvent } from "../../platform/stats";
 import { StoryArt } from "./StoryArt";
-import { StoryRings } from "./StoryRings";
 import { chapterStart, rootsSlides } from "./storySlides";
 import "./story.css";
-import "./roots.css";
-import { countEvent } from "../../platform/stats";
 
 export default function StoryScreen() {
   const slides = useMemo(() => rootsSlides(), []);
   const [play, setPlay] = useState<number | null>(null);
   const minutes = Math.round((slides.length * 30) / 60);
+  const first = STORY[0]?.cards[0];
 
   return (
-    <Screen className="story" label="Roots: the story of the stars">
-      <header className="story-hero">
-        <p className="story-kicker">Roots · कथा</p>
-        <h1>The story of the stars</h1>
-        <p className="story-lede">
+    <Page label="Roots: the story of the stars" back="/explore" backLabel="Explore">
+      <section className="v-card v-card--hero story-hero" aria-labelledby="story-h">
+        {first ? (
+          <span className="story-hero__art" aria-hidden="true">
+            <StoryArt art={first.art} />
+          </span>
+        ) : null}
+        <p className="v-eyebrow">Roots</p>
+        <h1 id="story-h" className="v-title">
+          The story of the stars
+        </h1>
+        <p className="v-lede">
           Four thousand years of people looking up: gods and ṛṣis, Greeks and astronomers, palm-readers and number-mystics.
         </p>
-        <div className="story-hero__actions">
+        <div className="v-actions">
           <button
             type="button"
-            className="stamp story-play"
+            className="v-btn"
             onClick={() => {
               countEvent("roots-start");
               setPlay(0);
             }}
           >
-            <span>▶ Start the story</span>
+            Start the story
           </button>
-          <span className="story-hero__meta">
-            {slides.length} short stories · about {minutes} minutes · tap to move, hold to pause
-          </span>
         </div>
-      </header>
-
-      <section className="story-ringsec" aria-labelledby="rings-h">
-        <h2 id="rings-h" className="story-sub">
-          Jump to a chapter
-        </h2>
-        <StoryRings />
+        <p className="v-small v-muted">
+          {slides.length} short stories · about {minutes} minutes · tap to move, hold to pause
+        </p>
       </section>
 
-      <section className="story-toc" aria-labelledby="toc-h">
-        <h2 id="toc-h" className="story-sub">
-          Inside
-        </h2>
-        <ol>
-          {STORY.map((ch) => (
+      <Section title="Chapters" note="Start from any one" />
+      <ol className="v-list story-chapters">
+        {STORY.map((ch, i) => {
+          const [num = "", name] = ch.title.split("·").map((x) => x.trim());
+          return (
             <li key={ch.id}>
-              <button type="button" onClick={() => setPlay(chapterStart(ch.id))}>
-                <span className="story-toc__art" aria-hidden="true">
-                  {ch.cards[0] ? <StoryArt art={ch.cards[0].art} /> : null}
+              <button type="button" className="v-row" onClick={() => setPlay(chapterStart(ch.id))}>
+                <span className="v-row__icon v-row__icon--gold story-chapters__n" aria-hidden="true">
+                  {i + 1}
                 </span>
-                <span className="story-toc__text">
-                  <span className="story-toc__k">{ch.title.split("·")[0]?.trim()}</span>
-                  <span className="story-toc__t">{ch.title.split("·")[1]?.trim() ?? ch.title}</span>
-                  <span className="story-toc__s">{ch.cards.map((c) => c.title).join(" · ")}</span>
+                <span className="v-row__body">
+                  <span className="v-row__t">{name ? (num.length > 3 ? `${num}: ${name}` : name) : ch.title}</span>
+                  <span className="v-row__s">{ch.cards.map((c) => c.title).join(" · ")}</span>
                 </span>
+                <ChevronRight />
               </button>
             </li>
-          ))}
-        </ol>
-      </section>
+          );
+        })}
+      </ol>
 
       {play !== null ? (
         <StoryPlayer title="Roots: the story of the stars" slides={slides} start={play} onClose={() => setPlay(null)} />
       ) : null}
-    </Screen>
+    </Page>
   );
 }

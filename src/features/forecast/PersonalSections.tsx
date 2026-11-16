@@ -1,218 +1,192 @@
-// The personal half of a forecast: life areas, natal contacts, transit strength, the day's guide and
-// day-by-day notes, all read from the person's own chart.
+// The personal cards of a forecast: what the day is good for, its good hours, the Moon in one
+// sentence, and the life areas as compact meters that open to say why.
 import { InfoDot } from "../../components/ui/Explain";
-import { GrahaGlyph } from "../../components/ui/GrahaGlyph";
-import { GRAHA_LORE } from "../../data/lore";
+import { Section } from "../../components/ui/Page";
 import { type DayRating, HOUSE_AREA, ord } from "../../engine/forecast";
-import type { AreaReading, DayGuide, PersonalReading } from "../../engine/personal";
-import "./personal.css";
-import { safeZone } from "../../engine/time";
+import type { DayGuide, PersonalReading } from "../../engine/personal";
+import { MoonDisc } from "../home/MoonDisc";
+import { AREA_WORD, english, pct, STAR_LINE, span12, TARA_ENGLISH, t12, toneOf } from "./util";
 
-const fmt = (ms: number, zone: string, o: Intl.DateTimeFormatOptions) =>
-  new Intl.DateTimeFormat("en-GB", { ...o, timeZone: safeZone(zone) }).format(ms);
-const hm = (ms: number, zone: string) => fmt(ms, zone, { hour: "2-digit", minute: "2-digit", hour12: false });
-const toneOf = (s: number) => (s >= 0.35 ? "bright" : s >= 0 ? "steady" : s >= -0.35 ? "mixed" : "testing");
-const WORD = { bright: "Strong", steady: "Good", mixed: "Mixed", testing: "Go gently" } as const;
-/** Line icons for the life areas (24-grid, currentColor), the app's own icon language, not emoji. */
-const AREA_PATH: Record<AreaReading["id"], string> = {
-  career: "M4 8h16v11H4zM9 8V5.5h6V8M4 13h16",
-  money:
-    "M12 3.5a8.5 8.5 0 1 0 0 17a8.5 8.5 0 1 0 0-17zM14.5 9.5c-.5-1-1.4-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1.2 0-2.1-.5-2.6-1.5M12 6.5v1.5M12 16v1.5",
-  love: "M12 19s-7-4.3-7-9.2A3.8 3.8 0 0 1 12 7.6a3.8 3.8 0 0 1 7 2.2C19 14.7 12 19 12 19z",
-  health: "M5 19c8 0 13-5 14-14-9 1-14 6-14 14zM5 19l7-7",
-  mind: "M12 18c-4 0-7-2-8-5 3 0 5 1 8 5zM12 18c4 0 7-2 8-5-3 0-5 1-8 5zM12 18c-2-3-2-7 0-11 2 4 2 8 0 11z",
-  home: "M4 11.5 12 5l8 6.5M6.5 10v9h11v-9M10 19v-5h4v5",
-  luck: "M12 4l2.3 5 5.2.5-3.9 3.5 1.1 5.2L12 15.6 7.3 18.2l1.1-5.2L4.5 9.5l5.2-.5z",
-};
-function AreaIcon({ id }: { id: AreaReading["id"] }) {
+export function DoCards({ g }: { g: DayGuide }) {
   return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d={AREA_PATH[id]} />
-    </svg>
+    <div className="v-grid2 fc-do">
+      <section className="v-card" aria-labelledby="fc-good-h">
+        <h2 id="fc-good-h" className="fc-do__h fc-do__h--good">
+          Good for
+        </h2>
+        <ul>
+          {g.goodFor.map((x) => (
+            <li key={x}>{x}</li>
+          ))}
+        </ul>
+      </section>
+      <section className="v-card" aria-labelledby="fc-easy-h">
+        <h2 id="fc-easy-h" className="fc-do__h fc-do__h--easy">
+          Go easy on
+        </h2>
+        <ul>
+          {g.easyOn.map((x) => (
+            <li key={x}>{x}</li>
+          ))}
+        </ul>
+      </section>
+    </div>
   );
 }
 
-export function AreasCard({ r, name }: { r: PersonalReading; name: string }) {
-  return (
-    <section className="cosmic-card fc-areas" aria-labelledby="fc-areas-h">
-      <header className="cosmic-card__head">
-        <h2 id="fc-areas-h">
-          {name}'s life, area by area <InfoDot id="bhava" />
-          <span className="gloss">each read from the planets in your own houses and their aṣṭakavarga strength</span>
-        </h2>
-      </header>
-      <ul className="fc-areas__list">
-        {r.areas.map((a) => {
-          const t = toneOf(a.score);
-          return (
-            <li key={a.id} className={`fc-area fc-area--${t}`}>
-              <span className="fc-area__icon" aria-hidden="true">
-                <AreaIcon id={a.id} />
-              </span>
-              <div className="fc-area__body">
-                <div className="fc-area__top">
-                  <span className="fc-area__label">{a.label}</span>
-                  <span className="fc-area__word">{WORD[t]}</span>
-                </div>
-                <div className="fc-area__bar" role="img" aria-label={`${a.label}: ${WORD[t]}`}>
-                  <span style={{ width: `${Math.round(((a.score + 1) / 2) * 100)}%` }} />
-                </div>
-                <p className="fc-area__why">{a.why}</p>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-    </section>
-  );
+interface HoursProps {
+  g: DayGuide;
+  zone: string;
+  /** Sunrise and sunset of the day, for the daylight bar. */
+  sun: { riseMs: number; setMs: number } | null;
+  /** The present moment when the day shown is today, else null. */
+  now: number | null;
 }
 
-export function ContactsCard({ r }: { r: PersonalReading }) {
-  if (!r.contacts.length) return null;
+export function HoursCard({ g, zone, sun, now }: HoursProps) {
+  const span = sun ? Math.max(1, sun.setMs - sun.riseMs) : 1;
+  const at = (ms: number) => (sun ? Math.min(100, Math.max(0, ((ms - sun.riseMs) / span) * 100)) : 0);
+  const inAvoid = now !== null && now >= g.avoid[0] && now < g.avoid[1];
+  const inBest = now !== null ? g.bestHours.find((h) => now >= h.startMs && now < h.endMs) : undefined;
+  const nextBest = now !== null ? g.bestHours.find((h) => h.startMs > now) : undefined;
   return (
-    <section className="cosmic-card fc-contacts" aria-labelledby="fc-contacts-h">
-      <header className="cosmic-card__head">
-        <h2 id="fc-contacts-h">
-          Touching your birth chart <span className="gloss">planets in the sky now sitting on planets you were born with</span>
-        </h2>
-      </header>
-      <ul>
-        {r.contacts.slice(0, 5).map((c) => (
-          <li key={`${c.transit}-${c.natal}`}>
-            <span className="fc-contacts__pair" aria-hidden="true">
-              <GrahaGlyph id={c.transit} size={34} />
-              {c.natal === "LAGNA" ? <span className="cp-sign">Lg</span> : <GrahaGlyph id={c.natal} size={34} />}
-            </span>
-            <span>{c.text}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-export function StrengthCard({ r }: { r: PersonalReading }) {
-  return (
-    <section className="cosmic-card fc-strength" aria-labelledby="fc-strength-h">
-      <header className="cosmic-card__head">
-        <h2 id="fc-strength-h">
-          How well each planet travels for you <InfoDot id="ashtakavarga" />
-          <span className="gloss">points out of 8 your chart gives each planet in the sign it's crossing (BPHS ch. 66)</span>
-        </h2>
-      </header>
-      <ul className="fc-strength__grid">
-        {r.strength.map((s) => (
-          <li key={s.graha} className={s.bindus >= 5 ? "is-strong" : s.bindus <= 3 ? "is-weak" : undefined}>
-            <GrahaGlyph id={s.graha} size={32} />
-            <span className="fc-strength__n">{s.bindus}</span>
-            <span className="fc-strength__dots" aria-hidden="true">
-              {"●".repeat(s.bindus)}
-              <i>{"●".repeat(8 - s.bindus)}</i>
-            </span>
-            <span className="fc-strength__t">{GRAHA_LORE.find((g) => g.id === s.graha)?.english}</span>
-          </li>
-        ))}
-      </ul>
-      <p className="fc-strength__note">{[...r.strength].sort((a, b) => b.bindus - a.bindus)[0]?.text}</p>
-    </section>
-  );
-}
-
-export function DayGuideCard({ g, zone, name }: { g: DayGuide; zone: string; name: string }) {
-  const lord = GRAHA_LORE.find((x) => x.id === g.lord);
-  return (
-    <section className="cosmic-card fc-guide" aria-labelledby="fc-guide-h">
-      <header className="cosmic-card__head">
-        <h2 id="fc-guide-h">
-          {name}'s guide for today <span className="gloss">by tradition. Use what helps, ignore what doesn't.</span>
-        </h2>
-      </header>
-      <div className="fc-guide__grid">
-        <div className="fc-guide__box fc-guide__box--good">
-          <p className="fc-guide__k">Good for</p>
-          <ul>
-            {g.goodFor.map((x) => (
-              <li key={x}>{x}</li>
+    <section className="v-card fc-hours" aria-labelledby="fc-hours-h">
+      <h2 id="fc-hours-h" className="v-card__title">
+        Good times
+      </h2>
+      {now !== null ? (
+        <p className="fc-hours__now">
+          {inAvoid
+            ? `Right now: Rāhu Kāla. Hold new starts until ${t12(g.avoid[1], zone)}.`
+            : inBest
+              ? `Right now: a good hour (${english(inBest.lord)} hour), until ${t12(inBest.endMs, zone)}.`
+              : nextBest
+                ? `Next good hour starts at ${t12(nextBest.startMs, zone)}.`
+                : "The good hours of daylight are over for today."}
+        </p>
+      ) : null}
+      {sun ? (
+        <>
+          <div className="fc-daybar" aria-hidden="true">
+            {g.bestHours.map((h) => (
+              <span
+                key={h.startMs}
+                className="fc-daybar__good"
+                style={{ left: `${at(h.startMs)}%`, width: `${at(h.endMs) - at(h.startMs)}%` }}
+              />
             ))}
-          </ul>
-        </div>
-        <div className="fc-guide__box fc-guide__box--easy">
-          <p className="fc-guide__k">Go easy on</p>
-          <ul>
-            {g.easyOn.map((x) => (
-              <li key={x}>{x}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      <div className="fc-guide__row">
-        <span className="fc-guide__k">Best hours</span>
-        <InfoDot id="hora" />
-        <span className="fc-guide__hours">
-          {g.bestHours.length
-            ? g.bestHours.map((h) => (
-                <span key={h.startMs} className="fc-chip">
-                  <span className="mono">
-                    {hm(h.startMs, zone)}-{hm(h.endMs, zone)}
-                  </span>{" "}
-                  {GRAHA_LORE.find((x) => x.id === h.lord)?.english} hour
+            <span className="fc-daybar__avoid" style={{ left: `${at(g.avoid[0])}%`, width: `${at(g.avoid[1]) - at(g.avoid[0])}%` }} />
+            {now !== null && now >= sun.riseMs && now <= sun.setMs ? (
+              <span className="fc-daybar__now" style={{ left: `${at(now)}%` }} />
+            ) : null}
+          </div>
+          <div className="fc-daybar__ends" aria-hidden="true">
+            <span>Sunrise {t12(sun.riseMs, zone)}</span>
+            <span>Sunset {t12(sun.setMs, zone)}</span>
+          </div>
+        </>
+      ) : null}
+      <dl className="fc-hours__list">
+        <div>
+          <dt>
+            <i className="fc-dot fc-dot--good" aria-hidden="true" />
+            Best hours <InfoDot id="hora" />
+          </dt>
+          <dd>
+            {g.bestHours.length ? (
+              g.bestHours.map((h) => (
+                <span key={h.startMs} className="v-chip v-chip--good fc-chip">
+                  {span12(h.startMs, h.endMs, zone)} · {english(h.lord)} hour
                 </span>
               ))
-            : "none outside Rāhu Kāla today"}
-        </span>
-      </div>
-      <div className="fc-guide__row">
-        <span className="fc-guide__k">Rāhu Kāla, pause new starts</span>
-        <InfoDot id="rahu-kala" />
-        <span className="fc-chip fc-chip--warn mono">
-          {hm(g.avoid[0], zone)}-{hm(g.avoid[1], zone)}
-        </span>
-      </div>
-      <div className="fc-guide__row">
-        <span className="fc-guide__k">Colour of the day</span>
-        <span className="fc-chip">
-          {g.colour} · {lord?.english}'s day
-        </span>
+            ) : (
+              <span className="v-muted">None outside Rāhu Kāla today.</span>
+            )}
+          </dd>
+        </div>
+        <div>
+          <dt>
+            <i className="fc-dot fc-dot--care" aria-hidden="true" />
+            Pause new starts <InfoDot id="rahu-kala" label="Rāhu Kāla" />
+          </dt>
+          <dd>
+            <span className="v-chip v-chip--care fc-chip">{span12(g.avoid[0], g.avoid[1], zone)} · Rāhu Kāla</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Colour of the day</dt>
+          <dd>
+            <span className="v-chip fc-chip">
+              {g.colour} · {english(g.lord)}'s day
+            </span>
+          </dd>
+        </div>
+      </dl>
+    </section>
+  );
+}
+
+export function MoonCard({ step, elongation }: { step: DayRating; elongation: number | null }) {
+  const taraWord = TARA_ENGLISH[step.tara];
+  return (
+    <section className="v-card fc-moon" aria-labelledby="fc-moon-h">
+      {elongation !== null ? <MoonDisc elongation={elongation} size={52} /> : null}
+      <div className="fc-moon__body">
+        <h2 id="fc-moon-h" className="v-card__title">
+          The Moon today
+        </h2>
+        <p>
+          The mood turns toward {HOUSE_AREA[step.moonHouse]}. {STAR_LINE[step.taraTone]}
+        </p>
+        <p className="v-small v-muted fc-moon__fine">
+          Moon in your {ord(step.moonHouse)} house from your Moon sign <InfoDot id="chandra-bala" /> · {step.tara} star
+          {taraWord ? ` (${taraWord})` : ""} <InfoDot id="tara-bala" />
+        </p>
       </div>
     </section>
   );
 }
 
-export function DayNotes({ steps, zone }: { steps: DayRating[]; zone: string }) {
+/** Life areas, best first: a meter each; opening one gives the reason and what suits it. */
+export function AreasCard({ r, title, split }: { r: PersonalReading; title: string; split?: boolean }) {
+  const sorted = [...r.areas].sort((a, b) => b.score - a.score);
   return (
-    <section className="cosmic-card fc-notes" aria-labelledby="fc-notes-h">
-      <header className="cosmic-card__head">
-        <h2 id="fc-notes-h">
-          Day by day <span className="gloss">where the Moon walks in your chart, and the star it brings</span>
-        </h2>
-      </header>
-      <ol>
-        {steps.map((s) => {
-          const t = toneOf(s.score);
+    <div className="v-stack fc-areas-wrap">
+      <Section
+        title={
+          <>
+            {title} <InfoDot id="bhava" />
+          </>
+        }
+        note="Tap an area to see why."
+      />
+      <ul className={`fc-areas${split ? " fc-areas--split" : ""}`}>
+        {sorted.map((a) => {
+          const t = toneOf(a.score);
           return (
-            <li key={s.ms} className={`fc-note fc-note--${t}`}>
-              <span className="fc-note__d">
-                <strong>{fmt(s.ms + 43_200_000, zone, { weekday: "short" })}</strong>
-                <span>{fmt(s.ms + 43_200_000, zone, { day: "numeric", month: "short" })}</span>
-              </span>
-              <span className="fc-note__t">
-                <span className="fc-note__w">{WORD[t]}</span> · Moon in your {ord(s.moonHouse)}: {HOUSE_AREA[s.moonHouse]}; {s.tara} star (
-                {s.taraTone === "kind" ? "kind" : s.taraTone === "unkind" ? "unkind" : "your own"})
-              </span>
+            <li key={a.id} data-tone={t}>
+              <details>
+                <summary>
+                  <span className="fc-areas__l">{a.label}</span>
+                  <span className="fc-areas__w">{AREA_WORD[t]}</span>
+                  <span className="v-meter" aria-hidden="true">
+                    <span style={{ width: `${Math.max(6, pct(a.score))}%` }} />
+                  </span>
+                </summary>
+                <div className="fc-areas__more">
+                  <p>
+                    <strong>Good for:</strong> {a.good}.
+                  </p>
+                  <p>
+                    <strong>Go easy on:</strong> {a.easy}.
+                  </p>
+                  {a.why ? <p className="v-small v-muted">Why: {a.why}</p> : null}
+                </div>
+              </details>
             </li>
           );
         })}
-      </ol>
-    </section>
+      </ul>
+    </div>
   );
 }

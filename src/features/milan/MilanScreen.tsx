@@ -1,17 +1,17 @@
-// Guna Milan (§4.9): two small scrolls tied with a mauli thread, the score, and the 36-bead mala.
+// Partner match: choose two people, read the answer first (BondCard), and keep the astrology in folds:
+// the 36-point Guna Milan, the South Indian Porutham, the school notes and how it was calculated.
 // Every bead, number and word of judgement here is milan()'s output, nothing is typed in.
-import { motion } from "motion/react";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
-import { useWide } from "../../app/useWide";
-import { Colophon, DISCLAIMER } from "../../components/ui/Colophon";
-import { Screen } from "../../components/ui/Screen";
+import { DISCLAIMER } from "../../components/ui/Colophon";
+import { InfoDot } from "../../components/ui/Explain";
+import { Page, Section } from "../../components/ui/Page";
+import { Avatar, birthLine } from "../../components/ui/PersonChip";
 import { Sheet } from "../../components/ui/Sheet";
-import { TurmericBand } from "../../components/ui/TurmericBand";
 import { glossary } from "../../data/glossary";
 import { nakBoth, rashiBoth } from "../../data/regional";
-import { NAKSHATRA_DEV, SIGN_DEV, SIGN_MARK, SIGN_NAMES } from "../../data/tables/names";
+import { NAKSHATRA_DEV, SIGN_DEV } from "../../data/tables/names";
 import { milan } from "../../engine/ashtakoota";
 import { AYANAMSA_LABEL } from "../../engine/ayanamsa";
 import { MANGLIK_CANCELLATIONS, MANGLIK_REF_LABEL } from "../../engine/manglik";
@@ -26,14 +26,27 @@ import {
   type SignIdx,
 } from "../../engine/types";
 import { haptics } from "../../platform/haptics";
-import { play } from "../../platform/sound";
 import { toast } from "../../state/ui";
+import { IconMilan } from "../chowki/icons";
 import { type ChartBody, KundliChart } from "../patri/KundliChart";
+import { BondCard } from "./BondCard";
 import { Mala } from "./Mala";
 import { PoruthamThread } from "./PoruthamThread";
-import { becauseBody, doshaLine, exceptionLine, fmtPts, RULE_TEXT, SCHOOL_LABEL, SCHOOL_NOTE, summaryText, WEIGHS } from "./rules";
+import {
+  BAND_LABEL,
+  becauseBody,
+  doshaLine,
+  exceptionLine,
+  fmtPts,
+  HAS_EXCEPTION,
+  KOOTA_GLOSS,
+  RULE_TEXT,
+  SCHOOL_LABEL,
+  SCHOOL_NOTE,
+  summaryText,
+  WEIGHS,
+} from "./rules";
 import "./milan.css";
-import { BondCard } from "./BondCard";
 
 const VERDICT: Record<string, string> = {
   "not-recommended": "tradition does not recommend this match",
@@ -50,7 +63,7 @@ interface MoonFacts {
 }
 const moonOfPatri = (p: Patri): MoonFacts => ({ nak: p.grahas.MO.nakshatra, pada: p.grahas.MO.pada, sign: p.grahas.MO.sign });
 
-/** "Manglik (from Lagna, Candra), bhaṅga noted" / "no Manglik mark". */
+/** "Manglik (Mars doṣa from Lagna, Candra)" / "not Manglik". */
 export function manglikLabel(m: ManglikStatus): string {
   if (!m.present) return "not Manglik";
   const from = m.from.map((f) => MANGLIK_REF_LABEL[f]).join(", ");
@@ -63,27 +76,39 @@ const bodiesOfPatri = (p: Patri): ChartBody[] =>
     return { id, sign: g.sign, degInSign: g.degInSign, retro: g.retrograde, nakshatra: g.nakshatra, pada: g.pada };
   });
 
-/** One leaf's Rāśi chart, static, the Moon lit; captioned with the Moon nakshatra and Manglik status. */
-function LeafChart({
-  who,
+/** A fold that stays out of the way; `lazy` content is mounted only once it is opened. */
+function Fold({ title, sub, lazy, children }: { title: string; sub?: React.ReactNode; lazy?: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <details className="v-fold" open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
+      <summary>
+        <span>
+          {title}
+          {sub ? <span className="v-fold__s">{sub}</span> : null}
+        </span>
+      </summary>
+      {!lazy || open ? <div className="v-fold__body">{children}</div> : null}
+    </details>
+  );
+}
+
+/** One person's Rāśi chart, static, the Moon lit; captioned with the Moon's star and sign. */
+function PersonChart({
   profile,
   patri,
-  manglik,
   style,
   script,
 }: {
-  who: string;
   profile: Profile;
   patri: Patri;
-  manglik: ManglikStatus | null;
   style: "north" | "south";
   script: "devanagari" | "latin";
 }) {
   const bodies = useMemo(() => bodiesOfPatri(patri), [patri]);
   const m = moonOfPatri(patri);
   return (
-    <figure className="milan-chart">
-      <div className="milan-chart__frame">
+    <figure className="mm-chart">
+      <div className="mm-chart__frame">
         <KundliChart
           title=""
           style={style}
@@ -95,201 +120,60 @@ function LeafChart({
           static
         />
       </div>
-      <figcaption className="milan-chart__cap">
-        <span className="milan-chart__who">
-          {who} · <b>{profile.name}</b> · Rāśi chart, Moon lit
+      <figcaption>
+        <b>{profile.name}</b>
+        <span className="v-small v-muted">
+          Moon in {nakBoth(m.nak, profile.tradition)} pada {m.pada} · {rashiBoth(m.sign, profile.tradition)}
         </span>
-        <span>
-          Moon in{" "}
-          <span lang="hi" className="dev">
-            {NAKSHATRA_DEV[m.nak]}
-          </span>{" "}
-          {nakBoth(m.nak, profile.tradition)} pada {m.pada} · {rashiBoth(m.sign, profile.tradition)}
-        </span>
-        <span className={`milan-chart__mk${manglik?.present ? " is-present" : ""}`}>{manglik ? manglikLabel(manglik) : "-"}</span>
       </figcaption>
     </figure>
   );
 }
 
-function ManglikMarks({ m, onOpen }: { m: ManglikStatus; onOpen: () => void }) {
-  const cancelled = m.cancellations.length > 0;
+function Slot({ who, person, onChoose }: { who: string; person: Profile | null; onChoose: () => void }) {
   return (
-    <button type="button" className="mk" onClick={onOpen} aria-haspopup="dialog">
-      {m.present ? (
-        <>
-          <span className="mk__dabs" aria-hidden="true">
-            {m.from.map((f) => (
-              <span key={f} className="mk__dab" />
-            ))}
-          </span>
-          <span className="vh">Manglik from {m.from.map((f) => MANGLIK_REF_LABEL[f]).join(", ")}</span>
-          <span aria-hidden="true">Mars doṣa</span>
-          {cancelled ? <span className="mk__muted">cancelled</span> : null}
-        </>
+    <button
+      type="button"
+      className={`mm-slot${person ? "" : " is-empty"}`}
+      aria-haspopup="dialog"
+      aria-label={person ? `${who}: ${person.name}. Change` : `${who}: choose a person`}
+      onClick={onChoose}
+    >
+      <span className="mm-slot__who">{who}</span>
+      {person ? (
+        <Avatar name={person.name} size={44} />
       ) : (
-        <span className="mk__muted">no Mars doṣa</span>
+        <span className="mm-slot__plus" aria-hidden="true">
+          +
+        </span>
       )}
+      <span className="mm-slot__name">{person ? person.name : "Choose"}</span>
+      <span className="mm-slot__change">{person ? "Change" : "Tap to pick"}</span>
     </button>
   );
 }
 
-function ScrollFace({
-  who,
-  profile,
-  moon,
-  manglik,
-  onManglik,
-}: {
-  who: string;
-  profile: Profile;
-  moon: MoonFacts | null;
-  manglik: ManglikStatus | null;
-  onManglik: () => void;
-}) {
+function SwapIcon() {
   return (
-    <div className="pair__scroll mscroll">
-      <span className="mscroll__who">{who}</span>
-      <b>{profile.name}</b>
-      {moon ? (
-        <span className="mscroll__moon">
-          <span className="mscroll__sign" title={`Moon sign ${SIGN_NAMES[moon.sign]}`}>
-            {SIGN_MARK[moon.sign]}
-          </span>
-          <span lang="hi" className="dev">
-            {NAKSHATRA_DEV[moon.nak]}
-          </span>
-        </span>
-      ) : (
-        <span className="mscroll__moon mk__muted">casting…</span>
-      )}
-      {moon ? (
-        <span className="mscroll__lat">
-          {nakBoth(moon.nak, profile.tradition)} {moon.pada} · {rashiBoth(moon.sign, profile.tradition)}
-        </span>
-      ) : null}
-      {manglik ? <ManglikMarks m={manglik} onOpen={onManglik} /> : null}
-    </div>
-  );
-}
-
-function MauliKnot() {
-  return (
-    <svg className="mauli-knot" viewBox="0 0 64 28" aria-hidden="true" data-decorative="true">
-      <path className="mauli-knot__t" d="M0 14 C 14 8, 22 20, 32 14 S 50 8, 64 14" />
-      <path className="mauli-knot__tw" d="M0 14 C 14 8, 22 20, 32 14 S 50 8, 64 14" />
-      <ellipse cx="27" cy="11" rx="6" ry="3.4" transform="rotate(-30 27 11)" className="mauli-knot__loop" />
-      <ellipse cx="37" cy="11" rx="6" ry="3.4" transform="rotate(30 37 11)" className="mauli-knot__loop" />
-      <circle cx="32" cy="14" r="3.4" className="mauli-knot__core" />
-      <path className="mauli-knot__t" d="M31 16 q -3 7 -7 10 M33 16 q 3 7 8 9" />
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M7 7h12l-3-3M17 17H5l3 3" />
     </svg>
   );
 }
 
-/** The picker: the first leaf is laid down, the second is dragged (or tapped) in from the bundle. */
-function Picker({
-  first,
-  profiles,
-  onPick,
-  onFirst,
-}: {
-  first: Profile | null;
-  profiles: Profile[];
-  onPick: (p: Profile) => void;
-  onFirst: (p: Profile) => void;
-}) {
-  const drop = useRef<HTMLDivElement>(null);
-  const [over, setOver] = useState(false);
-  const others = profiles.filter((p) => p.id !== first?.id);
-  const inDrop = (x: number, y: number): boolean => {
-    const r = drop.current?.getBoundingClientRect();
-    return !!r && x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
-  };
-  return (
-    <>
-      <div className="pair">
-        {first ? (
-          <div className="pair__scroll mscroll">
-            <span className="mscroll__who">first person</span>
-            <b>{first.name}</b>
-          </div>
-        ) : (
-          <div className="pair__scroll pair__scroll--empty mscroll">No one yet</div>
-        )}
-        <MauliKnot />
-        <div ref={drop} className={`pair__scroll pair__scroll--empty mscroll mscroll--drop${over ? " is-over" : ""}`}>
-          Tap a person below
-        </div>
-      </div>
-      {profiles.length === 0 ? (
-        <p className="p">
-          No one saved yet.{" "}
-          <Link className="linkish" to="/leaf/new">
-            Add the first person
-          </Link>
-        </p>
-      ) : others.length === 0 ? (
-        <p className="p">
-          Only one person is saved. Add their partner too.{" "}
-          <Link className="linkish" to="/leaf/new">
-            Add a second person
-          </Link>
-        </p>
-      ) : (
-        <>
-          <p className="p p--muted">Tap the second person, or drag them onto the dotted card.</p>
-          <ul className="milan-pick">
-            {others.map((p) => (
-              <li key={p.id}>
-                <motion.button
-                  type="button"
-                  className="milan-pick__leaf"
-                  drag
-                  dragSnapToOrigin
-                  dragMomentum={false}
-                  whileDrag={{ scale: 1.03, zIndex: 5 }}
-                  onDrag={(e) => {
-                    const pe = e as PointerEvent;
-                    if ("clientX" in pe) setOver(inDrop(pe.clientX, pe.clientY));
-                  }}
-                  onDragEnd={(e) => {
-                    setOver(false);
-                    const pe = e as PointerEvent;
-                    if ("clientX" in pe && inDrop(pe.clientX, pe.clientY)) onPick(p);
-                  }}
-                  onClick={() => onPick(p)}
-                  aria-label={`Check ${p.name} with ${first?.name ?? "the first person"} as the second person`}
-                >
-                  <span className="leaf__hole" aria-hidden="true" />
-                  {p.name}
-                </motion.button>
-              </li>
-            ))}
-          </ul>
-          {profiles.length > 2 ? (
-            <details className="milan-first">
-              <summary>Change the first person</summary>
-              <ul className="milan-pick">
-                {profiles.map((p) => (
-                  <li key={p.id}>
-                    <button type="button" className="milan-pick__leaf" onClick={() => onFirst(p)} aria-pressed={p.id === first?.id}>
-                      <span className="leaf__hole" aria-hidden="true" />
-                      {p.name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </details>
-          ) : null}
-        </>
-      )}
-    </>
-  );
-}
+type SheetState = { kind: "koota"; k: KootaResult } | { kind: "porutham"; p: PoruthamResult } | { kind: "pick"; side: "a" | "b" } | null;
 
-type SheetState = { kind: "koota"; k: KootaResult } | { kind: "manglik"; side: "a" | "b" } | { kind: "porutham"; p: PoruthamResult } | null;
-
-/** Keyed by the pair, so a new pair (or a swap) starts a fresh count and closes any sheet. */
+/** Keyed by the pair, so a new pair (or a swap) starts fresh and closes any sheet. */
 export default function MilanRoute() {
   const { a, b } = useParams();
   return <MilanScreen key={`${a ?? ""}|${b ?? ""}`} />;
@@ -302,14 +186,15 @@ function MilanScreen() {
   const settings = useSettings();
   const navigate = useNavigate();
   const [sheet, setSheet] = useState<SheetState>(null);
-  const [firstPick, setFirstPick] = useState<string | null>(null);
+  const [pick, setPick] = useState<{ a: string | null; b: string | null }>({ a: null, b: null });
 
   const pa = profiles?.find((p) => p.id === a) ?? null;
   const pb = profiles?.find((p) => p.id === b) ?? null;
-  const A = usePatri(pa, settings.preset);
-  const B = usePatri(pb, settings.preset);
-  const patA = A.patri && pa && A.patri.profileId === pa.id ? A.patri : null;
-  const patB = B.patri && pb && B.patri.profileId === pb.id ? B.patri : null;
+  const matched = !!pa && !!pb && pa.id !== pb.id;
+  const A = usePatri(matched ? pa : null, settings.preset);
+  const B = usePatri(matched ? pb : null, settings.preset);
+  const patA = A.patri && matched && A.patri.profileId === pa.id ? A.patri : null;
+  const patB = B.patri && matched && B.patri.profileId === pb.id ? B.patri : null;
 
   const result = useMemo<{ r: MilanResult | null; err: string | null }>(() => {
     if (!pa || !pb || !patA || !patB) return { r: null, err: null };
@@ -323,22 +208,41 @@ function MilanScreen() {
     }
   }, [pa, pb, patA, patB, settings.bhakootCancellation, settings.ashtakootaSchool]);
   const r = result.r;
-
-  const swap = () => {
-    if (!a || !b) return;
-    play("snap", 0.6);
-    haptics.selection();
-    navigate(`/milan/${b}/${a}`, { replace: true });
-  };
+  const poruthamList = useMemo(() => (r?.porutham ?? []).filter(isPoruthamResult), [r]);
 
   const loading = profiles === undefined;
-  const picking = !loading && (!pa || !pb || pa.id === pb.id);
-  const first = pa ?? profiles?.find((p) => p.id === firstPick) ?? active ?? null;
+  const list = profiles ?? [];
+  const byId = (id: string | null) => list.find((p) => p.id === id) ?? null;
+  // The two slots: the pair in the URL, else what was picked here, else a sensible start.
+  const slotA = matched ? pa : (byId(pick.a) ?? pa ?? active ?? list[0] ?? null);
+  const onlyOther = list.length === 2 ? (list.find((p) => p.id !== slotA?.id) ?? null) : null;
+  const slotB = matched ? pb : (byId(pick.b) ?? onlyOther);
+  const ready = !matched && !!slotA && !!slotB && slotA.id !== slotB.id;
+
+  const go = (x: Profile, y: Profile, replace: boolean) => navigate(`/milan/${x.id}/${y.id}`, { replace });
+  const swap = () => {
+    if (!slotA || !slotB) return;
+    haptics.selection();
+    if (matched) go(slotB, slotA, true);
+    else setPick({ a: slotB.id, b: slotA.id });
+  };
+  const choose = (side: "a" | "b", p: Profile) => {
+    const other = side === "a" ? slotB : slotA;
+    const mine = side === "a" ? slotA : slotB;
+    // Choosing the person who is already on the other side trades places.
+    const nextOther = other?.id === p.id ? mine : other;
+    const nextA = side === "a" ? p : nextOther;
+    const nextB = side === "a" ? nextOther : p;
+    haptics.selection();
+    // A new pair is a new screen (the route is keyed by the pair), so the sheet goes with the old one.
+    if (nextA && nextB && nextA.id !== nextB.id) return go(nextA, nextB, matched);
+    setSheet(null);
+    setPick({ a: nextA?.id ?? null, b: nextB?.id ?? null });
+  };
+
   const ma = patA ? moonOfPatri(patA) : null;
   const mb = patB ? moonOfPatri(patB) : null;
   const err = result.err ?? A.error?.message ?? B.error?.message ?? null;
-  const wide = useWide();
-  const poruthamList = useMemo(() => (r?.porutham ?? []).filter(isPoruthamResult), [r]);
 
   const copySummary = async () => {
     if (!r || !pa || !pb) return;
@@ -359,169 +263,198 @@ function MilanScreen() {
     }
   };
 
+  const flagged = r ? r.kootas.filter((k) => k.dosha) : [];
+
   return (
-    <Screen className="milan" scroll label="Partner Compatibility">
-      <article className="paper paper--cut sheet-col milan__sheet" aria-labelledby="milan-h">
-        <TurmericBand id="milan-h" level={1} dev="गुण मिलान" title="Partner Compatibility" meta="aṣṭakūṭa" explain="guna-milan" />
+    <Page
+      label="Partner Compatibility"
+      title="Partner match"
+      lede={matched ? undefined : "How two people fit, read the traditional way from their two Moons."}
+      wide={matched}
+    >
+      {loading ? null : (
+        <>
+          {a && !matched ? (
+            <div className="v-note v-note--warn">
+              {pa && pb
+                ? "A match needs two different people. Choose the second person."
+                : "That person is no longer saved. Choose two people."}
+            </div>
+          ) : null}
 
-        {loading ? null : picking ? (
-          <>
-            {a && !pa ? <div className="note-haldi">That person is no longer saved. Choose two people.</div> : null}
-            <Picker
-              first={first}
-              profiles={profiles ?? []}
-              onPick={(p) => {
-                if (!first) return;
-                play("bead");
-                haptics.selection();
-                navigate(`/milan/${first.id}/${p.id}`);
-              }}
-              onFirst={(p) => {
-                if (a) navigate("/milan", { replace: true });
-                setFirstPick(p.id);
-              }}
-            />
-          </>
-        ) : pa && pb ? (
-          <>
-            <motion.div
-              className="pair milan__pair"
-              drag="x"
-              dragSnapToOrigin
-              dragElastic={0.2}
-              dragMomentum={false}
-              style={{ touchAction: "pan-y" }}
-              onDragEnd={(_, info) => {
-                if (Math.abs(info.offset.x) > 72) swap();
-              }}
-            >
-              <ScrollFace
-                who="first person"
-                profile={pa}
-                moon={ma}
-                manglik={r?.manglik.a ?? null}
-                onManglik={() => setSheet({ kind: "manglik", side: "a" })}
-              />
-              <MauliKnot />
-              <ScrollFace
-                who="second person"
-                profile={pb}
-                moon={mb}
-                manglik={r?.manglik.b ?? null}
-                onManglik={() => setSheet({ kind: "manglik", side: "b" })}
-              />
-            </motion.div>
-            <p className="milan__swap">
-              <button type="button" className="linkish" onClick={swap}>
-                ⇄ Swap first and second person
-              </button>
-            </p>
-
-            {r && patA && patB ? <BondCard r={r} pa={pa} pb={pb} patA={patA} patB={patB} /> : null}
-
-            <details className="astro-tech milan-tech" open={r ? undefined : true}>
-              <summary>
-                <span>
-                  Full detail (astro tech)
-                  <small>The 36-point Guna Milan, every factor and its rule, Porutham and Manglik</small>
-                </span>
-              </summary>
-              {wide && patA && patB ? (
-                <div className="milan-charts">
-                  <LeafChart
-                    who="first person"
-                    profile={pa}
-                    patri={patA}
-                    manglik={r?.manglik.a ?? null}
-                    style={settings.chartStyle}
-                    script={settings.chartScript}
-                  />
-                  <LeafChart
-                    who="second person"
-                    profile={pb}
-                    patri={patB}
-                    manglik={r?.manglik.b ?? null}
-                    style={settings.chartStyle}
-                    script={settings.chartScript}
-                  />
-                </div>
-              ) : null}
-
-              {err ? (
-                <div className="note-lac" role="alert">
-                  The mala would not count: {err}
-                </div>
-              ) : r ? (
-                <Mala
-                  key={`${r.a}|${r.b}|${r.presetHash}|${settings.bhakootCancellation}|${settings.ashtakootaSchool}`}
-                  result={r}
-                  onOpen={(k) => setSheet({ kind: "koota", k })}
-                />
-              ) : (
-                <p className="p p--muted" role="status">
-                  Casting both charts…
+          {list.length > 0 ? (
+            <section className="v-card mm-pair" aria-label="The two people">
+              <div className="mm-pair__row">
+                <Slot who="First person" person={slotA} onChoose={() => setSheet({ kind: "pick", side: "a" })} />
+                {list.length > 1 ? (
+                  <button type="button" className="v-iconbtn mm-pair__swap" onClick={swap} disabled={!slotA || !slotB}>
+                    <SwapIcon />
+                    <span className="vh">Swap first and second person</span>
+                  </button>
+                ) : (
+                  <span aria-hidden="true" />
+                )}
+                {list.length > 1 ? (
+                  <Slot who="Second person" person={slotB} onChoose={() => setSheet({ kind: "pick", side: "b" })} />
+                ) : (
+                  <Link to="/leaf/new" className="mm-slot is-empty">
+                    <span className="mm-slot__who">Second person</span>
+                    <span className="mm-slot__plus" aria-hidden="true">
+                      +
+                    </span>
+                    <span className="mm-slot__name">Add a person</span>
+                    <span className="mm-slot__change">Birth date, time, place</span>
+                  </Link>
+                )}
+              </div>
+              {ready && slotA && slotB ? (
+                <button type="button" className="v-btn v-btn--block" onClick={() => go(slotA, slotB, false)}>
+                  See the match
+                </button>
+              ) : !matched && list.length > 1 ? (
+                <p className="v-small v-muted mm-pair__hint">
+                  Tap a card to choose each person. The match opens as soon as both are chosen.
                 </p>
-              )}
+              ) : null}
+            </section>
+          ) : null}
 
-              {r ? (
-                <div className="milan-verdict">
-                  <p className="milan-verdict__t">
-                    {pa.name} and {pb.name}: <strong>{r.total} of 36</strong>: {VERDICT[r.band]}.
-                    {r.kootas.some((k) => k.dosha)
-                      ? ` Tradition flags ${r.kootas
-                          .filter((k) => k.dosha)
-                          .map((k) => k.name)
-                          .join(" and ")}; tap a row to see why.`
+          {list.length < 2 ? (
+            <section className="v-card v-empty" aria-labelledby="mm-empty-h">
+              <span className="v-empty__art" aria-hidden="true">
+                <IconMilan size={30} />
+              </span>
+              <h2 id="mm-empty-h" className="v-card__title">
+                {list.length === 0 ? "A match needs two people" : "Add one more person"}
+              </h2>
+              <p>
+                {list.length === 0
+                  ? "No one is saved yet. Add two people with their birth date, time and place, and Vyomaphala will compare them."
+                  : `Only ${list[0]?.name ?? "one person"} is saved. Add their partner's birth date, time and place to see the match.`}
+              </p>
+              <ul className="v-ticks">
+                <li>One score out of 100, with the traditional 36 points</li>
+                <li>Understanding, companionship, trust, closeness and family, each in a line</li>
+                <li>What is strongest between you, and what to work on</li>
+              </ul>
+              <Link to="/leaf/new" className="v-btn">
+                Add a person
+              </Link>
+              <p className="v-small v-muted">About a minute each. Everything stays on this device.</p>
+            </section>
+          ) : null}
+
+          {matched ? (
+            err ? (
+              <div className="v-note v-note--care" role="alert">
+                The match could not be worked out: {err}
+              </div>
+            ) : r && patA && patB ? (
+              <>
+                <BondCard r={r} pa={pa} pb={pb} patA={patA} patB={patB} onCopy={() => void copySummary()} />
+
+                <Section title="Full detail" note="The astrology behind the answer. Open what you want to check." />
+
+                <Fold title="The 36-point score" sub={`Guna Milan: ${fmtPts(r.total)} of 36, ${BAND_LABEL[r.band]}`} lazy>
+                  <Mala result={r} onOpen={(k) => setSheet({ kind: "koota", k })} />
+                  <p>
+                    {pa.name} and {pb.name}: <strong>{fmtPts(r.total)} of 36</strong>: {VERDICT[r.band]}.
+                    {flagged.length
+                      ? ` Tradition flags ${flagged.map((k) => k.name).join(" and ")}; tap a test to see why.`
                       : " No factor is flagged."}
                   </p>
-                  <p className="milan-verdict__k">
+                  <p className="v-small v-muted">
                     A score is tradition's arithmetic on two Moons. It is not a verdict on two people. Karma, your own actions, decides the
                     rest.
                   </p>
-                </div>
-              ) : null}
+                </Fold>
 
-              {poruthamList.length > 0 ? (
-                <details className="milan-more">
-                  <summary>
-                    South Indian check · Porutham <span>{poruthamList.filter((p) => p.pass).length} of 10 agree</span>
-                  </summary>
-                  <PoruthamThread list={poruthamList} onOpen={(p) => setSheet({ kind: "porutham", p })} />
-                </details>
-              ) : null}
-            </details>
+                {poruthamList.length > 0 ? (
+                  <Fold title="South Indian check" sub={`Porutham: ${poruthamList.filter((p) => p.pass).length} of 10 agree`} lazy>
+                    <PoruthamThread list={poruthamList} onOpen={(p) => setSheet({ kind: "porutham", p })} />
+                  </Fold>
+                ) : null}
 
-            {r ? (
-              <p className="milan__share">
-                <button type="button" className="linkish" onClick={() => void copySummary()}>
-                  Copy summary
-                </button>
-              </p>
-            ) : null}
-          </>
-        ) : null}
+                <Fold title="Schools, exceptions and Manglik" sub="Where traditions differ, and what was applied">
+                  <dl className="mm-facts">
+                    <div>
+                      <dt>School</dt>
+                      <dd>
+                        {SCHOOL_LABEL[settings.ashtakootaSchool]}: {SCHOOL_NOTE[settings.ashtakootaSchool]}.
+                      </dd>
+                    </div>
+                    {r.kootas
+                      .filter((k) => HAS_EXCEPTION.has(k.id))
+                      .map((k) => {
+                        const exc = exceptionLine(k, r.kootas);
+                        return exc ? (
+                          <div key={k.id}>
+                            <dt>{k.name} exception</dt>
+                            <dd>
+                              {exc.text}
+                              {exc.source ? <span className="v-muted"> ({exc.source})</span> : null}
+                            </dd>
+                          </div>
+                        ) : null;
+                      })}
+                    <ManglikFact profile={pa} m={r.manglik.a} />
+                    <ManglikFact profile={pb} m={r.manglik.b} />
+                  </dl>
+                  <p className="v-small v-muted">
+                    Manglik is shown beside the score, never added to it. The school and the Bhakūṭa exception can be changed in{" "}
+                    <Link to="/drawer" className="mm-inline">
+                      Settings
+                    </Link>
+                    .
+                  </p>
+                </Fold>
 
-        <Colophon
-          rows={[
-            ["Method", "Aṣṭakūṭa from the two Moons' nakṣatra, pada and rāśi: eight kūṭas, 36 points"],
-            [
-              "School",
-              `${SCHOOL_LABEL[settings.ashtakootaSchool]} (Settings), after Muhūrta Cintāmaṇi ch. 6; ${SCHOOL_NOTE[settings.ashtakootaSchool]}; Varṇa, Vaśya and one Yoni cell follow it`,
-            ],
-            ["Sides", "first person in the first column of every table, second person in the second"],
-            [
-              "Bhakūṭa",
-              settings.bhakootCancellation
-                ? "the classical exception is applied (Settings)"
-                : "the classical exception is recorded, not applied (Settings)",
-            ],
-            ["Bands", "under 18 not recommended · 18-24½ acceptable · 25-32½ very good · 33-36 excellent"],
-            ["Ayanāṃśa", AYANAMSA_LABEL[settings.preset.ayanamsa]],
-          ]}
-        >
-          <p className="milan__school">A score is a tradition's arithmetic, not a verdict on two people.</p>
-        </Colophon>
-      </article>
+                <Fold title="Both birth charts" sub="Rāśi charts with the Moon lit" lazy>
+                  <div className="mm-charts">
+                    <PersonChart profile={pa} patri={patA} style={settings.chartStyle} script={settings.chartScript} />
+                    <PersonChart profile={pb} patri={patB} style={settings.chartStyle} script={settings.chartScript} />
+                  </div>
+                </Fold>
+
+                <Fold title="How this was calculated">
+                  <dl className="mm-facts">
+                    {(
+                      [
+                        ["Method", "Aṣṭakūṭa from the two Moons' nakṣatra, pada and rāśi: eight kūṭas, 36 points"],
+                        [
+                          "School",
+                          `${SCHOOL_LABEL[settings.ashtakootaSchool]} (Settings), after Muhūrta Cintāmaṇi ch. 6; ${SCHOOL_NOTE[settings.ashtakootaSchool]}; Varṇa, Vaśya and one Yoni cell follow it`,
+                        ],
+                        ["Sides", "first person in the first column of every table, second person in the second"],
+                        [
+                          "Bhakūṭa",
+                          settings.bhakootCancellation
+                            ? "the classical exception is applied (Settings)"
+                            : "the classical exception is recorded, not applied (Settings)",
+                        ],
+                        ["Bands", "under 18 not recommended · 18-24½ acceptable · 25-32½ very good · 33-36 excellent"],
+                        ["Ayanāṃśa", AYANAMSA_LABEL[settings.preset.ayanamsa]],
+                      ] as const
+                    ).map(([k, v]) => (
+                      <div key={k}>
+                        <dt>{k}</dt>
+                        <dd>{v}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <p className="v-small v-muted">A score is a tradition's arithmetic, not a verdict on two people.</p>
+                </Fold>
+              </>
+            ) : (
+              <div className="v-skel" role="status">
+                Reading both charts…
+              </div>
+            )
+          ) : null}
+
+          <p className="v-foot">{DISCLAIMER} All computation happened on this device. Nothing left it.</p>
+        </>
+      )}
 
       <Sheet
         open={sheet !== null}
@@ -531,43 +464,89 @@ function MilanScreen() {
             ? `${sheet.k.name}: the rule`
             : sheet?.kind === "porutham"
               ? `${sheet.p.name} porutham: the rule`
-              : "Manglik (Kuja doṣa)"
+              : sheet?.side === "a"
+                ? "Choose the first person"
+                : "Choose the second person"
         }
       >
+        {sheet?.kind === "pick" ? (
+          <div className="v-people">
+            <h2>{sheet.side === "a" ? "Who is the first person?" : "Who is the second person?"}</h2>
+            <div className="v-people__list" role="radiogroup" aria-label="Choose a person">
+              {list.map((p) => {
+                const on = p.id === (sheet.side === "a" ? slotA : slotB)?.id;
+                const other = p.id === (sheet.side === "a" ? slotB : slotA)?.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    className="v-people__one"
+                    onClick={() => choose(sheet.side, p)}
+                  >
+                    <Avatar name={p.name} size={40} />
+                    <span>
+                      <span className="t">{p.name}</span>
+                      <span className="s">
+                        {other ? `Now the ${sheet.side === "a" ? "second" : "first"} person. Choosing swaps the two.` : birthLine(p)}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <Link to="/leaf/new" className="v-btn v-btn--ghost v-btn--block">
+              + Add a person
+            </Link>
+          </div>
+        ) : null}
         {sheet?.kind === "koota" && pa && pb ? (
           <KootaSheet k={sheet.k} all={r?.kootas ?? []} pa={pa} pb={pb} ma={ma} mb={mb} onClose={() => setSheet(null)} />
         ) : null}
         {sheet?.kind === "porutham" && pa && pb ? (
           <PoruthamSheet p={sheet.p} pa={pa} pb={pb} ma={ma} mb={mb} onClose={() => setSheet(null)} />
         ) : null}
-        {sheet?.kind === "manglik" && r && pa && pb ? (
-          <ManglikSheet
-            profile={sheet.side === "a" ? pa : pb}
-            m={sheet.side === "a" ? r.manglik.a : r.manglik.b}
-            onClose={() => setSheet(null)}
-          />
-        ) : null}
       </Sheet>
-    </Screen>
+    </Page>
+  );
+}
+
+function ManglikFact({ profile, m }: { profile: Profile; m: ManglikStatus }) {
+  return (
+    <div>
+      <dt>Manglik: {profile.name}</dt>
+      <dd>
+        <b>{manglikLabel(m)}.</b>{" "}
+        {m.present
+          ? `Tradition says Maṅgala stands in the 1st, 2nd, 4th, 7th, 8th or 12th counted from ${m.from.map((f) => MANGLIK_REF_LABEL[f]).join(", ")}.`
+          : "Maṅgala stands in none of the 1st, 2nd, 4th, 7th, 8th or 12th from the Lagna, Candra or Śukra."}
+        {m.cancellations.length > 0 ? ` Cancelled by: ${m.cancellations.map((c) => MANGLIK_NAME.get(c) ?? c).join("; ")}.` : ""}
+        <span className="v-muted">
+          {" "}
+          ({m.citation.text}, {m.citation.ref})
+        </span>
+      </dd>
+    </div>
   );
 }
 
 function MoonLine({ who, p, m }: { who: string; p: Profile; m: MoonFacts | null }) {
   return (
-    <div className="row">
+    <div>
       <dt>{who}</dt>
       <dd>
         {p.name}:{" "}
         {m ? (
           <>
-            <span lang="hi" className="dev">
+            {nakBoth(m.nak, p.tradition)}{" "}
+            <span lang="hi" className="mm-dev">
               {NAKSHATRA_DEV[m.nak]}
             </span>{" "}
-            {nakBoth(m.nak, p.tradition)} pada {m.pada} · Moon in{" "}
-            <span lang="hi" className="dev">
+            pada {m.pada} · Moon in {rashiBoth(m.sign, p.tradition)}{" "}
+            <span lang="hi" className="mm-dev">
               {SIGN_DEV[m.sign]}
-            </span>{" "}
-            {rashiBoth(m.sign, p.tradition)}
+            </span>
           </>
         ) : (
           "-"
@@ -577,16 +556,13 @@ function MoonLine({ who, p, m }: { who: string; p: Profile; m: MoonFacts | null 
   );
 }
 
-const KOOTA_PLAIN: Record<KootaResult["id"], string> = {
-  varna: "varna",
-  vashya: "vashya",
-  tara: "tara",
-  yoni: "yoni",
-  maitri: "graha-maitri",
-  gana: "gana",
-  bhakoot: "bhakuta",
-  nadi: "nadi",
-};
+function SheetClose({ onClose }: { onClose: () => void }) {
+  return (
+    <button type="button" className="v-btn v-btn--ghost v-btn--block" onClick={onClose}>
+      Close
+    </button>
+  );
+}
 
 function KootaSheet({
   k,
@@ -606,55 +582,59 @@ function KootaSheet({
   onClose: () => void;
 }) {
   const exc = exceptionLine(k, all);
+  const g = glossary(KOOTA_GLOSS[k.id]);
   return (
-    <div className="kootasheet">
-      <h2 className="kootasheet__h">
-        <span lang="sa" className="dev">
+    <div className="mm-sheet">
+      <p className="v-eyebrow">
+        {k.name}{" "}
+        <span lang="sa" className="mm-dev">
           {k.nameDev}
         </span>{" "}
-        · {k.name}{" "}
-        <span className="kootasheet__score mono">
+        <InfoDot id={KOOTA_GLOSS[k.id]} label={k.name} />
+      </p>
+      <h2 className="mm-sheet__h">
+        <span>{g?.plain ?? k.name}</span>
+        <span className="v-chip v-chip--gold">
           {fmtPts(k.score)} / {k.max}
         </span>
       </h2>
-      <p className="p">{RULE_TEXT[k.id]}</p>
-      <p className="p kootasheet__plain">
+      <p>
         <strong>Simply put: </strong>
-        {glossary(KOOTA_PLAIN[k.id])?.short} {glossary(KOOTA_PLAIN[k.id])?.long}
+        {g?.short} {g?.long}
       </p>
-      <dl className="kootasheet__dl">
+      {k.dosha ? <p className="v-note v-note--care">{doshaLine(k)}</p> : null}
+      <dl className="mm-facts">
         <MoonLine who="First person" p={pa} m={ma} />
         <MoonLine who="Second person" p={pb} m={mb} />
-        <div className="row">
+        <div>
           <dt>Because</dt>
           <dd>{becauseBody(k)}</dd>
         </div>
-        <div className="row">
+        <div>
+          <dt>The rule</dt>
+          <dd>{RULE_TEXT[k.id]}</dd>
+        </div>
+        <div>
           <dt>Weighs</dt>
           <dd>Tradition weighs {WEIGHS[k.id]}.</dd>
         </div>
-        <div className="row">
+        {exc ? (
+          <div>
+            <dt>Exception</dt>
+            <dd>
+              {exc.text}
+              {exc.source ? <span className="v-muted"> · {exc.source}</span> : null}
+            </dd>
+          </div>
+        ) : null}
+        <div>
           <dt>Source</dt>
           <dd>
             {k.citation.text}, {k.citation.ref}
           </dd>
         </div>
-        {exc ? (
-          <div className="row">
-            <dt>Exception</dt>
-            <dd>
-              {exc.text}
-              {exc.source ? <span className="kootasheet__src"> · {exc.source}</span> : null}
-            </dd>
-          </div>
-        ) : null}
       </dl>
-      {k.dosha ? <p className="note-lac">{doshaLine(k)}</p> : null}
-      <p className="kootasheet__close">
-        <button type="button" className="linkish" onClick={onClose}>
-          Close
-        </button>
-      </p>
+      <SheetClose onClose={onClose} />
     </div>
   );
 }
@@ -675,74 +655,42 @@ function PoruthamSheet({
   onClose: () => void;
 }) {
   return (
-    <div className="kootasheet">
-      <h2 className="kootasheet__h">
-        <span lang="sa" className="dev">
+    <div className="mm-sheet">
+      <p className="v-eyebrow">
+        Porutham{" "}
+        <span lang="sa" className="mm-dev">
           {p.nameDev}
         </span>{" "}
-        · {p.name} porutham <span className={`kootasheet__score pstate${p.pass ? "" : " is-open"}`}>{p.pass ? "tied" : "open ×"}</span>
+        <InfoDot id="porutham" />
+      </p>
+      <h2 className="mm-sheet__h">
+        <span>{p.name}</span>
+        <span className={`v-chip ${p.pass ? "v-chip--good" : "v-chip--mixed"}`}>{p.pass ? "agrees" : "does not agree"}</span>
       </h2>
-      <p className="p">{p.rule}</p>
-      <dl className="kootasheet__dl">
+      <p>{p.rule}</p>
+      {p.pass ? null : <p className="v-note v-note--warn">Tradition says this check does not agree: {p.because}</p>}
+      <dl className="mm-facts">
         <MoonLine who="First person" p={pa} m={ma} />
         <MoonLine who="Second person" p={pb} m={mb} />
-        <div className="row">
+        <div>
           <dt>Because</dt>
           <dd>{p.because}</dd>
         </div>
-        <div className="row">
+        <div>
           <dt>Weighs</dt>
           <dd>
             Tradition weighs {p.weighs}.{p.weighty ? " Rajju and Vedha are the two the tradition weighs heaviest." : ""}
           </dd>
         </div>
-        <div className="row">
+        <div>
           <dt>Source</dt>
           <dd>
             {p.citation.text}, {p.citation.ref}
           </dd>
         </div>
       </dl>
-      {p.pass ? null : <p className="note-lac">Tradition says this knot stays open: {p.because}</p>}
-      <p className="p p--muted">Counted from the second person (the second person's column) to the first, as the tables are read.</p>
-      <p className="kootasheet__close">
-        <button type="button" className="linkish" onClick={onClose}>
-          Close
-        </button>
-      </p>
-    </div>
-  );
-}
-
-function ManglikSheet({ profile, m, onClose }: { profile: Profile; m: ManglikStatus; onClose: () => void }) {
-  return (
-    <div className="kootasheet">
-      <h2 className="kootasheet__h">
-        <span lang="sa" className="dev">
-          कुज दोष
-        </span>{" "}
-        · Manglik: {profile.name}
-      </h2>
-      <p className="p">
-        {m.present
-          ? `Tradition says Maṅgala stands in the 1st, 2nd, 4th, 7th, 8th or 12th counted from ${m.from.map((f) => MANGLIK_REF_LABEL[f]).join(", ")}.`
-          : "Maṅgala stands in none of the 1st, 2nd, 4th, 7th, 8th or 12th from the Lagna, Candra or Śukra."}
-      </p>
-      {m.cancellations.length > 0 ? (
-        <ul className="kootasheet__list">
-          {m.cancellations.map((c) => (
-            <li key={c}>{MANGLIK_NAME.get(c) ?? c}</li>
-          ))}
-        </ul>
-      ) : null}
-      <p className="p p--muted">
-        {m.citation.text}, {m.citation.ref}. Shown beside the score, never added to it.
-      </p>
-      <p className="kootasheet__close">
-        <button type="button" className="linkish" onClick={onClose}>
-          Close
-        </button>
-      </p>
+      <p className="v-small v-muted">Counted from the second person (the second person's column) to the first, as the tables are read.</p>
+      <SheetClose onClose={onClose} />
     </div>
   );
 }

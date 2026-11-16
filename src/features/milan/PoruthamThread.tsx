@@ -1,65 +1,42 @@
-// The ten poruthams as a second, shorter thread beneath the mala: ten knots, tied in brass where the
-// porutham holds, left open (an empty ring with a lac ×) where it does not. Every knot is a button
-// opening its rule. Pass/fail always also reads as text, colour is never the only signal.
+// The ten poruthams, inside the "South Indian check" fold: each simply agrees or does not. Every row
+// is a button opening its rule. Agree / doesn't is always written out, colour is never the only signal.
+import { ChevronRight } from "../../components/ui/Page";
 import type { PoruthamResult } from "../../engine/porutham";
 
-function Knot({ tied }: { tied: boolean }) {
+function Mark({ ok }: { ok: boolean }) {
   return (
-    <svg className={`pknot${tied ? " is-tied" : " is-open"}`} viewBox="0 0 28 28" aria-hidden="true" data-decorative="true">
-      {tied ? (
-        <>
-          <ellipse className="pknot__loop" cx="9.5" cy="10" rx="5" ry="3" transform="rotate(-35 9.5 10)" />
-          <ellipse className="pknot__loop" cx="18.5" cy="10" rx="5" ry="3" transform="rotate(35 18.5 10)" />
-          <circle className="pknot__core" cx="14" cy="14" r="6.5" />
-          <path className="pknot__wrap" d="M8.5 15.5 Q14 11 19.5 15.5" />
-        </>
-      ) : (
-        <>
-          <circle className="pknot__ring" cx="14" cy="14" r="8" />
-          <path className="pknot__x" d="M10.5 10.5 L17.5 17.5 M17.5 10.5 L10.5 17.5" />
-        </>
-      )}
+    <svg className={`mm-mark${ok ? " is-ok" : ""}`} width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      {ok ? <path d="M7.5 12.5l3 3 6-6.5" /> : <path d="M8.5 12h7" />}
     </svg>
   );
 }
 
 export function PoruthamThread({ list, onOpen }: { list: PoruthamResult[]; onOpen: (p: PoruthamResult) => void }) {
-  const tied = list.filter((p) => p.pass).length;
   return (
-    <section className="porutham" aria-labelledby="porutham-h">
-      <h2 id="porutham-h" className="porutham__h">
-        <span lang="ta">பொருத்தம்</span>
-        <span>Porutham</span>
-        <span className="porutham__meta">
-          {tied} of {list.length} agree
-        </span>
-      </h2>
-      <p className="porutham__sub">The South Indian way: ten checks, each simply agrees or doesn't.</p>
-      <ol className="pthread">
+    <>
+      <p className="v-small v-muted">The South Indian way: ten checks, each simply agrees or doesn't. Tap a check to see its rule.</p>
+      <ol className="mm-checks">
         {list.map((p) => (
-          <li key={p.id} className={p.pass ? "is-tied" : "is-open"}>
+          <li key={p.id}>
             <button
               type="button"
-              className="pthread__row"
+              className="mm-check"
               aria-haspopup="dialog"
               onClick={() => onOpen(p)}
               aria-label={`${p.name}: ${p.pass ? "agrees" : "does not agree"}${p.weighty ? ", one of the two matters most" : ""}`}
             >
-              <Knot tied={p.pass} />
-              <span className="pthread__name">
+              <Mark ok={p.pass} />
+              <span className="mm-check__name">
                 {p.name}
-                <span lang="sa" className="pthread__dev">
-                  {p.nameDev}
-                </span>
+                {p.weighty ? <span className="mm-check__s">matters most</span> : null}
               </span>
-              <span className="pthread__state">
-                {p.pass ? "agrees" : "doesn't"}
-                {p.weighty ? <span className="pthread__weighty">matters most</span> : null}
-              </span>
+              <span className={`mm-check__state${p.pass ? " is-ok" : ""}`}>{p.pass ? "agrees" : "doesn't"}</span>
+              <ChevronRight size={16} />
             </button>
           </li>
         ))}
       </ol>
-    </section>
+    </>
   );
 }

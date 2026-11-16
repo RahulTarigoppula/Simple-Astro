@@ -1,619 +1,483 @@
-/* Today's leaf, the brass dial and the Moon on the indigo cloth, the ledger on paper. */
-
-.today__desk {
-  /* Tithi weather: the cloth takes the paged day's Moon, not the room's. */
-  --moon-fill: color-mix(in oklch, var(--bg-elevated), var(--moon) calc(var(--moon-k) * 14%));
-  padding-bottom: var(--space-6);
+/* Almanac: the day in plain words, then rows you can tap for the exact times. */
+.alm-dev {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+.alm-aside {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+.alm-link {
+  color: var(--accent-text);
 }
 
-.today__cloth {
-  --cloth-text: var(--cloth-ink);
+/* The answer */
+.alm-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.alm-hero__top {
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  gap: var(--space-3);
-  width: calc(100% - var(--space-6));
-  max-width: 560px;
-  min-height: 120px;
-  margin: var(--space-3) auto 0;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  background-color: var(--moon-fill);
-  background-image: radial-gradient(color-mix(in oklch, var(--surface), transparent 91%) 1px, transparent 1.2px);
-  background-size: 8px 8px;
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.35),
-    inset 0 12px 30px rgba(0, 0, 0, 0.35);
-  color: var(--cloth-text);
+  gap: 16px;
 }
-:root[data-theme="day"] .today__cloth {
-  --cloth-text: var(--ink);
-}
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="night"]) .today__cloth {
-    --cloth-text: var(--ink);
-  }
-}
-
-/* ── the brass dial ─────────────────────────────────────────────────── */
-.dial {
-  position: relative;
+.alm-hero__moon {
   flex: none;
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 210deg,
-    var(--brass-hi),
-    var(--brass-mid) 14%,
-    var(--brass-lo) 30%,
-    var(--brass-mid) 46%,
-    var(--brass-hi) 58%,
-    var(--brass-mid) 72%,
-    var(--brass-dark) 88%,
-    var(--brass-hi)
-  );
-  box-shadow: var(--brass-edge), var(--shadow-2);
+  width: 84px;
+  height: 84px;
 }
-.dial svg {
+.alm-moon {
   display: block;
   width: 100%;
   height: 100%;
 }
-.dial--blank {
-  opacity: 0.6;
+.alm-moon__dark {
+  fill: var(--card-hi);
+  stroke: var(--card-edge-strong);
+  stroke-width: 2;
 }
-.dial__spin {
-  transform-box: view-box;
-  transform-origin: 50% 50%;
-  transition: transform var(--dur-slow) var(--ease-spring);
-  will-change: transform;
-}
-
-/* ── the Moon pager ─────────────────────────────────────────────────── */
-.moonpager {
-  display: grid;
-  justify-items: center;
-  gap: 2px;
-  color: var(--cloth-text);
-}
-.moonpager__row {
-  display: flex;
-  align-items: center;
-}
-.moonpager__step {
-  min-width: 44px;
-  min-height: 44px;
-  display: grid;
-  place-items: center;
-  font-size: var(--text-3xl);
-  line-height: 1;
-  color: var(--cloth-text);
-  border-radius: var(--radius-md);
-  transition: transform var(--dur-fast) var(--ease-out);
-}
-.moonpager__step:active {
-  transform: scale(0.92);
-}
-.moonpager__disc {
-  width: 76px;
-  height: 76px;
-  touch-action: pan-y;
-  cursor: grab;
-  user-select: none;
-  -webkit-user-select: none;
-}
-.moonpager__disc:active {
-  cursor: grabbing;
-}
-.moon {
-  display: block;
-  width: 76px;
-  height: 76px;
-}
-.moon__dark {
-  fill: color-mix(in oklch, var(--ink), var(--moon) 26%);
-}
-.moon__lit {
+.alm-moon__lit {
   fill: var(--moon);
 }
-.moon__maria {
-  fill: var(--ink-faint);
-  opacity: 0.2;
+.alm-hero__text {
+  min-width: 0;
 }
-.moon__rim {
-  fill: none;
-  stroke: color-mix(in oklch, var(--moon), transparent 55%);
-  stroke-width: 1;
-}
-.moonpager__cap {
+.alm-hero__date {
   margin: 0;
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  color: var(--cloth-text);
-}
-.moonpager__today {
-  min-height: 44px;
-  padding: 0 var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--cloth-text);
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-underline-offset: 3px;
-}
-
-/* ── the paper ──────────────────────────────────────────────────────── */
-.today__sheet {
-  margin-top: var(--space-3);
-}
-.today__where {
-  padding: var(--space-3) var(--paper-margin) 0;
-}
-.today__where .engraved {
-  display: inline-flex;
-}
-.today__whose {
-  margin-left: 0;
-  margin-right: 0;
-}
-.today-rows {
-  list-style: none;
-  margin: var(--space-2) 0 0;
-  padding: 0 var(--paper-margin);
-}
-.today-rows li {
-  border-bottom: 1px solid var(--border);
-}
-.today-rows li:last-child {
-  border-bottom: 0;
-}
-.today-rows .row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    "k end"
-    "v v";
-  align-items: baseline;
-  column-gap: var(--space-3);
-  row-gap: 0;
-  padding: 8px 0 9px;
-  border-bottom: 0;
-  color: var(--ink);
-}
-.today-rows .row .k {
-  grid-area: k;
-  width: auto;
-}
-.today-rows .row .v {
-  grid-area: v;
-  font-size: var(--text-lg);
-  line-height: 1.45;
-}
-.today-rows .row .end {
-  grid-area: end;
-}
-@media (min-width: 600px) {
-  .today-rows .row {
-    grid-template-columns: 7em minmax(0, 1fr) auto;
-    grid-template-areas: "k v end";
-  }
-}
-.today-dev {
-  color: var(--ink);
-  font-size: 0.94em;
-  white-space: nowrap;
-}
-.today-pada,
-.today-muted {
-  color: var(--ink-muted);
-  font-size: var(--text-sm);
-}
-.today-num {
-  font-size: var(--text-sm);
-  color: var(--ink);
-}
-/* Haldi is never text: a turmeric underline band with ink on top. */
-.haldi-band {
-  background-image: linear-gradient(var(--haldi), var(--haldi));
-  background-repeat: no-repeat;
-  background-size: 100% 7px;
-  background-position: 0 100%;
-  padding: 0 3px 1px;
-}
-.haldi-band--thin {
-  background-size: 100% 3px;
-}
-.today__gap {
-  margin: var(--space-3) var(--paper-margin) 0;
-  border-top: 1px solid var(--border-strong);
-}
-.today-inkline {
-  display: block;
-  width: calc(100% - 2 * var(--paper-margin));
-  height: 6px;
-  margin: var(--space-6) var(--paper-margin);
-}
-.today-inkline path {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 1.25px;
-}
-
-/* ── the footnote sheet ─────────────────────────────────────────────── */
-.footnote {
-  color: var(--ink);
-}
-.footnote__h {
-  margin: var(--space-2) var(--paper-margin) var(--space-2);
-  font-family: var(--font-body);
-  font-weight: 400;
-  font-size: var(--text-xl);
-  line-height: 1.3;
-}
-.footnote__dl {
-  margin: 0;
-  padding: 0 var(--paper-margin);
-  border-top: 1px solid var(--border-strong);
-}
-.footnote__dl dd {
-  overflow-wrap: anywhere;
-}
-.footnote__dl dd.footnote__num {
-  font-size: var(--text-sm);
-  line-height: 1.6;
-}
-.footnote__close {
-  margin: var(--space-3) var(--paper-margin) 0;
-}
-
-/* ── desktop: the cloth lies beside the paper column ───────────────── */
-@media (min-width: 900px) {
-  .today__desk {
-    display: grid;
-    grid-template-columns: minmax(300px, 372px) minmax(0, 560px);
-    justify-content: center;
-    align-items: start;
-    gap: var(--space-7);
-    padding: var(--space-6) var(--space-6) var(--space-9);
-  }
-  .today__side {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-    min-width: 0;
-  }
-  .today__cloth {
-    flex-direction: column;
-    width: auto;
-    margin: 0;
-    padding: var(--space-6) var(--space-4);
-  }
-  .dial {
-    width: 184px;
-    height: 184px;
-  }
-  .today__sheet {
-    margin: 0;
-    width: 100%;
-    --paper-margin: 32px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .dial__spin {
-    transition-duration: 1ms;
-  }
-}
-
-/* ── side column: the cloth, and on the desk-wide layout the month leaf ── */
-@media (max-width: 899.98px) {
-  .today__side {
-    display: contents;
-  }
-}
-.today__monthsheet {
-  padding-bottom: var(--space-4);
-}
-
-/* ── the section switch ─────────────────────────────────────────────── */
-.today-tabs {
   display: flex;
-  flex-wrap: nowrap;
-  gap: 4px;
-  margin: var(--space-4) var(--paper-margin) 0;
+  flex-direction: column;
+  gap: 2px;
+  font: 500 0.9375rem / 1.35 var(--font-body);
+  color: var(--ink-muted);
 }
-.today-tabs button {
-  flex: 1 1 auto;
-  padding: 0 10px;
-  white-space: nowrap;
+.alm-hero__plain {
+  margin-top: 4px;
+  font: 650 1.4375rem / 1.2 var(--font-display);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
-.today-tabs button[aria-selected="true"] {
-  background: var(--accent);
-  color: var(--accent-ink);
-  border-color: var(--accent);
+.alm-hero__small {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 4px;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
 }
-.today-panel {
-  min-height: 120px;
+.alm-hero__sun {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(98px, 1fr));
+  gap: 8px;
+  margin: 0;
 }
-.today-panel > .band--plain:first-child {
-  margin-top: var(--space-4);
+.alm-hero__sun > div {
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
 }
-
-/* ── choghaḍiyā and horā lists ──────────────────────────────────────── */
-.today-sub {
+.alm-hero__sun dt {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+.alm-hero__sun dd {
+  margin: 0;
+  font-weight: 600;
+}
+.alm-step {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0 var(--space-2);
-  margin: var(--space-4) var(--paper-margin) 0;
-  font-family: var(--font-body);
-  font-weight: 400;
-  font-size: var(--text-base);
-  color: var(--ink);
+  justify-content: space-between;
+  gap: 8px;
 }
-.today-sub__meta {
-  margin-left: auto;
-  font-size: var(--text-xs);
-  color: var(--ink-muted);
+.alm-step .v-btn {
+  padding: 0 14px;
 }
-.today-periods {
-  list-style: none;
-  margin: var(--space-1) 0 0;
-  padding: 0 var(--paper-margin);
+.alm-step .v-chev {
+  color: inherit;
 }
-.today-periods li {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 5.2em auto;
-  align-items: baseline;
-  column-gap: var(--space-2);
-  min-height: 40px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  color: var(--ink);
-}
-.today-periods li:last-child {
-  border-bottom: 0;
-}
-.today-periods__name {
-  min-width: 0;
-  font-size: var(--text-base);
-}
-.today-periods__n {
-  font-size: var(--text-xs);
-  color: var(--ink-muted);
-}
-.today-periods__aside {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: var(--text-sm);
-  color: var(--ink-muted);
-}
-.today-periods__t {
-  grid-column: 3;
-  text-align: right;
-  font-size: var(--text-sm);
-  white-space: nowrap;
-  color: var(--ink);
-}
-.today-periods li.is-now {
-  background: color-mix(in oklch, var(--paper-band), transparent 45%);
-  margin: 0 calc(-1 * var(--space-2));
-  padding-left: var(--space-2);
-  padding-right: var(--space-2);
-}
-/* The brass "now" clip, as on the daśā ribbon, pinned over the row's left edge. */
-.today-periods li.is-now::before {
-  content: "";
-  position: absolute;
-  left: -14px;
-  top: 50%;
-  translate: 0 -50%;
-  width: 20px;
-  height: 16px;
-  border-radius: 4px 8px 8px 4px;
-  background: linear-gradient(180deg, var(--brass-lo), var(--brass-hi) 40%, var(--brass-dark));
-  box-shadow: var(--shadow-1);
-}
-.today-periods__now {
-  margin-left: var(--space-2);
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--accent-text);
-}
-.qmark {
-  flex: none;
-  width: 11px;
-  height: 11px;
-}
-.qmark--good circle {
-  fill: var(--ink);
-}
-.qmark--neutral circle {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 1.4;
-}
-.qmark--bad path {
-  stroke: var(--ink);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-}
-.today-cite {
-  margin: var(--space-4) var(--paper-margin) 0;
-  font-size: var(--text-sm);
-}
-.today-cite cite {
-  font-style: italic;
+.alm-where {
+  margin: 0 2px;
 }
 
-/* ── the month leaf ─────────────────────────────────────────────────── */
+/* The four views */
+.alm-seg > button {
+  padding: 0 10px;
+  min-height: 44px;
+  font-size: 0.875rem;
+}
+@media (max-width: 429px) {
+  .alm-seg {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-radius: var(--radius-lg);
+  }
+  .alm-seg > button {
+    border-radius: var(--radius-md);
+  }
+}
+.alm-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.alm-panel .v-sec {
+  margin-top: 6px;
+}
+.alm-h {
+  margin: 6px 2px 0;
+  font: 650 1.1875rem / 1.25 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.alm-h__note {
+  display: block;
+  margin-top: 2px;
+  font: 400 0.8125rem / 1.4 var(--font-body);
+  letter-spacing: 0;
+  color: var(--ink-muted);
+}
+.alm-sub {
+  margin: 0 2px;
+  font: 600 1rem var(--font-body);
+}
+.alm-sub__meta {
+  margin-left: 6px;
+  font-weight: 400;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+/* Rows: one fact each, tap for the detail sheet */
+.alm-row {
+  display: flex;
+  align-items: center;
+}
+.alm-row > .info-dot {
+  flex: none;
+  margin: 0 14px 0 2px;
+}
+.alm-row__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 16px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.alm-row__main:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+.alm-row__body {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.alm-row__k {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+.alm-row__term {
+  opacity: 0.85;
+}
+.alm-row__v {
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.alm-row__until {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+.alm-row__end {
+  flex: none;
+  margin-left: auto;
+  text-align: right;
+}
+.alm-row--time .alm-row__end {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  max-width: 52%;
+}
+.alm-row__time {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--ink);
+}
+.alm-row--time .alm-row__main {
+  display: grid;
+  grid-template-columns: 4px minmax(0, 1fr) auto;
+  gap: 6px 12px;
+}
+@media (max-width: 419px) {
+  .alm-row--time .alm-row__main {
+    grid-template-columns: 4px minmax(0, 1fr);
+  }
+  .alm-row--time .alm-row__mark {
+    grid-row: 1 / span 2;
+  }
+  .alm-row--time .alm-row__end {
+    grid-column: 2;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: none;
+    margin-left: 0;
+  }
+  .alm-step .v-btn {
+    padding: 0 10px;
+    gap: 4px;
+  }
+}
+.alm-row__mark {
+  width: 4px;
+  align-self: stretch;
+  min-height: 36px;
+  border-radius: 2px;
+  background: var(--card-edge-strong);
+}
+.alm-row--avoid .alm-row__mark {
+  background: var(--care);
+}
+.alm-row--good .alm-row__mark {
+  background: var(--good);
+}
+
+/* Slots and planet hours */
+.alm-periods > li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px 12px;
+  min-height: 60px;
+  padding: 10px 16px;
+}
+.alm-periods > li.is-now {
+  background: var(--gold-soft);
+  box-shadow: inset 3px 0 0 var(--accent-2);
+}
+.alm-periods__aside {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+.alm-periods__aside .v-chip {
+  text-transform: capitalize;
+}
+.alm-qmark {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.alm-periods__name {
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  font-weight: 600;
+}
+.alm-periods__n {
+  min-width: 2ch;
+  font-weight: 400;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+.alm-periods__t {
+  grid-column: 1;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The month */
+.month {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+}
 .month__nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: var(--space-2) var(--paper-margin) 0;
-}
-.month__step {
-  min-width: 44px;
-  min-height: 44px;
-  display: grid;
-  place-items: center;
-  font-size: var(--text-2xl);
-  line-height: 1;
-  color: var(--ink);
-  border-radius: var(--radius-md);
+  gap: 12px;
 }
 .month__title {
-  margin: 0;
-  font-size: var(--text-lg);
-  color: var(--ink);
+  font: 650 1.125rem var(--font-display);
+  letter-spacing: -0.015em;
 }
 .month__grid {
-  display: grid;
-  gap: 2px;
-  margin: var(--space-1) calc(var(--paper-margin) - 4px) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid var(--card-edge);
+  border-radius: var(--radius-lg);
+  background: var(--card);
 }
 .month__row {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 2px;
+  gap: 4px;
 }
 .month__wd {
-  padding: 2px 0 2px;
-  font-size: var(--text-xs);
-  color: var(--ink-muted);
+  padding: 4px 0;
   text-align: center;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
 }
 .mcell {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto auto auto;
-  align-items: start;
-  width: 100%;
-  min-height: 60px;
-  padding: 3px 4px 2px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 72px;
+  padding: 6px 0 4px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
   color: var(--ink);
-  text-align: left;
-  transition: transform var(--dur-fast) var(--ease-out);
+  font: inherit;
+  cursor: pointer;
 }
-.mcell:active {
-  transform: scale(0.96);
+.mcell:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.mcell[aria-current="date"] {
+  border-color: var(--accent-2);
+}
+.mcell[aria-selected="true"] {
+  background: var(--violet-soft);
+  border-color: var(--accent);
+}
+.mcell--purnima {
+  background: var(--gold-soft);
 }
 .mcell__d {
-  font-size: var(--text-xs);
-  line-height: 1.3;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1.2;
 }
-.mglyph {
-  width: 13px;
-  height: 13px;
-  margin-top: 1px;
+.mcell__moon {
+  width: 16px;
+  height: 16px;
 }
-.mglyph__dark {
-  fill: color-mix(in oklch, var(--ink), var(--moon) 30%);
-}
-.mglyph__lit {
-  fill: var(--moon);
-}
-.mglyph__rim {
-  fill: none;
-  stroke: var(--ink-muted);
+.mcell__moon .alm-moon__dark {
   stroke-width: 5;
 }
 .mcell__t {
-  grid-column: 1 / -1;
-  font-size: var(--text-sm);
-  line-height: 1.35;
-  white-space: nowrap;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  color: var(--ink-muted);
 }
 .mcell__m {
-  grid-column: 1 / -1;
   display: flex;
   gap: 2px;
-  min-height: 15px;
+  min-height: 12px;
 }
 .mmark {
-  display: inline-block;
-  padding: 0 3px;
   font-style: normal;
-  font-size: var(--text-xs);
-  line-height: 1.3;
-  border: 1px solid var(--border-strong);
-  border-radius: 3px;
-  color: var(--ink);
+  font-size: 0.6875rem;
+  line-height: 1.1;
+  font-weight: 600;
+  color: var(--accent-text);
 }
 .mmark--sun {
-  border-style: dashed;
-}
-.mcell--purnima .mcell__t,
-.mcell--amavasya .mcell__t {
-  font-weight: 700;
-}
-/* Today: a double rule round the cell, and "today" in its name. */
-.mcell[aria-current="date"] {
-  border: 3px double var(--accent);
-}
-/* The leaf on show: a filled cell. */
-.mcell[aria-selected="true"] {
-  background: var(--paper-band);
-  border-color: var(--border-strong);
-  box-shadow: inset 0 -3px 0 var(--accent);
+  color: var(--accent-2);
 }
 .month__legend {
   display: flex;
-  flex-wrap: wrap;
-  gap: 2px var(--space-3);
-  margin: var(--space-2) var(--paper-margin) 0;
-  font-size: var(--text-xs);
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.8125rem;
   color: var(--ink-muted);
 }
 .month__legend .mmark {
-  color: var(--ink-muted);
+  font-size: 0.8125rem;
 }
 .month__pick {
-  margin: var(--space-3) var(--paper-margin) 0;
-  padding: var(--space-2) var(--space-3);
-  border-left: 3px solid var(--brass);
-  background: color-mix(in oklch, var(--surface-2), transparent 40%);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-}
-.month__pick-h {
-  margin: 0;
-  font-size: var(--text-sm);
-  color: var(--ink-muted);
-}
-.month__pick-v {
-  margin: 2px 0 0;
-  font-size: var(--text-base);
-  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 .month__open {
-  min-height: 44px;
-}
-@media (min-width: 900px) {
-  .today__monthsheet {
-    --paper-margin: 16px;
-  }
-  .today__monthsheet .month > .band--plain:first-child {
-    margin-top: 0;
-  }
-}
-.today-periods--plain li {
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-.today-periods--plain .today-periods__t {
-  grid-column: 2;
+  align-self: flex-start;
+  margin-top: 6px;
 }
 
-.today__mine {
-  padding: var(--space-3) var(--paper-margin) 0;
+/* Exact times: the fold and the details sheet */
+.alm-dl {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
 }
-
-.today-events {
-  margin: var(--space-5) var(--paper-margin, 0) 0;
+.alm-dl > div {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 12px;
+  padding: 9px 0;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+.alm-dl > div + div {
+  border-top: 1px solid var(--card-edge);
+}
+.alm-dl dt {
+  color: var(--ink-muted);
+}
+.alm-dl dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.alm-dl__num {
+  font-variant-numeric: tabular-nums;
+}
+.alm-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 6px var(--page-pad) 8px;
+  font-family: var(--font-body);
+}
+.alm-foot h2 {
+  margin: 0;
+  font: 650 1.25rem / 1.25 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.alm-foot p {
+  margin: 0;
+}
+.alm-foot__plain {
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+.alm-foot__plain .v-link {
+  margin: 0;
+}
+.alm-foot .v-actions {
+  justify-content: flex-end;
 }

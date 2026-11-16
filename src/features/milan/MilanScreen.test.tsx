@@ -5,6 +5,7 @@ import { DISCLAIMER } from "../../components/ui/Colophon";
 import { db } from "../../data/db";
 import { upsertProfile } from "../../data/repo";
 import { milan } from "../../engine/ashtakoota";
+import { bondReading } from "../../engine/bond";
 import { computePatri, REFERENCE_PROFILE } from "../../engine/patri";
 import { resolveBirthMoment } from "../../engine/time";
 import { DEFAULT_PRESET, type KootaResult, type Profile } from "../../engine/types";
@@ -64,6 +65,18 @@ describe("bead plan", () => {
   });
 });
 
+/** Folds are closed by default; their heavy content mounts when opened. */
+async function openFold(title: string) {
+  const summary = (await screen.findByText(title, {}, { timeout: 5000 })).closest("summary");
+  const details = summary?.closest("details");
+  if (!summary || !details) throw new Error(`no fold "${title}"`);
+  fireEvent.click(summary);
+  if (!details.open) {
+    details.open = true;
+    fireEvent(details, new Event("toggle"));
+  }
+}
+
 describe("MilanScreen", () => {
   beforeEach(async () => {
     await db.profiles.clear();
@@ -71,11 +84,36 @@ describe("MilanScreen", () => {
     await db.settings.clear();
   });
 
+  it("answers first: the bond score, the 36 points and the five parts are bondReading()'s output", async () => {
+    await upsertProfile(REFERENCE_PROFILE);
+    await upsertProfile(PRIYA);
+    const want = engineResult(REFERENCE_PROFILE, PRIYA);
+    const bond = bondReading(want, REFERENCE_PROFILE.name.split(/\s+/)[0] ?? "", PRIYA.name);
+    renderAt(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`);
+
+    expect(
+      await screen.findByRole("img", { name: new RegExp(`Match score ${bond.score} out of 100`) }, { timeout: 5000 }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(bond.headline)).toBeInTheDocument();
+    expect(screen.getByText(bond.summary)).toBeInTheDocument();
+    expect(screen.getByText(`${fmtPts(want.total)} of 36`)).toBeInTheDocument();
+    for (const p of bond.parts) {
+      expect(screen.getByRole("img", { name: new RegExp(`^${p.label}: .*, ${p.score} out of 100$`) })).toBeInTheDocument();
+      expect(screen.getAllByText(p.line).length).toBeGreaterThan(0);
+    }
+    for (const s of bond.signs) expect(screen.getByText(s.label)).toBeInTheDocument();
+    expect(screen.getByText(bond.tip)).toBeInTheDocument();
+    expect(screen.getByText(bond.manglik)).toBeInTheDocument();
+    // The technical material is folded away until asked for.
+    expect(screen.queryByRole("img", { name: /^Nāḍī:/ })).not.toBeInTheDocument();
+  });
+
   it("strings exactly milan()'s output on the mala, every row, the total and the band", async () => {
     await upsertProfile(REFERENCE_PROFILE);
     await upsertProfile(PRIYA);
     const want = engineResult(REFERENCE_PROFILE, PRIYA);
     renderAt(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`);
+    await openFold("The 36-point score");
 
     for (const k of want.kootas) {
       const img = await screen.findByRole(
@@ -85,16 +123,16 @@ describe("MilanScreen", () => {
       );
       expect(img).toBeInTheDocument();
     }
-    // Tap anywhere to finish the count.
-    fireEvent.pointerDown(document.body);
-    expect(await screen.findByText(BAND_LABEL[want.band])).toBeInTheDocument();
     expect(screen.getByText(`${fmtPts(want.total)} of 36 points: ${BAND_LABEL[want.band]}.`)).toBeInTheDocument();
 
-    // The lac rows are the engine's doṣa rows, labelled as such, colour is never the only signal.
+    // The doṣa rows are the engine's doṣa rows, labelled as such, colour is never the only signal.
     const doshaRows = want.kootas.filter((k) => k.dosha);
-    for (const k of doshaRows) expect(screen.getByRole("img", { name: new RegExp(`^${k.name}: .*a doṣa$`) })).toBeInTheDocument();
+    for (const k of doshaRows) {
+      const img = screen.getByRole("img", { name: new RegExp(`^${k.name}: .*a doṣa$`) });
+      expect(within(img.closest("button") as HTMLElement).getByText("doṣa")).toBeInTheDocument();
+    }
     expect(screen.getAllByText(/^Tradition says:/)).toHaveLength(doshaRows.length);
-    // The reference pair: Nāḍī fires, Bhakūṭa (a 3/11 axis) stays brass.
+    // The reference pair: Nāḍī fires, Bhakūṭa (a 3/11 axis) is not flagged.
     expect(doshaRows.map((k) => k.id)).toContain("nadi");
     expect(doshaRows.map((k) => k.id)).not.toContain("bhakoot");
   });
@@ -103,9 +141,8 @@ describe("MilanScreen", () => {
     await upsertProfile(REFERENCE_PROFILE);
     await upsertProfile(PRIYA);
     renderAt(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`);
+    await openFold("The 36-point score");
     const img = await screen.findByRole("img", { name: /^Nāḍī:/ }, { timeout: 5000 });
-    fireEvent.pointerDown(document.body); // finish the count first
-    await new Promise((r) => setTimeout(r, 450));
     const row = img.closest("button");
     if (!row) throw new Error("bead row is not a button");
     fireEvent.click(row);
@@ -116,7 +153,7 @@ describe("MilanScreen", () => {
     expect(within(dlg).getByText(/Muhūrta Cintāmaṇi/)).toBeInTheDocument();
   });
 
-  it("swaps the first and second leaf", async () => {
+  it("swaps the first and second person", async () => {
     await upsertProfile(REFERENCE_PROFILE);
     await upsertProfile(PRIYA);
     const { router } = renderAt(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`);
@@ -125,24 +162,49 @@ describe("MilanScreen", () => {
     const swapped = engineResult(PRIYA, REFERENCE_PROFILE);
     const first = swapped.kootas[0];
     if (!first) throw new Error("no kootas");
+    await openFold("The 36-point score");
     expect(
       await screen.findByRole("img", { name: new RegExp(`^${first.name}: ${fmtPts(first.score)} of`) }, { timeout: 5000 }),
     ).toBeInTheDocument();
   });
 
-  it("with one leaf, the second scroll is a dotted outline asking for another", async () => {
-    await upsertProfile(REFERENCE_PROFILE);
+  it("with nobody saved, explains that two people are needed", async () => {
     renderAt("/milan");
-    expect(await screen.findByText("Tap a person below")).toBeInTheDocument();
-    expect(screen.getByText(/Only one person is saved/)).toBeInTheDocument();
+    expect(await screen.findByText("A match needs two people")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Add a person" })).toHaveAttribute("href", "/leaf/new");
   });
 
-  it("picks the second leaf from the bundle", async () => {
+  it("with one person, the second slot asks for another", async () => {
+    await upsertProfile(REFERENCE_PROFILE);
+    renderAt("/milan");
+    expect(await screen.findByText("Add one more person")).toBeInTheDocument();
+    expect(screen.getByText(/^Only .* is saved/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: new RegExp(`^First person: ${REFERENCE_PROFILE.name}`) })).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /Add a person/ }).length).toBeGreaterThan(0);
+  });
+
+  it("with two people, both slots are filled and one tap opens the match", async () => {
     await upsertProfile(REFERENCE_PROFILE);
     await upsertProfile(PRIYA);
     const { router } = renderAt("/milan");
-    fireEvent.click(await screen.findByRole("button", { name: /^Check .* with/ }));
+    fireEvent.click(await screen.findByRole("button", { name: "See the match" }));
     await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/milan\/[^/]+\/[^/]+$/));
+    const [, , x, y] = router.state.location.pathname.split("/");
+    expect(x).not.toBe(y);
+  });
+
+  it("picks the second person from the saved people", async () => {
+    await upsertProfile(REFERENCE_PROFILE);
+    await upsertProfile(PRIYA);
+    await upsertProfile({ ...PRIYA, id: "test-meera", name: "Meera" });
+    const { router } = renderAt("/milan");
+    fireEvent.click(await screen.findByRole("button", { name: "Second person: choose a person" }));
+    // The most recently saved person fills the first slot; pick someone else as the second.
+    const firstLabel = screen.getByRole("button", { name: /^First person: / }).getAttribute("aria-label") ?? "";
+    const second = firstLabel.includes("Meera") ? { id: PRIYA.id, name: /Priya/ } : { id: "test-meera", name: /Meera/ };
+    const dlg = await screen.findByRole("dialog");
+    fireEvent.click(within(dlg).getByRole("radio", { name: second.name }));
+    await waitFor(() => expect(router.state.location.pathname).toMatch(new RegExp(`^/milan/[^/]+/${second.id}$`)));
   });
 });
 
@@ -155,17 +217,18 @@ describe("MilanScreen, porutham, compare and summary", () => {
     await upsertProfile(PRIYA);
   });
 
-  it("strings the ten poruthams as knots, tied or open, as milan() says, and opens each rule", async () => {
+  it("lists the ten poruthams, agreeing or not, as milan() says, and opens each rule", async () => {
     const want = engineResult(REFERENCE_PROFILE, PRIYA).porutham ?? [];
     expect(want).toHaveLength(10);
     renderAt(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`);
-    await screen.findByRole("img", { name: /^Nāḍī:/ }, { timeout: 5000 });
-    fireEvent.pointerDown(document.body);
+    expect(
+      await screen.findByText(`Porutham: ${want.filter((p) => p.pass).length} of 10 agree`, {}, { timeout: 5000 }),
+    ).toBeInTheDocument();
+    await openFold("South Indian check");
     for (const p of want) {
       const name = new RegExp(`^${p.name}: ${p.pass ? "agrees" : "does not agree"}`);
-      expect(screen.getByRole("button", { name })).toBeInTheDocument();
+      expect(await screen.findByRole("button", { name })).toBeInTheDocument();
     }
-    expect(screen.getAllByText(`${want.filter((p) => p.pass).length} of 10 agree`).length).toBeGreaterThan(0);
     const rajju = want.find((p) => p.id === "rajju");
     if (!rajju) throw new Error("no rajju");
     fireEvent.click(screen.getByRole("button", { name: /^Rajju:/ }));
@@ -178,9 +241,8 @@ describe("MilanScreen, porutham, compare and summary", () => {
 
   it("a koota sheet says what the tradition weighs and whether the exception holds", async () => {
     renderAt(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`);
+    await openFold("The 36-point score");
     const img = await screen.findByRole("img", { name: /^Nāḍī:/ }, { timeout: 5000 });
-    fireEvent.pointerDown(document.body);
-    await new Promise((r) => setTimeout(r, 450));
     const row = img.closest("button");
     if (!row) throw new Error("bead row is not a button");
     fireEvent.click(row);
@@ -195,9 +257,7 @@ describe("MilanScreen, porutham, compare and summary", () => {
     Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
     const want = engineResult(REFERENCE_PROFILE, PRIYA);
     renderAt(`/milan/${REFERENCE_PROFILE.id}/${PRIYA.id}`);
-    await screen.findByRole("img", { name: /^Nāḍī:/ }, { timeout: 5000 });
-    fireEvent.pointerDown(document.body);
-    fireEvent.click(await screen.findByRole("button", { name: "Copy summary" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Copy summary" }, { timeout: 5000 }));
     await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
     const text = writeText.mock.calls[0]?.[0] ?? "";
     expect(text).toContain(`${REFERENCE_PROFILE.name} and ${PRIYA.name}`);

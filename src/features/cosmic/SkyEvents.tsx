@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { InfoDot } from "../../components/ui/Explain";
 import { GrahaGlyph } from "../../components/ui/GrahaGlyph";
+import { ChevronRight } from "../../components/ui/Page";
 import { GRAHA_LORE, RASHI_LORE } from "../../data/lore";
 import { type SkyEvent, skyEvents } from "../../engine/events";
 import type { EnginePreset } from "../../engine/types";
@@ -27,7 +28,7 @@ function describe(e: SkyEvent): { icon: React.ReactNode; title: string; note: st
     case "full":
       return {
         icon: <span className="ev-moon ev-moon--full" />,
-        title: "Pūrṇimā · Full Moon",
+        title: "Full Moon · Pūrṇimā",
         note: "The Moon is opposite the Sun. A festival day in many traditions.",
         tone: "moon",
         explain: "tithi",
@@ -35,7 +36,7 @@ function describe(e: SkyEvent): { icon: React.ReactNode; title: string; note: st
     case "new":
       return {
         icon: <span className="ev-moon ev-moon--new" />,
-        title: "Amāvasyā · New Moon",
+        title: "New Moon · Amāvasyā",
         note: "The Moon is beside the Sun and unseen; a day for honouring ancestors.",
         tone: "moon",
         explain: "tithi",
@@ -148,20 +149,22 @@ export function SkyEvents({ nowMs, place, zone, preset, days = 45, limit = 8 }: 
   const shown = useMemo(() => (events ?? []).filter((e) => e.ms >= nowMs).slice(0, limit), [events, nowMs, limit]);
 
   return (
-    <section className="cosmic-card sky-events" aria-labelledby="sky-events-h">
-      <header className="cosmic-card__head">
-        <h2 id="sky-events-h">
-          Coming up in the sky{" "}
-          <span className="gloss">
-            next {days} days at {place.name.split(",")[0]}
-          </span>
-        </h2>
-        <Link to="/explore" className="linkish cosmic-card__more">
-          Explore →
+    <section className="v-card sky-events" aria-labelledby="sky-events-h">
+      <header className="sky-events__head">
+        <div>
+          <h2 id="sky-events-h" className="v-card__title">
+            Coming up in the sky
+          </h2>
+          <p className="v-card__sub">
+            Next {days} days at {place.name.split(",")[0]}
+          </p>
+        </div>
+        <Link to="/explore" className="v-link">
+          Explore <ChevronRight size={16} />
         </Link>
       </header>
       {shown.length === 0 ? (
-        <p className="p p--muted">Nothing could be reckoned for this place.</p>
+        <p className="v-muted">{events === null ? "Looking ahead…" : "Nothing could be reckoned for this place."}</p>
       ) : (
         <ol className="ev-list">
           {shown.map((e) => {
@@ -180,7 +183,7 @@ export function SkyEvents({ nowMs, place, zone, preset, days = 45, limit = 8 }: 
                 </span>
                 <span className="ev__when">
                   <span className="ev__day">{w.day}</span>
-                  <span className="ev__time mono">{w.time}</span>
+                  <span className="ev__time">{w.time}</span>
                   <span className="ev__rel">{w.rel}</span>
                 </span>
               </li>

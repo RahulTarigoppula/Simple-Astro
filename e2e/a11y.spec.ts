@@ -8,6 +8,8 @@ test("no serious or critical axe violations on the main screens", async ({ page 
   const routes = [
     "#/",
     `#/patri/${id}`,
+    `#/patri/${id}?v=chapters`,
+    `#/patri/${id}?v=chart`,
     "#/leaf/new",
     "#/today",
     "#/circle",

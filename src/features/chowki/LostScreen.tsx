@@ -1,25 +1,22 @@
 import { Link } from "react-router";
-import { Screen } from "../../components/ui/Screen";
+import { Page } from "../../components/ui/Page";
+import { IconSky } from "./icons";
 
 export default function LostScreen() {
   return (
-    <Screen scroll label="Page not found">
-      <div className="paper sheet-col" style={{ marginTop: "var(--space-9)" }}>
-        <div className="band">
-          <h1>
-            <span lang="hi" className="dev">
-              खो गया
-            </span>{" "}
-            · Page not found
-          </h1>
-        </div>
-        <p className="p">There is nothing at this address.</p>
-        <p className="p">
-          <Link className="linkish" to="/">
-            Back home
-          </Link>
-        </p>
-      </div>
-    </Screen>
+    <Page label="Page not found" back="/" backLabel="Home">
+      <section className="v-card v-empty" aria-labelledby="lost-h">
+        <span className="v-empty__art" aria-hidden="true">
+          <IconSky size={30} />
+        </span>
+        <h1 id="lost-h" className="v-title">
+          Page not found
+        </h1>
+        <p className="v-lede">There is nothing at this address.</p>
+        <Link className="v-btn" to="/">
+          Go to Home
+        </Link>
+      </section>
+    </Page>
   );
 }

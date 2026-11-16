@@ -2,9 +2,8 @@
 // who has never met Indian astrology, or doesn't believe in it.
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
-import { Screen } from "../../components/ui/Screen";
+import { ChevronRight, Page, Row, Section } from "../../components/ui/Page";
 import { GLOSSARY, type GlossaryGroup, GROUP_TITLES } from "../../data/glossary";
-import "../story/roots.css";
 import "./guide.css";
 
 const GROUPS = Object.keys(GROUP_TITLES) as GlossaryGroup[];
@@ -12,7 +11,7 @@ const GROUPS = Object.keys(GROUP_TITLES) as GlossaryGroup[];
 const STEPS: Array<{ title: string; body: string; to: string; cta: string }> = [
   {
     title: "Save a person",
-    body: 'Enter a name, the day, month and year of birth, the time on a 12-hour clock with am or pm, and the birth place picked from the list. Look at "Check before you save" (Moon sign, birth star, rising sign) before you save. If you don\'t know the time, switch on "Time of birth not known". You\'ll still get most of it.',
+    body: 'Enter a name, the day, month and year of birth, the time on a 12-hour clock with am or pm, and the birth place picked from the list. Look at "Check before you save" (Moon sign, birth star, rising sign) before you save. If you don\'t know the time, switch on "I don\'t know the time". You\'ll still get most of it.',
     to: "/leaf/new",
     cta: "Add a person",
   },
@@ -20,31 +19,31 @@ const STEPS: Array<{ title: string; body: string; to: string; cta: string }> = [
     title: "Read the birth chart",
     body: "See where the Sun, Moon and planets were at that moment, the life-chapter timeline (daśā), and classical patterns (yogas), each with a plain explanation.",
     to: "/circle",
-    cta: "People",
+    cta: "Open People",
   },
   {
     title: "See your forecast",
     body: "A plain-English outlook for the day, week, month, quarter and year. It shows which planets are working for you and which ask for patience, plus your life chapter (daśā).",
     to: "/forecast",
-    cta: "Forecast",
+    cta: "Open the forecast",
   },
   {
     title: "Check today",
     body: "The Hindu almanac for any day and place: lunar day, Moon's star, sunrise, and the time slots tradition calls good or bad.",
     to: "/today",
-    cta: "Today",
+    cta: "Open the almanac",
   },
   {
     title: "Explore the myths",
     body: "Every planet, sign and star has a story: the Moon's 27 wives, the demon behind eclipses, the boy who became the Pole Star. Explore them, or play the story of astrology from the beginning.",
     to: "/explore",
-    cta: "Explore",
+    cta: "Open Explore",
   },
   {
     title: "Partner Compatibility, or read a palm",
     body: "Partner Compatibility shows how two people fit: understanding, companionship, trust, closeness and family, with a score out of 100 from the traditional 36-point Guna Milan. The palm reader photographs your hand and describes its lines, on your device only.",
     to: "/milan",
-    cta: "Partner Compatibility",
+    cta: "Open Partner Compatibility",
   },
 ];
 
@@ -66,92 +65,129 @@ export default function GuideScreen() {
   );
 
   return (
-    <Screen className="guide" scroll label="Guide: Vyomaphala in plain English">
-      <header className="guide-hero">
-        <p className="guide-kicker">Guide</p>
-        <h1>How Vyomaphala works</h1>
-        <p className="guide-lede">
-          Vyomaphala (व्योमफल) is Sanskrit for the fruit of the sky: vyoma, the heavens, and phala, what they yield, the same phala as in
-          phalita jyotiṣa, the predictive side of Indian astrology. It is an Indian astrology (Jyotiṣa) app. It works out exactly where the
-          Sun, Moon and planets are (or were, when someone was born) and shows what the old tradition says about it. You don't need to know
-          anything, or believe anything, to use it.
-        </p>
-      </header>
-
-      <Link to="/story" className="guide-story">
-        <span className="guide-story__k">Roots</span>
-        <span className="guide-story__t">The story of the stars</span>
-        <span className="guide-story__s">Gods, ṛṣis, Greeks and astronomers. Play the story →</span>
-      </Link>
-
-      <section className="guide-card guide-honest" aria-labelledby="g-real">
-        <h2 id="g-real">What's real and what's tradition?</h2>
-        <div className="guide-two">
-          <div>
-            <h3>Real, checkable astronomy</h3>
-            <p>
-              Planet positions, sunrise and sunset, Moon phases, eclipse points, the rising sign. These are calculated to professional
-              accuracy (checked against Swiss Ephemeris and Drik Panchang) and you could verify them with a telescope.
-            </p>
-          </div>
-          <div>
-            <h3>Tradition, not science</h3>
-            <p>
-              What those positions are said to mean: personality, good and bad times, compatibility, palm lines. There's no scientific
-              evidence for them. Vyomaphala shows them as a cultural reference and for reflection, never as advice or fate.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="guide-card" aria-labelledby="g-how">
-        <h2 id="g-how">How to use it</h2>
-        <ol className="guide-steps">
-          {STEPS.map((s, i) => (
-            <li key={s.title}>
-              <span className="guide-steps__n" aria-hidden="true">
-                {i + 1}
-              </span>
-              <div>
-                <h3>{s.title}</h3>
-                <p>{s.body}</p>
-                <Link to={s.to} className="linkish">
-                  {s.cta} →
-                </Link>
-              </div>
-            </li>
-          ))}
-        </ol>
-        <p className="guide-tip">
+    <Page
+      label="Guide: Vyomaphala in plain English"
+      eyebrow="Guide"
+      title="How Vyomaphala works"
+      lede="It is an Indian astrology (Jyotiṣa) app. It works out exactly where the Sun, Moon and planets are (or were, when someone was born) and shows what the old tradition says about it. You don't need to know anything, or believe anything, to use it."
+      back
+      wide
+      className="guide"
+    >
+      <Section title="How to use it" id="g-how" />
+      <ol className="guide-steps" aria-labelledby="g-how">
+        {STEPS.map((s, i) => (
+          <li key={s.title} className="v-card">
+            <span className="guide-steps__n" aria-hidden="true">
+              {i + 1}
+            </span>
+            <h3 className="v-card__title">{s.title}</h3>
+            <p className="v-card__sub">{s.body}</p>
+            <Link to={s.to} className="v-link">
+              {s.cta} <ChevronRight size={16} />
+            </Link>
+          </li>
+        ))}
+      </ol>
+      <p className="v-note">
+        <span>
           Tip: wherever you see <span className="guide-i">ⓘ</span> next to a word, tap it for a plain-English explanation.
-        </p>
-      </section>
+        </span>
+      </p>
 
-      <section className="guide-card" aria-labelledby="g-private">
-        <h2 id="g-private">Your privacy</h2>
-        <p>
-          Everything is calculated on this device. Birth details and palm photos are stored only here, never uploaded. Vyomaphala uses the
-          internet for only two things: the optional place search (just the town name), and anonymous counts of which screens are opened and
-          which buttons are tapped (no names, no birth details, no cookies, and you can turn it off). You can back up or delete everything
-          from Settings.
-        </p>
-      </section>
+      <Section title="What is real and what is tradition" id="g-real" />
+      <div className="v-cols">
+        <section className="v-card guide-real" aria-labelledby="g-real-a">
+          <span className="v-chip v-chip--good">Real</span>
+          <h3 id="g-real-a" className="v-card__title">
+            Real, checkable astronomy
+          </h3>
+          <p>
+            Planet positions, sunrise and sunset, Moon phases, eclipse points, the rising sign. These are calculated to professional
+            accuracy (checked against Swiss Ephemeris and Drik Panchang) and you could verify them with a telescope.
+          </p>
+        </section>
+        <section className="v-card guide-real" aria-labelledby="g-real-b">
+          <span className="v-chip v-chip--gold">Tradition</span>
+          <h3 id="g-real-b" className="v-card__title">
+            Tradition, not science
+          </h3>
+          <p>
+            What those positions are said to mean: personality, good and bad times, compatibility, palm lines. There's no scientific
+            evidence for them. Vyomaphala shows them as a cultural reference and for reflection, never as advice or fate.
+          </p>
+        </section>
+      </div>
 
-      <section className="guide-gloss" aria-labelledby="g-words">
-        <div className="guide-gloss__head">
-          <h2 id="g-words">Every word, explained</h2>
-          <label className="guide-search">
-            <span className="vh">Search the glossary</span>
-            <input type="search" placeholder="Search, e.g. tithi, rising sign, Saturn" value={q} onChange={(e) => setQ(e.target.value)} />
-          </label>
+      <Section title="More" />
+      <ul className="v-list">
+        <li>
+          <Row to="/story" title="The story of the stars" sub="Gods, ṛṣis, Greeks and astronomers. Play the story" />
+        </li>
+        <li>
+          <Row to="/about" title="How Vyomaphala was made" sub="Sources, methods and checks" />
+        </li>
+      </ul>
+      <details className="v-fold">
+        <summary>
+          <span>
+            What the name means
+            <span className="v-fold__s">Vyomaphala, the fruit of the sky</span>
+          </span>
+        </summary>
+        <div className="v-fold__body">
+          <p>
+            Vyomaphala (<span lang="hi">व्योमफल</span>) is Sanskrit for the fruit of the sky: vyoma, the heavens, and phala, what they yield,
+            the same phala as in phalita jyotiṣa, the predictive side of Indian astrology.
+          </p>
         </div>
-        {hits.length === 0 ? <p className="guide-none">Nothing matches “{q}”.</p> : null}
-        {GROUPS.map((grp) => {
-          const items = hits.filter((g) => g.group === grp);
-          if (items.length === 0) return null;
-          return (
-            <div key={grp} className="guide-group">
-              <h3 className="guide-group__title">{GROUP_TITLES[grp]}</h3>
+      </details>
+      <details className="v-fold">
+        <summary>
+          <span>
+            Your privacy
+            <span className="v-fold__s">Everything is calculated on this device</span>
+          </span>
+        </summary>
+        <div className="v-fold__body">
+          <p>
+            Everything is calculated on this device. Birth details and palm photos are stored only here, never uploaded. Vyomaphala uses the
+            internet for only two things: the optional place search (just the town name), and anonymous counts of which screens are opened
+            and which buttons are tapped (no names, no birth details, no cookies, and you can turn it off). You can back up or delete
+            everything from Settings.
+          </p>
+          <Link to="/drawer" className="v-link guide-link">
+            Open Settings <ChevronRight size={16} />
+          </Link>
+        </div>
+      </details>
+
+      <Section title="Every word, explained" id="g-words" note="Open a group, or search" />
+      <label className="v-field">
+        <span className="vh">Search the glossary</span>
+        <input
+          className="v-input"
+          type="search"
+          placeholder="Search, e.g. tithi, rising sign, Saturn"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
+      </label>
+      {hits.length === 0 ? <p className="v-card v-muted">Nothing matches “{q}”.</p> : null}
+      {GROUPS.map((grp) => {
+        const items = hits.filter((g) => g.group === grp);
+        if (items.length === 0) return null;
+        return (
+          <details key={`${grp}${query.length > 1 ? "-q" : ""}`} className="v-fold guide-group" open={query.length > 1}>
+            <summary>
+              <span>
+                {GROUP_TITLES[grp]}
+                <span className="v-fold__s">
+                  {items.length} {items.length === 1 ? "word" : "words"}
+                </span>
+              </span>
+            </summary>
+            <div className="v-fold__body">
               {items.map((g) => (
                 <details key={g.id} id={`g-${g.id}`} className="guide-item" open={query.length > 1}>
                   <summary>
@@ -179,11 +215,11 @@ export default function GuideScreen() {
                 </details>
               ))}
             </div>
-          );
-        })}
-      </section>
+          </details>
+        );
+      })}
 
-      <p className="guide-foot">For reflection and cultural interest. Not medical, legal, financial or relationship advice.</p>
-    </Screen>
+      <p className="v-foot">For reflection and cultural interest. Not medical, legal, financial or relationship advice.</p>
+    </Page>
   );
 }

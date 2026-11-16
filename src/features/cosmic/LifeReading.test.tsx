@@ -1,6 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
+import { describe, expect, it, vi } from "vitest";
+import { GRAHA_LORE } from "../../data/lore";
 import { MOON_TRAITS, NAK_TRAITS, NUMBER_TRAITS } from "../../data/traits";
-import { reconcile } from "./LifeReading";
+import { currentDasha } from "../../engine/dasha";
+import { computePatri, REFERENCE_PROFILE } from "../../engine/patri";
+import { DEFAULT_PRESET } from "../../engine/types";
+import { LifeReading, reconcile } from "./LifeReading";
 
 describe("plus and minus points on the simple card", () => {
   it("never shows a word and its opposite on the same card", () => {
@@ -39,5 +45,80 @@ describe("plus and minus points on the simple card", () => {
         }
       }
     }
+  });
+});
+
+describe("the reading in simple words", () => {
+  const NOW = Date.UTC(2026, 9, 12, 6);
+  const patri = computePatri(REFERENCE_PROFILE, DEFAULT_PRESET, 0);
+  const show = (onChapters?: () => void) =>
+    render(
+      <MemoryRouter>
+        <LifeReading profile={REFERENCE_PROFILE} patri={patri} nowMs={NOW} {...(onChapters ? { onChapters } : {})} />
+      </MemoryRouter>,
+    );
+
+  it("answers first, then shows the three key signs as cards that open their stories", () => {
+    const { container } = show();
+    expect(screen.getByRole("heading", { level: 2, name: /this is you/ })).toBeInTheDocument();
+    const facts = within(screen.getByRole("list", { name: "Your three key signs" })).getAllByRole("listitem");
+    expect(facts.map((f) => f.getAttribute("data-fact"))).toEqual(["moon", "nak", "lagna"]);
+    expect(facts[0]).toHaveTextContent(/Moon sign Rāśi/);
+    expect(facts[0]).toHaveTextContent("Mīna");
+    expect(facts[1]).toHaveTextContent(/Birth star Nakṣatra/);
+    expect(facts[1]).toHaveTextContent("Revatī");
+    expect(facts[2]).toHaveTextContent(/Rising sign Lagna/);
+    expect(within(facts[1] as HTMLElement).getByRole("link")).toHaveAttribute("href", "/explore/nakshatra/26");
+    expect(within(facts[0] as HTMLElement).getByRole("button", { name: /What is Rāśi/ })).toBeInTheDocument();
+    expect(container.querySelector('[lang="hi"]')).toBeNull(); // plain English, no Devanagari headings
+  });
+
+  it("lists plus and minus points, love and work, and the chapter running now", () => {
+    show();
+    expect(within(screen.getByRole("region", { name: "Plus points" })).getAllByRole("listitem").length).toBeGreaterThan(2);
+    expect(within(screen.getByRole("region", { name: "Watch out for" })).getAllByRole("listitem").length).toBeGreaterThan(0);
+    expect(screen.getByText("In love")).toBeInTheDocument();
+    expect(screen.getByText("At work")).toBeInTheDocument();
+    const cur = currentDasha(patri.dasha, NOW);
+    if (!cur) throw new Error("no chapter");
+    const now = screen.getByRole("region", { name: /Your \w+ chapter/ });
+    expect(now).toHaveTextContent(`Your ${GRAHA_LORE.find((g) => g.id === cur.md.lord)?.english} chapter`);
+    expect(now).toHaveTextContent(/Inside it, a shorter \w+ stretch runs until \w+ 20\d\d/);
+  });
+
+  it("offers the next steps: forecast, palm, sky at birth and partner match", () => {
+    show();
+    const id = REFERENCE_PROFILE.id;
+    for (const [name, href] of [
+      [/^Forecast/, `/forecast/${id}`],
+      [/^Palm reading/, `/hast/${id}`],
+      [/^Sky at birth/, `/patri/${id}/sky`],
+      [/^Partner match/, "/milan"],
+      [/^Sun sign/, /^\/explore\/rashi\/\d+$/],
+      [/^Chinese zodiac/, "/explore/chinese"],
+      [/^Numbers/, "/explore/numbers"],
+    ] as const) {
+      const link = screen.getByRole("link", { name });
+      if (typeof href === "string") expect(link).toHaveAttribute("href", href);
+      else expect(link.getAttribute("href")).toMatch(href);
+    }
+  });
+
+  it("opens the Life chapters view from the chapter card when the screen provides it", () => {
+    const onChapters = vi.fn();
+    show(onChapters);
+    fireEvent.click(screen.getByRole("button", { name: "All life chapters" }));
+    expect(onChapters).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not guess a rising sign when the birth time is unknown", () => {
+    render(
+      <MemoryRouter>
+        <LifeReading profile={{ ...REFERENCE_PROFILE, timeUnknown: true }} patri={patri} nowMs={NOW} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole("heading", { level: 2, name: /this is you/ }).parentElement).not.toHaveTextContent(/Your rising sign is/);
+    expect(screen.getByText("Birth time unknown, so this is uncertain.")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "All life chapters" })).toBeNull();
   });
 });

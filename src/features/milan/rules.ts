@@ -142,3 +142,15 @@ export function summaryText({ result: r, first, second, manglikLabel, disclaimer
   lines.push("", disclaimer, "Computed on this device by Vyomaphala.");
   return lines.join("\n");
 }
+
+/** The glossary entry that explains each kūṭa in plain English. */
+export const KOOTA_GLOSS: Record<KootaId, string> = {
+  varna: "varna",
+  vashya: "vashya",
+  tara: "tara",
+  yoni: "yoni",
+  maitri: "graha-maitri",
+  gana: "gana",
+  bhakoot: "bhakuta",
+  nadi: "nadi",
+};

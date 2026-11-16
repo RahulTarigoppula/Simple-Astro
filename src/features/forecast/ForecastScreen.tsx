@@ -1,38 +1,26 @@
 // Forecasts for a day, week, month, quarter or year, read the classical way (gochara from the natal
-// Moon, Tārā/Candra-bala, the running daśā) and explained in plain English.
-import { useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+// Moon, Tārā/Candra-bala, the running daśā). The answer comes first; the astrology is folded below.
+import { useEffect, useMemo, useState } from "react";
+import { Link, useParams, useSearchParams } from "react-router";
 import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { useNowMs } from "../../app/useNow";
-import { InfoDot } from "../../components/ui/Explain";
-import { GrahaGlyph } from "../../components/ui/GrahaGlyph";
-import { Screen } from "../../components/ui/Screen";
-import { GRAHA_LORE, RASHI_LORE } from "../../data/lore";
-import type { SkyEvent } from "../../engine/events";
-import { type Forecast, forecast, HOUSE_AREA, ord, type Period, periodBounds } from "../../engine/forecast";
-import { dayGuide, personalReading } from "../../engine/personal";
-import { personalYear } from "../../engine/profile";
-import type { GrahaId } from "../../engine/types";
-import "../cosmic/cosmic.css";
-import { AreasCard, ContactsCard, DayGuideCard, DayNotes, StrengthCard } from "./PersonalSections";
-import "./forecast.css";
+import { ChevronLeft, ChevronRight, Page } from "../../components/ui/Page";
+import { RASHI_LORE } from "../../data/lore";
 import { rashiBoth } from "../../data/regional";
 import { CHAPTER_SHORT } from "../../data/traits";
+import { type Forecast, forecast, type Period, periodBounds } from "../../engine/forecast";
+import { computePanchang } from "../../engine/panchang";
+import { dayGuide, personalReading } from "../../engine/personal";
+import { personalYear } from "../../engine/profile";
 import { safeZone } from "../../engine/time";
 import { countEvent } from "../../platform/stats";
+import { IconForecast } from "../chowki/icons";
+import { ContactsFold, DashaFold, EventsFold, MethodFold, SaturnFold, StrengthFold, saturnName, TransitsFold } from "./Folds";
+import { MonthGrid, MonthRows, WeekStrip } from "./PeriodViews";
+import { AreasCard, DoCards, HoursCard, MoonCard } from "./PersonalSections";
+import { english, fmt, HALF_DAY, lore, pct, TONE_HINT, TONE_WORD } from "./util";
+import "./forecast.css";
 
-/** The nine tārās in a word of English, beside the Sanskrit. */
-const TARA_ENGLISH: Record<string, string> = {
-  Janma: "your own",
-  Sampat: "gain",
-  Vipat: "trouble",
-  Kṣema: "well-being",
-  Pratyari: "obstacle",
-  Sādhaka: "achievement",
-  Vadha: "hardest",
-  Mitra: "friend",
-  "Parama-Mitra": "best friend",
-};
 const PERIODS: Array<{ id: Period; label: string }> = [
   { id: "day", label: "Day" },
   { id: "week", label: "Week" },
@@ -40,19 +28,17 @@ const PERIODS: Array<{ id: Period; label: string }> = [
   { id: "quarter", label: "Quarter" },
   { id: "year", label: "Year" },
 ];
-const DAY = 86_400_000;
-const TONE_WORD = { bright: "Bright", steady: "Steady", mixed: "Mixed", testing: "Quiet" } as const;
-const TONE_HINT = {
-  bright: "Most of the sky favours you",
-  steady: "More help than hindrance",
-  mixed: "Help and hindrance in balance",
-  testing: "Tradition advises patience",
-} as const;
-const lore = (id: GrahaId) => GRAHA_LORE.find((g) => g.id === id);
-
-function fmt(ms: number, zone: string, o: Intl.DateTimeFormatOptions): string {
-  return new Intl.DateTimeFormat("en-GB", { ...o, timeZone: safeZone(zone) }).format(ms);
-}
+const asPeriod = (v: string | null): Period | null => PERIODS.find((p) => p.id === v)?.id ?? null;
+const THIS: Record<Period, string> = { day: "Today", week: "This week", month: "This month", quarter: "This quarter", year: "This year" };
+const AREAS_TITLE: Record<Period, string> = {
+  day: "Your life today",
+  week: "Your life this week",
+  month: "Your life this month",
+  quarter: "Your life this quarter",
+  year: "Your life this year",
+};
+/** The planet numerology gives each personal-year number. */
+const YEAR_LORD = { 1: "SU", 2: "MO", 3: "JU", 4: "RA", 5: "ME", 6: "VE", 7: "KE", 8: "SA", 9: "MA" } as const;
 
 function periodLabel(p: Period, s: number, e: number, zone: string): string {
   switch (p) {
@@ -71,130 +57,123 @@ function periodLabel(p: Period, s: number, e: number, zone: string): string {
 
 function shift(p: Period, atMs: number, zone: string, dir: 1 | -1): number {
   const [s, e] = periodBounds(p, atMs, safeZone(zone));
-  return dir === 1 ? e + DAY / 2 : s - DAY / 2;
+  return dir === 1 ? e + HALF_DAY : s - HALF_DAY;
 }
 
-function eventText(e: SkyEvent): string {
-  const g = e.graha ? lore(e.graha) : undefined;
-  const sign = e.sign !== undefined ? RASHI_LORE[e.sign] : undefined;
-  switch (e.kind) {
-    case "full":
-      return "Full Moon (Pūrṇimā)";
-    case "new":
-      return "New Moon (Amāvasyā)";
-    case "ekadashi":
-      return `${e.shukla ? "Śukla" : "Kṛṣṇa"} Ekādaśī begins`;
-    case "lunar-eclipse":
-      return `${e.eclipse} lunar eclipse${e.visibleHere ? " (visible here)" : " (not visible here)"}`;
-    case "solar-eclipse":
-      return `${e.eclipse} solar eclipse${e.visibleHere ? " (visible here)" : " (not visible here)"}`;
-    case "sankranti":
-      return `Sun enters ${sign?.name} (${sign?.western})`;
-    case "ingress":
-      return `${g?.english} enters ${sign?.name} (${sign?.western})`;
-    case "station":
-      return `${g?.english} turns ${e.retro ? "retrograde" : "direct"}`;
-  }
-}
-
-function keepEvent(p: Period, e: SkyEvent): boolean {
-  if (p === "year")
-    return e.kind.endsWith("eclipse") || ((e.kind === "ingress" || e.kind === "station") && ["JU", "SA", "RA"].includes(e.graha ?? ""));
-  if (p === "quarter") return e.kind !== "ekadashi" && !(e.kind === "ingress" && e.graha === "ME");
-  return true;
-}
-
-const WEEKDAYS = [
-  ["mon", "M"],
-  ["tue", "T"],
-  ["wed", "W"],
-  ["thu", "T"],
-  ["fri", "F"],
-  ["sat", "S"],
-  ["sun", "S"],
-] as const;
-
-/** 0 = Monday … 6 = Sunday, in the zone. */
-function monIndex(ms: number, zone: string): number {
-  return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(fmt(ms, zone, { weekday: "short" }));
-}
-
-function Steps({ f, zone }: { f: Forecast; zone: string }) {
-  if (f.period === "day") return null;
-  const best = [...f.steps].sort((a, b) => b.score - a.score)[0];
-  const cal = f.period === "month";
+/** The ring: how supportive the period reads, 0 to 100. */
+function Ring({ score, word }: { score: number; word: string }) {
+  const r = 44;
+  const c = 2 * Math.PI * r;
+  const p = Math.max(4, pct(score));
   return (
-    <section className="cosmic-card fc-steps" aria-labelledby="fc-steps-h">
-      <header className="cosmic-card__head">
-        <h2 id="fc-steps-h">
-          {f.period === "week" ? "Day by day" : cal ? "The month at a glance" : "Month by month"}
-          <span className="gloss">
-            {f.period === "week" || cal
-              ? "taller = more supportive, by the Moon's daily position and star"
-              : "by Jupiter, Saturn and the nodes"}
-          </span>
-        </h2>
-      </header>
-      {cal ? (
-        <div className="fc-wd" aria-hidden="true">
-          {WEEKDAYS.map(([key, d]) => (
-            <span key={key}>{d}</span>
-          ))}
+    <div className="fc-ring" role="img" aria-label={`${word}. Support ${pct(score)} out of 100.`}>
+      <svg viewBox="0 0 104 104" aria-hidden="true">
+        <circle cx="52" cy="52" r={r} className="fc-ring__track" />
+        <circle cx="52" cy="52" r={r} className="fc-ring__fill" strokeDasharray={`${(p / 100) * c} ${c}`} transform="rotate(-90 52 52)" />
+      </svg>
+      <span className="fc-ring__num">{pct(score)}</span>
+      <span className="fc-ring__of">of 100</span>
+    </div>
+  );
+}
+
+function Hero({ f, eyebrow }: { f: Forecast; eyebrow: string }) {
+  const word = TONE_WORD[f.tone];
+  const md = f.dasha.find((d) => d.level === "MD");
+  return (
+    <section className="v-card v-card--hero fc-hero" data-tone={f.tone} aria-labelledby="fc-hero-h" aria-live="polite">
+      <div className="fc-hero__top">
+        <Ring score={f.score} word={word} />
+        <div className="fc-hero__text">
+          <p className="v-eyebrow">{eyebrow}</p>
+          <h2 id="fc-hero-h" className="fc-hero__word">
+            {word}
+          </h2>
+          <p className="fc-hero__hint">{TONE_HINT[f.tone]}</p>
         </div>
-      ) : null}
-      <ol className={`fc-bars${cal ? " fc-bars--cal" : ""}`}>
-        {f.steps.map((s) => {
-          const tone = s.score >= 0.35 ? "bright" : s.score >= 0 ? "steady" : s.score >= -0.35 ? "mixed" : "testing";
-          const label =
-            f.period === "week"
-              ? fmt(s.ms + DAY / 2, zone, { weekday: "short" })
-              : cal
-                ? fmt(s.ms + DAY / 2, zone, { day: "numeric" })
-                : fmt(s.ms + DAY, zone, { month: "short" });
-          const title = `${f.period === "week" || cal ? fmt(s.ms + DAY / 2, zone, { weekday: "long", day: "numeric", month: "short" }) : fmt(s.ms + DAY, zone, { month: "long" })}: ${TONE_WORD[tone]}${s.tara ? ` · Moon in your ${ord(s.moonHouse)} · ${s.tara} tārā` : ""}`;
-          return (
-            <li
-              key={s.ms}
-              className={`fc-bar fc-bar--${tone}${s === best ? " is-best" : ""}`}
-              title={title}
-              aria-label={title}
-              style={cal && s === f.steps[0] ? { gridColumnStart: monIndex(s.ms + DAY / 2, zone) + 1 } : undefined}
-            >
-              <span className="fc-bar__fill" style={{ height: `${Math.round(18 + ((s.score + 1) / 2) * 82)}%` }} />
-              <span className="fc-bar__k">{label}</span>
+      </div>
+      <p className="fc-hero__line">{f.headline}</p>
+      {md || f.sadeSati !== "none" ? (
+        <ul className="fc-hero__ctx">
+          {md ? (
+            <li>
+              <span className="fc-hero__k">Life chapter</span> {english(md.lord)}: {CHAPTER_SHORT[md.lord]}
             </li>
-          );
-        })}
-      </ol>
-      {best ? (
-        <p className="fc-best">
-          ★ Best {f.period === "week" || cal ? "day" : "month"}:{" "}
-          <strong>
-            {f.period === "week" || cal
-              ? fmt(best.ms + DAY / 2, zone, { weekday: "long", day: "numeric", month: "short" })
-              : fmt(best.ms + DAY, zone, { month: "long" })}
-          </strong>
-        </p>
+          ) : null}
+          {f.sadeSati !== "none" ? (
+            <li>
+              <span className="v-chip v-chip--mixed fc-chip">Saturn season: {saturnName(f.sadeSati)}</span>
+            </li>
+          ) : null}
+        </ul>
       ) : null}
     </section>
   );
 }
 
+function Empty() {
+  return (
+    <Page label="Forecast" title="Your forecast">
+      <section className="v-card v-empty" aria-labelledby="fc-empty-h">
+        <span className="v-empty__art" aria-hidden="true">
+          <IconForecast />
+        </span>
+        <h2 id="fc-empty-h" className="v-card__title">
+          See what is ahead, in plain words
+        </h2>
+        <p className="v-muted">
+          Add your birth date, time and place once. Vyomaphala then reads every day, week, month and year from where the planets really are.
+        </p>
+        <ul className="v-ticks">
+          <li>A guide for today: good for, go easy on, and your best hours</li>
+          <li>Your life area by area: work, money, love, health, mind, home and luck</li>
+          <li>Planets crossing your own birth chart, and your current life chapter</li>
+        </ul>
+        <Link to="/leaf/new" className="v-btn">
+          Add your birth details
+        </Link>
+        <p className="v-small v-muted">Takes about a minute. Stays on this device.</p>
+      </section>
+    </Page>
+  );
+}
+
 export default function ForecastScreen() {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const [search, setSearch] = useSearchParams();
   const profiles = useProfiles();
   const active = useActiveProfile();
   const profile = (id ? profiles?.find((p) => p.id === id) : active) ?? active;
   const settings = useSettings();
   const { patri } = usePatri(profile, settings.preset);
   const nowMs = useNowMs(60_000);
-  const [period, setPeriod] = useState<Period>("day");
+
+  // The period is state, mirrored in the URL (?p=week). A link that changes the query moves the state;
+  // a switch of person navigates without the query, and the effect below puts it back.
+  const urlPeriod = asPeriod(search.get("p"));
+  const [period, setPeriod] = useState<Period>(urlPeriod ?? "day");
+  const [seenUrl, setSeenUrl] = useState(urlPeriod);
+  if (urlPeriod !== seenUrl) {
+    setSeenUrl(urlPeriod);
+    if (urlPeriod) setPeriod(urlPeriod);
+  }
+  useEffect(() => {
+    if (!urlPeriod && period !== "day") setSearch({ p: period }, { replace: true });
+  }, [urlPeriod, period, setSearch]);
+
   const [at, setAt] = useState<number | null>(null);
   const zone = profile?.birth.zone ?? "Asia/Kolkata";
   const atMs = at ?? nowMs;
-  const place = profile ? { lat: profile.birth.place.lat, lon: profile.birth.place.lon } : { lat: 12.97, lon: 77.59 };
-  const { lat, lon } = place;
+  const lat = profile?.birth.place.lat ?? 12.97;
+  const lon = profile?.birth.place.lon ?? 77.59;
+
+  const show = (p: Period, when: number | null) => {
+    setPeriod(p);
+    setAt(when);
+    setSearch(p === "day" ? {} : { p }, { replace: true });
+  };
+
+  const ready = Boolean(patri && profile && patri.profileId === profile.id);
 
   const f = useMemo(() => {
     if (!patri || !profile || patri.profileId !== profile.id) return null;
@@ -208,7 +187,7 @@ export default function ForecastScreen() {
   const personal = useMemo(() => {
     if (!patri || !profile || patri.profileId !== profile.id || !f) return null;
     try {
-      const mid = period === "day" ? f.startMs + 43_200_000 : (f.startMs + f.endMs) / 2;
+      const mid = period === "day" ? f.startMs + HALF_DAY : (f.startMs + f.endMs) / 2;
       const r = personalReading(patri, mid, settings.preset);
       const g = period === "day" ? dayGuide(patri, mid, { lat, lon }, settings.preset, r.areas) : null;
       return { r, g };
@@ -217,57 +196,31 @@ export default function ForecastScreen() {
     }
   }, [patri, profile, f, period, settings.preset, lat, lon]);
 
-  if (profiles !== undefined && !profile) {
-    return (
-      <Screen className="forecast" label="Forecast">
-        <div className="fc-empty">
-          <p className="fc-kicker">Forecast · भविष्य</p>
-          <h1>Your sky ahead</h1>
-          <p className="fc-empty__lede">
-            Add your birth date, time and place once. Vyomaphala then reads every day, week, month and year from where the planets really
-            are.
-          </p>
-          <ul className="fc-empty__list">
-            <li>A guide for today: good for, go easy on, and your best hours</li>
-            <li>Your life area by area: work, money, love, health, mind, home and luck</li>
-            <li>Planets crossing your own birth chart, and your current life chapter</li>
-          </ul>
-          <Link to="/leaf/new" className="stamp">
-            <span>Add your birth details</span>
-          </Link>
-          <p className="fc-empty__note">Takes about a minute. Stays on this device.</p>
-        </div>
-      </Screen>
-    );
-  }
+  // Sunrise, sunset and the Moon's shape for the day shown (day view only).
+  const dayStart = period === "day" && f ? f.startMs : null;
+  const sky = useMemo(() => {
+    if (dayStart === null) return null;
+    try {
+      const p = computePanchang(dayStart + HALF_DAY, { lat, lon }, settings.preset);
+      return { riseMs: p.sunriseMs, setMs: p.sunsetMs, elongation: p.elongation };
+    } catch {
+      return null;
+    }
+  }, [dayStart, lat, lon, settings.preset]);
+
+  if (profiles === undefined) return <Page label="Forecast">{null}</Page>;
+  if (!profile) return <Empty />;
 
   const moonSign = patri ? RASHI_LORE[patri.grahas.MO.sign] : undefined;
-  const good = f?.lines.filter((l) => l.favourable) ?? [];
-  const care = f?.lines.filter((l) => !l.favourable) ?? [];
-  const py = profile ? personalYear(profile.birth.localMo, profile.birth.localD, Number(fmt(atMs, zone, { year: "numeric" }))) : 0;
+  const moonSignText = moonSign && patri ? `${rashiBoth(patri.grahas.MO.sign, profile.tradition)} · ${moonSign.western}` : "";
+  const py = personalYear(profile.birth.localMo, profile.birth.localD, Number(fmt(atMs, zone, { year: "numeric" })));
+  const pyLord = lore(YEAR_LORD[py as keyof typeof YEAR_LORD]);
+  const isNow = f ? nowMs >= f.startMs && nowMs < f.endMs : false;
+  const step0 = f?.steps[0];
 
   return (
-    <Screen className="forecast" label="Forecast">
-      <header className="fc-head">
-        <p className="fc-kicker">Forecast · भविष्य</p>
-        <h1>{profile ? `${profile.name}'s sky ahead` : "Your sky ahead"}</h1>
-        <p className="fc-lede">
-          Read the classical way: where the planets are, counted from {profile?.name ?? "your"}'s Moon sign
-          {moonSign && patri ? ` (${rashiBoth(patri.grahas.MO.sign, profile?.tradition)} · ${moonSign.western})` : ""}, plus the running
-          life chapter (daśā). <InfoDot id="gochar" />
-        </p>
-        {profiles && profiles.length > 1 ? (
-          <div className="fc-people" role="group" aria-label="Whose forecast">
-            {profiles.map((p) => (
-              <button key={p.id} type="button" aria-pressed={p.id === profile?.id} onClick={() => navigate(`/forecast/${p.id}`)}>
-                {p.name}
-              </button>
-            ))}
-          </div>
-        ) : null}
-      </header>
-
-      <div className="seg fc-tabs" role="tablist" aria-label="Forecast period">
+    <Page label="Forecast" title={`${profile.name}'s forecast`} wide className="forecast">
+      <div className="v-seg fc-tabs" role="tablist" aria-label="Forecast period">
         {PERIODS.map((p) => (
           <button
             key={p.id}
@@ -275,9 +228,8 @@ export default function ForecastScreen() {
             role="tab"
             aria-selected={period === p.id}
             onClick={() => {
-              setPeriod(p.id);
               countEvent(`forecast-${p.id}`);
-              setAt(null);
+              show(p.id, null);
             }}
           >
             {p.label}
@@ -288,218 +240,112 @@ export default function ForecastScreen() {
       {f ? (
         <>
           <div className="fc-nav">
-            <button type="button" className="fc-step" aria-label="Previous" onClick={() => setAt(shift(period, atMs, zone, -1))}>
-              ←
+            <button
+              type="button"
+              className="v-iconbtn"
+              aria-label={`Previous ${period}`}
+              onClick={() => setAt(shift(period, atMs, zone, -1))}
+            >
+              <ChevronLeft />
             </button>
-            <div className="fc-when">
-              <span className="fc-when__label">{periodLabel(period, f.startMs, f.endMs, zone)}</span>
-              {at !== null ? (
-                <button type="button" className="linkish" onClick={() => setAt(null)}>
-                  back to now
+            <div className="fc-nav__when">
+              <span className="fc-nav__label">{periodLabel(period, f.startMs, f.endMs, zone)}</span>
+              {isNow ? (
+                <span className="fc-nav__now">{THIS[period]}</span>
+              ) : (
+                <button type="button" className="v-link" onClick={() => setAt(null)}>
+                  Back to now
                 </button>
-              ) : (
-                <span className="fc-when__now">now</span>
               )}
             </div>
-            <button type="button" className="fc-step" aria-label="Next" onClick={() => setAt(shift(period, atMs, zone, 1))}>
-              →
+            <button type="button" className="v-iconbtn" aria-label={`Next ${period}`} onClick={() => setAt(shift(period, atMs, zone, 1))}>
+              <ChevronRight size={20} />
             </button>
           </div>
 
-          <section className={`fc-hero fc-hero--${f.tone}`} aria-live="polite">
-            <div className="fc-orb" aria-hidden="true">
-              <span />
-            </div>
-            <div className="fc-hero__text">
-              <p className="fc-tone">
-                {TONE_WORD[f.tone]} <span>{TONE_HINT[f.tone]}</span>
-              </p>
-              <p className="fc-headline">
-                {profile ? <strong>{profile.name}, </strong> : null}
-                {f.headline[0]?.toLowerCase() + f.headline.slice(1)}
-              </p>
-              <div className="fc-meter" role="img" aria-label={`Support score ${Math.round(((f.score + 1) / 2) * 100)} out of 100`}>
-                <span style={{ width: `${Math.round(((f.score + 1) / 2) * 100)}%` }} />
-              </div>
-            </div>
-          </section>
+          <Hero f={f} eyebrow={isNow ? THIS[period] : periodLabel(period, f.startMs, f.endMs, zone)} />
 
-          {period === "day" && f.steps[0] ? (
-            <section className="cosmic-card fc-moon">
-              <header className="cosmic-card__head">
-                <h2>
-                  The Moon today <InfoDot id="chandra-bala" />
-                  <span className="gloss">the fastest mover sets the day's mood</span>
-                </h2>
-              </header>
-              <div className="fc-moon__row">
-                <GrahaGlyph id="MO" size={44} />
-                <p>
-                  The Moon is in your <strong>{ord(f.steps[0].moonHouse)} house</strong> from your Moon sign, the area of{" "}
-                  {HOUSE_AREA[f.steps[0].moonHouse]}. Today's star is <strong>{f.steps[0].tara}</strong>
-                  {TARA_ENGLISH[f.steps[0].tara] ? ` (${TARA_ENGLISH[f.steps[0].tara]})` : ""} for you (
-                  {f.steps[0].taraTone === "kind"
-                    ? "a kind one"
-                    : f.steps[0].taraTone === "unkind"
-                      ? "one tradition calls unkind"
-                      : "your own birth star, so mixed"}
-                  ) <InfoDot id="tara-bala" />.
-                </p>
+          {period === "day" ? (
+            <>
+              <div className="v-cols">
+                <div className="v-stack">
+                  {personal?.g ? <DoCards g={personal.g} /> : null}
+                  {step0 ? <MoonCard step={step0} elongation={sky?.elongation ?? null} /> : null}
+                </div>
+                {personal?.g ? (
+                  <HoursCard
+                    g={personal.g}
+                    zone={zone}
+                    sun={sky ? { riseMs: sky.riseMs, setMs: sky.setMs } : null}
+                    now={isNow ? nowMs : null}
+                  />
+                ) : null}
               </div>
-            </section>
+              {personal ? <AreasCard r={personal.r} title={AREAS_TITLE.day} split /> : null}
+            </>
           ) : null}
 
-          {personal?.g && profile ? <DayGuideCard g={personal.g} zone={zone} name={profile.name} /> : null}
+          {period === "week" ? (
+            <>
+              <WeekStrip key={f.startMs} f={f} zone={zone} now={nowMs} onOpenDay={(ms) => show("day", ms)} />
+              {personal ? <AreasCard r={personal.r} title={AREAS_TITLE.week} split /> : null}
+            </>
+          ) : null}
 
-          {personal && profile ? <AreasCard r={personal.r} name={profile.name} /> : null}
+          {period === "month" ? (
+            <div className="v-cols">
+              <MonthGrid f={f} zone={zone} now={nowMs} />
+              {personal ? <AreasCard r={personal.r} title={AREAS_TITLE.month} /> : null}
+            </div>
+          ) : null}
 
-          <Steps f={f} zone={zone} />
+          {period === "quarter" || period === "year" ? (
+            <div className="v-cols">
+              <div className="v-stack">
+                <MonthRows f={f} zone={zone} now={nowMs} />
+                {period === "year" ? (
+                  <section className="v-card fc-num" aria-labelledby="fc-num-h">
+                    <span className="fc-num__n" aria-hidden="true">
+                      {py}
+                    </span>
+                    <div>
+                      <h2 id="fc-num-h" className="v-card__title">
+                        Personal year {py}
+                      </h2>
+                      <p>
+                        In numerology this is {pyLord?.english}'s year, read as a time for {pyLord?.signifies}.
+                      </p>
+                      <Link to="/explore/numbers" className="v-link fc-num__more">
+                        More numbers <ChevronRight size={16} />
+                      </Link>
+                    </div>
+                  </section>
+                ) : null}
+              </div>
+              {personal ? <AreasCard r={personal.r} title={AREAS_TITLE[period]} /> : null}
+            </div>
+          ) : null}
 
-          {period === "week" ? <DayNotes steps={f.steps} zone={zone} /> : null}
-
-          {personal ? <ContactsCard r={personal.r} /> : null}
-
-          {personal && period !== "day" ? <StrengthCard r={personal.r} /> : null}
-
-          <div className="fc-two">
-            <section className="cosmic-card fc-list fc-list--good">
-              <header className="cosmic-card__head">
-                <h2>
-                  Working for you <span className="gloss">favourable transits by the classical table</span>
-                </h2>
-              </header>
-              {good.length ? (
-                <ul>
-                  {good.map((l) => (
-                    <li key={l.graha}>
-                      <GrahaGlyph id={l.graha} size={34} />
-                      <span>{l.text}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="p p--muted">No planet in a favourable house for this period. A time to rest and plan.</p>
-              )}
-            </section>
-            <section className="cosmic-card fc-list fc-list--care">
-              <header className="cosmic-card__head">
-                <h2>
-                  Go gently with <span className="gloss">transits tradition reads as strain</span>
-                </h2>
-              </header>
-              {care.length ? (
-                <ul>
-                  {care.map((l) => (
-                    <li key={l.graha}>
-                      <GrahaGlyph id={l.graha} size={34} />
-                      <span>{l.text}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="p p--muted">Nothing strained. Every listed planet is in a supportive house.</p>
-              )}
-            </section>
+          <h2 className="fc-more">The astrology behind this</h2>
+          <div className="v-cols fc-folds">
+            <div className="v-stack">
+              <TransitsFold lines={f.lines} />
+              {personal ? <ContactsFold r={personal.r} /> : null}
+              {personal && period !== "day" ? <StrengthFold r={personal.r} /> : null}
+            </div>
+            <div className="v-stack">
+              <DashaFold dasha={f.dasha} zone={zone} />
+              <SaturnFold sade={f.sadeSati} />
+              <EventsFold f={f} zone={zone} />
+              <MethodFold name={profile.name} moonSign={moonSignText} />
+            </div>
           </div>
 
-          {f.sadeSati !== "none" ? (
-            <section className="cosmic-card fc-saturn">
-              <GrahaGlyph id="SA" size={44} />
-              <div>
-                <h2>
-                  {f.sadeSati === "kantaka" ? "Kaṇṭaka Śani" : f.sadeSati === "ashtama" ? "Aṣṭama Śani" : `Sāḍe Sātī, ${f.sadeSati} phase`}{" "}
-                  <InfoDot id="sade-sati" />
-                </h2>
-                <p>
-                  {f.sadeSati === "kantaka"
-                    ? "Saturn is in a 'thorn' house (4th, 7th or 10th) from your Moon. Tradition reads extra effort at home, in partnerships or at work."
-                    : f.sadeSati === "ashtama"
-                      ? "Saturn is in the 8th from your Moon, a stretch tradition associates with slow, deep change."
-                      : "Saturn is passing over your Moon sign's neighbourhood: a 7½-year season of responsibility and maturing. Everyone meets it about every 30 years."}
-                </p>
-              </div>
-            </section>
-          ) : null}
-
-          <section className="cosmic-card fc-dasha">
-            <header className="cosmic-card__head">
-              <h2>
-                Your life chapter <InfoDot id="dasha" />
-                <span className="gloss">the Viṃśottarī periods running in this window</span>
-              </h2>
-            </header>
-            <ol>
-              {f.dasha.map((d) => (
-                <li key={`${d.level}-${d.startMs}`} className={`fc-dasha__${d.level}`}>
-                  <GrahaGlyph id={d.lord} size={32} />
-                  <div>
-                    <p className="fc-dasha__t">
-                      {d.level === "MD" ? "Chapter" : d.level === "AD" ? "Sub-chapter" : "Phase"}: {lore(d.lord)?.english} (
-                      {lore(d.lord)?.name})
-                    </p>
-                    <p className="fc-dasha__s">
-                      {fmt(d.startMs, zone, { day: "numeric", month: "short", year: "numeric" })} →{" "}
-                      {fmt(d.endMs, zone, { day: "numeric", month: "short", year: "numeric" })} · its theme: {CHAPTER_SHORT[d.lord]}.
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </section>
-
-          {f.events.filter((e) => keepEvent(period, e)).length ? (
-            <section className="cosmic-card fc-events">
-              <header className="cosmic-card__head">
-                <h2>In the sky this {period}</h2>
-              </header>
-              <ul>
-                {f.events
-                  .filter((e) => keepEvent(period, e))
-                  .slice(0, 24)
-                  .map((e) => (
-                    <li key={`${e.kind}-${e.ms}-${e.graha ?? ""}`}>
-                      <span className="fc-events__d mono">{fmt(e.ms, zone, { day: "2-digit", month: "short" })}</span>
-                      <span>{eventText(e)}</span>
-                    </li>
-                  ))}
-              </ul>
-            </section>
-          ) : null}
-
-          {period === "year" ? (
-            <section className="cosmic-card fc-num">
-              <span className="cp-sign cp-sign--num" aria-hidden="true">
-                {py}
-              </span>
-              <p>
-                <strong>Personal year {py}</strong> in numerology:{" "}
-                {lore(({ 1: "SU", 2: "MO", 3: "JU", 4: "RA", 5: "ME", 6: "VE", 7: "KE", 8: "SA", 9: "MA" } as const)[py as 1])?.english}'s
-                year, read as a time for{" "}
-                {lore(({ 1: "SU", 2: "MO", 3: "JU", 4: "RA", 5: "ME", 6: "VE", 7: "KE", 8: "SA", 9: "MA" } as const)[py as 1])?.signifies}.{" "}
-                <Link to="/explore/numbers" className="linkish">
-                  More numbers
-                </Link>
-              </p>
-            </section>
-          ) : null}
-
-          <aside className="fc-karma">
-            <span className="fc-karma__k">कर्म · Karma, not fate</span>
-            <p>
-              A forecast shows what <em>could</em> happen, like the weather. What does happen is shaped by your karma: your own choices and
-              actions. Use this to reflect and plan, never to fear.
-            </p>
-          </aside>
-
-          <p className="fc-foot">
-            How this is read: each planet's house is counted from the natal Moon sign and checked against the classical table of favourable
-            houses (Phaladīpikā ch. 26); days add the Moon's Tārā-bala and Candra-bala. It is a traditional reading for reflection. It is
-            not a prediction of events and not advice.
-          </p>
+          <p className="v-foot">A traditional reading for reflection, never a prediction or advice.</p>
         </>
       ) : (
-        <p className="p p--muted fc-wait">Reading the sky…</p>
+        <div className="v-skel">{ready ? "This period could not be read." : "Reading the sky…"}</div>
       )}
-    </Screen>
+    </Page>
   );
 }

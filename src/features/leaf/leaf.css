@@ -1,256 +1,395 @@
-.leaf-sheet {
-  margin-top: 0;
-}
-.leaf-strip-wrap {
-  padding: var(--space-3) var(--paper-margin) 0;
-}
-.leaf-strip .lg {
-  font-variation-settings:
-    "wdth" 87,
-    "wght" 800;
-}
-.leaf-place {
-  position: relative;
-}
-.leaf-place .chosen {
-  flex: 1 1 100%;
+/* Add / edit a person: four short steps. Built on the 2.0 blocks in styles/ui.css. */
+
+/* ── Progress: "Step 2 of 4" and four tappable steps ───────────────────── */
+.leaf-steps {
   display: flex;
-  gap: var(--space-3);
-  align-items: baseline;
-  flex-wrap: wrap;
-  font-size: var(--text-sm);
-  color: var(--ink-muted);
-  padding-left: calc(5em + var(--space-3));
+  flex-direction: column;
+  gap: 4px;
 }
-.leaf-place .chosen b {
+.leaf-steps__now {
+  font: 600 0.8125rem var(--font-body);
+  letter-spacing: 0.04em;
+  color: var(--accent-text);
+}
+.leaf-steps ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.leaf-steps button {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 0 4px;
+  border: 0;
+  background: none;
+  color: var(--ink-muted);
+  font: 550 0.8125rem var(--font-body);
+  text-align: left;
+  cursor: pointer;
+}
+.leaf-steps button:disabled {
+  color: var(--ink-faint);
+  cursor: default;
+}
+.leaf-steps__bar {
+  display: block;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.leaf-steps button.is-done .leaf-steps__bar {
+  background: var(--accent-text);
+  opacity: 0.55;
+}
+.leaf-steps button[aria-current="step"] {
   color: var(--ink);
-  font-weight: 400;
+}
+.leaf-steps button[aria-current="step"] .leaf-steps__bar {
+  background: var(--accent-text);
+}
+
+/* ── One step ──────────────────────────────────────────────────────────── */
+.leaf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.leaf-q {
+  margin: 4px 0 -6px;
+  font: 650 1.3125rem / 1.25 var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.leaf-q:focus,
+.leaf-q:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.leaf-seg > button {
+  min-height: 44px;
+}
+
+/* Tradition: three choices, each with a line that says what it changes */
+.leaf-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+.leaf-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 14px;
+  border: 1px solid var(--card-edge-strong);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.leaf-choice[aria-checked="true"] {
+  border-color: var(--accent-text);
+  background: var(--violet-soft);
+}
+.leaf-choice__dot {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--ink-muted);
+}
+.leaf-choice[aria-checked="true"] .leaf-choice__dot {
+  border-color: var(--accent-text);
+  background: radial-gradient(circle, var(--accent-text) 0 45%, transparent 50%);
+}
+.leaf-choice__body {
+  min-width: 0;
+}
+.leaf-choice__t {
+  display: block;
+  font-weight: 600;
+}
+.leaf-choice__s {
+  display: block;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+
+/* ── Date and time boxes ───────────────────────────────────────────────── */
+.bf-group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.bf-group > legend {
+  padding: 0;
+  margin-bottom: 8px;
+}
+.bf-group.is-off {
+  opacity: 0.45;
+}
+.bf-row {
+  display: grid;
+  gap: 8px;
+}
+.bf-row--date {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.9fr) minmax(0, 1.2fr);
+}
+.bf-row--time {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr);
+}
+.bf-row--pair {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.bf-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.bf-cell > label,
+.bf-cell__l {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+.bf-num {
+  padding: 0 8px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.bf-select {
+  padding: 0 28px 0 12px;
+  background-position:
+    calc(100% - 16px) 50%,
+    calc(100% - 10px) 50%;
+}
+.bf-ampm {
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  overflow: visible;
+}
+.bf-ampm > button {
+  flex: 1 1 0;
+  min-height: 52px;
+  padding: 0 6px;
+  border: 1px solid var(--card-edge-strong);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 1.0625rem;
+}
+.bf-ampm > button[aria-checked="true"] {
+  border-color: transparent;
+  background: var(--aurora);
+  color: var(--accent-ink);
+  box-shadow: none;
+}
+.bf-read {
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--violet-soft);
+  color: var(--ink);
+  line-height: 1.45;
+}
+.bf-read b {
+  font-weight: 600;
+}
+.bf-read.is-missing {
+  background: var(--mixed-soft);
+  color: var(--warning-text);
+}
+.bf-read.is-urgent {
+  box-shadow: inset 0 0 0 1.5px var(--warning-text);
+  font-weight: 600;
+}
+
+/* "I don't know the time": the whole row is the switch */
+.leaf-switchrow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.leaf-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 0 14px;
+  border: 1px solid var(--card-edge-strong);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--ink);
+  font: 600 1rem var(--font-body);
+  text-align: left;
+  cursor: pointer;
+}
+.leaf-switch__knob {
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 30px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 0 1px var(--card-edge-strong);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.leaf-switch__knob::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ink);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.leaf-switch[aria-checked="true"] {
+  border-color: var(--accent-text);
+}
+.leaf-switch[aria-checked="true"] .leaf-switch__knob {
+  background: var(--accent);
+}
+.leaf-switch[aria-checked="true"] .leaf-switch__knob::after {
+  transform: translateX(22px);
+}
+
+/* ── Place ─────────────────────────────────────────────────────────────── */
+.leaf-ll {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+.leaf-ll--after::before {
+  content: " · ";
 }
 .leaf-online {
   display: flex;
-  gap: var(--space-3);
-  align-items: center;
-  flex-wrap: wrap;
-  padding: 6px var(--paper-margin) 8px;
-  border-bottom: 1px solid var(--border);
+  flex-direction: column;
+  gap: 10px;
 }
-.online-stamp {
-  display: inline-flex;
+.leaf-chosen {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 1.5px solid var(--accent);
-  color: var(--accent-text);
-  border-radius: var(--radius-sm);
-  rotate: -1.5deg;
-  font-size: var(--text-sm);
-}
-.online-stamp:disabled {
-  border-color: var(--ink-faint);
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 14px;
+  border: 1px dashed var(--card-edge-strong);
+  border-radius: var(--radius-md);
   color: var(--ink-muted);
+}
+.leaf-chosen.is-set {
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  background: var(--good-soft);
+  color: var(--ink);
+}
+.leaf-chosen__tick {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(74, 222, 128, 0.18);
+  color: var(--good);
+}
+.leaf-chosen__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.leaf-chosen__t {
+  font-weight: 600;
 }
 .leaf-manual {
   display: flex;
-  gap: var(--space-3);
-  padding: 8px var(--paper-margin);
-  border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
 }
-.leaf-manual label {
+.leaf-inline {
   display: inline-flex;
-  gap: 6px;
-  align-items: baseline;
-  font-size: var(--text-sm);
-  color: var(--ink-muted);
-}
-.leaf-manual input {
-  width: 7.5em;
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  background: none;
-  border: 0;
-  border-bottom: 1px solid var(--border-strong);
-  color: var(--ink);
-  padding: 6px 2px;
-  min-height: 40px;
-}
-.leaf-override .drums {
-  padding-top: var(--space-2);
-  max-width: 260px;
-}
-.leaf-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-  padding: 0 var(--paper-margin);
-}
-@media (min-width: 900px) {
-  .leafscreen .sky {
-    height: 120px;
-  }
-  .leaf-sheet {
-    max-width: 620px;
-  }
-}
-
-.leaf-adv {
-  margin: 0 var(--paper-margin);
-  border-top: 1px solid var(--border);
-}
-.leaf-adv summary {
-  padding: 14px 0;
-  cursor: pointer;
+  align-items: center;
+  min-height: 44px;
   color: var(--accent-text);
-  font-size: var(--text-sm);
   font-weight: 600;
 }
+.leafscreen .leaf-strip {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
 
-/* ── Plain-words birth fields ─────────────────────────────────────────── */
-.leaf-lede {
+/* ── Check and save ────────────────────────────────────────────────────── */
+.leaf-review {
   margin: 0;
-  padding: var(--space-2) var(--paper-margin) var(--space-3);
-  color: var(--ink-muted);
-  font-size: var(--text-sm);
-  line-height: 1.5;
 }
-.bf {
+.leaf-review > div {
   display: grid;
-  gap: 2px;
-  padding: var(--space-3) var(--paper-margin) var(--space-2);
-  border-bottom: 1px solid var(--border);
-}
-.bf__row {
-  display: flex;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "k b"
+    "v b";
   align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-3);
-  min-height: 52px;
+  column-gap: 8px;
+  padding: 10px 6px 10px 16px;
 }
-.bf__row.is-off {
-  opacity: 0.45;
+.leaf-review > div + div {
+  border-top: 1px solid var(--card-edge);
 }
-.bf__k {
-  flex: none;
-  width: 7em;
+.leaf-review dt {
+  grid-area: k;
+  font-size: 0.8125rem;
   color: var(--ink-muted);
-  font-size: var(--text-sm);
 }
-.bf__fields {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.bf__num,
-.bf__select {
-  min-height: 46px;
-  padding: 0 10px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-strong);
-  background: rgba(10, 14, 39, 0.55);
-  color: var(--ink);
-  font-family: var(--font-mono);
-  font-size: var(--text-lg);
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-}
-.bf__select {
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  text-align: left;
-  appearance: none;
-  -webkit-appearance: none;
-  padding-right: 28px;
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--ink-muted) 50%), linear-gradient(135deg, var(--ink-muted) 50%, transparent 50%);
-  background-position:
-    calc(100% - 15px) 55%,
-    calc(100% - 10px) 55%;
-  background-size:
-    5px 5px,
-    5px 5px;
-  background-repeat: no-repeat;
-}
-.bf__select--month {
-  min-width: 8.5em;
-}
-.bf__select option {
-  color: var(--ink);
-  background: var(--surface-solid);
-}
-.bf__num::placeholder {
-  color: var(--ink-faint);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-}
-.bf__num:focus,
-.bf__select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.28);
-}
-.bf__num:disabled,
-.bf__select:disabled {
-  opacity: 0.6;
-}
-.bf__colon {
-  color: var(--ink-muted);
-  font-family: var(--font-mono);
-  font-size: var(--text-lg);
-}
-.bf__ampm button[disabled] {
-  opacity: 0.5;
-}
-.bf__read {
-  margin: 4px 0 6px;
-  padding-left: calc(7em + var(--space-3));
-  color: var(--ink);
-  font-size: var(--text-sm);
-  line-height: 1.5;
-}
-.bf__read b {
+.leaf-review dd {
+  grid-area: v;
+  margin: 0;
   font-weight: 600;
-  color: var(--accent-text);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
-.bf__read.is-missing {
+.leaf-review button {
+  grid-area: b;
+}
+.leaf-review .bf-read {
+  padding: 0;
+  background: none;
+}
+.leaf-review .bf-read.is-missing {
   color: var(--warning-text);
-}
-.leaf-unknown .v {
-  flex: 1 1 14em;
-}
-.leaf-place.is-empty .chosen {
-  color: var(--warning-text);
-}
-.leaf-place__none {
-  font-size: var(--text-sm);
-}
-.leaf-offset {
-  padding: 4px var(--paper-margin) 12px;
-}
-.leaf-offset .bf__k {
-  width: auto;
 }
 
 /* "Check before you save": the three facts a family knows about a person */
 .leaf-check {
-  margin: var(--space-4) var(--paper-margin) 0;
-  padding: var(--space-4) var(--space-4) var(--space-3);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(245, 196, 107, 0.4);
-  background: radial-gradient(360px 140px at 0% 0%, rgba(245, 196, 107, 0.14), transparent 70%), rgba(14, 17, 46, 0.7);
+  border-color: rgba(245, 196, 107, 0.45);
+  background: radial-gradient(360px 140px at 0% 0%, rgba(245, 196, 107, 0.12), transparent 70%), var(--card);
 }
 .leaf-check.is-waiting {
-  border-color: var(--border);
-  background: rgba(14, 17, 46, 0.5);
+  border-color: var(--card-edge);
+  background: var(--card);
 }
 .leaf-check__h {
-  margin: 0 0 var(--space-3);
-  font-family: var(--font-display);
-  font-size: var(--text-base);
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  margin: 0 0 12px;
+  font: 600 1.0625rem / 1.3 var(--font-display);
+  letter-spacing: -0.015em;
   color: var(--accent-2);
 }
 .leaf-check.is-waiting .leaf-check__h {
@@ -258,46 +397,81 @@
 }
 .leaf-check__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 14px 12px;
   margin: 0;
 }
 .leaf-check__grid > div {
   min-width: 0;
 }
 .leaf-check__grid dt {
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.8125rem;
   color: var(--ink-muted);
 }
 .leaf-check__grid dd {
-  margin: 4px 0 0;
-  font-family: var(--font-display);
-  font-size: var(--text-xl);
-  line-height: 1.15;
-  color: var(--ink);
   display: flex;
   flex-direction: column;
+  margin: 2px 0 0;
+  font: 600 1.25rem / 1.2 var(--font-display);
+  color: var(--ink);
 }
 .leaf-check__grid dd small {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 400;
-  color: var(--ink-muted);
   margin-top: 2px;
+  font: 400 0.8125rem / 1.4 var(--font-body);
+  color: var(--ink-muted);
 }
-.leaf-check__p {
-  margin: var(--space-3) 0 0;
-  font-size: var(--text-sm);
+.v-page .leaf-check__p {
+  margin-top: 12px;
+  font-size: 0.875rem;
   line-height: 1.5;
   color: var(--ink-muted);
 }
-@media (max-width: 420px) {
-  .bf__k {
-    width: 100%;
-  }
-  .bf__read {
-    padding-left: 0;
+
+/* ── Foot: Back, Next / Save ───────────────────────────────────────────── */
+.leaf-problem {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.leaf-foot {
+  display: flex;
+  gap: 10px;
+}
+.leaf-foot__go {
+  flex: 1;
+}
+.leaf-foot__note {
+  margin-top: -8px;
+  text-align: center;
+}
+.leaf-example {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 16px;
+  border-top: 1px solid var(--card-edge);
+}
+.leaf-example .v-btn {
+  height: auto;
+  padding-block: 8px;
+  line-height: 1.25;
+  text-align: center;
+}
+.leaf-ask {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 8px 20px 4px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.leaf-ask p {
+  margin: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .leaf-switch__knob,
+  .leaf-switch__knob::after {
+    transition: none;
   }
 }

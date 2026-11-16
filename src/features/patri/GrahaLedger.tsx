@@ -1,14 +1,6 @@
 import { digitsFor } from "../../app/digits";
 import { nakName, rashiName, type Tradition } from "../../data/regional";
-import {
-  GRAHA_ABBR_DEV,
-  GRAHA_ABBR_LAT,
-  GRAHA_ENGLISH,
-  GRAHA_NAMES,
-  NAKSHATRA_SHORT,
-  SIGN_NAMES,
-  SIGN_WESTERN,
-} from "../../data/tables/names";
+import { GRAHA_ENGLISH, GRAHA_NAMES, NAKSHATRA_SHORT, SIGN_NAMES, SIGN_WESTERN } from "../../data/tables/names";
 import { dms, formatArcmin } from "../../engine/math";
 import { GRAHA_IDS, type GrahaId, type Patri } from "../../engine/types";
 
@@ -19,8 +11,10 @@ function Degree({ x, dev }: { x: number; dev: boolean }) {
     <span className={dev ? "num num--dev" : "num"} lang={dev ? "hi" : undefined}>
       {n(d)}°{n(String(m).padStart(2, "0"))}
       <span className="min">′</span>
-      {n(String(s).padStart(2, "0"))}
-      <span className="sec">″</span>
+      <span className="deg-s">
+        {n(String(s).padStart(2, "0"))}
+        <span className="sec">″</span>
+      </span>
     </span>
   );
 }
@@ -35,7 +29,7 @@ interface GrahaLedgerProps {
   tradition?: Tradition | undefined;
 }
 
-/** The graha ledger: tabular degrees, ′ ″ muted, ℞, and the vermilion asterisk ONLY within 2′ of an edge. */
+/** The planet table: tabular degrees, ′ ″ muted, ℞, and an asterisk ONLY within 2′ of an edge. */
 export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false, tradition }: GrahaLedgerProps) {
   const L = patri.lagna;
   const regional = tradition !== undefined && tradition !== "north";
@@ -43,34 +37,28 @@ export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false,
   const star = (i: number) => (regional ? nakName(i, tradition) : NAKSHATRA_SHORT[i]);
   return (
     <table className="ledger ledger--grahas">
-      <caption className="vh">Graha positions, sidereal, {patri.preset.ayanamsa}</caption>
+      <caption className="vh">Planet positions, sidereal, {patri.preset.ayanamsa}</caption>
       <thead>
         <tr>
           <th scope="col">
-            Graha <span className="gloss">planet</span>
+            Planet <span className="ledger-sk">Graha</span>
           </th>
           <th scope="col">
-            Rāśi <span className="gloss">sign</span>
+            Sign <span className="ledger-sk">Rāśi</span>
           </th>
           <th scope="col">Degree</th>
           <th scope="col">
-            Nakṣatra · pada <span className="gloss">Moon star</span>
-          </th>
-          <th scope="col">
-            Lord <span className="gloss">ruler</span>
+            Star · quarter <span className="ledger-sk">Nakṣatra · pada · its lord</span>
           </th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <th scope="row" style={{ fontWeight: 400, textAlign: "left", paddingLeft: "var(--paper-margin)" }}>
-            <span lang="hi" className="dev">
-              ल
-            </span>{" "}
-            Lg <span className="gloss ledger-gloss">Rising sign</span>
+          <th scope="row">
+            Rising <span className="ledger-sk">Lagna</span>
           </th>
           <td>
-            {sign(L.sign)} <span className="gloss ledger-gloss">{SIGN_WESTERN[L.sign]}</span>
+            {sign(L.sign)} <span className="ledger-sk">{SIGN_WESTERN[L.sign]}</span>
           </td>
           <td>
             <Degree x={L.degInSign} dev={devDigits} />
@@ -87,8 +75,8 @@ export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false,
                 *
               </button>
             ) : null}
+            <span className="ledger-sk">lord {GRAHA_ENGLISH[L.nakshatraLord]}</span>
           </td>
-          <td className="pd">{GRAHA_ABBR_LAT[L.nakshatraLord]}</td>
         </tr>
         {GRAHA_IDS.map((id) => {
           const g = patri.grahas[id];
@@ -108,15 +96,17 @@ export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false,
               }}
             >
               <td>
-                <span lang="hi" className="dev">
-                  {GRAHA_ABBR_DEV[id]}
-                </span>{" "}
-                {GRAHA_ABBR_LAT[id]}
-                {g.retrograde ? <span className="retro">℞</span> : null}
-                <span className="gloss ledger-gloss">{GRAHA_ENGLISH[id]}</span>
+                {GRAHA_ENGLISH[id]}
+                {g.retrograde ? (
+                  <span className="retro" title="retrograde">
+                    {" "}
+                    ℞
+                  </span>
+                ) : null}
+                <span className="ledger-sk">{GRAHA_NAMES[id]}</span>
               </td>
               <td>
-                {sign(g.sign)} <span className="gloss ledger-gloss">{SIGN_WESTERN[g.sign]}</span>
+                {sign(g.sign)} <span className="ledger-sk">{SIGN_WESTERN[g.sign]}</span>
               </td>
               <td>
                 <Degree x={g.degInSign} dev={devDigits} />
@@ -136,9 +126,7 @@ export function GrahaLedger({ patri, lit, onRead, onBoundary, devDigits = false,
                     *
                   </button>
                 ) : null}
-              </td>
-              <td className="pd" title={GRAHA_NAMES[g.nakshatraLord]}>
-                {GRAHA_ABBR_LAT[g.nakshatraLord]}
+                <span className="ledger-sk">lord {GRAHA_ENGLISH[g.nakshatraLord]}</span>
               </td>
             </tr>
           );

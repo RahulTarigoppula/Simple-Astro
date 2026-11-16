@@ -1,21 +1,20 @@
-// Add or edit a person. Four things are asked, in plain words: name, date of birth, time of birth
-// (12-hour clock, am/pm chosen by hand) and place of birth (searched, never assumed). Before anything is
-// saved, "Check before you save" reads the Moon sign, birth star and rising sign back, so a wrong
-// am/pm, day or town is caught here and not on the chart. The engraved strip below it is the
-// contract with reality: zone, offset, Julian Day and Lagna.
+// Add or edit a person, as four short steps: Who (name, tradition, writing hand), When (date, and the
+// time on a 12-hour clock with am/pm chosen by hand), Where (the place, searched and picked, never
+// assumed) and Check (everything read back, with the Moon sign, birth star and rising sign, so a wrong
+// am/pm, day or town is caught before it is saved). One tap on Save saves one person.
+// The step lives in the address (?step=2), so the Back button walks the steps and never drops what was typed.
 import tzlookup from "@photostructure/tz-lookup";
 import * as A from "astronomy-engine";
 import { DateTime } from "luxon";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router";
 import { useProfile, useSettings } from "../../app/hooks";
 import { DigitSet } from "../../components/ui/DigitSet";
 import { InfoDot } from "../../components/ui/Explain";
-import { HoldStamp } from "../../components/ui/HoldStamp";
-import { Screen } from "../../components/ui/Screen";
+import { Page } from "../../components/ui/Page";
 import { Sheet } from "../../components/ui/Sheet";
-import { TurmericBand } from "../../components/ui/TurmericBand";
 import { loadGazetteer, NetError, searchOnline, searchPlaces } from "../../data/places";
+import { nakBoth, rashiBoth, TRADITION_LABEL, type Tradition } from "../../data/regional";
 import { saveSettings, upsertProfile } from "../../data/repo";
 import { SIGN_ENGRAVED, SIGN_MARK, SIGN_WESTERN } from "../../data/tables/names";
 import { ayanamsa } from "../../engine/ayanamsa";
@@ -28,14 +27,12 @@ import { checkLocalTime, formatOffset, jdTtFromUtcMs, resolveBirthMoment } from 
 import type { BirthMoment, Place, Profile } from "../../engine/types";
 import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
-import { toast } from "../../state/ui";
-import { ParapetSky } from "../chowki/ParapetSky";
-import { BirthFields, fieldsOfHour, hourOf, missingText } from "./BirthFields";
-import "./leaf.css";
-import { nakBoth, rashiBoth, TRADITION_LABEL, type Tradition } from "../../data/regional";
 import { countEvent } from "../../platform/stats";
+import { toast } from "../../state/ui";
+import { DateFields, fieldsOfHour, hourOf, missingText, Readback, TimeFields } from "./BirthFields";
+import "./leaf.css";
 
-/** The sky strip needs a horizon before a place is chosen; nothing else uses this. */
+/** Where the hand-typed coordinates start before a place is chosen; nothing else uses this. */
 const SKY_FALLBACK: Place = { name: "Bengaluru", admin1: "Karnataka", country: "IN", lat: 12.9716, lon: 77.5946, source: "manual" };
 const BOMBAY_TIME = 291; // +04:51, not in the IANA database
 
@@ -93,15 +90,55 @@ function freshDraft(): Draft {
   };
 }
 
-const placeLabel = (p: Place) => [p.name, p.admin1, p.country].filter(Boolean).join(", ");
+/** "Bengaluru, Karnataka, IN" (a name that already carries its region is left as it is). */
+const placeLabel = (p: Place) => (p.name.includes(",") ? p.name : [p.name, p.admin1, p.country].filter(Boolean).join(", "));
 const latLon = (p: Place) =>
   `${Math.abs(p.lat).toFixed(4)} ${p.lat >= 0 ? "N" : "S"} · ${Math.abs(p.lon).toFixed(4)} ${p.lon >= 0 ? "E" : "W"}`;
+
+const STEPS = [
+  { label: "Who", title: "Who is this for?" },
+  { label: "When", title: "When were they born?" },
+  { label: "Where", title: "Where were they born?" },
+  { label: "Check", title: "Check and save" },
+] as const;
+const LAST = STEPS.length - 1;
+
+const TRADITION_NOTE: Record<Tradition, string> = {
+  north: "Sanskrit names and the diamond-shaped chart.",
+  telugu: "Telugu names beside the Sanskrit, and the square South Indian chart.",
+  tamil: "Tamil names beside the Sanskrit, and the square South Indian chart.",
+};
+
+/** What each history entry of the flow remembers: how many steps deep it is, and the step it came from. */
+interface Trail {
+  depth?: number;
+  from?: number;
+}
+
+function Tick() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
+    </svg>
+  );
+}
 
 export default function LeafScreen() {
   const { id } = useParams();
   const editing = useProfile(id);
   const settings = useSettings();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [params] = useSearchParams();
   const [draft, setDraft] = useState<Draft>(freshDraft);
   const [loadedFrom, setLoadedFrom] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -109,8 +146,11 @@ export default function LeafScreen() {
   const [gazReady, setGazReady] = useState(false);
   const [online, setOnline] = useState<"idle" | "asking" | "busy" | "failed">("idle");
   const [manual, setManual] = useState(false);
+  const [tried, setTried] = useState(false);
+  const [leaving, setLeaving] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null);
   const lastSign = useRef(-1);
+  const body = useRef<HTMLFormElement>(null);
 
   // Edit mode: load the person once. Leaving an edit for "Add a person" starts from an empty draft
   // (both routes render this same screen, so React would otherwise keep the old state).
@@ -167,7 +207,7 @@ export default function LeafScreen() {
   const effMi = draft.timeUnknown ? 0 : draft.mi;
   const missing = missingText(draft, draft.timeUnknown);
 
-  // Resolve the written moment: the engraved strip is the contract with reality.
+  // Resolve the written moment: zone, offset and Julian Day are the contract with reality.
   const resolved = useMemo((): { m: BirthMoment | null; err: EngineError | null } => {
     if (missing) return { m: null, err: new EngineError("TIME_INVALID", missing) };
     if (!draft.place) return { m: null, err: new EngineError("PLACE_MISSING", "Choose the place of birth.") };
@@ -187,18 +227,15 @@ export default function LeafScreen() {
     }
   }, [missing, draft.y, draft.mo, draft.d, effH, effMi, draft.place, offsetOverrideMin]);
 
-  const skyPlace = draft.place ?? SKY_FALLBACK;
-  const [openedAt] = useState(() => Date.now());
-  const skyMs = resolved.m?.utcMs ?? openedAt;
-
   // The check card: Moon sign, birth star and rising sign for the moment as written.
   const check = useMemo(() => {
     const m = resolved.m;
-    if (!m) return null;
+    const place = draft.place;
+    if (!m || !place) return null;
     try {
       const a = angasAt(m.utcMs, settings.preset.ayanamsa);
       const ay = ayanamsa(jdTtFromUtcMs(m.utcMs), settings.preset.ayanamsa);
-      const r = lagna(A.MakeTime(new Date(m.utcMs)), skyPlace.lat, skyPlace.lon, ay);
+      const r = lagna(A.MakeTime(new Date(m.utcMs)), place.lat, place.lon, ay);
       return {
         moonSign: signOf(a.moonSid),
         nak: a.nakshatra.index,
@@ -208,7 +245,7 @@ export default function LeafScreen() {
     } catch {
       return null;
     }
-  }, [resolved.m, settings.preset.ayanamsa, skyPlace.lat, skyPlace.lon]);
+  }, [resolved.m, settings.preset.ayanamsa, draft.place]);
   const lg = check?.lagnaSign ?? null;
 
   useEffect(() => {
@@ -225,11 +262,95 @@ export default function LeafScreen() {
     return checkLocalTime(draft.y, draft.mo, draft.d, effH, effMi, resolved.m.zone);
   }, [offsetOverrideMin, resolved.m, draft.y, draft.mo, draft.d, effH, effMi]);
 
+  const clockTrouble =
+    resolved.err?.code === "TIME_AMBIGUOUS"
+      ? "This clock time happened twice here (the clocks went back). Open Advanced below, choose Manual and say which."
+      : localStatus === "nonexistent" || (resolved.err?.code === "TIME_INVALID" && !missing && !!draft.place)
+        ? "This clock time did not exist here (a clock change skipped it). Open Advanced below and choose Manual."
+        : null;
+  // Each new clock trouble opens the Advanced panel once, even if the person closed it before.
+  const [advOpen, setAdvOpen] = useState(false);
+  const lastTrouble = useRef<string | null>(null);
+  useEffect(() => {
+    if (clockTrouble && clockTrouble !== lastTrouble.current) setAdvOpen(true);
+    lastTrouble.current = clockTrouble;
+  }, [clockTrouble]);
+
+  // ── The steps ──────────────────────────────────────────────────────────────
+  // What stops each step, in plain words (null = the step is complete).
+  const problems: Array<string | null> = [
+    draft.name.trim() ? null : "Type a name to go on.",
+    missing,
+    !draft.place
+      ? "Pick the place of birth from the list."
+      : resolved.m
+        ? null
+        : (clockTrouble ?? resolved.err?.detail ?? "These birth details cannot be used yet."),
+  ];
+  const firstBad = problems.findIndex((p) => p !== null);
+  const reach = firstBad === -1 ? LAST : firstBad; // the furthest step that may be opened
+  const asked = Number(params.get("step"));
+  const wanted = Number.isInteger(asked) && asked >= 1 && asked <= STEPS.length ? asked - 1 : id ? LAST : 0;
+  const step = Math.min(wanted, reach);
+  const problem = step < LAST ? (problems[step] ?? null) : resolved.m ? null : (problems[2] ?? "These birth details cannot be saved yet.");
+  const trail = (location.state ?? {}) as Trail;
+  const depth = trail.depth ?? 0;
+  const ready = !id || loadedFrom === id;
+
+  const goTo = (i: number) => {
+    if (i === step) return;
+    setTried(false);
+    navigate({ search: `?step=${i + 1}` }, { state: { depth: depth + 1, from: step } satisfies Trail });
+  };
+  const next = () => {
+    if (problem) {
+      setTried(true);
+      play("dull");
+      return;
+    }
+    goTo(step + 1);
+  };
+  const back = () => {
+    setTried(false);
+    // Arrived here from the step before: really go back, so the phone's Back button and this one agree.
+    if (depth > 0 && trail.from === step - 1) navigate(-1);
+    else navigate({ search: `?step=${step}` }, { replace: true, state: trail });
+  };
+
+  // A new step starts at its top with its first field focused (never on the very first screen: that
+  // would raise the keyboard over the page before anything has been read).
+  const shown = useRef<number | null>(null);
+  useEffect(() => {
+    if (!ready) return;
+    if (shown.current === null || shown.current === step) {
+      shown.current = step;
+      return;
+    }
+    shown.current = step;
+    const form = body.current;
+    const scroller = form?.closest("main");
+    if (scroller && typeof scroller.scrollTo === "function") scroller.scrollTo(0, 0);
+    form?.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+  }, [step, ready]);
+
+  // After a save the steps are taken back out of the history, so Back from the chart does not
+  // walk through an empty form. A short timer covers a history that does not answer.
+  useEffect(() => {
+    if (!leaving) return;
+    if (depth === 0) {
+      navigate(leaving, { replace: true });
+      return;
+    }
+    const t = window.setTimeout(() => navigate(leaving, { replace: true }), 600);
+    return () => window.clearTimeout(t);
+  }, [leaving, depth, navigate]);
+
   const saving = useRef(false);
   const seal = async () => {
     if (!resolved.m) {
+      setTried(true);
       play("dull");
-      toast(resolved.err ? resolved.err.detail : "These birth details cannot be saved yet.", "danger");
+      toast(problem ?? "These birth details cannot be saved yet.", "danger");
       return;
     }
     if (saving.current) return;
@@ -253,12 +374,17 @@ export default function LeafScreen() {
       haptics.impact("medium");
       toast(`Saved ${name}. Their birth chart is ready.`);
       countEvent(editing ? "person-edited" : "person-added");
-      navigate(`/patri/${profile.id}`);
+      setLeaving(`/patri/${profile.id}`); // stays "saving": this screen is on its way out
+      if (depth > 0) navigate(-depth);
     } catch (e) {
-      toast(`Could not save: ${e instanceof Error ? e.message : String(e)}`, "danger");
-    } finally {
       saving.current = false;
+      toast(`Could not save: ${e instanceof Error ? e.message : String(e)}`, "danger");
     }
+  };
+
+  const openManual = () => {
+    setManual(true);
+    setAdvOpen(true);
   };
 
   const goOnline = async (allowed = settings.onlineLookupAllowed) => {
@@ -276,10 +402,10 @@ export default function LeafScreen() {
       const found = await searchOnline(q, ac.signal);
       setResults(found);
       setOnline(found.length ? "idle" : "failed");
-      if (!found.length) setManual(true);
+      if (!found.length) openManual();
     } catch (e) {
       setOnline("failed");
-      setManual(true);
+      openManual();
       toast(e instanceof NetError ? "No connection. Type the coordinates instead." : "Not found; you can type the coordinates.", "warn");
     }
   };
@@ -288,8 +414,15 @@ export default function LeafScreen() {
     set("place", p);
     setQuery("");
     setResults([]);
+    setTried(false);
     play("tick");
     haptics.selection();
+  };
+
+  const fillExample = () => {
+    setDraft(draftFromProfile(REFERENCE_PROFILE));
+    play("tick");
+    goTo(LAST);
   };
 
   const pre1955India = draft.y > 0 && draft.y < 1955 && draft.place?.country === "IN";
@@ -297,409 +430,600 @@ export default function LeafScreen() {
   const offAbs = Math.abs(draft.manualOffsetMin);
   const strip = resolved.m;
   const title = id ? "Edit person" : "Add a person";
-  const clockTrouble =
-    resolved.err?.code === "TIME_AMBIGUOUS"
-      ? "This clock time happened twice here. Open Advanced below, choose Manual and say which."
-      : resolved.err?.code === "TIME_INVALID" && !missing && /did not exist/.test(resolved.err.detail)
-        ? "This clock time did not exist here (a clock change skipped it). Open Advanced below and choose Manual."
-        : null;
-  // Each new clock trouble opens the Advanced panel once, even if the person closed it before.
-  const [advOpen, setAdvOpen] = useState(false);
-  const lastTrouble = useRef<string | null>(null);
-  useEffect(() => {
-    if (clockTrouble && clockTrouble !== lastTrouble.current) setAdvOpen(true);
-    lastTrouble.current = clockTrouble;
-  }, [clockTrouble]);
-  const whyNot = resolved.m ? null : (clockTrouble ?? resolved.err?.detail ?? "Fill in the details above.");
 
   if (id && editing === null) {
     return (
-      <Screen scroll label="Person not found">
-        <div className="paper sheet-col" style={{ marginTop: "var(--space-9)" }}>
-          <TurmericBand title="Person not found" level={1} />
-          <p className="p">This person is not saved on this device.</p>
-          <p className="p">
-            <Link className="linkish" to="/">
-              Back home
-            </Link>
-          </p>
+      <Page label="Person not found" title="Person not found" back noPerson>
+        <div className="v-card v-empty">
+          <p>This person is not saved on this device.</p>
+          <Link className="v-btn" to="/circle">
+            See your people
+          </Link>
         </div>
-      </Screen>
+      </Page>
+    );
+  }
+  if (!ready || leaving) {
+    return (
+      <Page label={title} title={title} back noPerson>
+        <div className="v-skel" role="status">
+          {leaving ? "Saved. Opening the chart…" : "Opening…"}
+        </div>
+      </Page>
     );
   }
 
+  /** Zone, clock offset, Julian Day and rising sign as worked out: the technical read-back. */
+  const stripEl = (
+    <div className="engraved leaf-strip" role="status" aria-label="Time zone, clock offset, Julian Day and rising sign, worked out">
+      {strip ? (
+        <>
+          <b>{strip.zone.toUpperCase()}</b>
+          <span className="sep">·</span>
+          <span>
+            {formatOffset(strip.offsetMin)}
+            {strip.offsetSource === "override" ? " (manual)" : ""}
+          </span>
+          <span className="sep">·</span>
+          <span>
+            JD <DigitSet text={strip.jdUt.toFixed(4)} />
+          </span>
+          <span className="sep">·</span>
+          <span>
+            LAGNA {lg != null ? `${SIGN_MARK[lg]} ` : ""}
+            <b>
+              <DigitSet text={lg != null ? (SIGN_ENGRAVED[lg] ?? "") : "-"} />
+            </b>
+          </span>
+        </>
+      ) : (
+        <span>{resolved.err?.code === "TIME_AMBIGUOUS" ? "THE CLOCK NEEDS THE OFFSET" : "WAITING FOR THE DETAILS"}</span>
+      )}
+    </div>
+  );
+
   return (
-    <Screen className="leafscreen" label={title}>
-      <ParapetSky utcMs={skyMs} lat={skyPlace.lat} lon={skyPlace.lon} />
-      <div className="paper sheet-col leaf-sheet">
-        <TurmericBand dev={id ? "व्यक्ति" : "नया व्यक्ति"} title={title} meta={id ? "editing" : "unsaved"} level={1} />
-        <p className="leaf-lede">
-          Four things: name, date, time and place of birth. The time matters most: a few hours changes the rising sign, and a wrong am/pm
-          can change the Moon sign and birth star.
+    <Page label={title} title={title} back noPerson className="leafscreen">
+      <nav className="leaf-steps" aria-label="Steps">
+        <p className="leaf-steps__now" aria-live="polite">
+          Step {step + 1} of {STEPS.length}
         </p>
-
-        <div className="field">
-          <label htmlFor="leaf-name">Name</label>
-          <input
-            id="leaf-name"
-            type="text"
-            value={draft.name}
-            placeholder="Who is this?"
-            spellCheck={false}
-            autoComplete="off"
-            onChange={(e) => set("name", e.target.value)}
-          />
-        </div>
-
-        <div className="radio-row leaf-trad" role="radiogroup" aria-label="How do you read your chart?">
-          <span className="v">
-            How do you read your chart?
-            <span className="help">
-              Sets the names you see (Telugu and Tamil names appear beside the Sanskrit) and how the chart is drawn. The planets and the
-              calculation are the same everywhere in India.
-            </span>
-          </span>
-          <span className="seg">
-            {(Object.keys(TRADITION_LABEL) as Tradition[]).map((k) => (
-              <button key={k} type="button" role="radio" aria-checked={draft.tradition === k} onClick={() => set("tradition", k)}>
-                {TRADITION_LABEL[k]}
-              </button>
-            ))}
-          </span>
-        </div>
-
-        <BirthFields
-          y={draft.y}
-          mo={draft.mo}
-          d={draft.d}
-          hour12={draft.hour12}
-          ampm={draft.ampm}
-          mi={draft.mi}
-          timeUnknown={draft.timeUnknown}
-          onChange={(p) => patch(p)}
-        />
-
-        <div className="toggle-row leaf-unknown">
-          <span className="v">
-            Time of birth not known <InfoDot id="unknown-time" />
-            <span className="help">
-              Noon is used. The Moon sign and birth star usually still hold; the rising sign, houses and life-chapter dates will not be
-              reliable, and the chart will say so.
-            </span>
-          </span>
-          <button
-            type="button"
-            role="switch"
-            className="switch"
-            aria-checked={draft.timeUnknown}
-            aria-label="Time of birth not known"
-            onClick={() => {
-              set("timeUnknown", !draft.timeUnknown);
-              play("tick");
-            }}
-          />
-        </div>
-
-        <div className={`field leaf-place${draft.place ? "" : " is-empty"}`}>
-          <label htmlFor="leaf-place">Place of birth</label>
-          <input
-            id="leaf-place"
-            type="search"
-            value={query}
-            placeholder={draft.place ? "Search to change the place…" : "Type the town or city…"}
-            spellCheck={false}
-            autoComplete="off"
-            aria-describedby="leaf-place-chosen"
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setOnline("idle");
-            }}
-          />
-          <span className="chosen" id="leaf-place-chosen">
-            {draft.place ? (
-              <>
-                <b>{placeLabel(draft.place)}</b>
-                <span className="mono" style={{ fontSize: 10 }}>
-                  {latLon(draft.place)}
-                </span>
-              </>
-            ) : (
-              <span className="leaf-place__none">Not chosen yet. Start typing and pick the town from the list.</span>
-            )}
-          </span>
-        </div>
-        {results.length ? (
-          <ul className="results" aria-label="Places found">
-            {results.map((p) => (
-              <li key={`${p.geonameId ?? ""}-${p.lat}-${p.lon}`}>
-                <button type="button" onClick={() => choosePlace(p)}>
-                  <span>{p.name}</span>
-                  <span className="where">{[p.admin1, p.country].filter(Boolean).join(", ")}</span>
-                  <span className="ll">{latLon(p)}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        {query.trim().length >= 2 && results.length === 0 ? (
-          <div className="leaf-online">
-            <span style={{ fontSize: "var(--text-sm)", color: "var(--ink-muted)" }}>
-              {gazReady ? "Not in the built-in list." : "Loading places…"}
-            </span>
-            <button type="button" className="online-stamp" disabled={online === "busy"} onClick={() => void goOnline()}>
-              {online === "busy" ? "searching…" : "Search online"}
-            </button>
-            <button type="button" className="linkish" onClick={() => setManual((m) => !m)}>
-              type coordinates
-            </button>
-          </div>
-        ) : null}
-        {manual ? (
-          <ManualPlace
-            initial={draft.place ?? SKY_FALLBACK}
-            onSet={(p) => {
-              choosePlace(p);
-              setManual(false);
-            }}
-          />
-        ) : null}
-
-        <section className={`leaf-check${check ? "" : " is-waiting"}`} aria-labelledby="leaf-check-h" aria-live="polite">
-          <h2 id="leaf-check-h" className="leaf-check__h">
-            Check before you save
-          </h2>
-          {check ? (
-            <>
-              <dl className="leaf-check__grid">
-                <div>
-                  <dt>Moon sign (rāśi)</dt>
-                  <dd>
-                    {rashiBoth(check.moonSign, draft.tradition)}
-                    <small>{SIGN_WESTERN[check.moonSign]}</small>
-                  </dd>
-                </div>
-                <div>
-                  <dt>Birth star (nakṣatra)</dt>
-                  <dd>
-                    {nakBoth(check.nak, draft.tradition)}
-                    <small>pada {check.pada}</small>
-                  </dd>
-                </div>
-                <div>
-                  <dt>Rising sign (lagna)</dt>
-                  <dd>
-                    {draft.timeUnknown ? "needs the time" : rashiBoth(check.lagnaSign, draft.tradition)}
-                    {draft.timeUnknown ? null : <small>{SIGN_WESTERN[check.lagnaSign]}</small>}
-                  </dd>
-                </div>
-              </dl>
-              <p className="leaf-check__p">
-                If this is not what the family knows, the usual culprits are am/pm, the day, or the town. Fix them above and watch this
-                change.
-              </p>
-            </>
-          ) : (
-            <p className="leaf-check__p">
-              {whyNot} Your Moon sign, birth star and rising sign appear here as soon as they can be worked out.
-            </p>
-          )}
-        </section>
-
-        {localStatus === "nonexistent" || (resolved.err?.code === "TIME_INVALID" && !missing) ? (
-          <p className="note-haldi" role="status">
-            <span aria-hidden="true">⚑</span>
-            <span>
-              This clock time did not exist here (a clock change skipped it). Open "Advanced: clock offset" below and choose Manual.
-            </span>
-          </p>
-        ) : null}
-        {resolved.err?.code === "TIME_AMBIGUOUS" ? (
-          <p className="note-haldi" role="status">
-            <span aria-hidden="true">⚑</span>
-            <span>This clock time happened twice here. Open "Advanced: clock offset" below, choose Manual and say which.</span>
-          </p>
-        ) : null}
-        {draft.override !== "none" ? (
-          <p className="note-haldi">
-            <span aria-hidden="true">⚑</span>
-            <span>You set the clock offset by hand. The chart will show "(manual)" next to the time zone.</span>
-          </p>
-        ) : null}
-
-        <div className="radio-row" role="radiogroup" aria-label="Dominant hand">
-          <span className="v">
-            Dominant hand
-            <span className="help">The hand you write with. Used only for the palm reading.</span>
-          </span>
-          <span className="seg">
-            {(["right", "left"] as const).map((h) => (
-              <button key={h} type="button" role="radio" aria-checked={draft.handedness === h} onClick={() => set("handedness", h)}>
-                {h === "right" ? "Right" : "Left"}
-              </button>
-            ))}
-          </span>
-        </div>
-
-        <details className="leaf-adv" open={draft.override !== "none" || advOpen} onToggle={(e) => setAdvOpen(e.currentTarget.open)}>
-          <summary>Advanced: clock offset and ayanāṃśa (rarely needed)</summary>
-          <div className="radio-row leaf-override" role="radiogroup" aria-label="Clock offset">
-            <span className="v">
-              Clock offset <InfoDot id="timezone" />
-              <span className="help">
-                {pre1955India
-                  ? "Before 1955 some Indian births used Bombay Time (+04:51). Leave on automatic unless you know the clock used."
-                  : "Worked out automatically from the time-zone database (tzdb). Leave it unless you know better."}
-              </span>
-            </span>
-            <span className="seg">
-              {(["none", "bombay", "manual"] as const).map((o) => (
-                <button
-                  key={o}
-                  type="button"
-                  role="radio"
-                  aria-checked={draft.override === o}
-                  onClick={() =>
-                    o === "manual" && draft.override !== "manual"
-                      ? patch({ override: o, manualOffsetMin: offsetAtPlace() })
-                      : set("override", o)
-                  }
-                >
-                  {o === "none" ? "Automatic" : o === "bombay" ? "Bombay +04:51" : "Manual"}
-                </button>
-              ))}
-            </span>
-          </div>
-          {draft.override === "manual" ? (
-            <div className="leaf-override bf__fields leaf-offset" role="group" aria-label="Manual UTC offset">
-              <span className="bf__k">UTC offset</span>
-              <select
-                className="bf__select"
-                aria-label="Offset hours"
-                value={offSign * Math.floor(offAbs / 60)}
-                onChange={(e) => {
-                  const v = Number(e.target.value);
-                  set("manualOffsetMin", (v < 0 ? -1 : 1) * (Math.abs(v) * 60 + (offAbs % 60)));
-                }}
-              >
-                {Array.from({ length: 27 }, (_, i) => i - 12).map((v) => (
-                  <option key={v} value={v}>
-                    {v < 0 ? "−" : "+"}
-                    {String(Math.abs(v)).padStart(2, "0")}
-                  </option>
-                ))}
-              </select>
-              <span className="bf__colon" aria-hidden="true">
-                :
-              </span>
-              <select
-                className="bf__select"
-                aria-label="Offset minutes"
-                value={offAbs % 60}
-                onChange={(e) => set("manualOffsetMin", offSign * (Math.floor(offAbs / 60) * 60 + Number(e.target.value)))}
-              >
-                {Array.from({ length: 60 }, (_, i) => i).map((m) => (
-                  <option key={m} value={m}>
-                    {String(m).padStart(2, "0")}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ) : null}
-          <div className="leaf-strip-wrap">
-            <div className="engraved leaf-strip" role="status" aria-label="Time zone, clock offset, Julian Day and rising sign, worked out">
-              {strip ? (
-                <>
-                  <b>{strip.zone.toUpperCase()}</b>
-                  <span className="sep">·</span>
-                  <span>
-                    {formatOffset(strip.offsetMin)}
-                    {strip.offsetSource === "override" ? " (manual)" : ""}
-                  </span>
-                  <span className="sep">·</span>
-                  <span>
-                    JD <DigitSet text={strip.jdUt.toFixed(4)} />
-                  </span>
-                  <span className="sep">·</span>
-                  <span>
-                    LAGNA {lg != null ? `${SIGN_MARK[lg]} ` : ""}
-                    <b className="lg">
-                      <DigitSet text={lg != null ? (SIGN_ENGRAVED[lg] ?? "") : "-"} />
-                    </b>
-                  </span>
-                </>
-              ) : (
-                <span>{resolved.err?.code === "TIME_AMBIGUOUS" ? "THE CLOCK NEEDS THE OFFSET" : "WAITING FOR THE DETAILS"}</span>
-              )}
-            </div>
-          </div>
-          <div className="field" style={{ borderBottom: 0 }}>
-            <span className="k">
-              Ayanāṃśa <InfoDot id="ayanamsha" />
-            </span>
-            <span className="v" style={{ flex: 1, fontSize: "var(--text-sm)" }}>
-              Lahiri (
-              {settings.preset.ayanamsa === "se-true" ? "SE-true" : settings.preset.ayanamsa === "se-mean" ? "SE-mean" : "Drik-compatible"})
-              · node: {settings.preset.node}
-            </span>
-            <Link className="linkish" to="/drawer">
-              change
-            </Link>
-          </div>
-        </details>
-
-        <div className="sealbtn-wrap">
-          <HoldStamp
-            className="sealbtn"
-            label={<>◉ &nbsp;hold to save</>}
-            ariaLabel="Hold to save"
-            disabled={!resolved.m}
-            onFire={() => void seal()}
-          />
-          <p className="p p--muted" style={{ margin: 0 }}>
-            {whyNot ? whyNot : "Hold for a breath. Nothing leaves this device."}
-          </p>
-          {!id && !draft.name && !draft.d && !draft.place ? (
-            <div className="leaf-actions">
+        <ol>
+          {STEPS.map((s, i) => (
+            <li key={s.label}>
               <button
                 type="button"
-                className="linkish"
+                className={i < step ? "is-done" : undefined}
+                aria-label={`Step ${i + 1}: ${s.label}`}
+                aria-current={i === step ? "step" : undefined}
+                disabled={i > reach}
+                onClick={() => goTo(i)}
+              >
+                <span className="leaf-steps__bar" aria-hidden="true" />
+                <span className="leaf-steps__l">{s.label}</span>
+              </button>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <form
+        ref={body}
+        className="leaf-form"
+        noValidate
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (step === LAST) void seal();
+          else next();
+        }}
+      >
+        <h2 className="leaf-q" tabIndex={-1} data-autofocus={step === LAST ? "" : undefined}>
+          {STEPS[step]?.title}
+        </h2>
+
+        {step === 0 ? (
+          <>
+            <p className="v-muted">Four short steps, about a minute. Everything stays on this device.</p>
+            <div className="v-field">
+              <label className="v-label" htmlFor="leaf-name">
+                Name
+              </label>
+              <input
+                id="leaf-name"
+                className="v-input"
+                type="text"
+                value={draft.name}
+                placeholder="For example, Rahul"
+                spellCheck={false}
+                autoComplete="off"
+                autoCapitalize="words"
+                enterKeyHint="next"
+                maxLength={60}
+                data-autofocus=""
+                onChange={(e) => set("name", e.target.value)}
+              />
+            </div>
+
+            <div className="v-field">
+              <span className="v-label" id="leaf-trad-l">
+                Which tradition does the family follow?
+              </span>
+              <span className="v-hint">
+                This only sets the names you see and how the chart is drawn. The planets and the calculation are the same everywhere in
+                India.
+              </span>
+              <div className="leaf-choices" role="radiogroup" aria-labelledby="leaf-trad-l">
+                {(Object.keys(TRADITION_LABEL) as Tradition[]).map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    role="radio"
+                    className="leaf-choice"
+                    aria-checked={draft.tradition === k}
+                    onClick={() => set("tradition", k)}
+                  >
+                    <span className="leaf-choice__dot" aria-hidden="true" />
+                    <span className="leaf-choice__body">
+                      <span className="leaf-choice__t">{TRADITION_LABEL[k]}</span>
+                      <span className="leaf-choice__s">{TRADITION_NOTE[k]}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="v-field">
+              <span className="v-label" id="leaf-hand-l">
+                Writing hand
+              </span>
+              <span className="v-hint">Used only for the palm reading.</span>
+              <div className="v-seg leaf-seg" role="radiogroup" aria-labelledby="leaf-hand-l">
+                {(["right", "left"] as const).map((h) => (
+                  <button key={h} type="button" role="radio" aria-checked={draft.handedness === h} onClick={() => set("handedness", h)}>
+                    {h === "right" ? "Right" : "Left"}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : null}
+
+        {step === 1 ? (
+          <>
+            <p className="v-muted">
+              The time matters most: a few hours changes the rising sign, and a wrong am/pm can change the Moon sign and birth star.
+            </p>
+            <DateFields y={draft.y} mo={draft.mo} d={draft.d} onChange={patch} />
+            <TimeFields hour12={draft.hour12} ampm={draft.ampm} mi={draft.mi} timeUnknown={draft.timeUnknown} onChange={patch} />
+            <Readback
+              y={draft.y}
+              mo={draft.mo}
+              d={draft.d}
+              hour12={draft.hour12}
+              ampm={draft.ampm}
+              mi={draft.mi}
+              timeUnknown={draft.timeUnknown}
+              urgent={tried}
+            />
+            <div className="leaf-switchrow">
+              <button
+                type="button"
+                role="switch"
+                className="leaf-switch"
+                aria-checked={draft.timeUnknown}
+                aria-describedby="leaf-unknown-s"
                 onClick={() => {
-                  setDraft(draftFromProfile(REFERENCE_PROFILE));
+                  set("timeUnknown", !draft.timeUnknown);
                   play("tick");
                 }}
               >
-                Fill in an example (Rahul, 14 Mar 1994)
+                <span className="leaf-switch__t">I don't know the time</span>
+                <span className="leaf-switch__knob" aria-hidden="true" />
               </button>
+              <p className="v-hint" id="leaf-unknown-s">
+                Noon is used. The Moon sign and birth star usually still hold; the rising sign, houses and life-chapter dates will not be
+                reliable, and the chart will say so. <InfoDot id="unknown-time" />
+              </p>
             </div>
+          </>
+        ) : null}
+
+        {step === 2 ? (
+          <>
+            <div className="v-field">
+              <label className="v-label" htmlFor="leaf-place">
+                Place of birth
+              </label>
+              <span className="v-hint" id="leaf-place-hint">
+                Type the first letters of the town or city, then tap it in the list.
+              </span>
+              <input
+                id="leaf-place"
+                className="v-input"
+                type="search"
+                value={query}
+                placeholder={draft.place ? "Search to change the place…" : "Town or city"}
+                spellCheck={false}
+                autoComplete="off"
+                enterKeyHint="search"
+                aria-describedby="leaf-place-hint leaf-place-chosen"
+                data-autofocus=""
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setOnline("idle");
+                }}
+                onKeyDown={(e) => {
+                  // Enter in a half-typed search must not skip ahead: the place is picked from the list.
+                  if (e.key === "Enter" && query.trim()) e.preventDefault();
+                }}
+              />
+            </div>
+            {results.length ? (
+              <ul className="v-list leaf-results" aria-label="Places found">
+                {results.map((p) => (
+                  <li key={`${p.geonameId ?? ""}-${p.lat}-${p.lon}`}>
+                    <button type="button" className="v-row" onClick={() => choosePlace(p)}>
+                      <span className="v-row__body">
+                        <span className="v-row__t">{p.name}</span>
+                        <span className="v-row__s">
+                          {[p.admin1, p.country].filter(Boolean).join(", ")}
+                          <span className="leaf-ll leaf-ll--after">{latLon(p)}</span>
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            {query.trim().length >= 2 && results.length === 0 ? (
+              <div className="v-card leaf-online">
+                <p role="status">{gazReady ? "Not in the built-in list." : "Loading places…"}</p>
+                <div className="v-actions">
+                  <button
+                    type="button"
+                    className="v-btn v-btn--ghost v-btn--sm"
+                    disabled={online === "busy"}
+                    onClick={() => void goOnline()}
+                  >
+                    {online === "busy" ? "Searching…" : "Search online"}
+                  </button>
+                  <button type="button" className="v-btn v-btn--quiet v-btn--sm" onClick={openManual}>
+                    Type coordinates
+                  </button>
+                </div>
+              </div>
+            ) : null}
+            <div className={`leaf-chosen${draft.place ? " is-set" : ""}`} id="leaf-place-chosen" aria-live="polite">
+              {draft.place ? (
+                <>
+                  <span className="leaf-chosen__tick">
+                    <Tick />
+                  </span>
+                  <span className="leaf-chosen__body">
+                    <span className="leaf-chosen__t">{placeLabel(draft.place)}</span>
+                    <span className="leaf-ll">{latLon(draft.place)}</span>
+                  </span>
+                </>
+              ) : (
+                <span>Not chosen yet.</span>
+              )}
+            </div>
+
+            {clockTrouble ? (
+              <p className="v-note v-note--warn" role="status">
+                {clockTrouble}
+              </p>
+            ) : null}
+            {draft.override !== "none" ? (
+              <p className="v-note v-note--warn">You set the clock offset by hand. The chart will show "(manual)" next to the time zone.</p>
+            ) : null}
+
+            <details className="v-fold" open={draft.override !== "none" || advOpen} onToggle={(e) => setAdvOpen(e.currentTarget.open)}>
+              <summary>
+                <span>
+                  Advanced
+                  <span className="v-fold__s">Clock offset, coordinates and calculation. Rarely needed.</span>
+                </span>
+              </summary>
+              <div className="v-fold__body">
+                <div className="v-field">
+                  <span className="v-label" id="leaf-off-l">
+                    Clock offset <InfoDot id="timezone" />
+                  </span>
+                  <span className="v-hint">
+                    {pre1955India
+                      ? "Before 1955 some Indian births used Bombay Time (+04:51). Leave on automatic unless you know the clock used."
+                      : "Worked out automatically from the time-zone database (tzdb). Leave it unless you know better."}
+                  </span>
+                  <div className="v-seg leaf-seg" role="radiogroup" aria-labelledby="leaf-off-l">
+                    {(["none", "bombay", "manual"] as const).map((o) => (
+                      <button
+                        key={o}
+                        type="button"
+                        role="radio"
+                        aria-checked={draft.override === o}
+                        onClick={() =>
+                          o === "manual" && draft.override !== "manual"
+                            ? patch({ override: o, manualOffsetMin: offsetAtPlace() })
+                            : set("override", o)
+                        }
+                      >
+                        {o === "none" ? "Automatic" : o === "bombay" ? "Bombay +04:51" : "Manual"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {draft.override === "manual" ? (
+                  <fieldset className="bf-group">
+                    <legend className="v-label">Manual UTC offset</legend>
+                    <div className="bf-row bf-row--pair">
+                      <div className="bf-cell">
+                        <label htmlFor="leaf-off-h">Offset hours</label>
+                        <select
+                          id="leaf-off-h"
+                          className="v-select bf-select"
+                          value={offSign * Math.floor(offAbs / 60)}
+                          onChange={(e) => {
+                            const v = Number(e.target.value);
+                            set("manualOffsetMin", (v < 0 ? -1 : 1) * (Math.abs(v) * 60 + (offAbs % 60)));
+                          }}
+                        >
+                          {Array.from({ length: 27 }, (_, i) => i - 12).map((v) => (
+                            <option key={v} value={v}>
+                              {v < 0 ? "−" : "+"}
+                              {String(Math.abs(v)).padStart(2, "0")}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="bf-cell">
+                        <label htmlFor="leaf-off-m">Offset minutes</label>
+                        <select
+                          id="leaf-off-m"
+                          className="v-select bf-select"
+                          value={offAbs % 60}
+                          onChange={(e) => set("manualOffsetMin", offSign * (Math.floor(offAbs / 60) * 60 + Number(e.target.value)))}
+                        >
+                          {Array.from({ length: 60 }, (_, i) => i).map((m) => (
+                            <option key={m} value={m}>
+                              {String(m).padStart(2, "0")}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </fieldset>
+                ) : null}
+
+                <div className="v-field">
+                  <span className="v-label">Coordinates</span>
+                  <span className="v-hint">For a village that is not in the list, type its latitude and longitude.</span>
+                  {manual ? (
+                    <ManualPlace
+                      initial={draft.place ?? SKY_FALLBACK}
+                      onSet={(p) => {
+                        choosePlace(p);
+                        setManual(false);
+                      }}
+                    />
+                  ) : (
+                    <div>
+                      <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={() => setManual(true)}>
+                        Type coordinates by hand
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="v-field">
+                  <span className="v-label">Worked out</span>
+                  {stripEl}
+                </div>
+                <div className="v-field">
+                  <span className="v-label">
+                    Ayanāṃśa <InfoDot id="ayanamsha" />
+                  </span>
+                  <span className="v-hint">
+                    Lahiri (
+                    {settings.preset.ayanamsa === "se-true"
+                      ? "SE-true"
+                      : settings.preset.ayanamsa === "se-mean"
+                        ? "SE-mean"
+                        : "Drik-compatible"}
+                    ) · node: {settings.preset.node}.{" "}
+                    <Link className="leaf-inline" to="/drawer">
+                      Change in Settings
+                    </Link>
+                  </span>
+                </div>
+              </div>
+            </details>
+          </>
+        ) : null}
+
+        {step === LAST ? (
+          <>
+            <dl className="v-card v-card--flush leaf-review">
+              <div>
+                <dt>Name</dt>
+                <dd>{draft.name.trim()}</dd>
+                <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the name" onClick={() => goTo(0)}>
+                  Change
+                </button>
+              </div>
+              <div>
+                <dt>Born</dt>
+                <dd>
+                  <Readback
+                    y={draft.y}
+                    mo={draft.mo}
+                    d={draft.d}
+                    hour12={draft.hour12}
+                    ampm={draft.ampm}
+                    mi={draft.mi}
+                    timeUnknown={draft.timeUnknown}
+                  />
+                </dd>
+                <button
+                  type="button"
+                  className="v-btn v-btn--quiet v-btn--sm"
+                  aria-label="Change the date and time"
+                  onClick={() => goTo(1)}
+                >
+                  Change
+                </button>
+              </div>
+              <div>
+                <dt>Place</dt>
+                <dd>{draft.place ? placeLabel(draft.place) : "Not chosen yet"}</dd>
+                <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the place" onClick={() => goTo(2)}>
+                  Change
+                </button>
+              </div>
+              <div>
+                <dt>Tradition</dt>
+                <dd>
+                  {TRADITION_LABEL[draft.tradition]} · {draft.handedness === "right" ? "right-handed" : "left-handed"}
+                </dd>
+                <button
+                  type="button"
+                  className="v-btn v-btn--quiet v-btn--sm"
+                  aria-label="Change the tradition or writing hand"
+                  onClick={() => goTo(0)}
+                >
+                  Change
+                </button>
+              </div>
+            </dl>
+
+            <section className={`v-card leaf-check${check ? "" : " is-waiting"}`} aria-labelledby="leaf-check-h" aria-live="polite">
+              <h3 id="leaf-check-h" className="leaf-check__h">
+                Check before you save
+              </h3>
+              {check ? (
+                <>
+                  <dl className="leaf-check__grid">
+                    <div>
+                      <dt>Moon sign (rāśi)</dt>
+                      <dd>
+                        {rashiBoth(check.moonSign, draft.tradition)}
+                        <small>{SIGN_WESTERN[check.moonSign]}</small>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Birth star (nakṣatra)</dt>
+                      <dd>
+                        {nakBoth(check.nak, draft.tradition)}
+                        <small>pada {check.pada}</small>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Rising sign (lagna)</dt>
+                      <dd>
+                        {draft.timeUnknown ? "needs the time" : rashiBoth(check.lagnaSign, draft.tradition)}
+                        {draft.timeUnknown ? null : <small>{SIGN_WESTERN[check.lagnaSign]}</small>}
+                      </dd>
+                    </div>
+                  </dl>
+                  <p className="leaf-check__p">
+                    If this is not what the family knows, the usual culprits are am/pm, the day, or the town. Tap Change above and watch
+                    this update.
+                  </p>
+                </>
+              ) : (
+                <p className="leaf-check__p">
+                  {problem ?? "These details could not be worked out."} Your Moon sign, birth star and rising sign appear here as soon as
+                  they can be worked out.
+                </p>
+              )}
+            </section>
+
+            {clockTrouble ? (
+              <p className="v-note v-note--warn" role="status">
+                {clockTrouble}
+              </p>
+            ) : null}
+            {draft.timeUnknown ? (
+              <p className="v-note">The time of birth is not known, so noon is used and the rising sign is left out.</p>
+            ) : null}
+            {draft.override !== "none" ? (
+              <p className="v-note v-note--warn">You set the clock offset by hand. The chart will show "(manual)" next to the time zone.</p>
+            ) : null}
+
+            <details className="v-fold">
+              <summary>
+                <span>
+                  Technical details
+                  <span className="v-fold__s">Time zone, clock offset and Julian Day, as worked out.</span>
+                </span>
+              </summary>
+              <div className="v-fold__body">{stripEl}</div>
+            </details>
+          </>
+        ) : null}
+
+        {/* On When the sentence under the fields already says what is missing. */}
+        {tried && problem && step !== 1 ? (
+          <p className="v-error leaf-problem" role="alert">
+            {problem}
+          </p>
+        ) : null}
+
+        <div className="leaf-foot">
+          {step > 0 ? (
+            <button type="button" className="v-btn v-btn--ghost" onClick={back}>
+              Back
+            </button>
           ) : null}
+          {step === LAST ? (
+            <button type="submit" className="v-btn leaf-foot__go" disabled={!resolved.m}>
+              {id ? "Save changes" : "Save"}
+            </button>
+          ) : (
+            <button type="submit" className="v-btn leaf-foot__go">
+              Next
+            </button>
+          )}
         </div>
-      </div>
+        {step === LAST ? <p className="v-small v-muted leaf-foot__note">Nothing leaves this device.</p> : null}
+
+        {step === 0 && !id && !draft.name && !draft.d && !draft.place ? (
+          <div className="leaf-example">
+            <p className="v-small v-muted">Just looking around?</p>
+            <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={fillExample}>
+              Fill in an example (Rahul, 14 Mar 1994)
+            </button>
+          </div>
+        ) : null}
+      </form>
 
       <Sheet open={online === "asking"} onClose={() => setOnline("idle")} label="Search online?">
-        <TurmericBand title="Search online?" level={2} />
-        <p className="p">
-          Vyomaphala works offline. To look up “{query.trim()}”, only the place name would be sent to Open-Meteo’s geocoder (and, if that
-          finds nothing, to OpenStreetMap Nominatim). No birth details, no names of people. You will be asked once.
-        </p>
-        <div className="tools" style={{ paddingBottom: "var(--space-4)" }}>
-          <button
-            type="button"
-            className="stamp"
-            onClick={() => {
-              void saveSettings({ onlineLookupAllowed: true }).then(() => {
-                setOnline("idle");
-                void goOnline(true);
-              });
-            }}
-          >
-            <span>Allow and search</span>
-          </button>
-          <button type="button" className="linkish" onClick={() => setOnline("idle")}>
-            Stay offline
-          </button>
+        <div className="leaf-ask">
+          <h2 className="v-card__title">Search online?</h2>
+          <p>
+            Vyomaphala works offline. To look up “{query.trim()}”, only the place name would be sent to Open-Meteo’s geocoder (and, if that
+            finds nothing, to OpenStreetMap Nominatim). No birth details, no names of people. You will be asked once.
+          </p>
+          <div className="v-actions">
+            <button
+              type="button"
+              className="v-btn"
+              onClick={() => {
+                void saveSettings({ onlineLookupAllowed: true }).then(() => {
+                  setOnline("idle");
+                  void goOnline(true);
+                });
+              }}
+            >
+              Allow and search
+            </button>
+            <button type="button" className="v-btn v-btn--ghost" onClick={() => setOnline("idle")}>
+              Stay offline
+            </button>
+          </div>
         </div>
       </Sheet>
-    </Screen>
+    </Page>
   );
 }
 
@@ -711,30 +1035,61 @@ function ManualPlace({ initial, onSet }: { initial: Place; onSet: (p: Place) => 
   const lo = Number(lon);
   const ok =
     lat.trim() !== "" && lon.trim() !== "" && Number.isFinite(la) && Number.isFinite(lo) && Math.abs(la) <= 90 && Math.abs(lo) <= 180;
+  const use = () => {
+    if (ok) onSet({ name: name.trim() || `${la.toFixed(2)}, ${lo.toFixed(2)}`, country: "", lat: la, lon: lo, source: "manual" });
+  };
+  // Enter in these boxes uses the coordinates; it must not skip to the next step.
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    use();
+  };
   return (
-    <div className="leaf-manual" role="group" aria-label="Manual coordinates">
-      <label>
-        Place name
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="village" style={{ fontFamily: "var(--font-body)" }} />
-      </label>
-      <label>
-        Latitude (°N)
-        <input inputMode="decimal" value={lat} onChange={(e) => setLat(e.target.value)} />
-      </label>
-      <label>
-        Longitude (°E)
-        <input inputMode="decimal" value={lon} onChange={(e) => setLon(e.target.value)} />
-      </label>
-      <button
-        type="button"
-        className="linkish"
-        disabled={!ok}
-        onClick={() =>
-          onSet({ name: name.trim() || `${la.toFixed(2)}, ${lo.toFixed(2)}`, country: "", lat: la, lon: lo, source: "manual" })
-        }
-      >
-        Use this place
-      </button>
-    </div>
+    <fieldset className="bf-group leaf-manual">
+      <legend className="v-label">Manual coordinates</legend>
+      <div className="bf-cell">
+        <label htmlFor="leaf-man-name">Place name</label>
+        <input
+          id="leaf-man-name"
+          className="v-input"
+          value={name}
+          autoComplete="off"
+          placeholder="Village"
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={onKeyDown}
+        />
+      </div>
+      <div className="bf-row bf-row--pair">
+        <div className="bf-cell">
+          <label htmlFor="leaf-man-lat">Latitude (°N)</label>
+          <input
+            id="leaf-man-lat"
+            className="v-input"
+            inputMode="decimal"
+            autoComplete="off"
+            value={lat}
+            onChange={(e) => setLat(e.target.value)}
+            onKeyDown={onKeyDown}
+          />
+        </div>
+        <div className="bf-cell">
+          <label htmlFor="leaf-man-lon">Longitude (°E)</label>
+          <input
+            id="leaf-man-lon"
+            className="v-input"
+            inputMode="decimal"
+            autoComplete="off"
+            value={lon}
+            onChange={(e) => setLon(e.target.value)}
+            onKeyDown={onKeyDown}
+          />
+        </div>
+      </div>
+      <div>
+        <button type="button" className="v-btn v-btn--ghost v-btn--sm" disabled={!ok} onClick={use}>
+          Use this place
+        </button>
+      </div>
+    </fieldset>
   );
 }

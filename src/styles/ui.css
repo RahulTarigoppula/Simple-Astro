@@ -178,7 +178,7 @@
     gap: 16px;
   }
 }
-.v-page p {
+:where(.v-page) p {
   margin: 0;
 }
 
@@ -1007,4 +1007,23 @@ dialog.sheet-dialog {
 }
 .info-dot {
   color: var(--ink-muted);
+}
+
+/* The "newer version" banner */
+.sw-tab {
+  top: calc(env(safe-area-inset-top, 0px) + 8px);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-full);
+  background: var(--surface-solid);
+  color: var(--ink);
+  font: 550 0.875rem var(--font-body);
+  padding: 8px 16px;
+}
+
+/* Links inside running text are underlined: colour is never the only signal. */
+.v-page a:not([class]),
+.v-people a:not([class]) {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

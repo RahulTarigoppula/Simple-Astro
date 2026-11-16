@@ -40,7 +40,7 @@ describe("TimeUnknownNote", () => {
     const patri = computePatri(leaf, DEFAULT_PRESET, 0);
     render(<TimeUnknownNote profile={leaf} patri={patri} />);
     const note = screen.getByRole("note");
-    expect(note).toHaveClass("note-haldi", "note--keep");
+    expect(note).toHaveClass("v-note", "note--keep");
     expect(note).toHaveTextContent(/Birth time unknown, so the chart is cast for local noon/);
   });
 });

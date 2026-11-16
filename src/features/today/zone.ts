@@ -7,6 +7,8 @@ export interface ZoneClock {
   zone: string;
   /** "17:04" */
   hm(ms: number): string;
+  /** "5:04 pm": the clock people read aloud */
+  hm12(ms: number): string;
   /** "17:04:12" */
   hms(ms: number): string;
   /** Local civil day number (days since 1970-01-01 on the zone's calendar). */
@@ -28,6 +30,7 @@ export function zoneClock(zoneIn: string): ZoneClock {
   if (hit) return hit;
   const zone = safeZone(zoneIn);
   const fHm = new Intl.DateTimeFormat("en-GB", { timeZone: zone, hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+  const fHm12 = new Intl.DateTimeFormat("en-GB", { timeZone: zone, hour: "numeric", minute: "2-digit", hourCycle: "h12" });
   const fHms = new Intl.DateTimeFormat("en-GB", {
     timeZone: zone,
     hour: "2-digit",
@@ -63,6 +66,7 @@ export function zoneClock(zoneIn: string): ZoneClock {
   const clock: ZoneClock = {
     zone,
     hm: (ms) => fHm.format(ms),
+    hm12: (ms) => fHm12.format(ms).replace(/[  ]/g, " ").toLowerCase(),
     hms: (ms) => fHms.format(ms),
     dayNumber: (ms) => {
       const p = parts(ms);
@@ -89,14 +93,14 @@ export function zoneClock(zoneIn: string): ZoneClock {
   return clock;
 }
 
-/** "ends 17:04" or "ends 09:17 +1", the +n counts civil days past the governing day. */
+/** "until 5:04 pm" or "until 9:17 am tomorrow": civil days past the governing day are said in words. */
 export function endsLabel(clock: ZoneClock, endMs: number, dayMs: number): string {
   const dd = clock.dayNumber(endMs) - clock.dayNumber(dayMs);
-  return `ends ${clock.hm(endMs)}${dd === 1 ? " tomorrow" : dd > 1 ? ` in ${dd} days` : ""}`;
+  return `until ${clock.hm12(endMs)}${dd === 1 ? " tomorrow" : dd > 1 ? ` in ${dd} days` : ""}`;
 }
 
-/** "15:22-16:54" (with "+1" on the end when it crosses midnight). */
+/** "3:22 pm to 4:54 pm" (with "into tomorrow" on the end when it crosses midnight). */
 export function rangeLabel(clock: ZoneClock, [a, b]: readonly [number, number]): string {
   const dd = clock.dayNumber(b) - clock.dayNumber(a);
-  return `${clock.hm(a)}-${clock.hm(b)}${dd === 1 ? " (into tomorrow)" : dd > 1 ? ` (+${dd} days)` : ""}`;
+  return `${clock.hm12(a)} to ${clock.hm12(b)}${dd === 1 ? " (into tomorrow)" : dd > 1 ? ` (+${dd} days)` : ""}`;
 }

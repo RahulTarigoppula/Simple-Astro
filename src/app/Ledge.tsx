@@ -24,7 +24,7 @@ export function Ledge() {
       label: "Chart",
       name: active ? `Birth chart of ${active.name}` : "Birth chart: add a person",
       icon: <IconChart />,
-      on: /^\/(patri|hast|leaf)\//,
+      on: /^\/(patri|hast)\//,
     },
     {
       to: active ? `/forecast/${active.id}` : "/forecast",

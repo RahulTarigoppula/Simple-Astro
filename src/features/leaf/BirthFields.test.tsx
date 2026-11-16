@@ -1,3 +1,4 @@
+// (.tsx so the "dom" test project picks this file up; as .ts it was in no project and never ran.)
 import { describe, expect, it } from "vitest";
 import { type BirthFieldValues, fieldsOfHour, hourOf, missingText } from "./BirthFields";
 
@@ -26,6 +27,10 @@ describe("the 12-hour clock fields", () => {
     expect(missingText(v({ mo: 2, d: 31 }), false)).toBe("February 1994 has only 28 days.");
     expect(missingText(v({ hour12: 0 }), false)).toBe("Pick the hour of birth.");
     expect(missingText(v({ ampm: null }), false)).toBe("Was it am or pm? Tap one.");
+    expect(missingText(v({ y: 1799 }), false)).toBe("Years 1800 to 2100 only.");
+    expect(missingText(v({ y: 2101 }), false)).toBe("Years 1800 to 2100 only.");
+    expect(missingText(v({ y: 199 }), false)).toBe("Fill in the date of birth."); // still typing the year
+    expect(missingText(v({ d: 45 }), false)).toBe("Days 1 to 31 only.");
     expect(missingText(v({}), false)).toBeNull();
     // With the time unknown the clock is not asked for at all.
     expect(missingText(v({ hour12: 0, ampm: null }), true)).toBeNull();

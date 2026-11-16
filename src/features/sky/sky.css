@@ -17,19 +17,20 @@
 
 .sky-head {
   flex: none;
-  padding: var(--space-3) var(--space-5) 0;
+  padding: 4px var(--page-pad) 0;
 }
-.sky-head h1 {
+.sky-head__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sky-head .v-title {
+  font-size: 1.5rem;
+}
+.sky-head__sub {
   margin: 0;
-  font-size: var(--text-2xl);
-  line-height: var(--leading-tight);
-  color: var(--cloth-ink);
-  text-wrap: balance;
-}
-.sky-head p {
-  margin: 2px 0 0;
-  font-size: var(--text-sm);
-  color: color-mix(in oklch, var(--cloth-ink), transparent 16%);
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
 }
 
 .sky-stage {
@@ -230,15 +231,12 @@
 .sky-btn:disabled {
   color: color-mix(in oklch, var(--cloth-ink), transparent 40%);
 }
-.sky-btn--desk {
-  font-size: var(--text-lg);
-  min-width: 112px;
-}
 .sky-note {
   margin: 0;
-  font-size: var(--text-sm);
+  font-size: 0.875rem;
+  line-height: 1.45;
   text-align: center;
-  color: color-mix(in oklch, var(--cloth-ink), transparent 20%);
+  color: var(--ink-muted);
 }
 
 /* ScrubRing, a knurled brass ring; the sindoor notch at the top is the index */
@@ -302,8 +300,8 @@
 .rooftop--missing {
   display: grid;
   place-content: center;
-  gap: var(--space-4);
-  text-align: center;
+  padding: var(--page-pad);
+  touch-action: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -318,6 +316,7 @@
 }
 
 .sky-help {
-  padding: 0 var(--space-5) var(--space-3);
-  font-size: 12px;
+  padding: 0 var(--space-3) var(--space-2);
+  max-width: 60ch;
+  justify-self: center;
 }

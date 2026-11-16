@@ -1,7 +1,7 @@
 import { Link, useRouteError } from "react-router";
 import { EngineError } from "../engine/errors";
 
-/** One presentation language for failure: the lac seal cracks and says why. */
+/** One plain page for any failure: what happened, and two ways out. */
 export function RouteError() {
   const err = useRouteError();
   const reason =
@@ -12,40 +12,31 @@ export function RouteError() {
         : "Vyomaphala could not open this page";
   const offlineChunk = err instanceof Error && /dynamically imported module|Failed to fetch|Loading chunk/i.test(err.message);
   return (
-    <main className="screen screen--scroll" aria-label="Error">
-      <div className="paper sheet-col" style={{ marginTop: "var(--space-8)" }}>
-        <div className="band">
-          <h1>
-            <span lang="hi" className="dev">
-              कुछ गड़बड़
-            </span>{" "}
-            · Something went wrong
-          </h1>
-        </div>
-        <div style={{ display: "grid", placeItems: "center", padding: "var(--space-6) 0 0" }}>
-          <div className="seal is-cracked" aria-hidden="true">
-            <svg width="46" height="46" viewBox="0 0 46 46">
-              <path d="M8 12l12 10-6 6 10 10M30 6l-4 12 10 4" stroke="var(--lac-text)" strokeWidth="1.6" fill="none" />
+    <main className="screen v-screen" aria-label="Error">
+      <div className="v-page">
+        <div className="v-card v-empty" style={{ marginTop: "var(--space-8)" }}>
+          <span className="v-empty__art" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7.5v5.5M12 16.5v.2" />
             </svg>
-          </div>
-        </div>
-        <p className="p" role="alert">
-          {offlineChunk
-            ? "This screen could not be loaded. If you are online, a newer version is probably waiting: reload. If you are offline, open it once with a connection, or use Settings, Prepare for offline."
-            : `Reason: ${reason}.`}
-        </p>
-        {offlineChunk ? (
-          <p className="p">
-            <button type="button" className="stamp" onClick={() => window.location.reload()}>
-              <span>Reload</span>
-            </button>
+          </span>
+          <h1 className="v-title">Something went wrong</h1>
+          <p className="v-lede" role="alert">
+            {offlineChunk
+              ? "This screen could not be loaded. If you are online, a newer version is probably waiting: reload. If you are offline, open it once with a connection, or use Settings, Prepare for offline."
+              : `Reason: ${reason}.`}
           </p>
-        ) : null}
-        <p className="p">
-          <Link className="linkish" to="/">
-            Back home
-          </Link>
-        </p>
+          <div className="v-actions">
+            <button type="button" className="v-btn" onClick={() => window.location.reload()}>
+              Reload
+            </button>
+            <Link className="v-btn v-btn--ghost" to="/">
+              Back home
+            </Link>
+          </div>
+          <p className="v-small v-muted">Your saved people and settings are not affected.</p>
+        </div>
       </div>
     </main>
   );

@@ -1,33 +1,37 @@
-// Explore: the library of the sky, nine grahas, twelve rāśis, twenty-seven nakṣatras, numerology and
-// the Chinese zodiac, each with its myth, its meaning, the real astronomy, and where it sits right now.
+// Explore: the library of the sky. The hub is a directory (planets, signs, stars, numbers, the Chinese
+// zodiac, the stories); each list is a grid of cards; each detail page tells the story, what it
+// stands for, where it is right now and what the real sky is. The sky wheel is an optional extra.
 import { useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router";
 import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { useNowMs } from "../../app/useNow";
 import { InfoDot } from "../../components/ui/Explain";
 import { GrahaGlyph } from "../../components/ui/GrahaGlyph";
-import { Screen } from "../../components/ui/Screen";
+import { ChevronLeft, ChevronRight, Page, Row, Section } from "../../components/ui/Page";
+import { StoryPlayer } from "../../components/ui/StoryPlayer";
 import { GRAHA_LORE, NAKSHATRA_LORE, RASHI_LORE } from "../../data/lore";
+import { nakBoth, rashiBoth } from "../../data/regional";
 import { EXALTATION, naturalRelation, OWN_SIGNS } from "../../data/tables/dignity";
 import { GANA_BY_NAK, GANA_LABEL, YONI_BY_NAK, YONI_LABEL } from "../../data/tables/koota";
-import { NAK_LORDS, NAKSHATRA_DEV, NAKSHATRA_NAMES } from "../../data/tables/names";
+import { NAK_LORDS, NAKSHATRA_DEV, NAKSHATRA_NAMES, SIGN_MARK } from "../../data/tables/names";
 import { transitsAt } from "../../engine/gochar";
 import { mulberry32 } from "../../engine/math";
 import { birthNumbers, CHINESE_ANIMALS, chineseZodiac, NUMBER_GRAHA, nameNumber, personalYear } from "../../engine/profile";
 import { GRAHA_IDS, type GrahaId } from "../../engine/types";
-import "../cosmic/cosmic.css";
-import { StoryPlayer } from "../../components/ui/StoryPlayer";
-import { StoryRings } from "../story/StoryRings";
+import { countEvent } from "../../platform/stats";
+import { IconGuide, IconMoon, IconNumbers, IconSky, IconStory, IconToday } from "../chowki/icons";
 import { SkyWheel, type WheelSel } from "./SkyWheel";
+import { StarPatch } from "./StarPatch";
 import { panelFor, slidesFor } from "./skyStories";
 import "./explore.css";
 import "./wheel.css";
-import { nakName, rashiName } from "../../data/regional";
-import { countEvent } from "../../platform/stats";
 
 const lore = (id: GrahaId) => GRAHA_LORE.find((g) => g.id === id);
 const NAK_SPAN = 360 / 27;
 const ELEMENT_TONE = { Fire: "fire", Earth: "earth", Air: "air", Water: "water" } as const;
+const cap = (s: string) => (s ? (s[0]?.toUpperCase() ?? "") + s.slice(1) : s);
+/** The zodiac mark as text, never as a colour emoji. */
+const signMark = (i: number) => `${SIGN_MARK[i] ?? ""}︎`;
 
 function useSky() {
   const settings = useSettings();
@@ -35,11 +39,57 @@ function useSky() {
   return useMemo(() => transitsAt(now, settings.preset), [now, settings.preset]);
 }
 
-function Back() {
+// ── shared pieces ─────────────────────────────────────────────────────────
+function SignOrb({ i, small }: { i: number; small?: boolean }) {
+  const r = RASHI_LORE[i];
   return (
-    <Link to="/explore" className="ex-back">
-      ← Explore
-    </Link>
+    <span className={`ex-orb ex-orb--${r ? ELEMENT_TONE[r.element] : "air"}${small ? " ex-orb--sm" : ""}`} aria-hidden="true">
+      {signMark(i)}
+    </span>
+  );
+}
+
+function NumOrb({ children, small, tone }: { children: React.ReactNode; small?: boolean; tone?: "gold" | "violet" | "rose" }) {
+  return (
+    <span className={`ex-orb ex-orb--${tone ?? "gold"}${small ? " ex-orb--sm" : ""}`} aria-hidden="true">
+      {children}
+    </span>
+  );
+}
+
+/** The top of a detail page: the glyph, the English name, the Sanskrit small. */
+function Hero({
+  art,
+  eyebrow,
+  title,
+  small,
+  sub,
+}: {
+  art: React.ReactNode;
+  eyebrow: React.ReactNode;
+  title: string;
+  small?: React.ReactNode;
+  sub?: React.ReactNode;
+}) {
+  return (
+    <header className="v-card v-card--hero ex-hero">
+      <span className="ex-hero__art">{art}</span>
+      <div className="ex-hero__text">
+        <p className="v-eyebrow">{eyebrow}</p>
+        <h1 className="v-title">{title}</h1>
+        {small ? <p className="ex-hero__small">{small}</p> : null}
+        {sub ? <p className="ex-hero__sub">{sub}</p> : null}
+      </div>
+    </header>
+  );
+}
+
+function Card({ title, children, className }: { title: React.ReactNode; children: React.ReactNode; className?: string }) {
+  return (
+    <section className={`v-card ex-card${className ? ` ${className}` : ""}`}>
+      <h2 className="v-card__title">{title}</h2>
+      {children}
+    </section>
   );
 }
 
@@ -56,7 +106,48 @@ function Facts({ rows }: { rows: Array<[string, React.ReactNode]> }) {
   );
 }
 
-// ── detail: graha ─────────────────────────────────────────────────────────
+function Chips({ items, label }: { items: Array<{ to: string; text: string }>; label: string }) {
+  return (
+    <ul className="ex-chips" aria-label={label}>
+      {items.map((it) => (
+        <li key={it.to}>
+          <Link to={it.to}>{it.text}</Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Pager({ prev, next }: { prev: { to: string; text: string }; next: { to: string; text: string } }) {
+  return (
+    <nav className="ex-pager" aria-label="Previous and next">
+      <Link to={prev.to} className="v-btn v-btn--ghost">
+        <ChevronLeft />
+        <span>
+          <span className="ex-pager__k">Previous</span>
+          {prev.text}
+        </span>
+      </Link>
+      <Link to={next.to} className="v-btn v-btn--ghost">
+        <span>
+          <span className="ex-pager__k">Next</span>
+          {next.text}
+        </span>
+        <ChevronRight />
+      </Link>
+    </nav>
+  );
+}
+
+function Dev({ children }: { children: string | undefined }) {
+  return children ? (
+    <span lang="hi" className="ex-dev">
+      {children}
+    </span>
+  ) : null;
+}
+
+// ── detail: a planet ──────────────────────────────────────────────────────
 function GrahaDetail({ id }: { id: GrahaId }) {
   const g = lore(id);
   const sky = useSky();
@@ -69,29 +160,26 @@ function GrahaDetail({ id }: { id: GrahaId }) {
   const own = OWN_SIGNS[id] ?? [];
   const ex = EXALTATION[id];
   const mine = patri && active && patri.profileId === active.id ? patri.grahas[id] : null;
+  const at = GRAHA_LORE.findIndex((x) => x.id === id);
+  const prev = GRAHA_LORE[(at + GRAHA_LORE.length - 1) % GRAHA_LORE.length];
+  const next = GRAHA_LORE[(at + 1) % GRAHA_LORE.length];
   return (
-    <article className="ex-detail">
-      <Back />
-      <header className="ex-hero">
-        <GrahaGlyph id={id} size={96} />
-        <div>
-          <p className="ex-kicker">Graha · {g.title}</p>
-          <h1>
-            {g.name}{" "}
-            <span lang="hi" className="ex-dev">
-              {g.dev}
-            </span>
-          </h1>
-          <p className="ex-sub">{g.english}</p>
-        </div>
-      </header>
-      <section className="cosmic-card ex-story">
-        <h2>The story</h2>
-        <p>{g.myth}</p>
-      </section>
-      <section className="cosmic-card">
-        <h2>What it stands for</h2>
-        <p className="ex-big">{g.signifies[0]?.toUpperCase() + g.signifies.slice(1)}.</p>
+    <Page label={`${g.english}: the planet ${g.name}`} back="/explore" backLabel="Explore">
+      <Hero
+        art={<GrahaGlyph id={id} size={88} />}
+        eyebrow={`Planet · ${g.title}`}
+        title={g.english}
+        small={
+          <>
+            {g.name} <Dev>{g.dev}</Dev> <InfoDot id="graha" />
+          </>
+        }
+      />
+      <Card title="The story">
+        <p className="ex-prose">{g.myth}</p>
+      </Card>
+      <Card title="What it stands for">
+        <p className="ex-big">{cap(g.signifies)}.</p>
         <Facts
           rows={[
             ["Day", g.day],
@@ -108,9 +196,8 @@ function GrahaDetail({ id }: { id: GrahaId }) {
             ["Exalted in", ex ? `${RASHI_LORE[ex[0]]?.name} (${RASHI_LORE[ex[0]]?.western})` : "-"],
           ]}
         />
-      </section>
-      <section className="cosmic-card">
-        <h2>Where it is right now</h2>
+      </Card>
+      <Card title="Where it is right now">
         <p>
           {g.english} is in <Link to={`/explore/rashi/${now.sign}`}>{RASHI_LORE[now.sign]?.name}</Link> ({RASHI_LORE[now.sign]?.western}),{" "}
           {Math.floor(now.degInSign)}°, in the nakṣatra{" "}
@@ -123,27 +210,25 @@ function GrahaDetail({ id }: { id: GrahaId }) {
             {mine.retrograde && id !== "RA" && id !== "KE" ? ", retrograde" : ""}.
           </p>
         ) : null}
-      </section>
-      <section className="cosmic-card">
-        <h2>The real sky</h2>
-        <p>{g.real}</p>
-      </section>
-      <section className="cosmic-card">
-        <h2>Its three birth stars</h2>
-        <p className="p--muted">Each graha rules three nakṣatras; they set the order of the daśā life chapters.</p>
-        <ul className="ex-chips">
-          {naks.map(({ n, i }) => (
-            <li key={n}>
-              <Link to={`/explore/nakshatra/${i}`}>{n}</Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </article>
+      </Card>
+      <Card title="The real sky">
+        <p className="ex-prose">{g.real}</p>
+      </Card>
+      <Card title="Its three birth stars">
+        <p className="v-card__sub">Each graha rules three nakṣatras; they set the order of the daśā life chapters.</p>
+        <Chips label={`Birth stars ruled by ${g.english}`} items={naks.map(({ n, i }) => ({ to: `/explore/nakshatra/${i}`, text: n }))} />
+      </Card>
+      {prev && next ? (
+        <Pager
+          prev={{ to: `/explore/graha/${prev.id}`, text: prev.english }}
+          next={{ to: `/explore/graha/${next.id}`, text: next.english }}
+        />
+      ) : null}
+    </Page>
   );
 }
 
-// ── detail: rāśi ──────────────────────────────────────────────────────────
+// ── detail: a sign ────────────────────────────────────────────────────────
 function RashiDetail({ i }: { i: number }) {
   const r = RASHI_LORE[i];
   const sky = useSky();
@@ -158,53 +243,37 @@ function RashiDetail({ i }: { i: number }) {
   });
   const here = GRAHA_IDS.filter((g) => sky[g].sign === i);
   const mineHere = patri && active && patri.profileId === active.id ? GRAHA_IDS.filter((g) => patri.grahas[g].sign === i) : [];
+  const p = (i + 11) % 12;
+  const n = (i + 1) % 12;
   return (
-    <article className="ex-detail">
-      <Back />
-      <header className="ex-hero">
-        <span className={`ex-signorb ex-signorb--${ELEMENT_TONE[r.element]}`} aria-hidden="true">
-          {i + 1}
-        </span>
-        <div>
-          <p className="ex-kicker">
-            Rāśi {i + 1} of 12 <InfoDot id="rashi" />
-          </p>
-          <h1>
-            {r.name}{" "}
-            <span lang="hi" className="ex-dev">
-              {r.dev}
-            </span>
-          </h1>
-          <p className="ex-sub">
-            {r.western} · {r.symbol}
-          </p>
-        </div>
-      </header>
-      <section className="cosmic-card">
-        <h2>Its nature</h2>
-        <p className="ex-big">{r.nature[0]?.toUpperCase() + r.nature.slice(1)}.</p>
+    <Page label={`${r.western}: the sign ${r.name}`} back="/explore" backLabel="Explore">
+      <Hero
+        art={<SignOrb i={i} />}
+        eyebrow={
+          <>
+            Sign {i + 1} of 12 <InfoDot id="rashi" />
+          </>
+        }
+        title={r.western}
+        small={
+          <>
+            {r.name} <Dev>{r.dev}</Dev> · {r.symbol}
+          </>
+        }
+      />
+      <Card title="What it stands for">
+        <p className="ex-big">{cap(r.nature)}.</p>
         <Facts
           rows={[
             ["Element", r.element],
             ["Quality", `${r.quality}: ${r.quality === "Movable" ? "starts things" : r.quality === "Fixed" ? "holds steady" : "adapts"}`],
-            ["Ruled by", <Link key="r" to={`/explore/graha/${r.ruler}`}>{`${lore(r.ruler)?.name} (${lore(r.ruler)?.english})`}</Link>],
+            ["Ruled by", <Link key="r" to={`/explore/graha/${r.ruler}`}>{`${lore(r.ruler)?.english} (${lore(r.ruler)?.name})`}</Link>],
             ["Body (Kāla-puruṣa)", r.body],
             ["Western sign", `${r.western}, about 24° ahead of this sidereal sign`],
           ]}
         />
-      </section>
-      <section className="cosmic-card">
-        <h2>Nakṣatras in this sign</h2>
-        <ul className="ex-chips">
-          {naks.map((k) => (
-            <li key={k}>
-              <Link to={`/explore/nakshatra/${k}`}>{NAKSHATRA_NAMES[k]}</Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-      <section className="cosmic-card">
-        <h2>Who is here</h2>
+      </Card>
+      <Card title="Who is here right now">
         <p>
           <strong>Now:</strong> {here.length ? here.map((g) => lore(g)?.english).join(", ") : "no graha is in this sign right now"}.
         </p>
@@ -214,53 +283,76 @@ function RashiDetail({ i }: { i: number }) {
             {patri.lagna.sign === i ? ", and it is the rising sign" : ""}.
           </p>
         ) : null}
-      </section>
-    </article>
+      </Card>
+      <Card title="The real sky">
+        <StarPatch from={i * 30} span={30} lat={24} label={`The real stars of ${r.name}`} />
+        <h3 className="ex-h3">Birth stars in this sign</h3>
+        <Chips
+          label={`Birth stars in ${r.western}`}
+          items={naks.map((k) => ({ to: `/explore/nakshatra/${k}`, text: NAKSHATRA_NAMES[k] ?? "" }))}
+        />
+      </Card>
+      <Pager
+        prev={{ to: `/explore/rashi/${p}`, text: RASHI_LORE[p]?.western ?? "" }}
+        next={{ to: `/explore/rashi/${n}`, text: RASHI_LORE[n]?.western ?? "" }}
+      />
+    </Page>
   );
 }
 
-// ── detail: nakṣatra ──────────────────────────────────────────────────────
+// ── detail: a birth star ──────────────────────────────────────────────────
 function NakshatraDetail({ i }: { i: number }) {
   const n = NAKSHATRA_LORE[i];
   const sky = useSky();
   if (!n) return null;
+  const name = NAKSHATRA_NAMES[i] ?? "";
   const lord = NAK_LORDS[i % 9] ?? "KE";
   const a = i * NAK_SPAN;
   const s0 = Math.floor(a / 30);
   const s1 = Math.floor((a + NAK_SPAN - 0.001) / 30);
   const dms = (x: number) => `${Math.floor(x % 30)}°${String(Math.round(((x % 30) % 1) * 60)).padStart(2, "0")}′`;
-  const moonHere = sky.MO.nakshatra === i;
+  const here = GRAHA_IDS.filter((g) => sky[g].nakshatra === i);
   return (
-    <article className="ex-detail">
-      <Back />
-      <header className="ex-hero">
-        <span className="ex-nakorb" aria-hidden="true">
-          <span>{i + 1}</span>
-        </span>
-        <div>
-          <p className="ex-kicker">
-            Nakṣatra {i + 1} of 27 <InfoDot id="nakshatra" />
-          </p>
-          <h1>
-            {NAKSHATRA_NAMES[i]}{" "}
-            <span lang="hi" className="ex-dev">
-              {NAKSHATRA_DEV[i]}
-            </span>
-          </h1>
-          <p className="ex-sub">
-            “{n.meaning}” · {n.symbol}
-          </p>
-        </div>
-      </header>
-      {moonHere ? <p className="ex-now">☾ The Moon is in {NAKSHATRA_NAMES[i]} right now.</p> : null}
-      <section className="cosmic-card ex-story">
-        <h2>The story</h2>
-        <p>
+    <Page label={`The birth star ${name}`} back="/explore" backLabel="Explore">
+      <Hero
+        art={<NumOrb>{i + 1}</NumOrb>}
+        eyebrow={
+          <>
+            Birth star {i + 1} of 27 <InfoDot id="nakshatra" />
+          </>
+        }
+        title={name}
+        small={
+          <>
+            <Dev>{NAKSHATRA_DEV[i]}</Dev> “{n.meaning}” · {n.symbol}
+          </>
+        }
+      />
+      <Card title="The story">
+        <p className="ex-prose">
           Presided over by <strong>{n.deity}</strong>. {n.story}
         </p>
-      </section>
-      <section className="cosmic-card">
-        <h2>In the sky</h2>
+      </Card>
+      <Card title="What it stands for">
+        <Facts
+          rows={[
+            ["Ruling graha", <Link key="l" to={`/explore/graha/${lord}`}>{`${lore(lord)?.english} (${lore(lord)?.name})`}</Link>],
+            ["Gaṇa (nature)", GANA_LABEL[GANA_BY_NAK[i] ?? "deva"]],
+            ["Yoni (animal)", YONI_LABEL[YONI_BY_NAK[i] ?? "horse"]],
+          ]}
+        />
+        <p className="v-card__sub ex-note">
+          Gaṇa and yoni are used in Guna Milan matching <InfoDot id="guna-milan" />.
+        </p>
+      </Card>
+      <Card title="Where it is right now">
+        {sky.MO.nakshatra === i ? <p className="v-note">The Moon is in {name} right now.</p> : null}
+        <p>
+          <strong>Now:</strong> {here.length ? here.map((g) => lore(g)?.english).join(", ") : "no graha is in this star right now"}.
+        </p>
+      </Card>
+      <Card title="The real sky">
+        <StarPatch from={a} span={NAK_SPAN} lat={32} label={`The real stars of ${name}`} />
         <Facts
           rows={[
             ["Stars", n.star],
@@ -268,20 +360,14 @@ function NakshatraDetail({ i }: { i: number }) {
               "Span",
               `${RASHI_LORE[s0]?.name} ${dms(a)} → ${RASHI_LORE[s1]?.name} ${dms(a + NAK_SPAN) === "0°00′" ? "30°00′" : dms(a + NAK_SPAN)}`,
             ],
-            ["Ruling graha", <Link key="l" to={`/explore/graha/${lord}`}>{`${lore(lord)?.name} (${lore(lord)?.english})`}</Link>],
-            ["Gaṇa (nature)", GANA_LABEL[GANA_BY_NAK[i] ?? "deva"]],
-            ["Yoni (animal)", YONI_LABEL[YONI_BY_NAK[i] ?? "horse"]],
           ]}
         />
-        <p className="p--muted ex-note">
-          Gaṇa and yoni are used in Guna Milan matching <InfoDot id="guna-milan" />.
-        </p>
-      </section>
-      <div className="ex-pager">
-        <Link to={`/explore/nakshatra/${(i + 26) % 27}`}>← {NAKSHATRA_NAMES[(i + 26) % 27]}</Link>
-        <Link to={`/explore/nakshatra/${(i + 1) % 27}`}>{NAKSHATRA_NAMES[(i + 1) % 27]} →</Link>
-      </div>
-    </article>
+      </Card>
+      <Pager
+        prev={{ to: `/explore/nakshatra/${(i + 26) % 27}`, text: NAKSHATRA_NAMES[(i + 26) % 27] ?? "" }}
+        next={{ to: `/explore/nakshatra/${(i + 1) % 27}`, text: NAKSHATRA_NAMES[(i + 1) % 27] ?? "" }}
+      />
+    </Page>
   );
 }
 
@@ -306,13 +392,18 @@ function Numbers() {
   const p = profiles?.find((x) => x.id === (pid ?? active?.id)) ?? active ?? null;
   const q = profiles?.find((x) => x.id === other) ?? null;
   const year = new Date().getFullYear();
-  const card = (label: string, v: number, how: string) => {
+  const card = (label: string, small: string | null, v: number, how: string) => {
     const g = NUMBER_GRAHA[v as 1];
     return (
-      <div className="ex-num" key={label}>
-        <span className="cp-sign cp-sign--num ex-num__v">{v}</span>
+      <li className="ex-num" key={label}>
+        <NumOrb small tone="violet">
+          {v}
+        </NumOrb>
         <div>
-          <p className="ex-num__k">{label}</p>
+          <p className="ex-num__k">
+            {label}
+            {small ? <span className="ex-num__small"> · {small}</span> : null}
+          </p>
           <p className="ex-num__p">
             {g ? (
               <Link to={`/explore/graha/${g}`}>
@@ -323,7 +414,7 @@ function Numbers() {
           </p>
           <p className="ex-num__how">{how}</p>
         </div>
-      </div>
+      </li>
     );
   };
   const n = p ? birthNumbers(p.birth.localY, p.birth.localMo, p.birth.localD) : null;
@@ -331,20 +422,15 @@ function Numbers() {
   const nq = q ? birthNumbers(q.birth.localY, q.birth.localMo, q.birth.localD) : null;
   const rel = n && nq ? naturalRelation(NUMBER_GRAHA[n.root as 1], NUMBER_GRAHA[nq.root as 1]) : null;
   return (
-    <article className="ex-detail">
-      <Back />
-      <header className="ex-hero">
-        <span className="cp-sign cp-sign--num ex-bignum" aria-hidden="true">
-          108
-        </span>
-        <div>
-          <p className="ex-kicker">Aṅka Jyotiṣa · Numerology</p>
-          <h1>Your numbers</h1>
-          <p className="ex-sub">Each digit 1-9 belongs to a graha. Just for fun. There is no scientific basis.</p>
-        </div>
-      </header>
+    <Page label="Numerology: your numbers" back="/explore" backLabel="Explore">
+      <Hero
+        art={<NumOrb tone="violet">108</NumOrb>}
+        eyebrow="Numerology · Aṅka Jyotiṣa"
+        title="Your numbers"
+        sub="Each digit 1-9 belongs to a graha. Just for fun. There is no scientific basis."
+      />
       {profiles && profiles.length > 1 ? (
-        <div className="fc-people" role="group" aria-label="Whose numbers">
+        <div className="v-seg" role="group" aria-label="Whose numbers">
           {profiles.map((x) => (
             <button key={x.id} type="button" aria-pressed={x.id === p?.id} onClick={() => setPid(x.id)}>
               {x.name}
@@ -353,34 +439,44 @@ function Numbers() {
         </div>
       ) : null}
       {p && n && nm ? (
-        <section className="cosmic-card ex-nums">
-          {card("Root number · Mūlāṅka", n.root, `From the day of birth, ${p.birth.localD}, added to one digit. Said to show your nature.`)}
+        <ul className="v-list ex-nums" aria-label={`${p.name}'s numbers`}>
           {card(
-            "Destiny number · Bhāgyāṅka",
+            "Root number",
+            "Mūlāṅka",
+            n.root,
+            `From the day of birth, ${p.birth.localD}, added to one digit. Said to show your nature.`,
+          )}
+          {card(
+            "Destiny number",
+            "Bhāgyāṅka",
             n.destiny,
             `From every digit of ${p.birth.localD}/${p.birth.localMo}/${p.birth.localY}. Said to show your path.`,
           )}
           {card(
             "Name number",
+            null,
             nm.single,
             `"${p.name}" by the Chaldean letter values: ${nm.compound} → ${nm.single}. Said to show how others see you.`,
           )}
           {card(
             `Personal year ${year}`,
+            null,
             personalYear(p.birth.localMo, p.birth.localD, year),
             `Birthday + month + ${year}, reduced. The theme of this year, birthday to birthday.`,
           )}
-        </section>
+        </ul>
       ) : (
-        <p className="p p--muted">
-          <Link to="/leaf/new">Add a person</Link> to see their numbers.
-        </p>
+        <div className="v-card v-empty">
+          <p>Add a person to see their numbers.</p>
+          <Link to="/leaf/new" className="v-btn">
+            Add a person
+          </Link>
+        </div>
       )}
       {p && n && profiles && profiles.length > 1 ? (
-        <section className="cosmic-card">
-          <h2>Number friendship</h2>
-          <p className="p--muted">Compare root numbers through their grahas' classical friendships.</p>
-          <div className="fc-people">
+        <Card title="Number friendship">
+          <p className="v-card__sub">Compare root numbers through their grahas' classical friendships.</p>
+          <div className="v-seg" role="group" aria-label={`Compare ${p.name} with`}>
             {profiles
               .filter((x) => x.id !== p.id)
               .map((x) => (
@@ -390,7 +486,7 @@ function Numbers() {
               ))}
           </div>
           {q && nq && rel ? (
-            <p className="ex-big">
+            <p className="ex-big" aria-live="polite">
               {p.name}'s {n.root} ({lore(NUMBER_GRAHA[n.root as 1])?.english}) and {q.name}'s {nq.root} (
               {lore(NUMBER_GRAHA[nq.root as 1])?.english}):{" "}
               {rel === "self"
@@ -403,17 +499,18 @@ function Numbers() {
               .
             </p>
           ) : null}
-        </section>
+        </Card>
       ) : null}
-      <section className="cosmic-card ex-story">
-        <h2>Why 108?</h2>
-        <p>
+      <Card title="Why 108?">
+        <p className="ex-prose">
           108 = 27 nakṣatras × 4 padas = 12 signs × 9 grahas. It's why a mālā has 108 beads, and why so many prayers are said 108 times.
-          Pythagoras taught that "all is number" around 530 BCE; Indian numerology joined that idea to the nine grahas.{" "}
-          <Link to="/story">Read the whole story →</Link>
+          Pythagoras taught that "all is number" around 530 BCE; Indian numerology joined that idea to the nine grahas.
         </p>
-      </section>
-    </article>
+        <Link to="/story" className="v-link ex-more">
+          Read the whole story <ChevronRight size={16} />
+        </Link>
+      </Card>
+    </Page>
   );
 }
 
@@ -421,29 +518,18 @@ function Numbers() {
 function Chinese() {
   const profiles = useProfiles();
   return (
-    <article className="ex-detail">
-      <Back />
-      <header className="ex-hero">
-        <span className="cp-sign cp-sign--cn ex-bignum" aria-hidden="true">
-          十二
-        </span>
-        <div>
-          <p className="ex-kicker">Shēngxiào · Chinese zodiac</p>
-          <h1>The twelve animals</h1>
-          <p className="ex-sub">A neighbouring tradition: one animal per lunar year, in a 12-year cycle with five elements.</p>
-        </div>
-      </header>
-      <section className="cosmic-card ex-story">
-        <h2>The Great Race</h2>
-        <p>
-          The Jade Emperor called all the animals to a race across a great river; the order they arrived would name the years. The clever
-          Rat rode on the Ox's back and leapt ashore first. The Ox came second, then the Tiger, the Rabbit hopping across stones, the Dragon
-          (who stopped to bring rain), the Horse (startled at the bank by the Snake hidden on its hoof), the Goat, Monkey and Rooster
-          sharing a raft, the Dog who stopped to bathe, and last the Pig, who had stopped to eat and nap.
-        </p>
-      </section>
-      <section className="cosmic-card">
-        <h2>Your circle</h2>
+    <Page label="The Chinese zodiac" back="/explore" backLabel="Explore">
+      <Hero
+        art={
+          <NumOrb tone="rose">
+            <span lang="zh">十二</span>
+          </NumOrb>
+        }
+        eyebrow="Chinese zodiac · Shēngxiào"
+        title="The twelve animals"
+        sub="A neighbouring tradition: one animal per lunar year, in a 12-year cycle with five elements."
+      />
+      <Card title="Your circle">
         {profiles?.length ? (
           <ul className="ex-cn">
             {profiles.map((p) => {
@@ -456,27 +542,173 @@ function Chinese() {
             })}
           </ul>
         ) : (
-          <p className="p--muted">No one saved yet.</p>
+          <p className="v-muted">No one saved yet.</p>
         )}
-        <p className="p--muted ex-note">
+        <p className="v-card__sub ex-note">
           The year starts at Chinese New Year (a new moon between 21 January and 20 February), not on 1 January, so early-year birthdays
           often belong to the previous animal.
         </p>
-      </section>
-      <section className="cosmic-card">
-        <h2>The cycle</h2>
-        <ol className="ex-chips ex-chips--ol">
+      </Card>
+      <Card title="The Great Race">
+        <p className="ex-prose">
+          The Jade Emperor called all the animals to a race across a great river; the order they arrived would name the years. The clever
+          Rat rode on the Ox's back and leapt ashore first. The Ox came second, then the Tiger, the Rabbit hopping across stones, the Dragon
+          (who stopped to bring rain), the Horse (startled at the bank by the Snake hidden on its hoof), the Goat, Monkey and Rooster
+          sharing a raft, the Dog who stopped to bathe, and last the Pig, who had stopped to eat and nap.
+        </p>
+      </Card>
+      <Card title="The cycle">
+        <ol className="ex-cycle">
           {CHINESE_ANIMALS.map((a) => (
             <li key={a}>{a}</li>
           ))}
         </ol>
-      </section>
-    </article>
+      </Card>
+    </Page>
   );
 }
 
-// ── hub: the Sky Wheel and its story panel ────────────────────────────────
-function Hub() {
+// ── lists: planets, signs, stars ──────────────────────────────────────────
+function Tile({
+  to,
+  art,
+  title,
+  sub,
+  mark,
+}: {
+  to: string;
+  art: React.ReactNode;
+  title: string;
+  sub: React.ReactNode;
+  mark?: string | null;
+}) {
+  return (
+    <li>
+      <Link to={to} className="ex-tile">
+        {art}
+        <span className="ex-tile__t">{title}</span>
+        <span className="ex-tile__s">{sub}</span>
+        {mark ? <span className="v-chip v-chip--gold">{mark}</span> : null}
+      </Link>
+    </li>
+  );
+}
+
+function ListPage({ kind }: { kind: "graha" | "rashi" | "nakshatra" }) {
+  const sky = useSky();
+  const active = useActiveProfile();
+  const settings = useSettings();
+  const { patri: p } = usePatri(active, settings.preset);
+  const patri = p && active && p.profileId === active.id ? p : null;
+  if (kind === "graha")
+    return (
+      <Page
+        label="The nine planets"
+        eyebrow={
+          <>
+            Navagraha <InfoDot id="graha" />
+          </>
+        }
+        title="The nine planets"
+        lede="Seven you can see, and the two shadow points where eclipses happen."
+        back="/explore"
+        backLabel="Explore"
+        wide
+      >
+        <ul className="ex-grid">
+          {GRAHA_LORE.map((g) => (
+            <Tile
+              key={g.id}
+              to={`/explore/graha/${g.id}`}
+              art={<GrahaGlyph id={g.id} size={48} />}
+              title={g.english}
+              sub={
+                <>
+                  {g.name} <Dev>{g.dev}</Dev>
+                </>
+              }
+            />
+          ))}
+        </ul>
+      </Page>
+    );
+  if (kind === "rashi")
+    return (
+      <Page
+        label="The twelve signs"
+        eyebrow={
+          <>
+            Rāśi <InfoDot id="rashi" />
+          </>
+        }
+        title="The twelve signs"
+        lede="Twelve equal slices of the sky that the Sun, Moon and planets travel through."
+        back="/explore"
+        backLabel="Explore"
+        wide
+      >
+        <ul className="ex-grid">
+          {RASHI_LORE.map((r, i) => (
+            <Tile
+              key={r.name}
+              to={`/explore/rashi/${i}`}
+              art={<SignOrb i={i} small />}
+              title={r.western}
+              sub={
+                <>
+                  {r.name} <Dev>{r.dev}</Dev>
+                </>
+              }
+              mark={
+                patri?.grahas.MO.sign === i
+                  ? "Moon sign"
+                  : patri?.lagna.sign === i
+                    ? "Rising sign"
+                    : sky.MO.sign === i
+                      ? "Moon is here"
+                      : null
+              }
+            />
+          ))}
+        </ul>
+      </Page>
+    );
+  return (
+    <Page
+      label="The 27 birth stars"
+      eyebrow={
+        <>
+          Nakṣatra <InfoDot id="nakshatra" />
+        </>
+      }
+      title="The 27 birth stars"
+      lede="The Moon visits one each day. The one it was in when you were born is your birth star."
+      back="/explore"
+      backLabel="Explore"
+      wide
+    >
+      <ol className="ex-grid">
+        {NAKSHATRA_LORE.map((n, i) => (
+          <Tile
+            key={NAKSHATRA_NAMES[i]}
+            to={`/explore/nakshatra/${i}`}
+            art={<NumOrb small>{i + 1}</NumOrb>}
+            title={NAKSHATRA_NAMES[i] ?? ""}
+            sub={
+              <>
+                <Dev>{NAKSHATRA_DEV[i]}</Dev> {n.symbol}
+              </>
+            }
+            mark={patri?.grahas.MO.nakshatra === i ? "Birth star" : sky.MO.nakshatra === i ? "Moon is here" : null}
+          />
+        ))}
+      </ol>
+    </Page>
+  );
+}
+
+// ── the sky wheel (optional, a way to wander) ─────────────────────────────
+function Wheel() {
   const sky = useSky();
   const active = useActiveProfile();
   const settings = useSettings();
@@ -486,7 +718,7 @@ function Hub() {
   const [playing, setPlaying] = useState(false);
   const surprise = () => {
     countEvent("explore-surprise");
-    // Seeded from the clock (Math.random is never used in Vyomaphala).
+    // Seeded from the clock (no unseeded randomness anywhere in Vyomaphala).
     const r = mulberry32(Date.now() % 2147483647)();
     const k = Math.floor(r * 48);
     if (k < 9) setSel({ kind: "graha", id: GRAHA_IDS[k] ?? "SU" });
@@ -505,16 +737,15 @@ function Hub() {
     else setSel({ kind: "nak", i: sky.MO.nakshatra });
   };
   return (
-    <>
-      <header className="ex-head ex-head--wheel">
-        <p className="ex-kicker">Explore · अन्वेषण</p>
-        <h1>The sky, and its stories</h1>
-        <p className="ex-lede">
-          Turn the wheel. Every planet, sign and star has a myth, a meaning in the tradition, and real stars behind it.
-        </p>
-      </header>
-
-      <div className="seg ex-kinds" role="group" aria-label="Choose a ring">
+    <Page
+      label="The sky wheel"
+      title="The sky wheel"
+      lede="Turn the wheel, or tap any part of it. Every planet, sign and star has a myth, a meaning in the tradition, and real stars behind it."
+      back="/explore"
+      backLabel="Explore"
+      wide
+    >
+      <div className="v-seg ex-kinds" role="group" aria-label="Choose a ring">
         {kinds.map(([k, label]) => (
           <button key={k} type="button" aria-pressed={sel.kind === k} onClick={() => pick(k)}>
             {label}
@@ -522,23 +753,32 @@ function Hub() {
         ))}
       </div>
 
-      {patri && active ? (
-        <div className="ex-you" role="group" aria-label={`Start with ${active.name}'s sky`}>
-          <button type="button" onClick={() => setSel({ kind: "nak", i: patri.grahas.MO.nakshatra })}>
-            ★ {nakName(patri.grahas.MO.nakshatra, active.tradition)} <span>birth star</span>
-          </button>
-          <button type="button" onClick={() => setSel({ kind: "rashi", i: patri.grahas.MO.sign })}>
-            ☾ {rashiName(patri.grahas.MO.sign, active.tradition)} <span>Moon sign</span>
-          </button>
-          <button type="button" onClick={() => setSel({ kind: "rashi", i: patri.lagna.sign })}>
-            ↑ {rashiName(patri.lagna.sign, active.tradition)} <span>rising sign</span>
-          </button>
-        </div>
-      ) : null}
-
-      <button type="button" className="ex-surprise" onClick={surprise}>
-        ✦ Surprise me
-      </button>
+      <div className="v-actions">
+        {patri && active ? (
+          <>
+            <button
+              type="button"
+              className="v-btn v-btn--ghost v-btn--sm"
+              onClick={() => setSel({ kind: "nak", i: patri.grahas.MO.nakshatra })}
+            >
+              {active.name}'s birth star
+            </button>
+            <button
+              type="button"
+              className="v-btn v-btn--ghost v-btn--sm"
+              onClick={() => setSel({ kind: "rashi", i: patri.grahas.MO.sign })}
+            >
+              Moon sign
+            </button>
+            <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={() => setSel({ kind: "rashi", i: patri.lagna.sign })}>
+              Rising sign
+            </button>
+          </>
+        ) : null}
+        <button type="button" className="v-btn v-btn--quiet v-btn--sm" onClick={surprise}>
+          Surprise me
+        </button>
+      </div>
 
       <div className="ex-stage">
         <SkyWheel
@@ -549,46 +789,33 @@ function Hub() {
           onPlay={() => setPlaying(true)}
           natalMoon={patri?.grahas.MO.sign}
         />
-        <article className={`ex-panel ex-panel--${panel.tone}`} aria-live="polite" key={JSON.stringify(sel)}>
+        <article className={`v-card ex-panel ex-panel--${panel.tone}`} aria-live="polite" key={JSON.stringify(sel)}>
           <div className="ex-panel__art">{panel.art}</div>
-          <p className="ex-kicker">{panel.kicker}</p>
+          <p className="v-eyebrow">{panel.kicker}</p>
           <h2 className="ex-panel__t">
             {panel.title}{" "}
-            {panel.dev ? (
-              <span lang="hi" className="ex-dev">
-                {panel.dev}
-              </span>
-            ) : null}
+            <span className="ex-panel__small">
+              {panel.small} <Dev>{panel.dev}</Dev>
+            </span>
           </h2>
-          <p className="ex-panel__tag">{panel.tagline}</p>
-          {panel.now || panel.mine ? (
-            <div className="ex-panel__badges">
-              {panel.now ? <span className="ex-badge ex-badge--now">{panel.now}</span> : null}
-              {panel.mine ? <span className="ex-badge ex-badge--mine">{panel.mine}</span> : null}
-            </div>
-          ) : null}
-          <p className="ex-panel__story">{panel.story}</p>
-          <dl className="ex-panel__facts">
-            {panel.facts.map(([k, v]) => (
-              <div key={k}>
-                <dt>{k}</dt>
-                <dd>{v}</dd>
-              </div>
-            ))}
-          </dl>
-          <div className="ex-panel__actions">
+          <p className="ex-big">{panel.tagline}</p>
+          {panel.now ? <p className="v-note">{panel.now}</p> : null}
+          {panel.mine ? <p className="v-note v-note--warn">{panel.mine}</p> : null}
+          <p className="ex-prose">{panel.story}</p>
+          <Facts rows={panel.facts} />
+          <div className="v-actions">
             <button
               type="button"
-              className="stamp"
+              className="v-btn v-btn--sm"
               onClick={() => {
                 countEvent("explore-play-story");
                 setPlaying(true);
               }}
             >
-              <span>▶ Play its story</span>
+              Play its story
             </button>
-            <Link to={panel.to} className="linkish">
-              Full page →
+            <Link to={panel.to} className="v-btn v-btn--ghost v-btn--sm">
+              Full page
             </Link>
           </div>
         </article>
@@ -596,90 +823,141 @@ function Hub() {
 
       {playing ? (
         <StoryPlayer
-          title={`${panel.title} · ${panel.kicker.split("·")[0]?.trim()}`}
+          title={`${panel.small ?? panel.title} · ${panel.kicker.split("·")[0]?.trim()}`}
           slides={slidesFor(sel, panel)}
           onClose={() => setPlaying(false)}
         />
       ) : null}
-
-      <section className="ex-sec" aria-labelledby="ex-roots">
-        <h2 id="ex-roots">Stories to play</h2>
-        <StoryRings />
-      </section>
-
-      <nav className="ex-learn" aria-label="More to explore">
-        <Link to="/explore/numbers" className="ex-learn__card ex-learn__card--violet">
-          <span className="ex-learn__k">Aṅka</span>
-          <span className="ex-learn__t">Numerology</span>
-          <span className="ex-learn__s">Root, destiny and name numbers</span>
-        </Link>
-        <Link to="/explore/chinese" className="ex-learn__card ex-learn__card--rose">
-          <span className="ex-learn__k">Shēngxiào</span>
-          <span className="ex-learn__t">Chinese zodiac</span>
-          <span className="ex-learn__s">The Great Race and your animal</span>
-        </Link>
-      </nav>
-
-      <details className="ex-browse">
-        <summary>Browse everything as a list</summary>
-        <h3>Navagraha</h3>
-        <ul className="ex-grid ex-grid--graha">
-          {GRAHA_LORE.map((g) => (
-            <li key={g.id}>
-              <Link to={`/explore/graha/${g.id}`} className="ex-tile">
-                <GrahaGlyph id={g.id} size={44} />
-                <span className="ex-tile__t">{g.name}</span>
-                <span className="ex-tile__s">{g.english}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <h3>Rāśis</h3>
-        <ul className="ex-grid ex-grid--rashi">
-          {RASHI_LORE.map((r, i) => (
-            <li key={r.name}>
-              <Link to={`/explore/rashi/${i}`} className="ex-tile">
-                <span className={`ex-signorb ex-signorb--sm ex-signorb--${ELEMENT_TONE[r.element]}`} aria-hidden="true">
-                  {i + 1}
-                </span>
-                <span className="ex-tile__t">{r.name}</span>
-                <span className="ex-tile__s">{r.western}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <h3>Nakṣatras</h3>
-        <ol className="ex-naks">
-          {NAKSHATRA_LORE.map((n, i) => (
-            <li key={NAKSHATRA_NAMES[i]}>
-              <Link to={`/explore/nakshatra/${i}`}>
-                <span className="ex-naks__i">{i + 1}</span>
-                <span className="ex-naks__t">{NAKSHATRA_NAMES[i]}</span>
-                <span className="ex-naks__s">
-                  {n.deity.split(",")[0]} · {n.symbol}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ol>
-      </details>
-    </>
+    </Page>
   );
 }
+
+// ── hub: the directory ────────────────────────────────────────────────────
+function Door({
+  to,
+  art,
+  tone,
+  title,
+  sub,
+}: {
+  to: string;
+  art: React.ReactNode;
+  tone?: "gold" | "cyan" | "rose" | "green";
+  title: string;
+  sub: string;
+}) {
+  return (
+    <li>
+      <Link to={to} className="ex-door">
+        <span className={`ex-door__art${tone ? ` ex-door__art--${tone}` : ""}`} aria-hidden="true">
+          {art}
+        </span>
+        <span className="ex-door__t">{title}</span>
+        <span className="ex-door__s">{sub}</span>
+      </Link>
+    </li>
+  );
+}
+
+function Hub() {
+  const sky = useSky();
+  const active = useActiveProfile();
+  const settings = useSettings();
+  const { patri: p } = usePatri(active, settings.preset);
+  const patri = p && active && p.profileId === active.id ? p : null;
+  const moonSign = RASHI_LORE[sky.MO.sign];
+  return (
+    <Page
+      label="Explore the sky"
+      title="Explore"
+      lede="Every planet, sign and star has a story, a meaning in the tradition, and real stars behind it."
+      wide
+    >
+      <ul className="ex-doors" aria-label="The sky">
+        <Door to="/explore/graha" art={<b>9</b>} tone="gold" title="Planets" sub="The Sun, the Moon and the seven others" />
+        <Door to="/explore/rashi" art={<b>12</b>} title="Signs" sub="Aries to Pisces, the Indian way" />
+        <Door to="/explore/nakshatra" art={<b>27</b>} tone="cyan" title="Stars" sub="The birth stars the Moon visits" />
+        <Door to="/explore/numbers" art={<IconNumbers />} tone="green" title="Numbers" sub="What a birth date and a name add up to" />
+        <Door to="/explore/chinese" art={<b lang="zh">十二</b>} tone="rose" title="Chinese zodiac" sub="The Great Race and your animal" />
+        <Door to="/story" art={<IconStory />} tone="gold" title="The story of the stars" sub="How Indian astrology began" />
+        <Door to="/today" art={<IconToday />} tone="cyan" title="Today's almanac" sub="The Hindu calendar for today" />
+        <Door to="/guide" art={<IconGuide />} title="How to use" sub="A short guide to Vyomaphala" />
+      </ul>
+
+      <div className={patri && active ? "v-cols" : undefined}>
+        {patri && active ? (
+          <div className="v-stack">
+            <Section title={`${active.name}'s own sky`} note="Three places to start" />
+            <ul className="v-list">
+              <li>
+                <Row
+                  to={`/explore/rashi/${patri.grahas.MO.sign}`}
+                  icon={<IconMoon />}
+                  title={`${RASHI_LORE[patri.grahas.MO.sign]?.western} · ${rashiBoth(patri.grahas.MO.sign, active.tradition)}`}
+                  sub="Moon sign"
+                />
+              </li>
+              <li>
+                <Row
+                  to={`/explore/nakshatra/${patri.grahas.MO.nakshatra}`}
+                  icon={<IconSky />}
+                  tone="gold"
+                  title={nakBoth(patri.grahas.MO.nakshatra, active.tradition)}
+                  sub="Birth star"
+                />
+              </li>
+              <li>
+                <Row
+                  to={`/explore/rashi/${patri.lagna.sign}`}
+                  icon={<span className="ex-rise">↑</span>}
+                  tone="cyan"
+                  title={`${RASHI_LORE[patri.lagna.sign]?.western} · ${rashiBoth(patri.lagna.sign, active.tradition)}`}
+                  sub="Rising sign"
+                />
+              </li>
+            </ul>
+          </div>
+        ) : null}
+        <div className="v-stack">
+          <Section title="In the sky right now" />
+          <ul className="v-list">
+            <li>
+              <Row
+                to={`/explore/nakshatra/${sky.MO.nakshatra}`}
+                icon={<IconMoon />}
+                title={`The Moon is in ${NAKSHATRA_NAMES[sky.MO.nakshatra]}`}
+                sub={`In the sign ${moonSign?.western} (${moonSign?.name})`}
+              />
+            </li>
+            <li>
+              <Row
+                to="/explore/wheel"
+                icon={<IconSky />}
+                tone="gold"
+                title="Turn the sky wheel"
+                sub="Optional: spin the whole sky and tap any planet, sign or star"
+              />
+            </li>
+          </ul>
+        </div>
+      </div>
+    </Page>
+  );
+}
+
 export default function ExploreScreen() {
   const { kind, key } = useParams();
   const i = Number(key);
-  let body: React.ReactNode;
-  if (kind === "graha" && key && (GRAHA_IDS as readonly string[]).includes(key)) body = <GrahaDetail id={key as GrahaId} />;
-  else if (kind === "rashi" && i >= 0 && i < 12) body = <RashiDetail i={i} />;
-  else if (kind === "nakshatra" && i >= 0 && i < 27) body = <NakshatraDetail i={i} />;
-  else if (kind === "numbers") body = <Numbers />;
-  else if (kind === "chinese") body = <Chinese />;
-  else if (kind !== undefined) return <Navigate to="/explore" replace />;
-  else body = <Hub />;
-  return (
-    <Screen className="explore" label="Explore the sky">
-      {body}
-    </Screen>
-  );
+  if (kind === undefined) return <Hub />;
+  if (key === undefined) {
+    if (kind === "graha" || kind === "rashi" || kind === "nakshatra") return <ListPage kind={kind} />;
+    if (kind === "numbers") return <Numbers />;
+    if (kind === "chinese") return <Chinese />;
+    if (kind === "wheel") return <Wheel />;
+  } else {
+    if (kind === "graha" && (GRAHA_IDS as readonly string[]).includes(key)) return <GrahaDetail id={key as GrahaId} />;
+    if (kind === "rashi" && Number.isInteger(i) && i >= 0 && i < 12) return <RashiDetail i={i} />;
+    if (kind === "nakshatra" && Number.isInteger(i) && i >= 0 && i < 27) return <NakshatraDetail i={i} />;
+  }
+  return <Navigate to="/explore" replace />;
 }
