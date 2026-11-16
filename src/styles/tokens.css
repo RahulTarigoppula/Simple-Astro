@@ -211,6 +211,16 @@
 .v-night {
   --ink-muted: #aca698;
   --accent-rgb: 240, 166, 90;
+  /* the living sky: one painting per hour of the day, the same in both themes */
+  --sky-paint-night: linear-gradient(180deg, #05081a 0%, #0d1638 48%, #1f1d4a 82%, #33264f 100%);
+  --sky-paint-dawn: linear-gradient(180deg, #141b47 0%, #4a3b78 42%, #b8607a 74%, #f0a66b 100%);
+  --sky-paint-day: linear-gradient(180deg, #123f85 0%, #1f5fae 45%, #4a8ccb 80%, #7fb2dc 100%);
+  --sky-paint-golden: linear-gradient(180deg, #1c2f73 0%, #5a4a8f 40%, #c0627a 72%, #f0a058 100%);
+  --sky-paint-dusk: linear-gradient(180deg, #0b1036 0%, #2a2466 44%, #7a3f78 78%, #c9655f 100%);
+  --sky-sun: #ffd98a;
+  --sky-moon: #f3ecd8;
+  --sky-good: #8ff0a8;
+  --sky-avoid: #ff8f9b;
   --shadow-card: none;
   --card: #1a1917;
   --card-2: #211f1c;

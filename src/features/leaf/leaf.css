@@ -60,24 +60,42 @@
   cursor: default;
 }
 .leaf-steps__bar {
+  position: relative;
   display: block;
   width: 100%;
   height: 4px;
   border-radius: 2px;
+  overflow: hidden;
   background: rgba(var(--tint), 0.12);
   transition: background var(--dur-base) var(--ease-out);
 }
-.leaf-steps button.is-done .leaf-steps__bar,
-.leaf-steps button[aria-current="step"] .leaf-steps__bar {
+/* the ink runs along each part as its step is reached, and runs back when the reader goes back */
+.leaf-steps__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
   background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 700ms var(--ease-out);
+}
+.leaf-steps button.is-done .leaf-steps__bar::after,
+.leaf-steps button[aria-current="step"] .leaf-steps__bar::after {
+  transform: scaleX(1);
 }
 .leaf-steps button:not(:disabled):hover .leaf-steps__bar {
-  background: var(--ink);
+  background: rgba(var(--tint), 0.34);
 }
 
 /* ── One step ──────────────────────────────────────────────────────────── */
 .leaf-form {
   flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.leaf-stepbody {
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -356,6 +374,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .leaf-steps__bar,
+  .leaf-steps__bar::after,
   .leaf-switch__knob,
   .leaf-switch__knob::after {
     transition: none;
@@ -624,4 +643,47 @@
 }
 .leaf-ask p {
   margin: 0;
+}
+
+/* ── The reward on the last step: the Moon where it stood, among the real stars of the birth star ── */
+.leaf-sky {
+  position: relative;
+  margin: 0;
+  padding: 10px 10px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--sky-paint-night);
+  color: var(--ink);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.leaf-sky figcaption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 6px;
+  padding: 0 10px;
+  text-align: center;
+}
+.leaf-sky__k {
+  font: 600 12px var(--font-body);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.74);
+}
+.leaf-sky__v {
+  font: 500 clamp(1.75rem, 8.4vw, 2.25rem) / 1.12 var(--font-display);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.leaf-sky__s {
+  margin-top: 4px;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.8);
+}
+@media (min-width: 900px) {
+  .leaf-sky {
+    max-width: 560px;
+  }
 }

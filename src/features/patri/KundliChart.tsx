@@ -121,10 +121,10 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
     };
 
     if (style === "north") {
-      out.push(<path key="frame" className="stroke" d="M2 2H398V398H2Z" />);
-      out.push(<path key="d1" className="stroke" d="M2 2L398 398" />);
-      out.push(<path key="d2" className="stroke" d="M398 2L2 398" />);
-      out.push(<path key="dia" className="stroke" d="M200 2L398 200L200 398L2 200Z" />);
+      out.push(<path key="frame" className="stroke" pathLength={1} d="M2 2H398V398H2Z" />);
+      out.push(<path key="d1" className="stroke" pathLength={1} d="M2 2L398 398" />);
+      out.push(<path key="d2" className="stroke" pathLength={1} d="M398 2L2 398" />);
+      out.push(<path key="dia" className="stroke" pathLength={1} d="M200 2L398 200L200 398L2 200Z" />);
       for (let h = 1; h <= 12; h++) {
         const a = NORTH_ANCHOR[h];
         if (!a) continue;
@@ -149,15 +149,15 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
       if (n1) out.push(<path key="tilak" className="tilak" data-tilak="" d={tilakPath(n1.n[0], n1.n[1] - 30, 9)} />);
     } else {
       // South: 4 × 4 grid, centre 2 × 2 blank; signs fixed, Lagna marked by a diagonal tick.
-      out.push(<path key="frame" className="stroke" d="M2 2H398V398H2Z" />);
-      out.push(<path key="h1" className="stroke" d="M2 100H398" />);
-      out.push(<path key="h3" className="stroke" d="M2 300H398" />);
-      out.push(<path key="v1" className="stroke" d="M100 2V398" />);
-      out.push(<path key="v3" className="stroke" d="M300 2V398" />);
-      out.push(<path key="h2a" className="stroke" d="M2 200H100" />);
-      out.push(<path key="h2b" className="stroke" d="M300 200H398" />);
-      out.push(<path key="v2a" className="stroke" d="M200 2V100" />);
-      out.push(<path key="v2b" className="stroke" d="M200 300V398" />);
+      out.push(<path key="frame" className="stroke" pathLength={1} d="M2 2H398V398H2Z" />);
+      out.push(<path key="h1" className="stroke" pathLength={1} d="M2 100H398" />);
+      out.push(<path key="h3" className="stroke" pathLength={1} d="M2 300H398" />);
+      out.push(<path key="v1" className="stroke" pathLength={1} d="M100 2V398" />);
+      out.push(<path key="v3" className="stroke" pathLength={1} d="M300 2V398" />);
+      out.push(<path key="h2a" className="stroke" pathLength={1} d="M2 200H100" />);
+      out.push(<path key="h2b" className="stroke" pathLength={1} d="M300 200H398" />);
+      out.push(<path key="v2a" className="stroke" pathLength={1} d="M200 2V100" />);
+      out.push(<path key="v2b" className="stroke" pathLength={1} d="M200 300V398" />);
       SOUTH_CELL.forEach(([row, col], sign) => {
         const x0 = col * 100;
         const y0 = row * 100;
@@ -202,8 +202,8 @@ export const KundliChart = forwardRef<KundliHandle, KundliProps>(function Kundli
   useImperativeHandle(ref, () => ({ svg: svgRef.current, chips }), [chips]);
   useEffect(() => onChips?.(chips), [chips, onChips]);
 
-  // The whole figure, planets included, is there at once: at most one short fade (none on a revisit,
-  // in print, or with reduced motion). No staggered drawing.
+  // A newly worked-out figure draws itself once: the frame line by line, then the labels and planets
+  // fade in (chart.css). On a revisit, in print, or with reduced motion it is simply there.
   const fade = !(skipInk || isStatic);
 
   return (

@@ -18,87 +18,247 @@
   fill: var(--moon);
 }
 
-/* The answer */
-.alm-hero {
+/* ── The picture band: a large Moon in its true phase over the sky of the moment ───────────── */
+.alm-band {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  margin: 6px 0 4px;
+  align-items: center;
+  text-align: center;
+  color: var(--ink);
 }
-.alm-hero__bar {
+.alm-band > * {
+  position: relative;
+}
+.alm-stars {
+  position: absolute;
+  inset: -64px calc(-1 * var(--page-pad)) -40px;
+  width: calc(100% + 2 * var(--page-pad));
+  height: calc(100% + 104px);
+  pointer-events: none;
+}
+.alm-band__text {
+  display: contents;
+}
+.alm-band__eyebrow {
+  order: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 0;
+  font: 600 12px var(--font-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+.alm-band .info-dot {
+  color: rgba(255, 255, 255, 0.8);
+}
+.alm-band__nav {
+  order: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-}
-.alm-hero__when {
-  min-width: 0;
-}
-.alm-hero__when .v-eyebrow {
-  display: flex;
-  align-items: center;
   gap: 8px;
-}
-.alm-hero__date {
+  width: 100%;
+  max-width: 420px;
   margin-top: 2px;
-  font-size: 1.0625rem;
-  font-weight: 550;
-  line-height: 1.35;
 }
-.alm-hero__nav {
-  flex: none;
-  display: flex;
-  gap: 8px;
+.alm-band__nav .v-chev {
+  color: inherit;
 }
-.alm-hero__nav .v-chev,
 .month__nav .v-chev {
   color: inherit;
 }
-.alm-hero__main {
+.alm-band__date {
+  margin: 0;
+  min-width: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+.alm-band__moon {
+  order: 2;
+  width: clamp(170px, 56vw, 220px);
+  margin: -2px 0 -10px;
+}
+.alm-band__title {
+  order: 3;
+  margin: 0;
+  font: 500 clamp(2rem, 9.2vw, 2.75rem) / 1.06 var(--font-display);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25);
+}
+.alm-band__small {
+  order: 4;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+  margin: 8px 0 0;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.86);
 }
-.alm-hero__text {
-  min-width: 0;
+.alm-band__chips {
+  order: 5;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 440px;
+  margin: 16px 0 0;
+}
+.alm-band__chips > span {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  justify-content: center;
+  gap: 1px;
+  min-height: 58px;
+  padding: 8px 6px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.13);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.82);
 }
-.alm-hero__small {
-  color: var(--ink-muted);
-}
-.alm-hero__small .info-dot {
-  margin-left: 4px;
-}
-.alm-hero__moon {
-  flex: none;
-  width: 84px;
-  height: 84px;
-}
-.alm-hero__sun {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 22px;
-  padding-top: 16px;
-  border-top: 1px solid var(--card-edge);
-  color: var(--ink-muted);
-}
-.alm-hero__sun > span {
-  white-space: nowrap;
-}
-.alm-hero__sun b {
-  font-weight: 600;
+.alm-band__chips b {
+  font: 600 0.9375rem / 1.25 var(--font-body);
   color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
 }
-.alm-hero__back {
-  align-self: flex-start;
+.alm-band__back {
+  order: 6;
+  margin-top: 12px;
 }
-@media (max-width: 359px) {
-  .alm-hero__moon {
-    width: 64px;
-    height: 64px;
+.alm-band .alm-seg {
+  order: 7;
+  width: 100%;
+  max-width: 440px;
+  margin-top: 16px;
+  background: rgba(255, 255, 255, 0.13);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.alm-band .alm-seg > button {
+  color: rgba(255, 255, 255, 0.88);
+}
+.alm-band .alm-seg > [aria-selected="true"] {
+  background: var(--ink);
+  color: var(--sky-cloth);
+  box-shadow: none;
+}
+/* Slots, hours and the month are long lists: the band steps back so they start on the first screen. */
+.alm-band[data-compact] .alm-band__moon {
+  width: 104px;
+  margin: 2px 0 0;
+}
+.alm-band[data-compact] .alm-band__title {
+  font-size: 1.5rem;
+}
+.alm-band[data-compact] .alm-band__chips,
+.alm-band[data-compact] .alm-band__small {
+  display: none;
+}
+
+/* The large Moon */
+.moonpic {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.moonpic__mask {
+  fill: rgb(255, 255, 255);
+  stroke: rgb(255, 255, 255);
+  stroke-width: 2;
+}
+.moonpic__night {
+  fill: rgba(255, 255, 255, 0.05);
+}
+.moonpic--dark .moonpic__night {
+  fill: color-mix(in srgb, var(--sky-cloth) 90%, var(--sky-moon));
+}
+.moonpic__mare {
+  fill: var(--sky-cloth);
+  opacity: 0.17;
+}
+.moonpic__ray {
+  fill: var(--star);
+  opacity: 0.6;
+}
+.moonpic__rim {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 1;
+}
+
+@media (min-width: 900px) {
+  /* the field is stretched over a wide band, so each star is drawn smaller to stay a point */
+  .alm-stars .sky-scene__star {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0.42);
+  }
+  .alm-band {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+    column-gap: 56px;
+    align-items: center;
+    text-align: left;
+    padding-top: 8px;
+  }
+  .alm-band__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .alm-band__nav {
+    order: 3;
+    justify-content: flex-start;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .alm-band__nav .alm-band__date {
+    order: -1;
+    margin-right: 4px;
+  }
+  .alm-band__title {
+    order: 1;
+    margin-top: 8px;
+    font-size: 3.25rem;
+  }
+  .alm-band__small {
+    order: 2;
+    justify-content: flex-start;
+  }
+  .alm-band__moon,
+  .alm-band[data-compact] .alm-band__moon {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    width: 100%;
+    margin: 0;
+  }
+  .alm-band .alm-seg {
+    grid-column: 1;
+    grid-row: 2;
+    margin-top: 20px;
+  }
+  .alm-band[data-compact] .alm-band__title {
+    font-size: 3.25rem;
+  }
+  .alm-band[data-compact] .alm-band__chips {
+    display: grid;
+  }
+  .alm-band[data-compact] .alm-band__small {
+    display: flex;
   }
 }
 .alm-where {

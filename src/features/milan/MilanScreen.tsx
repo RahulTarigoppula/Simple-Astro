@@ -6,7 +6,8 @@ import { Link, useNavigate, useParams } from "react-router";
 import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { DISCLAIMER } from "../../components/ui/Colophon";
 import { InfoDot } from "../../components/ui/Explain";
-import { Page } from "../../components/ui/Page";
+import { Reveal } from "../../components/ui/Motion";
+import { Page, Row, Section } from "../../components/ui/Page";
 import { Avatar, birthLine } from "../../components/ui/PersonChip";
 import { Sheet } from "../../components/ui/Sheet";
 import { glossary } from "../../data/glossary";
@@ -29,8 +30,9 @@ import { haptics } from "../../platform/haptics";
 import { toast } from "../../state/ui";
 import { IconMilan } from "../chowki/icons";
 import { type ChartBody, KundliChart } from "../patri/KundliChart";
-import { BondCard, Fold, ORDER_NOTE } from "./BondCard";
+import { BondBand, BondCard, Fold, ORDER_NOTE } from "./BondCard";
 import { Mala } from "./Mala";
+import { PairPicture } from "./PairPicture";
 import { PoruthamThread } from "./PoruthamThread";
 import {
   BAND_LABEL,
@@ -123,7 +125,6 @@ function Slot({ who, person, onChoose }: { who: string; person: Profile | null; 
       aria-label={person ? `${who}: ${person.name}. Change` : `${who}: choose a person`}
       onClick={onChoose}
     >
-      {person ? <Avatar name={person.name} size={64} /> : <Plus />}
       <span className="mm-slot__name">
         <span>{person ? person.name : "Choose"}</span>
         <Caret />
@@ -133,13 +134,30 @@ function Slot({ who, person, onChoose }: { who: string; person: Profile | null; 
   );
 }
 
-function Plus() {
+function IconFive() {
   return (
-    <span className="mm-slot__plus" aria-hidden="true">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-        <path d="M12 5v14M5 12h14" />
-      </svg>
-    </span>
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <path d="M5 6h14M5 10.5h10M5 15h14M5 19.5h8" />
+    </svg>
+  );
+}
+
+function IconBeads() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+        <circle key={i} cx={12 + 8 * Math.cos((i * Math.PI) / 4)} cy={12 + 8 * Math.sin((i * Math.PI) / 4)} r={i < 6 ? 1.9 : 1.1} />
+      ))}
+    </svg>
   );
 }
 
@@ -274,13 +292,89 @@ function MilanScreen() {
 
   const flagged = r ? r.kootas.filter((k) => k.dosha) : [];
 
+  const pairRow =
+    list.length > 0 ? (
+      <section className="mm-pair" aria-label="The two people">
+        <Slot who="First person" person={slotA} onChoose={() => setSheet({ kind: "pick", side: "a" })} />
+        {list.length > 1 ? (
+          <button type="button" className="v-iconbtn mm-pair__swap" onClick={swap} disabled={!slotA || !slotB}>
+            <SwapIcon />
+            <span className="vh">Swap first and second person</span>
+          </button>
+        ) : (
+          <span aria-hidden="true" />
+        )}
+        {list.length > 1 ? (
+          <Slot who="Second person" person={slotB} onChoose={() => setSheet({ kind: "pick", side: "b" })} />
+        ) : (
+          <Link to="/leaf/new" className="mm-slot is-empty">
+            <span className="mm-slot__name">
+              <span>Add a person</span>
+            </span>
+            <span className="mm-slot__who">Second person</span>
+          </Link>
+        )}
+      </section>
+    ) : null;
+
+  const hero = loading ? (
+    <section className="mm-band">
+      <div className="mm-band__text">
+        <h1 className="mm-band__eyebrow">Partner match</h1>
+      </div>
+    </section>
+  ) : matched && r && patA && patB && !err ? (
+    <BondBand r={r} pa={pa} pb={pb} pair={pairRow} />
+  ) : (
+    <section className="mm-band mm-band--choose" aria-labelledby="mm-h">
+      <div className="mm-band__stage">
+        <PairPicture a={slotA?.name ?? null} b={slotB?.name ?? null} />
+        {pairRow}
+      </div>
+      <div className="mm-band__text">
+        <h1 id="mm-h" className={matched ? "mm-band__eyebrow" : "mm-band__title"}>
+          Partner match
+        </h1>
+        {matched ? null : list.length === 0 ? (
+          <>
+            <h2 className="mm-band__sub">A match needs two people</h2>
+            <p className="mm-band__lede">
+              No one is saved yet. Add two people with their birth date, time and place, and Vyomaphala will compare them.
+            </p>
+            <Link to="/leaf/new" className="v-btn mm-go">
+              Add a person
+            </Link>
+            <p className="mm-band__small">About a minute each. Everything stays on this device.</p>
+          </>
+        ) : list.length === 1 ? (
+          <>
+            <h2 className="mm-band__sub">Add one more person</h2>
+            <p className="mm-band__lede">
+              Only {list[0]?.name ?? "one person"} is saved. Add their partner's birth date, time and place to see the match.
+            </p>
+            <Link to="/leaf/new" className="v-btn mm-go">
+              Add a person
+            </Link>
+            <p className="mm-band__small">About a minute. Everything stays on this device.</p>
+          </>
+        ) : (
+          <>
+            <p className="mm-band__lede mm-band__lede--top">How two people fit, read the traditional way from their two Moons.</p>
+            {ready && slotA && slotB ? (
+              <button type="button" className="v-btn mm-go" onClick={() => go(slotA, slotB, false)}>
+                See the match
+              </button>
+            ) : (
+              <p className="mm-band__small">Tap each side to choose a person. The match opens as soon as both are chosen.</p>
+            )}
+          </>
+        )}
+      </div>
+    </section>
+  );
+
   return (
-    <Page
-      label="Partner match"
-      title="Partner match"
-      lede={matched ? undefined : "How two people fit, read the traditional way from their two Moons."}
-      {...(matched ? { className: "mm-result" } : {})}
-    >
+    <Page label="Partner match" hero={hero} sky="dusk" wide>
       {loading ? null : (
         <>
           {a && !matched ? (
@@ -291,60 +385,37 @@ function MilanScreen() {
             </div>
           ) : null}
 
-          {list.length > 0 ? (
-            <section className="mm-pair" aria-label="The two people">
-              <Slot who="First person" person={slotA} onChoose={() => setSheet({ kind: "pick", side: "a" })} />
-              {list.length > 1 ? (
-                <button type="button" className="v-iconbtn mm-pair__swap" onClick={swap} disabled={!slotA || !slotB}>
-                  <SwapIcon />
-                  <span className="vh">Swap first and second person</span>
-                </button>
-              ) : (
-                <span aria-hidden="true" />
-              )}
-              {list.length > 1 ? (
-                <Slot who="Second person" person={slotB} onChoose={() => setSheet({ kind: "pick", side: "b" })} />
-              ) : (
-                <Link to="/leaf/new" className="mm-slot is-empty">
-                  <Plus />
-                  <span className="mm-slot__name">
-                    <span>Add a person</span>
-                  </span>
-                  <span className="mm-slot__who">Second person</span>
-                </Link>
-              )}
-            </section>
-          ) : null}
-
-          {ready && slotA && slotB ? (
-            <button type="button" className="v-btn v-btn--block mm-go" onClick={() => go(slotA, slotB, false)}>
-              See the match
-            </button>
-          ) : !matched && list.length > 1 ? (
-            <p className="v-muted mm-pair__hint">Tap each side to choose a person. The match opens as soon as both are chosen.</p>
-          ) : null}
-
-          {list.length < 2 ? (
-            <section className="v-card v-empty" aria-labelledby="mm-empty-h">
-              {list.length === 0 ? (
-                <span className="v-empty__art" aria-hidden="true">
-                  <IconMilan size={30} />
-                </span>
-              ) : null}
-              <h2 id="mm-empty-h" className="mm-empty__h">
-                {list.length === 0 ? "A match needs two people" : "Add one more person"}
-              </h2>
-              <p className="v-muted">
-                {list.length === 0
-                  ? "No one is saved yet. Add two people with their birth date, time and place, and Vyomaphala will compare them: one answer, then understanding, companionship, trust, closeness and family, each in a line."
-                  : `Only ${list[0]?.name ?? "one person"} is saved. Add their partner's birth date, time and place to see the match.`}
-              </p>
-              <Link to="/leaf/new" className="v-btn">
-                Add a person
-              </Link>
-              <p className="v-small v-muted">About a minute each. Everything stays on this device.</p>
-            </section>
-          ) : null}
+          {matched ? null : (
+            <Reveal i={0} className="mm-block mm-what">
+              <Section title="What a match shows" />
+              <ul className="v-list">
+                <li>
+                  <Row
+                    icon={<IconMilan />}
+                    tone="rose"
+                    title="One clear answer"
+                    sub="A word and a score out of 100, read from the two Moons"
+                  />
+                </li>
+                <li>
+                  <Row
+                    icon={<IconFive />}
+                    tone="gold"
+                    title="The five things people ask"
+                    sub="Understanding, companionship, trust, closeness and family"
+                  />
+                </li>
+                <li>
+                  <Row
+                    icon={<IconBeads />}
+                    tone="cyan"
+                    title="The tradition behind it"
+                    sub="The 36 points of Guna Milan and the South Indian Porutham"
+                  />
+                </li>
+              </ul>
+            </Reveal>
+          )}
 
           {matched ? (
             err ? (

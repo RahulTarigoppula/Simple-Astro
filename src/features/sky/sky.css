@@ -322,3 +322,49 @@
   max-width: 60ch;
   justify-self: center;
 }
+
+/* ── 3.1: the same chrome and entrance as the picture bands ────────────── */
+.sky-head .v-back {
+  background: rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.sky-head .v-eyebrow {
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.76);
+}
+.sky-head .v-title {
+  font: 500 1.75rem / 1.12 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.sky-head__sub {
+  color: rgba(255, 255, 255, 0.76);
+}
+.sky-head__text {
+  animation: sky-rise 600ms var(--ease-out) both;
+}
+.sky-stage {
+  animation: sky-open 1100ms var(--ease-out) 120ms both;
+}
+.sky-foot {
+  animation: sky-rise 700ms var(--ease-out) 420ms both;
+}
+@keyframes sky-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+@keyframes sky-open {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky-head__text,
+  .sky-stage,
+  .sky-foot {
+    animation: none;
+  }
+}

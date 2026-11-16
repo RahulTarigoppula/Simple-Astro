@@ -10,7 +10,7 @@ import { computePatri, REFERENCE_PROFILE } from "../../engine/patri";
 import { resolveBirthMoment } from "../../engine/time";
 import { DEFAULT_PRESET, type KootaResult, type Profile } from "../../engine/types";
 import { BANNED_WORDS } from "../../test/banned-words";
-import { BondCard, FLAGGED_LEAD } from "./BondCard";
+import { BondBand, BondCard, FLAGGED_LEAD } from "./BondCard";
 import { beadsOf } from "./Mala";
 import MilanScreen from "./MilanScreen";
 import { BAND_LABEL, fmtPts } from "./rules";
@@ -142,7 +142,17 @@ describe("MilanScreen", () => {
     const pa = computePatri(REFERENCE_PROFILE, DEFAULT_PRESET, 0);
     const pb = computePatri(PRIYA, DEFAULT_PRESET, 0);
     const router = createMemoryRouter(
-      [{ path: "/", element: <BondCard r={low} pa={REFERENCE_PROFILE} pb={PRIYA} patA={pa} patB={pb} onCopy={() => {}} /> }],
+      [
+        {
+          path: "/",
+          element: (
+            <>
+              <BondBand r={low} pa={REFERENCE_PROFILE} pb={PRIYA} pair={null} />
+              <BondCard r={low} pa={REFERENCE_PROFILE} pb={PRIYA} patA={pa} patB={pb} onCopy={() => {}} />
+            </>
+          ),
+        },
+      ],
       { initialEntries: ["/"] },
     );
     const { container } = render(<RouterProvider router={router} />);

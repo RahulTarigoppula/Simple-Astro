@@ -67,6 +67,15 @@ describe("the Chart tab", () => {
     expect(tabs.map((t) => t.textContent)).toEqual(["About you", "Life chapters", "Planets", "Now"]);
     expect(tabs[0]).toHaveAttribute("aria-selected", "true");
     expect(screen.getByRole("tabpanel")).toHaveAccessibleName("About you");
+    // the picture band: the piece of sky behind the birth Moon, then the three key signs as tiles
+    expect(
+      screen.getByRole("img", {
+        name: /real stars behind the Moon when Rahul was born: the Moon, \d+ percent lit, among the stars of Revatī in Mīna/,
+      }),
+    ).toBeInTheDocument();
+    const tiles = within(screen.getByRole("list", { name: "Your three key signs" })).getAllByRole("link");
+    expect(tiles.map((t) => t.getAttribute("href"))).toEqual(["/explore/rashi/11", "/explore/nakshatra/26", "/explore/rashi/11"]);
+    expect(tiles[1]).toHaveTextContent("Birth starRevatī");
     // nothing of the other views is built yet
     expect(container.querySelector("table")).toBeNull();
     expect(container.querySelector("svg.chart")).toBeNull();
@@ -79,6 +88,11 @@ describe("the Chart tab", () => {
     fireEvent.click(screen.getByRole("tab", { name: "Life chapters" }));
     expect(router.state.location.search).toBe("?v=chapters");
     expect(screen.getByRole("heading", { level: 2, name: /^The \w+ chapter$/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", {
+        name: /^Your life as an arc of nine chapters, from 1994 to \d{4}\. You are in the \w+ chapter, \d+ percent through it, at age \d+\.$/,
+      }),
+    ).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /mahādaśā/ })).toHaveLength(9);
     expect(screen.queryByRole("heading", { name: /this is you/ })).toBeNull();
     fireEvent.keyDown(screen.getByRole("tab", { name: "Life chapters" }), { key: "ArrowRight" });
@@ -110,7 +124,7 @@ describe("the Chart tab", () => {
     expect(ledger).toHaveTextContent("15°39′25″"); // the rising degree, Mīna
     expect(within(ledger).getByRole("row", { name: /^Moon, Mīna/ })).toHaveTextContent("Revatī 1lord Mercury");
     expect(screen.getByRole("button", { name: "Show South Indian style" })).toBeInTheDocument();
-    // the figure is whole at once (one short fade, no staggered drawing), in Latin letters with a key under it
+    // the figure draws itself with CSS only (no per-element ink state), in Latin letters with a key under it
     const fig = container.querySelector("svg.chart:not(.loupe svg)") as SVGElement;
     expect(fig.querySelectorAll("[data-ink], [data-settle]")).toHaveLength(0);
     expect(
@@ -180,7 +194,13 @@ describe("the Chart tab", () => {
     const { container } = renderChart(`/patri/${ID}?v=now`);
     const hero = await screen.findByRole("region", { name: "Today for this chart" }, { timeout: 8000 });
     expect(within(hero).getByRole("heading", { level: 2 })).toHaveTextContent(/^Today the Moon is in your \d+(st|nd|rd|th) area: /);
-    expect(hero.querySelectorAll(".v-chip").length).toBeLessThanOrEqual(3);
+    expect(
+      within(hero).getByRole("img", {
+        name: /^The planets today, counted from your Moon sign: Sun in area \d+, .*\d of the nine stand where tradition counts them as helpful\.$/,
+      }),
+    ).toBeInTheDocument();
+    expect(hero.querySelectorAll(".nowring__bead")).toHaveLength(9);
+    expect(screen.getByRole("region", { name: "Today's three signals" }).querySelectorAll(".v-chip").length).toBeLessThanOrEqual(3);
     expect(screen.getByRole("heading", { level: 2, name: "Saturn's long seasons" })).toBeInTheDocument();
     const fold = screen.getByText("Where the planets are now").closest("details") as HTMLDetailsElement;
     expect(fold).toHaveClass("v-fold");

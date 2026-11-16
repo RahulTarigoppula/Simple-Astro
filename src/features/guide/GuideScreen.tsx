@@ -2,6 +2,7 @@
 // who has never met Indian astrology, or doesn't believe in it. Short on the page; the detail is folded.
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
+import { Reveal } from "../../components/ui/Motion";
 import { ChevronRight, Page, Row, Section } from "../../components/ui/Page";
 import { GLOSSARY, type GlossaryGroup, GROUP_TITLES } from "../../data/glossary";
 import "./guide.css";
@@ -51,48 +52,52 @@ export default function GuideScreen() {
       back
       className="guide"
     >
-      <Section title="Six things you can do" id="g-how" />
-      <ol className="v-list guide-steps" aria-labelledby="g-how">
-        {STEPS.map((s, i) => (
-          <li key={s.title}>
-            <Link to={s.to} className="v-row">
-              <span className="v-row__icon guide-steps__n" aria-hidden="true">
-                {i + 1}
-              </span>
-              <span className="v-row__body">
-                <span className="v-row__t">{s.title}</span>
-                <span className="v-row__s">{s.body}</span>
-              </span>
-              <ChevronRight />
-            </Link>
-          </li>
-        ))}
-      </ol>
-      <p className="guide-tip">
-        Wherever you see <span className="guide-i">ⓘ</span> next to a word, tap it for a plain-English explanation.
-      </p>
+      <Reveal i={0} className="v-stack guide-block">
+        <Section title="Six things you can do" id="g-how" />
+        <ol className="v-list guide-steps" aria-labelledby="g-how">
+          {STEPS.map((s, i) => (
+            <li key={s.title}>
+              <Link to={s.to} className="v-row">
+                <span className="v-row__icon guide-steps__n" aria-hidden="true">
+                  {i + 1}
+                </span>
+                <span className="v-row__body">
+                  <span className="v-row__t">{s.title}</span>
+                  <span className="v-row__s">{s.body}</span>
+                </span>
+                <ChevronRight />
+              </Link>
+            </li>
+          ))}
+        </ol>
+        <p className="guide-tip">
+          Wherever you see <span className="guide-i">ⓘ</span> next to a word, tap it for a plain-English explanation.
+        </p>
+      </Reveal>
 
-      <Section title="What is real, what is tradition" id="g-real" />
-      <div className="v-card guide-real">
-        <section aria-labelledby="g-real-a">
-          <h3 id="g-real-a">
-            <span className="v-chip v-chip--good">Real</span> Checkable astronomy
-          </h3>
-          <p>
-            Planet positions, sunrise and sunset, Moon phases, eclipse points, the rising sign. These are calculated to professional
-            accuracy (checked against Swiss Ephemeris and Drik Panchang) and you could verify them with a telescope.
-          </p>
-        </section>
-        <section aria-labelledby="g-real-b">
-          <h3 id="g-real-b">
-            <span className="v-chip v-chip--gold">Tradition</span> Not science
-          </h3>
-          <p>
-            What those positions are said to mean: personality, good and bad times, compatibility, palm lines. There's no scientific
-            evidence for them. Vyomaphala shows them as a cultural reference and for reflection, never as advice or fate.
-          </p>
-        </section>
-      </div>
+      <Reveal i={1} className="v-stack guide-block">
+        <Section title="What is real, what is tradition" id="g-real" />
+        <div className="v-card guide-real">
+          <section aria-labelledby="g-real-a">
+            <h3 id="g-real-a">
+              <span className="v-chip v-chip--good">Real</span> Checkable astronomy
+            </h3>
+            <p>
+              Planet positions, sunrise and sunset, Moon phases, eclipse points, the rising sign. These are calculated to professional
+              accuracy (checked against Swiss Ephemeris and Drik Panchang) and you could verify them with a telescope.
+            </p>
+          </section>
+          <section aria-labelledby="g-real-b">
+            <h3 id="g-real-b">
+              <span className="v-chip v-chip--gold">Tradition</span> Not science
+            </h3>
+            <p>
+              What those positions are said to mean: personality, good and bad times, compatibility, palm lines. There's no scientific
+              evidence for them. Vyomaphala shows them as a cultural reference and for reflection, never as advice or fate.
+            </p>
+          </section>
+        </div>
+      </Reveal>
 
       <Section title="Every word, explained" id="g-words" />
       <label className="v-field">

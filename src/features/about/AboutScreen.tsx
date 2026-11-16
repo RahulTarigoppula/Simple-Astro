@@ -1,7 +1,9 @@
 // About Vyomaphala: how it was made. Every data source, what we did to it, every algorithm, and how it was
 // checked. Facts here mirror src/data/attribution.json and docs/VERIFICATION-LOG.md.
 import { Link } from "react-router";
+import { Reveal } from "../../components/ui/Motion";
 import { ChevronRight, Page, Section } from "../../components/ui/Page";
+import { AllSky } from "../explore/SkyArt";
 import "./about.css";
 
 const NUMBERS: Array<[string, string]> = [
@@ -139,22 +141,21 @@ function Fold({ title, sub, children }: { title: string; sub: string; children: 
 }
 
 export default function AboutScreen() {
-  return (
-    <Page
-      label="About Vyomaphala"
-      title="How Vyomaphala was made"
-      lede={
-        <>
+  const hero = (
+    <section className="bh bh--split about-band" aria-labelledby="about-h">
+      <p className="bh__eyebrow">
+        <span>
           Vyomaphala (<span lang="hi">व्योमफल</span>), the fruit of the sky.
-        </>
-      }
-      back
-      className="about"
-    >
-      <section className="v-card v-card--hero about-hero" aria-label="From the maker">
-        <span className="about-mark" aria-hidden="true">
-          “
         </span>
+      </p>
+      <h1 id="about-h" className="bh__title bh__title--md">
+        How Vyomaphala was made
+      </h1>
+      <figure className="bh__pic about-sky">
+        <AllSky label="Every one of the 9,096 real stars Vyomaphala draws from, where it is in the sky" />
+        <figcaption>The 9,096 real stars, each where it is in the sky.</figcaption>
+      </figure>
+      <div className="about-hero" role="group" aria-label="From the maker">
         <blockquote className="about-quote">
           <p>It took almost 18 weeks of extensive planning, development, data gathering and cleaning. This is the result: Vyomaphala.</p>
           <footer>Rahul (RT), who made Vyomaphala</footer>
@@ -162,17 +163,23 @@ export default function AboutScreen() {
         <p className="about-hours">
           <b>18 weeks × 7 days × 2 hours = 252 hours</b> of work and dedication.
         </p>
-      </section>
+      </div>
+    </section>
+  );
 
-      <Section title="In numbers" />
-      <ul className="v-card about-numbers" aria-label="Vyomaphala in numbers">
-        {NUMBERS.map(([n, l]) => (
-          <li key={l}>
-            <span className="about-numbers__n">{n}</span>
-            <span className="about-numbers__l">{l}</span>
-          </li>
-        ))}
-      </ul>
+  return (
+    <Page label="About Vyomaphala" back className="about" hero={hero} wide sky="night">
+      <Reveal i={0} className="v-stack">
+        <Section title="In numbers" />
+        <ul className="v-card about-numbers" aria-label="Vyomaphala in numbers">
+          {NUMBERS.map(([n, l]) => (
+            <li key={l}>
+              <span className="about-numbers__n">{n}</span>
+              <span className="about-numbers__l">{l}</span>
+            </li>
+          ))}
+        </ul>
+      </Reveal>
 
       <Section title="The detail" />
       <Fold title="Where the data comes from" sub={`${SOURCES.length} open, credited sources`}>

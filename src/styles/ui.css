@@ -1059,3 +1059,149 @@ dialog.sheet-dialog {
   background: var(--btn-fill);
   color: var(--accent-ink);
 }
+
+/* ── The picture band: a full-bleed sky at the top of a tab, the page slides up over it ───────── */
+.v-band {
+  position: relative;
+  color: var(--ink);
+  background: var(--sky-paint-night);
+  transition: background 600ms var(--ease-out);
+}
+.v-band[data-sky="dawn"] {
+  background: var(--sky-paint-dawn);
+}
+.v-band[data-sky="day"] {
+  background: var(--sky-paint-day);
+}
+.v-band[data-sky="golden"] {
+  background: var(--sky-paint-golden);
+}
+.v-band[data-sky="dusk"] {
+  background: var(--sky-paint-dusk);
+}
+.v-band__in {
+  width: 100%;
+  max-width: var(--page-w);
+  margin: 0 auto;
+  padding: calc(6px + env(safe-area-inset-top, 0px)) var(--page-pad) 56px;
+  font-family: var(--font-body);
+}
+.v-band__in--wide {
+  max-width: 1040px;
+}
+.v-band .v-person,
+.v-band .v-back,
+.v-band .v-iconbtn {
+  background: rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.v-band .v-brand__mark::after {
+  background: transparent;
+  box-shadow: none;
+}
+.v-band .v-brand__mark {
+  background: none;
+  box-shadow: inset -6px 0 0 0 var(--sky-sun);
+}
+.v-band .v-btn--ghost {
+  background: rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.v-page--under {
+  position: relative;
+  margin-top: -32px;
+  padding-top: 26px;
+  border-radius: 32px 32px 0 0;
+  background: var(--bg);
+}
+/* with a band the status-bar strip belongs to the picture */
+.desk:has(.v-band) > .desk__top {
+  display: none;
+}
+@media (min-width: 900px) {
+  .v-band__in {
+    margin-left: max(0px, calc((100% - 1040px) / 2));
+    margin-right: auto;
+    padding: 24px 40px 64px;
+  }
+  .v-page--under {
+    max-width: none;
+    margin-left: 0;
+    padding-left: max(40px, calc((100% - 1040px) / 2 + 40px));
+  }
+}
+
+/* The living sky */
+.sky-scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.sky-scene__star {
+  fill: var(--star);
+}
+.sky-scene__star--tw {
+  animation: sky-twinkle 3.6s ease-in-out infinite;
+}
+@keyframes sky-twinkle {
+  50% {
+    opacity: 0.15;
+  }
+}
+.sky-scene__path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 7;
+  stroke-linecap: round;
+}
+.sky-scene__done {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.75);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.sky-scene__good {
+  fill: none;
+  stroke: var(--sky-good);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+.sky-scene__avoid {
+  fill: none;
+  stroke: var(--sky-avoid);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+.sky-scene__horizon {
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 1;
+}
+.sky-scene__foot {
+  fill: rgba(255, 255, 255, 0.85);
+}
+.sky-scene__label {
+  fill: rgba(255, 255, 255, 0.82);
+  font: 500 11.5px var(--font-body);
+}
+.sky-scene__sun {
+  fill: var(--sky-sun);
+}
+.sky-scene__moon-dark {
+  fill: rgba(255, 255, 255, 0.16);
+}
+.sky-scene__moon {
+  fill: var(--sky-moon);
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky-scene__star--tw {
+    animation: none;
+  }
+}
+.sky-scene[data-phase="night"] .sky-scene__good,
+.sky-scene[data-phase="night"] .sky-scene__avoid {
+  opacity: 0.55;
+}

@@ -1,36 +1,53 @@
 /* About: the maker's words, the numbers, then the detail in folds. */
+.about-band .bh__eyebrow {
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+.about-sky {
+  margin-left: auto;
+  margin-right: auto;
+}
+.about-sky figcaption {
+  margin-top: 8px;
+  font-size: 0.8125rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.72);
+}
 .about-hero {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 24px;
-}
-.about-mark {
-  height: 28px;
-  font: 560 3.5rem / 1 var(--font-display);
-  color: var(--accent);
+  margin-top: 18px;
 }
 .about-quote {
   margin: 0;
+  padding-left: 16px;
+  border-left: 2px solid var(--sky-sun);
 }
 .about-quote p {
-  font: 500 1.375rem / 1.4 var(--font-display);
+  font: 500 1.3125rem / 1.4 var(--font-display);
   letter-spacing: -0.015em;
   text-wrap: pretty;
 }
 .about-quote footer {
-  margin-top: 12px;
+  margin-top: 10px;
   font-size: 0.9375rem;
-  color: var(--ink-muted);
+  color: rgba(255, 255, 255, 0.76);
 }
 .about-hours {
-  padding-top: 16px;
-  border-top: 1px solid var(--card-edge);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.12);
   font-size: 1rem;
   line-height: 1.5;
 }
 .about-hours b {
   font-weight: 650;
+}
+.about .v-stack > .v-sec {
+  margin-bottom: 4px;
 }
 
 /* The numbers: one card, a plain grid, no tiles */

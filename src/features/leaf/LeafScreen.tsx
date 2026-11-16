@@ -7,6 +7,7 @@
 import tzlookup from "@photostructure/tz-lookup";
 import * as A from "astronomy-engine";
 import { DateTime } from "luxon";
+import { motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router";
 import { useProfile, useSettings } from "../../app/hooks";
@@ -17,7 +18,7 @@ import { Sheet } from "../../components/ui/Sheet";
 import { loadGazetteer, NetError, searchOnline, searchPlaces } from "../../data/places";
 import { nakBoth, rashiBoth, TRADITION_LABEL, type Tradition } from "../../data/regional";
 import { saveSettings, upsertProfile } from "../../data/repo";
-import { SIGN_ENGRAVED, SIGN_MARK, SIGN_WESTERN } from "../../data/tables/names";
+import { NAKSHATRA_NAMES, SIGN_ENGRAVED, SIGN_MARK, SIGN_WESTERN } from "../../data/tables/names";
 import { ayanamsa } from "../../engine/ayanamsa";
 import { EngineError } from "../../engine/errors";
 import { lagna } from "../../engine/lagna";
@@ -30,6 +31,7 @@ import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
 import { countEvent } from "../../platform/stats";
 import { toast } from "../../state/ui";
+import { SkyWindow } from "../explore/SkyArt";
 import { DateFields, fieldsOfHour, hourOf, missingText, Readback, TimeFields } from "./BirthFields";
 import { clearDraft, type Draft, draftKey, freshDraft, readDraft, sameDraft, writeDraft } from "./leafDraft";
 import "./leaf.css";
@@ -147,6 +149,7 @@ const STEPS = [
   { label: "Check", title: "Check and save", hint: "Read it back once. Nothing leaves this device." },
 ] as const;
 const LAST = STEPS.length - 1;
+const NAK_SPAN = 360 / 27;
 
 const TRADITION_NOTE: Record<Tradition, string> = {
   north: "Sanskrit names and the diamond-shaped chart.",
@@ -291,6 +294,9 @@ export default function LeafScreen() {
       const r = lagna(A.MakeTime(new Date(m.utcMs)), place.lat, place.lon, ay);
       return {
         moonSign: signOf(a.moonSid),
+        // for the picture on the last step: where the Moon stood, and its phase
+        moonSid: a.moonSid,
+        elong: a.elongation,
         nak: a.nakshatra.index,
         pada: a.nakshatra.pada,
         lagnaSign: signOf(r.ascSid),
@@ -348,6 +354,14 @@ export default function LeafScreen() {
   const problem = step < LAST ? (problems[step] ?? null) : resolved.m ? null : (problems[2] ?? "These birth details cannot be saved yet.");
   const trail = (location.state ?? {}) as Trail;
   const depth = trail.depth ?? 0;
+  // Which way the step slides in: forward from the right, back from the left. Still for less motion, and in tests.
+  const reduced = useReducedMotion();
+  const still = !!reduced || import.meta.env.MODE === "test";
+  const lastStep = useRef(step);
+  const dir = step >= lastStep.current ? 1 : -1;
+  useEffect(() => {
+    lastStep.current = step;
+  }, [step]);
   const ready = id ? loadedFrom === id : loadedFrom === null;
 
   // Keep the draft as it changes. A form with nothing new in it keeps nothing.
@@ -615,483 +629,518 @@ export default function LeafScreen() {
           else next();
         }}
       >
-        <div className="leaf-ask-head">
-          <h2 className="v-title leaf-q" tabIndex={-1} data-autofocus={step === LAST ? "" : undefined}>
-            {STEPS[step]?.title}
-          </h2>
-          {step === 2 ? (
-            <p className="v-lede" id="leaf-place-hint">
-              Type the first letters of the town or city, then tap it in the list.
-            </p>
-          ) : (
-            <p className="v-lede">{STEPS[step]?.hint}</p>
-          )}
-        </div>
-
-        {step === 0 ? (
-          <>
-            {restored && !id ? (
-              <div className="v-note leaf-kept" role="status">
-                <span>Carrying on where you left off.</span>
-                <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={startAgain}>
-                  Start again
-                </button>
-              </div>
-            ) : null}
-            <div className="v-field">
-              <label className="v-label" htmlFor="leaf-name">
-                Name
-              </label>
-              <input
-                id="leaf-name"
-                className="v-input"
-                type="text"
-                value={draft.name}
-                placeholder="For example, Rahul"
-                spellCheck={false}
-                autoComplete="off"
-                autoCapitalize="words"
-                enterKeyHint="next"
-                maxLength={60}
-                data-autofocus=""
-                onChange={(e) => set("name", e.target.value)}
-              />
-            </div>
-
-            <div className="v-field">
-              <span className="v-label" id="leaf-trad-l">
-                Which tradition does the family follow?
-              </span>
-              <div className="leaf-choices" role="radiogroup" aria-labelledby="leaf-trad-l" aria-describedby="leaf-trad-s">
-                {(Object.keys(TRADITION_LABEL) as Tradition[]).map((k) => (
-                  <button
-                    key={k}
-                    type="button"
-                    role="radio"
-                    className="leaf-choice"
-                    aria-checked={draft.tradition === k}
-                    onClick={() => set("tradition", k)}
-                  >
-                    <span className="leaf-choice__body">
-                      <span className="leaf-choice__t">{TRADITION_LABEL[k]}</span>
-                      <span className="leaf-choice__s">{TRADITION_NOTE[k]}</span>
-                    </span>
-                    <span className="leaf-choice__tick" aria-hidden="true">
-                      <Tick />
-                    </span>
-                  </button>
-                ))}
-              </div>
-              <span className="v-hint" id="leaf-trad-s">
-                Only the names and the way the chart is drawn change. The calculation is the same everywhere in India.
-              </span>
-            </div>
-
-            <div className="v-field">
-              <span className="v-label" id="leaf-hand-l">
-                Writing hand <span className="leaf-label-s">for the palm reading</span>
-              </span>
-              <div className="v-seg leaf-seg" role="radiogroup" aria-labelledby="leaf-hand-l">
-                {(["right", "left"] as const).map((h) => (
-                  <button key={h} type="button" role="radio" aria-checked={draft.handedness === h} onClick={() => set("handedness", h)}>
-                    {h === "right" ? "Right" : "Left"}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </>
-        ) : null}
-
-        {step === 1 ? (
-          <>
-            <DateFields y={draft.y} mo={draft.mo} d={draft.d} onChange={patch} />
-            <TimeFields hour12={draft.hour12} ampm={draft.ampm} mi={draft.mi} timeUnknown={draft.timeUnknown} onChange={patch} />
-            <Readback
-              y={draft.y}
-              mo={draft.mo}
-              d={draft.d}
-              hour12={draft.hour12}
-              ampm={draft.ampm}
-              mi={draft.mi}
-              timeUnknown={draft.timeUnknown}
-              urgent={tried}
-            />
-            <div className="leaf-switchrow">
-              <button
-                type="button"
-                role="switch"
-                className="leaf-switch"
-                aria-checked={draft.timeUnknown}
-                aria-describedby="leaf-unknown-s"
-                onClick={() => {
-                  set("timeUnknown", !draft.timeUnknown);
-                  play("tick");
-                }}
-              >
-                <span className="leaf-switch__t">I don't know the time</span>
-                <span className="leaf-switch__knob" aria-hidden="true" />
-              </button>
-              <p className="v-hint" id="leaf-unknown-s">
-                Noon is used. The Moon sign and birth star usually still hold; the rising sign, houses and life-chapter dates will not be
-                reliable, and the chart will say so. <InfoDot id="unknown-time" />
+        <motion.div
+          key={step}
+          className="leaf-stepbody"
+          initial={still ? false : { opacity: 0, x: 28 * dir }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 0.8, 0.2, 1] }}
+        >
+          <div className="leaf-ask-head">
+            <h2 className="v-title leaf-q" tabIndex={-1} data-autofocus={step === LAST ? "" : undefined}>
+              {STEPS[step]?.title}
+            </h2>
+            {step === 2 ? (
+              <p className="v-lede" id="leaf-place-hint">
+                Type the first letters of the town or city, then tap it in the list.
               </p>
-            </div>
-          </>
-        ) : null}
+            ) : (
+              <p className="v-lede">{STEPS[step]?.hint}</p>
+            )}
+          </div>
 
-        {step === 2 ? (
-          <>
-            <div className="v-field">
-              <label className="vh" htmlFor="leaf-place">
-                Place of birth
-              </label>
-              <input
-                id="leaf-place"
-                className="v-input"
-                type="search"
-                value={query}
-                placeholder={draft.place ? "Search to change the place…" : "Town or city"}
-                spellCheck={false}
-                autoComplete="off"
-                enterKeyHint="search"
-                aria-describedby="leaf-place-hint leaf-place-chosen"
-                data-autofocus=""
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                  setOnline("idle");
-                }}
-                onKeyDown={(e) => {
-                  // Enter in a half-typed search must not skip ahead: the place is picked from the list.
-                  if (e.key === "Enter" && query.trim()) e.preventDefault();
-                }}
-              />
-            </div>
-            {results.length ? (
-              <ul className="v-list leaf-results" aria-label="Places found">
-                {results.map((p) => {
-                  const region = placeRegion(p);
-                  const twin = results.some((o) => o !== p && o.name === p.name && placeRegion(o) === region);
-                  const sub = [region, twin ? roughly(p) : ""].filter(Boolean).join(" · ");
-                  return (
-                    <li key={`${p.geonameId ?? ""}-${p.lat}-${p.lon}`}>
-                      <button type="button" className="v-row" onClick={() => choosePlace(p)}>
-                        <span className="v-row__body">
-                          <span className="v-row__t">{p.name}</span>
-                          {sub ? <span className="v-row__s">{sub}</span> : null}
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : null}
-            {query.trim().length >= 2 && results.length === 0 ? (
-              <div className="leaf-online">
-                <p role="status">{gazReady ? "Not in the built-in list." : "Loading places…"}</p>
-                <div className="v-actions">
-                  <button
-                    type="button"
-                    className="v-btn v-btn--ghost v-btn--sm"
-                    disabled={online === "busy"}
-                    onClick={() => void goOnline()}
-                  >
-                    {online === "busy" ? "Searching…" : "Search online"}
-                  </button>
-                  <button type="button" className="v-btn v-btn--quiet v-btn--sm" onClick={openManual}>
-                    Type coordinates
+          {step === 0 ? (
+            <>
+              {restored && !id ? (
+                <div className="v-note leaf-kept" role="status">
+                  <span>Carrying on where you left off.</span>
+                  <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={startAgain}>
+                    Start again
                   </button>
                 </div>
+              ) : null}
+              <div className="v-field">
+                <label className="v-label" htmlFor="leaf-name">
+                  Name
+                </label>
+                <input
+                  id="leaf-name"
+                  className="v-input"
+                  type="text"
+                  value={draft.name}
+                  placeholder="For example, Rahul"
+                  spellCheck={false}
+                  autoComplete="off"
+                  autoCapitalize="words"
+                  enterKeyHint="next"
+                  maxLength={60}
+                  data-autofocus=""
+                  onChange={(e) => set("name", e.target.value)}
+                />
               </div>
-            ) : null}
-            <div className={`leaf-chosen${draft.place ? " is-set" : tried ? " is-missing" : ""}`} id="leaf-place-chosen" aria-live="polite">
-              {draft.place ? (
-                <>
-                  <span className="leaf-chosen__tick">
-                    <Tick />
-                  </span>
-                  <span className="leaf-chosen__body">
-                    <span className="leaf-chosen__t">{placeLabel(draft.place)}</span>
-                    {draft.place.source === "manual" ? <span className="leaf-ll">{latLon(draft.place)}</span> : null}
-                  </span>
-                </>
-              ) : (
-                <span>{tried ? "Not chosen yet." : "The place you pick will show here."}</span>
-              )}
-            </div>
 
-            {clockTrouble ? (
-              <p className="v-note v-note--warn" role="status">
-                {clockTrouble}
-              </p>
-            ) : null}
-            {draft.override !== "none" ? (
-              <p className="v-note v-note--warn">You set the clock offset by hand. The chart will show "(manual)" next to the time zone.</p>
-            ) : null}
-
-            <details className="v-fold" open={draft.override !== "none" || advOpen} onToggle={(e) => setAdvOpen(e.currentTarget.open)}>
-              <summary>
-                <span>
-                  Advanced
-                  <span className="v-fold__s">Clock offset, coordinates and calculation. Rarely needed.</span>
+              <div className="v-field">
+                <span className="v-label" id="leaf-trad-l">
+                  Which tradition does the family follow?
                 </span>
-              </summary>
-              <div className="v-fold__body">
-                <div className="v-field">
-                  <span className="v-label" id="leaf-off-l">
-                    Clock offset <InfoDot id="timezone" />
-                  </span>
-                  <span className="v-hint">
-                    {pre1955India
-                      ? "Before 1955 some Indian births used Bombay Time (+04:51). Leave on automatic unless you know the clock used."
-                      : "Worked out automatically from the time-zone database (tzdb). Leave it unless you know better."}
-                  </span>
-                  <div className="v-seg leaf-seg" role="radiogroup" aria-labelledby="leaf-off-l">
-                    {(["none", "bombay", "manual"] as const).map((o) => (
-                      <button
-                        key={o}
-                        type="button"
-                        role="radio"
-                        aria-checked={draft.override === o}
-                        onClick={() =>
-                          o === "manual" && draft.override !== "manual"
-                            ? patch({ override: o, manualOffsetMin: offsetAtPlace() })
-                            : set("override", o)
-                        }
-                      >
-                        {o === "none" ? "Automatic" : o === "bombay" ? "Bombay +04:51" : "Manual"}
-                      </button>
-                    ))}
+                <div className="leaf-choices" role="radiogroup" aria-labelledby="leaf-trad-l" aria-describedby="leaf-trad-s">
+                  {(Object.keys(TRADITION_LABEL) as Tradition[]).map((k) => (
+                    <button
+                      key={k}
+                      type="button"
+                      role="radio"
+                      className="leaf-choice"
+                      aria-checked={draft.tradition === k}
+                      onClick={() => set("tradition", k)}
+                    >
+                      <span className="leaf-choice__body">
+                        <span className="leaf-choice__t">{TRADITION_LABEL[k]}</span>
+                        <span className="leaf-choice__s">{TRADITION_NOTE[k]}</span>
+                      </span>
+                      <span className="leaf-choice__tick" aria-hidden="true">
+                        <Tick />
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <span className="v-hint" id="leaf-trad-s">
+                  Only the names and the way the chart is drawn change. The calculation is the same everywhere in India.
+                </span>
+              </div>
+
+              <div className="v-field">
+                <span className="v-label" id="leaf-hand-l">
+                  Writing hand <span className="leaf-label-s">for the palm reading</span>
+                </span>
+                <div className="v-seg leaf-seg" role="radiogroup" aria-labelledby="leaf-hand-l">
+                  {(["right", "left"] as const).map((h) => (
+                    <button key={h} type="button" role="radio" aria-checked={draft.handedness === h} onClick={() => set("handedness", h)}>
+                      {h === "right" ? "Right" : "Left"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          ) : null}
+
+          {step === 1 ? (
+            <>
+              <DateFields y={draft.y} mo={draft.mo} d={draft.d} onChange={patch} />
+              <TimeFields hour12={draft.hour12} ampm={draft.ampm} mi={draft.mi} timeUnknown={draft.timeUnknown} onChange={patch} />
+              <Readback
+                y={draft.y}
+                mo={draft.mo}
+                d={draft.d}
+                hour12={draft.hour12}
+                ampm={draft.ampm}
+                mi={draft.mi}
+                timeUnknown={draft.timeUnknown}
+                urgent={tried}
+              />
+              <div className="leaf-switchrow">
+                <button
+                  type="button"
+                  role="switch"
+                  className="leaf-switch"
+                  aria-checked={draft.timeUnknown}
+                  aria-describedby="leaf-unknown-s"
+                  onClick={() => {
+                    set("timeUnknown", !draft.timeUnknown);
+                    play("tick");
+                  }}
+                >
+                  <span className="leaf-switch__t">I don't know the time</span>
+                  <span className="leaf-switch__knob" aria-hidden="true" />
+                </button>
+                <p className="v-hint" id="leaf-unknown-s">
+                  Noon is used. The Moon sign and birth star usually still hold; the rising sign, houses and life-chapter dates will not be
+                  reliable, and the chart will say so. <InfoDot id="unknown-time" />
+                </p>
+              </div>
+            </>
+          ) : null}
+
+          {step === 2 ? (
+            <>
+              <div className="v-field">
+                <label className="vh" htmlFor="leaf-place">
+                  Place of birth
+                </label>
+                <input
+                  id="leaf-place"
+                  className="v-input"
+                  type="search"
+                  value={query}
+                  placeholder={draft.place ? "Search to change the place…" : "Town or city"}
+                  spellCheck={false}
+                  autoComplete="off"
+                  enterKeyHint="search"
+                  aria-describedby="leaf-place-hint leaf-place-chosen"
+                  data-autofocus=""
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setOnline("idle");
+                  }}
+                  onKeyDown={(e) => {
+                    // Enter in a half-typed search must not skip ahead: the place is picked from the list.
+                    if (e.key === "Enter" && query.trim()) e.preventDefault();
+                  }}
+                />
+              </div>
+              {results.length ? (
+                <ul className="v-list leaf-results" aria-label="Places found">
+                  {results.map((p) => {
+                    const region = placeRegion(p);
+                    const twin = results.some((o) => o !== p && o.name === p.name && placeRegion(o) === region);
+                    const sub = [region, twin ? roughly(p) : ""].filter(Boolean).join(" · ");
+                    return (
+                      <li key={`${p.geonameId ?? ""}-${p.lat}-${p.lon}`}>
+                        <button type="button" className="v-row" onClick={() => choosePlace(p)}>
+                          <span className="v-row__body">
+                            <span className="v-row__t">{p.name}</span>
+                            {sub ? <span className="v-row__s">{sub}</span> : null}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : null}
+              {query.trim().length >= 2 && results.length === 0 ? (
+                <div className="leaf-online">
+                  <p role="status">{gazReady ? "Not in the built-in list." : "Loading places…"}</p>
+                  <div className="v-actions">
+                    <button
+                      type="button"
+                      className="v-btn v-btn--ghost v-btn--sm"
+                      disabled={online === "busy"}
+                      onClick={() => void goOnline()}
+                    >
+                      {online === "busy" ? "Searching…" : "Search online"}
+                    </button>
+                    <button type="button" className="v-btn v-btn--quiet v-btn--sm" onClick={openManual}>
+                      Type coordinates
+                    </button>
                   </div>
                 </div>
-                {draft.override === "manual" ? (
-                  <fieldset className="bf-group">
-                    <legend className="v-label">Manual UTC offset</legend>
-                    <div className="bf-row bf-row--pair">
-                      <div className="bf-cell">
-                        <label htmlFor="leaf-off-h">Offset hours</label>
-                        <select
-                          id="leaf-off-h"
-                          className="v-select bf-select"
-                          value={offSign * Math.floor(offAbs / 60)}
-                          onChange={(e) => {
-                            const v = Number(e.target.value);
-                            set("manualOffsetMin", (v < 0 ? -1 : 1) * (Math.abs(v) * 60 + (offAbs % 60)));
-                          }}
-                        >
-                          {Array.from({ length: 27 }, (_, i) => i - 12).map((v) => (
-                            <option key={v} value={v}>
-                              {v < 0 ? "−" : "+"}
-                              {String(Math.abs(v)).padStart(2, "0")}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="bf-cell">
-                        <label htmlFor="leaf-off-m">Offset minutes</label>
-                        <select
-                          id="leaf-off-m"
-                          className="v-select bf-select"
-                          value={offAbs % 60}
-                          onChange={(e) => set("manualOffsetMin", offSign * (Math.floor(offAbs / 60) * 60 + Number(e.target.value)))}
-                        >
-                          {Array.from({ length: 60 }, (_, i) => i).map((m) => (
-                            <option key={m} value={m}>
-                              {String(m).padStart(2, "0")}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </fieldset>
-                ) : null}
+              ) : null}
+              <div
+                className={`leaf-chosen${draft.place ? " is-set" : tried ? " is-missing" : ""}`}
+                id="leaf-place-chosen"
+                aria-live="polite"
+              >
+                {draft.place ? (
+                  <>
+                    <span className="leaf-chosen__tick">
+                      <Tick />
+                    </span>
+                    <span className="leaf-chosen__body">
+                      <span className="leaf-chosen__t">{placeLabel(draft.place)}</span>
+                      {draft.place.source === "manual" ? <span className="leaf-ll">{latLon(draft.place)}</span> : null}
+                    </span>
+                  </>
+                ) : (
+                  <span>{tried ? "Not chosen yet." : "The place you pick will show here."}</span>
+                )}
+              </div>
 
-                <div className="v-field">
-                  <span className="v-label">Coordinates</span>
-                  <span className="v-hint">For a village that is not in the list, type its latitude and longitude.</span>
-                  {draft.place ? <span className="leaf-ll">Now: {latLon(draft.place)}</span> : null}
-                  {manual ? (
-                    <ManualPlace
-                      initial={draft.place ?? SKY_FALLBACK}
-                      onSet={(p) => {
-                        choosePlace(p);
-                        setManual(false);
-                      }}
-                    />
-                  ) : (
-                    <div>
-                      <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={() => setManual(true)}>
-                        Type coordinates by hand
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                <div className="v-field">
-                  <span className="v-label">Worked out</span>
-                  {stripEl}
-                </div>
-                <div className="v-field">
-                  <span className="v-label">
-                    Ayanāṃśa <InfoDot id="ayanamsha" />
-                  </span>
-                  <span className="v-hint">
-                    Lahiri (
-                    {settings.preset.ayanamsa === "se-true"
-                      ? "SE-true"
-                      : settings.preset.ayanamsa === "se-mean"
-                        ? "SE-mean"
-                        : "Drik-compatible"}
-                    ) · node: {settings.preset.node}.{" "}
-                    <Link className="leaf-inline" to="/drawer">
-                      Change in Settings
-                    </Link>
-                  </span>
-                </div>
-              </div>
-            </details>
-          </>
-        ) : null}
-
-        {step === LAST ? (
-          <>
-            <dl className="v-card v-card--flush leaf-review">
-              <div>
-                <dt>Name</dt>
-                <dd>{draft.name.trim()}</dd>
-                <dd className="leaf-review__act">
-                  <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the name" onClick={() => goTo(0)}>
-                    Change
-                  </button>
-                </dd>
-              </div>
-              <div>
-                <dt>Born</dt>
-                <dd>
-                  <Readback
-                    y={draft.y}
-                    mo={draft.mo}
-                    d={draft.d}
-                    hour12={draft.hour12}
-                    ampm={draft.ampm}
-                    mi={draft.mi}
-                    timeUnknown={draft.timeUnknown}
-                  />
-                </dd>
-                <dd className="leaf-review__act">
-                  <button
-                    type="button"
-                    className="v-btn v-btn--quiet v-btn--sm"
-                    aria-label="Change the date and time"
-                    onClick={() => goTo(1)}
-                  >
-                    Change
-                  </button>
-                </dd>
-              </div>
-              <div>
-                <dt>Place</dt>
-                <dd>{draft.place ? placeLabel(draft.place) : "Not chosen yet"}</dd>
-                <dd className="leaf-review__act">
-                  <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the place" onClick={() => goTo(2)}>
-                    Change
-                  </button>
-                </dd>
-              </div>
-              <div>
-                <dt>Tradition</dt>
-                <dd>
-                  {TRADITION_LABEL[draft.tradition]} · {draft.handedness === "right" ? "right-handed" : "left-handed"}
-                </dd>
-                <dd className="leaf-review__act">
-                  <button
-                    type="button"
-                    className="v-btn v-btn--quiet v-btn--sm"
-                    aria-label="Change the tradition or writing hand"
-                    onClick={() => goTo(0)}
-                  >
-                    Change
-                  </button>
-                </dd>
-              </div>
-            </dl>
-
-            <section className={`leaf-check${check ? "" : " is-waiting"}`} aria-labelledby="leaf-check-h" aria-live="polite">
-              <div className="v-sec">
-                <h3 id="leaf-check-h">Check before you save</h3>
-              </div>
-              {check ? (
-                <>
-                  <dl className="v-card leaf-check__grid">
-                    <div>
-                      <dt>Moon sign (rāśi)</dt>
-                      <dd>
-                        {rashiBoth(check.moonSign, draft.tradition)}
-                        <small>{SIGN_WESTERN[check.moonSign]}</small>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Birth star (nakṣatra)</dt>
-                      <dd>
-                        {nakBoth(check.nak, draft.tradition)}
-                        <small>Quarter (pada) {check.pada}</small>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Rising sign (lagna)</dt>
-                      <dd>
-                        {draft.timeUnknown ? "needs the time" : rashiBoth(check.lagnaSign, draft.tradition)}
-                        {draft.timeUnknown ? null : <small>{SIGN_WESTERN[check.lagnaSign]}</small>}
-                      </dd>
-                    </div>
-                  </dl>
-                  <p className="leaf-check__p">
-                    If this is not what the family knows, the usual culprits are am/pm, the day, or the town. Tap Change above and watch
-                    this update.
-                  </p>
-                </>
-              ) : (
-                <p className="v-card leaf-check__p">
-                  {problem ?? "These details could not be worked out."} Your Moon sign, birth star and rising sign appear here as soon as
-                  they can be worked out.
+              {clockTrouble ? (
+                <p className="v-note v-note--warn" role="status">
+                  {clockTrouble}
                 </p>
-              )}
-            </section>
+              ) : null}
+              {draft.override !== "none" ? (
+                <p className="v-note v-note--warn">
+                  You set the clock offset by hand. The chart will show "(manual)" next to the time zone.
+                </p>
+              ) : null}
 
-            {clockTrouble ? (
-              <p className="v-note v-note--warn" role="status">
-                {clockTrouble}
-              </p>
-            ) : null}
-            {draft.timeUnknown ? (
-              <p className="v-note">The time of birth is not known, so noon is used and the rising sign is left out.</p>
-            ) : null}
-            {draft.override !== "none" ? (
-              <p className="v-note v-note--warn">You set the clock offset by hand. The chart will show "(manual)" next to the time zone.</p>
-            ) : null}
+              <details className="v-fold" open={draft.override !== "none" || advOpen} onToggle={(e) => setAdvOpen(e.currentTarget.open)}>
+                <summary>
+                  <span>
+                    Advanced
+                    <span className="v-fold__s">Clock offset, coordinates and calculation. Rarely needed.</span>
+                  </span>
+                </summary>
+                <div className="v-fold__body">
+                  <div className="v-field">
+                    <span className="v-label" id="leaf-off-l">
+                      Clock offset <InfoDot id="timezone" />
+                    </span>
+                    <span className="v-hint">
+                      {pre1955India
+                        ? "Before 1955 some Indian births used Bombay Time (+04:51). Leave on automatic unless you know the clock used."
+                        : "Worked out automatically from the time-zone database (tzdb). Leave it unless you know better."}
+                    </span>
+                    <div className="v-seg leaf-seg" role="radiogroup" aria-labelledby="leaf-off-l">
+                      {(["none", "bombay", "manual"] as const).map((o) => (
+                        <button
+                          key={o}
+                          type="button"
+                          role="radio"
+                          aria-checked={draft.override === o}
+                          onClick={() =>
+                            o === "manual" && draft.override !== "manual"
+                              ? patch({ override: o, manualOffsetMin: offsetAtPlace() })
+                              : set("override", o)
+                          }
+                        >
+                          {o === "none" ? "Automatic" : o === "bombay" ? "Bombay +04:51" : "Manual"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {draft.override === "manual" ? (
+                    <fieldset className="bf-group">
+                      <legend className="v-label">Manual UTC offset</legend>
+                      <div className="bf-row bf-row--pair">
+                        <div className="bf-cell">
+                          <label htmlFor="leaf-off-h">Offset hours</label>
+                          <select
+                            id="leaf-off-h"
+                            className="v-select bf-select"
+                            value={offSign * Math.floor(offAbs / 60)}
+                            onChange={(e) => {
+                              const v = Number(e.target.value);
+                              set("manualOffsetMin", (v < 0 ? -1 : 1) * (Math.abs(v) * 60 + (offAbs % 60)));
+                            }}
+                          >
+                            {Array.from({ length: 27 }, (_, i) => i - 12).map((v) => (
+                              <option key={v} value={v}>
+                                {v < 0 ? "−" : "+"}
+                                {String(Math.abs(v)).padStart(2, "0")}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="bf-cell">
+                          <label htmlFor="leaf-off-m">Offset minutes</label>
+                          <select
+                            id="leaf-off-m"
+                            className="v-select bf-select"
+                            value={offAbs % 60}
+                            onChange={(e) => set("manualOffsetMin", offSign * (Math.floor(offAbs / 60) * 60 + Number(e.target.value)))}
+                          >
+                            {Array.from({ length: 60 }, (_, i) => i).map((m) => (
+                              <option key={m} value={m}>
+                                {String(m).padStart(2, "0")}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    </fieldset>
+                  ) : null}
 
-            <details className="v-fold">
-              <summary>
-                <span>
-                  Technical details
-                  <span className="v-fold__s">Time zone, clock offset and Julian Day, as worked out.</span>
-                </span>
-              </summary>
-              <div className="v-fold__body">
-                {stripEl}
-                {draft.place ? <p className="leaf-ll leaf-coords">Coordinates: {latLon(draft.place)}</p> : null}
-              </div>
-            </details>
-          </>
-        ) : null}
+                  <div className="v-field">
+                    <span className="v-label">Coordinates</span>
+                    <span className="v-hint">For a village that is not in the list, type its latitude and longitude.</span>
+                    {draft.place ? <span className="leaf-ll">Now: {latLon(draft.place)}</span> : null}
+                    {manual ? (
+                      <ManualPlace
+                        initial={draft.place ?? SKY_FALLBACK}
+                        onSet={(p) => {
+                          choosePlace(p);
+                          setManual(false);
+                        }}
+                      />
+                    ) : (
+                      <div>
+                        <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={() => setManual(true)}>
+                          Type coordinates by hand
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
-        {step === 0 && !id && (restored || (!draft.name && !draft.d && !draft.place)) ? (
-          <div className="leaf-example">
-            <span className="v-muted">Just looking around?</span>
-            <button type="button" className="v-link" onClick={fillExample}>
-              Fill in an example (Rahul, 14 Mar 1994)
-            </button>
-          </div>
-        ) : null}
+                  <div className="v-field">
+                    <span className="v-label">Worked out</span>
+                    {stripEl}
+                  </div>
+                  <div className="v-field">
+                    <span className="v-label">
+                      Ayanāṃśa <InfoDot id="ayanamsha" />
+                    </span>
+                    <span className="v-hint">
+                      Lahiri (
+                      {settings.preset.ayanamsa === "se-true"
+                        ? "SE-true"
+                        : settings.preset.ayanamsa === "se-mean"
+                          ? "SE-mean"
+                          : "Drik-compatible"}
+                      ) · node: {settings.preset.node}.{" "}
+                      <Link className="leaf-inline" to="/drawer">
+                        Change in Settings
+                      </Link>
+                    </span>
+                  </div>
+                </div>
+              </details>
+            </>
+          ) : null}
+
+          {step === LAST ? (
+            <>
+              {check ? (
+                <figure className="leaf-sky v-night">
+                  <SkyWindow
+                    centre={check.moonSid}
+                    from={check.nak * NAK_SPAN}
+                    span={NAK_SPAN}
+                    bodies={[{ id: "MO", lon: check.moonSid, name: "The Moon" }]}
+                    elong={check.elong}
+                    label={`The Moon at this birth, among the real stars of ${NAKSHATRA_NAMES[check.nak]}, in ${SIGN_WESTERN[check.moonSign]}`}
+                  />
+                  <figcaption>
+                    <span className="leaf-sky__k">Born under</span>
+                    <span className="leaf-sky__v">{nakBoth(check.nak, draft.tradition)}</span>
+                    <span className="leaf-sky__s">
+                      Moon in {SIGN_WESTERN[check.moonSign]} · the real sky at that moment{draft.timeUnknown ? " (noon)" : ""}
+                    </span>
+                  </figcaption>
+                </figure>
+              ) : null}
+              <dl className="v-card v-card--flush leaf-review">
+                <div>
+                  <dt>Name</dt>
+                  <dd>{draft.name.trim()}</dd>
+                  <dd className="leaf-review__act">
+                    <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the name" onClick={() => goTo(0)}>
+                      Change
+                    </button>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Born</dt>
+                  <dd>
+                    <Readback
+                      y={draft.y}
+                      mo={draft.mo}
+                      d={draft.d}
+                      hour12={draft.hour12}
+                      ampm={draft.ampm}
+                      mi={draft.mi}
+                      timeUnknown={draft.timeUnknown}
+                    />
+                  </dd>
+                  <dd className="leaf-review__act">
+                    <button
+                      type="button"
+                      className="v-btn v-btn--quiet v-btn--sm"
+                      aria-label="Change the date and time"
+                      onClick={() => goTo(1)}
+                    >
+                      Change
+                    </button>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Place</dt>
+                  <dd>{draft.place ? placeLabel(draft.place) : "Not chosen yet"}</dd>
+                  <dd className="leaf-review__act">
+                    <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the place" onClick={() => goTo(2)}>
+                      Change
+                    </button>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Tradition</dt>
+                  <dd>
+                    {TRADITION_LABEL[draft.tradition]} · {draft.handedness === "right" ? "right-handed" : "left-handed"}
+                  </dd>
+                  <dd className="leaf-review__act">
+                    <button
+                      type="button"
+                      className="v-btn v-btn--quiet v-btn--sm"
+                      aria-label="Change the tradition or writing hand"
+                      onClick={() => goTo(0)}
+                    >
+                      Change
+                    </button>
+                  </dd>
+                </div>
+              </dl>
+
+              <section className={`leaf-check${check ? "" : " is-waiting"}`} aria-labelledby="leaf-check-h" aria-live="polite">
+                <div className="v-sec">
+                  <h3 id="leaf-check-h">Check before you save</h3>
+                </div>
+                {check ? (
+                  <>
+                    <dl className="v-card leaf-check__grid">
+                      <div>
+                        <dt>Moon sign (rāśi)</dt>
+                        <dd>
+                          {rashiBoth(check.moonSign, draft.tradition)}
+                          <small>{SIGN_WESTERN[check.moonSign]}</small>
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Birth star (nakṣatra)</dt>
+                        <dd>
+                          {nakBoth(check.nak, draft.tradition)}
+                          <small>Quarter (pada) {check.pada}</small>
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Rising sign (lagna)</dt>
+                        <dd>
+                          {draft.timeUnknown ? "needs the time" : rashiBoth(check.lagnaSign, draft.tradition)}
+                          {draft.timeUnknown ? null : <small>{SIGN_WESTERN[check.lagnaSign]}</small>}
+                        </dd>
+                      </div>
+                    </dl>
+                    <p className="leaf-check__p">
+                      If this is not what the family knows, the usual culprits are am/pm, the day, or the town. Tap Change above and watch
+                      this update.
+                    </p>
+                  </>
+                ) : (
+                  <p className="v-card leaf-check__p">
+                    {problem ?? "These details could not be worked out."} Your Moon sign, birth star and rising sign appear here as soon as
+                    they can be worked out.
+                  </p>
+                )}
+              </section>
+
+              {clockTrouble ? (
+                <p className="v-note v-note--warn" role="status">
+                  {clockTrouble}
+                </p>
+              ) : null}
+              {draft.timeUnknown ? (
+                <p className="v-note">The time of birth is not known, so noon is used and the rising sign is left out.</p>
+              ) : null}
+              {draft.override !== "none" ? (
+                <p className="v-note v-note--warn">
+                  You set the clock offset by hand. The chart will show "(manual)" next to the time zone.
+                </p>
+              ) : null}
+
+              <details className="v-fold">
+                <summary>
+                  <span>
+                    Technical details
+                    <span className="v-fold__s">Time zone, clock offset and Julian Day, as worked out.</span>
+                  </span>
+                </summary>
+                <div className="v-fold__body">
+                  {stripEl}
+                  {draft.place ? <p className="leaf-ll leaf-coords">Coordinates: {latLon(draft.place)}</p> : null}
+                </div>
+              </details>
+            </>
+          ) : null}
+
+          {step === 0 && !id && (restored || (!draft.name && !draft.d && !draft.place)) ? (
+            <div className="leaf-example">
+              <span className="v-muted">Just looking around?</span>
+              <button type="button" className="v-link" onClick={fillExample}>
+                Fill in an example (Rahul, 14 Mar 1994)
+              </button>
+            </div>
+          ) : null}
+        </motion.div>
 
         {/* The way forward stays in reach: this bar is pinned to the bottom of the scrolling page. */}
         <div className="leaf-foot" data-testid="leaf-actions">

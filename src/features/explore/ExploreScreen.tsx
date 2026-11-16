@@ -7,6 +7,7 @@ import { useActiveProfile, usePatri, useProfiles, useSettings } from "../../app/
 import { useNowMs } from "../../app/useNow";
 import { InfoDot } from "../../components/ui/Explain";
 import { GrahaGlyph } from "../../components/ui/GrahaGlyph";
+import { Reveal } from "../../components/ui/Motion";
 import { ChevronLeft, ChevronRight, Page, Row, Section } from "../../components/ui/Page";
 import { StoryPlayer } from "../../components/ui/StoryPlayer";
 import { GRAHA_LORE, NAKSHATRA_LORE, RASHI_LORE } from "../../data/lore";
@@ -19,15 +20,17 @@ import { mulberry32 } from "../../engine/math";
 import { birthNumbers, CHINESE_ANIMALS, chineseZodiac, NUMBER_GRAHA, nameNumber, personalYear } from "../../engine/profile";
 import { GRAHA_IDS, type GrahaId } from "../../engine/types";
 import { countEvent } from "../../platform/stats";
-import { IconMoon, IconNumbers, IconSky, IconStory, IconToday } from "../chowki/icons";
+import { IconNumbers, IconSky, IconStory, IconToday } from "../chowki/icons";
+import { BeltRing, BeltStrip, bodiesOf, englishOf, MoonMark, SignMark, SkyWindow, StarDot, skyWords } from "./SkyArt";
 import { SkyWheel, type WheelSel } from "./SkyWheel";
-import { StarPatch } from "./StarPatch";
 import { panelFor, slidesFor } from "./skyStories";
 import "./explore.css";
 import "./wheel.css";
 
 const lore = (id: GrahaId) => GRAHA_LORE.find((g) => g.id === id);
 const NAK_SPAN = 360 / 27;
+const SUN_MOON = ["SU", "MO"] as const;
+const MOON_ONLY = ["MO"] as const;
 const cap = (s: string) => (s ? (s[0]?.toUpperCase() ?? "") + s.slice(1) : s);
 /** The zodiac mark as text, never as a colour emoji. */
 const signMark = (i: number) => `${SIGN_MARK[i] ?? ""}︎`;
@@ -39,15 +42,6 @@ function useSky() {
 }
 
 // ── shared pieces ─────────────────────────────────────────────────────────
-/** A round disc holding a sign's mark, a star's number or a count. */
-function Disc({ children, big }: { children: React.ReactNode; big?: boolean }) {
-  return (
-    <span className={`ex-disc${big ? " ex-disc--big" : ""}`} aria-hidden="true">
-      {children}
-    </span>
-  );
-}
-
 /** The top of a detail page: the English name large, the Sanskrit small, the picture beside it. */
 function Head({
   art,
@@ -76,6 +70,37 @@ function Head({
     </header>
   );
 }
+
+/** The top of a page with a picture band: small line, the name large, the Sanskrit small, the picture, what is true now. */
+function Hero({
+  eyebrow,
+  title,
+  small,
+  pic,
+  children,
+  md,
+}: {
+  eyebrow: React.ReactNode;
+  title: string;
+  small?: React.ReactNode;
+  pic: React.ReactNode;
+  children?: React.ReactNode;
+  md?: boolean;
+}) {
+  return (
+    <section className="bh bh--split">
+      <p className="bh__eyebrow">{eyebrow}</p>
+      <h1 className={`bh__title${md ? " bh__title--md" : ""}`}>{title}</h1>
+      {small ? <p className="bh__small">{small}</p> : null}
+      {pic}
+      {children}
+    </section>
+  );
+}
+
+const elongOf = (sky: ReturnType<typeof useSky>) => sky.MO.lonSidereal - sky.SU.lonSidereal;
+/** "Sun, Mercury and Venus" */
+const listWords = (xs: string[]) => (xs.length < 2 ? (xs[0] ?? "") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
 
 function Card({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -173,32 +198,60 @@ function GrahaDetail({ id }: { id: GrahaId }) {
   const prev = GRAHA_LORE[(at + GRAHA_LORE.length - 1) % GRAHA_LORE.length];
   const next = GRAHA_LORE[(at + 1) % GRAHA_LORE.length];
   return (
-    <Page label={`${g.english}: the planet ${g.name}`} back="/explore/graha" backLabel="Planets">
-      <Head
-        art={<GrahaGlyph id={id} size={76} />}
-        eyebrow={`Planet · ${g.title}`}
-        title={g.english}
-        small={
-          <>
-            {g.name} <Dev>{g.dev}</Dev> <InfoDot id="graha" />
-          </>
-        }
-        lead={`${cap(g.signifies)}.`}
-      />
-      <Card title="Where it is right now">
-        <p>
-          {g.english} is in <Link to={`/explore/rashi/${now.sign}`}>{RASHI_LORE[now.sign]?.name}</Link> ({RASHI_LORE[now.sign]?.western}),{" "}
-          {Math.floor(now.degInSign)}°, in the nakṣatra{" "}
-          <Link to={`/explore/nakshatra/${now.nakshatra}`}>{NAKSHATRA_NAMES[now.nakshatra]}</Link>
-          {now.retrograde && id !== "RA" && id !== "KE" ? ", moving retrograde" : ""}.
-        </p>
-        {mine && active ? (
+    <Page
+      label={`${g.english}: the planet ${g.name}`}
+      back="/explore/graha"
+      backLabel="Planets"
+      wide
+      sky="night"
+      hero={
+        <Hero
+          eyebrow={`Planet · ${g.title}`}
+          title={g.english}
+          small={
+            <>
+              {g.name} <Dev>{g.dev}</Dev> <InfoDot id="graha" />
+            </>
+          }
+          pic={
+            <div className="bh__pic">
+              <SkyWindow
+                centre={now.lonSidereal}
+                bodies={bodiesOf(sky, id)}
+                elong={elongOf(sky)}
+                label={`${g.english} where it is right now, among the real stars of ${RASHI_LORE[now.sign]?.western}`}
+              />
+            </div>
+          }
+        >
+          <p className="bh__now">
+            <i aria-hidden="true" />
+            <span>
+              Right now in <Link to={`/explore/rashi/${now.sign}`}>{RASHI_LORE[now.sign]?.western}</Link> ({RASHI_LORE[now.sign]?.name}),{" "}
+              {Math.floor(now.degInSign)}°, in the star{" "}
+              <Link to={`/explore/nakshatra/${now.nakshatra}`}>{NAKSHATRA_NAMES[now.nakshatra]}</Link>
+              {now.retrograde && id !== "RA" && id !== "KE" ? ", moving retrograde" : ""}.
+            </span>
+          </p>
+          <p className="bh__note">
+            {id === "RA" || id === "KE"
+              ? "A shadow point, not a body: the ring marks its place on the Sun's path, among the real stars."
+              : "The real sky around it, facing south. The gold line is the Sun's path."}
+          </p>
+        </Hero>
+      }
+    >
+      <Reveal i={0}>
+        <p className="ex-lead">{cap(g.signifies)}.</p>
+      </Reveal>
+      {mine && active ? (
+        <Card title={`In ${active.name}'s birth chart`}>
           <p>
-            In {active.name}'s birth chart it was in {RASHI_LORE[mine.sign]?.name}, {NAKSHATRA_NAMES[mine.nakshatra]} pada {mine.pada}
+            It was in {RASHI_LORE[mine.sign]?.name}, {NAKSHATRA_NAMES[mine.nakshatra]} pada {mine.pada}
             {mine.retrograde && id !== "RA" && id !== "KE" ? ", retrograde" : ""}.
           </p>
-        ) : null}
-      </Card>
+        </Card>
+      ) : null}
       <Card title="In the tradition">
         <Facts
           rows={[
@@ -255,33 +308,63 @@ function RashiDetail({ i }: { i: number }) {
   const p = (i + 11) % 12;
   const n = (i + 1) % 12;
   return (
-    <Page label={`${r.western}: the sign ${r.name}`} back="/explore/rashi" backLabel="Signs">
-      <Head
-        art={<Disc big>{signMark(i)}</Disc>}
-        eyebrow={
-          <>
-            Sign {i + 1} of 12 <InfoDot id="rashi" />
-          </>
-        }
-        title={r.western}
-        small={
-          <>
-            {r.name} <Dev>{r.dev}</Dev> · {r.symbol}
-          </>
-        }
-        lead={`${cap(r.nature)}.`}
-      />
-      <Card title="Who is here right now">
-        <p>
-          <strong>Now:</strong> {here.length ? here.map((g) => lore(g)?.english).join(", ") : "no graha is in this sign right now"}.
-        </p>
-        {active && patri ? (
+    <Page
+      label={`${r.western}: the sign ${r.name}`}
+      back="/explore/rashi"
+      backLabel="Signs"
+      wide
+      sky="night"
+      hero={
+        <Hero
+          eyebrow={
+            <>
+              Sign {i + 1} of 12 <InfoDot id="rashi" />
+            </>
+          }
+          title={r.western}
+          small={
+            <>
+              {signMark(i)} {r.name} <Dev>{r.dev}</Dev> · {r.symbol}
+            </>
+          }
+          pic={
+            <div className="bh__pic">
+              <SkyWindow
+                centre={i * 30 + 15}
+                from={i * 30}
+                span={30}
+                bodies={bodiesOf(sky)}
+                elong={elongOf(sky)}
+                label={`The real stars of ${r.western}${here.length ? `, with ${listWords(here.map(englishOf))} in it right now` : ""}`}
+              />
+            </div>
+          }
+        >
+          <p className="bh__now">
+            <i aria-hidden="true" />
+            <span>
+              {here.length
+                ? `${listWords(here.map(englishOf))} ${here.length > 1 ? "are" : "is"} here right now.`
+                : "No planet is in this sign right now."}
+            </span>
+          </p>
+          <p className="bh__note">
+            The real stars of this slice of the sky, facing south. The gold line is the Sun's path; the brightest star is ringed.
+          </p>
+        </Hero>
+      }
+    >
+      <Reveal i={0}>
+        <p className="ex-lead">{cap(r.nature)}.</p>
+      </Reveal>
+      {active && patri ? (
+        <Card title={`In ${active.name}'s chart`}>
           <p>
-            <strong>In {active.name}'s chart:</strong> {mineHere.length ? mineHere.map((g) => lore(g)?.english).join(", ") : "empty"}
+            {mineHere.length ? listWords(mineHere.map(englishOf)) : "No planet"} {mineHere.length > 1 ? "were" : "was"} here at birth
             {patri.lagna.sign === i ? ", and it is the rising sign" : ""}.
           </p>
-        ) : null}
-      </Card>
+        </Card>
+      ) : null}
       <Card title="In the tradition">
         <Facts
           rows={[
@@ -293,9 +376,6 @@ function RashiDetail({ i }: { i: number }) {
           ]}
         />
       </Card>
-      <Fold title="The real sky">
-        <StarPatch from={i * 30} span={30} lat={24} label={`The real stars of ${r.name}`} />
-      </Fold>
       <Fold title="Birth stars in this sign">
         <Chips
           label={`Birth stars in ${r.western}`}
@@ -323,32 +403,57 @@ function NakshatraDetail({ i }: { i: number }) {
   const dms = (x: number) => `${Math.floor(x % 30)}°${String(Math.round(((x % 30) % 1) * 60)).padStart(2, "0")}′`;
   const here = GRAHA_IDS.filter((g) => sky[g].nakshatra === i);
   return (
-    <Page label={`The birth star ${name}`} back="/explore/nakshatra" backLabel="Stars">
-      <Head
-        art={<Disc big>{i + 1}</Disc>}
-        eyebrow={
-          <>
-            Birth star {i + 1} of 27 <InfoDot id="nakshatra" />
-          </>
-        }
-        title={name}
-        small={
-          <>
-            <Dev>{NAKSHATRA_DEV[i]}</Dev> “{n.meaning}” · {n.symbol}
-          </>
-        }
-        lead={
-          <>
-            Presided over by <strong>{n.deity}</strong>. {n.story}
-          </>
-        }
-      />
-      <Card title="Who is here right now">
-        {sky.MO.nakshatra === i ? <p>The Moon is in {name} right now.</p> : null}
-        <p>
-          <strong>Now:</strong> {here.length ? here.map((g) => lore(g)?.english).join(", ") : "no graha is in this star right now"}.
+    <Page
+      label={`The birth star ${name}`}
+      back="/explore/nakshatra"
+      backLabel="Stars"
+      wide
+      sky="night"
+      hero={
+        <Hero
+          eyebrow={
+            <>
+              Birth star {i + 1} of 27 <InfoDot id="nakshatra" />
+            </>
+          }
+          title={name}
+          small={
+            <>
+              <Dev>{NAKSHATRA_DEV[i]}</Dev> “{n.meaning}” · {n.symbol}
+            </>
+          }
+          pic={
+            <div className="bh__pic">
+              <SkyWindow
+                centre={a + NAK_SPAN / 2}
+                from={a}
+                span={NAK_SPAN}
+                bodies={bodiesOf(sky)}
+                elong={elongOf(sky)}
+                label={`The real stars of ${name}${here.length ? `, with ${listWords(here.map(englishOf))} in it right now` : ""}`}
+              />
+            </div>
+          }
+        >
+          <p className="bh__now">
+            <i aria-hidden="true" />
+            <span>
+              {here.length
+                ? `${listWords(here.map(englishOf))} ${here.length > 1 ? "are" : "is"} in this star right now.`
+                : "No planet is in this star right now."}
+            </span>
+          </p>
+          <p className="bh__note">
+            The real stars of this slice of the sky, facing south. The gold line is the Sun's path; the brightest star is ringed.
+          </p>
+        </Hero>
+      }
+    >
+      <Reveal i={0}>
+        <p className="ex-lead">
+          Presided over by <strong>{n.deity}</strong>. {n.story}
         </p>
-      </Card>
+      </Reveal>
       <Card title="In the tradition">
         <Facts
           rows={[
@@ -366,9 +471,6 @@ function NakshatraDetail({ i }: { i: number }) {
           Gaṇa and yoni are used in Guna Milan matching <InfoDot id="guna-milan" />.
         </p>
       </Card>
-      <Fold title="The real sky">
-        <StarPatch from={a} span={NAK_SPAN} lat={32} label={`The real stars of ${name}`} />
-      </Fold>
       <Pager
         prev={{ to: `/explore/nakshatra/${(i + 26) % 27}`, text: NAKSHATRA_NAMES[(i + 26) % 27] ?? "" }}
         next={{ to: `/explore/nakshatra/${(i + 1) % 27}`, text: NAKSHATRA_NAMES[(i + 1) % 27] ?? "" }}
@@ -577,102 +679,179 @@ function ListPage({ kind }: { kind: "graha" | "rashi" | "nakshatra" }) {
     return (
       <Page
         label="The nine planets"
-        title="The nine planets"
-        lede={
-          <>
-            Seven you can see, and the two shadow points where eclipses happen. <InfoDot id="graha" />
-          </>
-        }
         back="/explore"
         backLabel="Explore"
+        wide
+        sky="night"
+        hero={
+          <Hero
+            md
+            eyebrow="Where they are right now"
+            title="The nine planets"
+            pic={
+              <div className="bh__pic ex-strip">
+                <BeltStrip sky={sky} label={`The nine planets along the zodiac, Aries to Pisces, right now: ${skyWords(sky)}.`} />
+              </div>
+            }
+          >
+            <p className="bh__line">
+              Seven you can see, and the two shadow points where eclipses happen. <InfoDot id="graha" />
+            </p>
+            <p className="bh__note">In their true order along the Sun's path today, over the real stars of the zodiac.</p>
+          </Hero>
+        }
       >
-        <ul className="v-list ex-list">
-          {GRAHA_LORE.map((g) => (
-            <li key={g.id}>
-              <Row
-                to={`/explore/graha/${g.id}`}
-                icon={<GrahaGlyph id={g.id} size={42} />}
-                title={g.english}
-                sub={
-                  <>
-                    {g.name} <Dev>{g.dev}</Dev> · {g.title}
-                  </>
-                }
-              />
-            </li>
-          ))}
-        </ul>
+        <Reveal i={0}>
+          <ul className="v-list ex-list">
+            {GRAHA_LORE.map((g) => (
+              <li key={g.id}>
+                <Row
+                  to={`/explore/graha/${g.id}`}
+                  icon={<GrahaGlyph id={g.id} size={42} />}
+                  title={g.english}
+                  sub={
+                    <>
+                      {g.name} <Dev>{g.dev}</Dev> · now in {RASHI_LORE[sky[g.id].sign]?.western}
+                    </>
+                  }
+                />
+              </li>
+            ))}
+          </ul>
+        </Reveal>
       </Page>
     );
-  if (kind === "rashi")
+  if (kind === "rashi") {
+    const mine = patri?.grahas.MO.sign;
     return (
       <Page
         label="The twelve signs"
-        title="The twelve signs"
-        lede={
-          <>
-            Twelve equal slices of the sky that the Sun, Moon and planets travel through. <InfoDot id="rashi" />
-          </>
-        }
         back="/explore"
         backLabel="Explore"
+        wide
+        sky="night"
+        hero={
+          <Hero
+            md
+            eyebrow="The zodiac right now"
+            title="The twelve signs"
+            pic={
+              <div className="bh__pic bh__pic--sm">
+                <BeltRing
+                  sky={sky}
+                  show={SUN_MOON}
+                  lit={sky.MO.sign}
+                  mine={mine}
+                  label={`The twelve signs as a ring of real stars. The Moon is in ${RASHI_LORE[sky.MO.sign]?.western} and the Sun in ${RASHI_LORE[sky.SU.sign]?.western}.`}
+                >
+                  <span className="belt-ring__k">Moon in</span>
+                  <span className="belt-ring__v">{RASHI_LORE[sky.MO.sign]?.western}</span>
+                </BeltRing>
+              </div>
+            }
+          >
+            <p className="bh__line">
+              Twelve equal slices of the sky that the Sun, Moon and planets travel through. <InfoDot id="rashi" />
+            </p>
+            {mine != null && active ? (
+              <p className="bh__note">
+                Gold marks {active.name}'s Moon sign, {RASHI_LORE[mine]?.western}.
+              </p>
+            ) : null}
+          </Hero>
+        }
       >
+        <Reveal i={0}>
+          <ol className="v-list ex-list">
+            {RASHI_LORE.map((r, i) => (
+              <li key={r.name}>
+                <Row
+                  to={`/explore/rashi/${i}`}
+                  icon={<StarDot from={i * 30} span={30} />}
+                  title={r.western}
+                  sub={
+                    <>
+                      {signMark(i)} {r.name} <Dev>{r.dev}</Dev>
+                    </>
+                  }
+                  end={mark(
+                    patri?.grahas.MO.sign === i
+                      ? "Moon sign"
+                      : patri?.lagna.sign === i
+                        ? "Rising sign"
+                        : sky.MO.sign === i
+                          ? "Moon is here"
+                          : sky.SU.sign === i
+                            ? "Sun is here"
+                            : null,
+                  )}
+                />
+              </li>
+            ))}
+          </ol>
+        </Reveal>
+      </Page>
+    );
+  }
+  const mine = patri?.grahas.MO.nakshatra;
+  return (
+    <Page
+      label="The 27 birth stars"
+      back="/explore"
+      backLabel="Explore"
+      wide
+      sky="night"
+      hero={
+        <Hero
+          md
+          eyebrow="The Moon's path right now"
+          title="The 27 birth stars"
+          pic={
+            <div className="bh__pic bh__pic--sm">
+              <BeltRing
+                sky={sky}
+                parts={27}
+                show={MOON_ONLY}
+                lit={sky.MO.nakshatra}
+                mine={mine}
+                label={`The 27 birth stars as a ring of real stars. The Moon is in ${NAKSHATRA_NAMES[sky.MO.nakshatra]} right now.`}
+              >
+                <span className="belt-ring__k">Moon in</span>
+                <span className="belt-ring__v">{NAKSHATRA_NAMES[sky.MO.nakshatra]}</span>
+              </BeltRing>
+            </div>
+          }
+        >
+          <p className="bh__line">
+            The Moon visits one each day. The one it was in when you were born is your birth star. <InfoDot id="nakshatra" />
+          </p>
+          {mine != null && active ? (
+            <p className="bh__note">
+              Gold marks {active.name}'s birth star, {NAKSHATRA_NAMES[mine]}.
+            </p>
+          ) : null}
+        </Hero>
+      }
+    >
+      <Reveal i={0}>
         <ol className="v-list ex-list">
-          {RASHI_LORE.map((r, i) => (
-            <li key={r.name}>
+          {NAKSHATRA_LORE.map((n, i) => (
+            <li key={NAKSHATRA_NAMES[i]}>
               <Row
-                to={`/explore/rashi/${i}`}
-                icon={<span className="ex-glyph">{signMark(i)}</span>}
-                title={r.western}
+                to={`/explore/nakshatra/${i}`}
+                icon={<StarDot from={i * NAK_SPAN} span={NAK_SPAN} />}
+                title={NAKSHATRA_NAMES[i] ?? ""}
                 sub={
                   <>
-                    {r.name} <Dev>{r.dev}</Dev>
+                    {i + 1} · <Dev>{NAKSHATRA_DEV[i]}</Dev> {n.symbol}
                   </>
                 }
-                end={mark(
-                  patri?.grahas.MO.sign === i
-                    ? "Moon sign"
-                    : patri?.lagna.sign === i
-                      ? "Rising sign"
-                      : sky.MO.sign === i
-                        ? "Moon is here"
-                        : null,
-                )}
+                end={mark(patri?.grahas.MO.nakshatra === i ? "Birth star" : sky.MO.nakshatra === i ? "Moon is here" : null)}
               />
             </li>
           ))}
         </ol>
-      </Page>
-    );
-  return (
-    <Page
-      label="The 27 birth stars"
-      title="The 27 birth stars"
-      lede={
-        <>
-          The Moon visits one each day. The one it was in when you were born is your birth star. <InfoDot id="nakshatra" />
-        </>
-      }
-      back="/explore"
-      backLabel="Explore"
-    >
-      <ol className="v-list ex-list">
-        {NAKSHATRA_LORE.map((n, i) => (
-          <li key={NAKSHATRA_NAMES[i]}>
-            <Row
-              to={`/explore/nakshatra/${i}`}
-              icon={<span className="ex-glyph">{i + 1}</span>}
-              title={NAKSHATRA_NAMES[i] ?? ""}
-              sub={
-                <>
-                  <Dev>{NAKSHATRA_DEV[i]}</Dev> {n.symbol}
-                </>
-              }
-              end={mark(patri?.grahas.MO.nakshatra === i ? "Birth star" : sky.MO.nakshatra === i ? "Moon is here" : null)}
-            />
-          </li>
-        ))}
-      </ol>
+      </Reveal>
     </Page>
   );
 }
@@ -811,7 +990,7 @@ function Wheel() {
   );
 }
 
-// ── hub: one calm list ────────────────────────────────────────────────────
+// ── hub: the sky as it is, then one calm list ─────────────────────────────
 function Hub() {
   const sky = useSky();
   const active = useActiveProfile();
@@ -819,48 +998,90 @@ function Hub() {
   const { patri: p } = usePatri(active, settings.preset);
   const patri = p && active && p.profileId === active.id ? p : null;
   const num = (n: React.ReactNode) => <span className="ex-glyph">{n}</span>;
+  const mine = patri?.grahas.MO.sign;
+  const lit = Math.round(((1 - Math.cos((elongOf(sky) * Math.PI) / 180)) / 2) * 100);
+  const hero = (
+    <section className="bh bh--split" aria-labelledby="ex-h">
+      <p className="bh__eyebrow">The sky right now</p>
+      <h1 id="ex-h" className="bh__title">
+        Explore
+      </h1>
+      <Link
+        to="/explore/wheel"
+        className="bh__pic ex-ringlink"
+        aria-label={`Open the sky wheel. Right now: ${skyWords(sky)}.${mine != null && active ? ` ${active.name}'s Moon sign, ${RASHI_LORE[mine]?.western}, is marked in gold.` : ""}`}
+      >
+        <BeltRing sky={sky} lit={sky.MO.sign} mine={mine}>
+          <span className="belt-ring__k">Moon in</span>
+          <span className="belt-ring__v">{RASHI_LORE[sky.MO.sign]?.western}</span>
+        </BeltRing>
+      </Link>
+      <p className="bh__line">Every planet, sign and star has a story. Pick one to read.</p>
+      <p className="bh__note">
+        The real stars of the zodiac, with the Sun, Moon and planets where they are today.
+        {mine != null && active ? ` Gold marks ${active.name}'s Moon sign, ${RASHI_LORE[mine]?.western}.` : ""} Tap the ring to turn it.
+      </p>
+    </section>
+  );
   return (
-    <Page label="Explore the sky" title="Explore" lede="Every planet, sign and star has a story. Pick one to read.">
-      <ul className="v-list" aria-label="The sky">
-        <li>
-          <Row to="/explore/graha" icon={num(9)} title="Planets" sub="The Sun, the Moon and the seven others" />
-        </li>
-        <li>
-          <Row to="/explore/rashi" icon={num(12)} title="Signs" sub="Aries to Pisces, the Indian way" />
-        </li>
-        <li>
-          <Row
-            to="/explore/nakshatra"
-            icon={num(27)}
-            title="Stars"
-            sub={`The birth stars. The Moon is in ${NAKSHATRA_NAMES[sky.MO.nakshatra]} now`}
-          />
-        </li>
-        <li>
-          <Row to="/explore/numbers" icon={<IconNumbers />} title="Numbers" sub="What a birth date and a name add up to" />
-        </li>
-        <li>
-          <Row to="/explore/chinese" icon={num(<span lang="zh">十二</span>)} title="Chinese zodiac" sub="The Great Race and your animal" />
-        </li>
-        <li>
-          <Row to="/story" icon={<IconStory />} title="The story of the stars" sub="How Indian astrology began" />
-        </li>
-        <li>
-          <Row to="/today" icon={<IconToday />} title="Today's almanac" sub="The Hindu calendar for today" />
-        </li>
-        <li>
-          <Row to="/explore/wheel" icon={<IconSky />} title="The sky wheel" sub="Turn the whole sky and tap any part of it" />
-        </li>
-      </ul>
+    <Page label="Explore the sky" hero={hero} wide sky="night">
+      <Reveal i={0}>
+        <ul className="v-list ex-list" aria-label="The sky">
+          <li>
+            <Row
+              to="/explore/graha"
+              icon={<MoonMark elong={elongOf(sky)} />}
+              title="Planets"
+              sub={`The Sun, the Moon and the seven others. The Moon is ${lit}% lit now`}
+            />
+          </li>
+          <li>
+            <Row
+              to="/explore/rashi"
+              icon={<SignMark i={sky.SU.sign} />}
+              title="Signs"
+              sub={`Aries to Pisces, the Indian way. The Sun is in ${RASHI_LORE[sky.SU.sign]?.western} now`}
+            />
+          </li>
+          <li>
+            <Row
+              to="/explore/nakshatra"
+              icon={<StarDot from={sky.MO.nakshatra * NAK_SPAN} span={NAK_SPAN} />}
+              title="Stars"
+              sub={`The birth stars. The Moon is in ${NAKSHATRA_NAMES[sky.MO.nakshatra]} now`}
+            />
+          </li>
+          <li>
+            <Row to="/explore/numbers" icon={<IconNumbers />} title="Numbers" sub="What a birth date and a name add up to" />
+          </li>
+          <li>
+            <Row
+              to="/explore/chinese"
+              icon={num(<span lang="zh">十二</span>)}
+              title="Chinese zodiac"
+              sub="The Great Race and your animal"
+            />
+          </li>
+          <li>
+            <Row to="/story" icon={<IconStory />} title="The story of the stars" sub="How Indian astrology began" />
+          </li>
+          <li>
+            <Row to="/today" icon={<IconToday />} title="Today's almanac" sub="The Hindu calendar for today" />
+          </li>
+          <li>
+            <Row to="/explore/wheel" icon={<IconSky />} title="The sky wheel" sub="Turn the whole sky and tap any part of it" />
+          </li>
+        </ul>
+      </Reveal>
 
       {patri && active ? (
-        <>
+        <Reveal i={1} className="v-stack">
           <Section title={`${active.name}'s own sky`} note="Three places to start" />
-          <ul className="v-list" aria-label={`${active.name}'s own sky`}>
+          <ul className="v-list ex-list" aria-label={`${active.name}'s own sky`}>
             <li>
               <Row
                 to={`/explore/rashi/${patri.grahas.MO.sign}`}
-                icon={<IconMoon />}
+                icon={<StarDot from={patri.grahas.MO.sign * 30} span={30} />}
                 title={`${RASHI_LORE[patri.grahas.MO.sign]?.western} · ${rashiBoth(patri.grahas.MO.sign, active.tradition)}`}
                 sub="Moon sign"
               />
@@ -868,7 +1089,7 @@ function Hub() {
             <li>
               <Row
                 to={`/explore/nakshatra/${patri.grahas.MO.nakshatra}`}
-                icon={<IconSky />}
+                icon={<StarDot from={patri.grahas.MO.nakshatra * NAK_SPAN} span={NAK_SPAN} />}
                 title={nakBoth(patri.grahas.MO.nakshatra, active.tradition)}
                 sub="Birth star"
               />
@@ -876,26 +1097,13 @@ function Hub() {
             <li>
               <Row
                 to={`/explore/rashi/${patri.lagna.sign}`}
-                icon={
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M12 19V5M6 11l6-6 6 6M4 21h16" />
-                  </svg>
-                }
+                icon={<StarDot from={patri.lagna.sign * 30} span={30} />}
                 title={`${RASHI_LORE[patri.lagna.sign]?.western} · ${rashiBoth(patri.lagna.sign, active.tradition)}`}
                 sub="Rising sign"
               />
             </li>
           </ul>
-        </>
+        </Reveal>
       ) : null}
     </Page>
   );

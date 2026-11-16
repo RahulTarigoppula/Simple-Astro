@@ -14,6 +14,8 @@ export interface LeafMoon {
   nakDev: string;
   signName: string;
   signDev: string;
+  /** Moon − Sun angle at birth, in degrees: the phase the Moon was in. */
+  elongation: number;
 }
 
 const memo = new Map<string, LeafMoon | null>();
@@ -34,6 +36,7 @@ export function leafMoon(p: Profile, ayanamsa: AyanamsaPreset): LeafMoon | null 
       nakDev: NAKSHATRA_DEV[a.nakshatra.index] ?? "",
       signName: SIGN_NAMES[sign],
       signDev: SIGN_DEV[sign],
+      elongation: a.elongation,
     };
   } catch {
     out = null;

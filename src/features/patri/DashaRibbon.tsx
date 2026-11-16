@@ -4,12 +4,14 @@
 import { useMemo, useState } from "react";
 import { InfoDot } from "../../components/ui/Explain";
 import { GrahaGlyph } from "../../components/ui/GrahaGlyph";
+import { CountUp } from "../../components/ui/Motion";
 import { Section } from "../../components/ui/Page";
 import { GRAHA_ENGLISH, GRAHA_NAMES } from "../../data/tables/names";
 import { CHAPTER_PLAIN, CHAPTER_SHORT } from "../../data/traits";
 import { currentDasha, intervalYears, pratyantars } from "../../engine/dasha";
 import { safeZone } from "../../engine/time";
 import type { DashaNode } from "../../engine/types";
+import { LifeArc } from "./LifeArc";
 
 const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -40,9 +42,59 @@ interface DashaRibbonProps {
   nowMs: number;
   zone: string;
   yearDays: 365.25 | 360;
+  /** The picture band above already names the running chapter: start at what is inside it. */
+  onBand?: boolean;
 }
 
-export function DashaRibbon({ tree, nowMs, zone, yearDays }: DashaRibbonProps) {
+/** The Life chapters picture band: the life arc with the running chapter named inside it. */
+export function ChapterHero({ tree, nowMs, zone, birthMs }: { tree: DashaNode[]; nowMs: number; zone: string; birthMs: number }) {
+  const cur = useMemo(() => currentDasha(tree, nowMs), [tree, nowMs]);
+  const last = tree[tree.length - 1];
+  const age = Math.floor((nowMs - birthMs) / (365.25 * 86_400_000));
+  const done = cur ? Math.round(share(cur.md, nowMs)) : 0;
+  return (
+    <>
+      <div className="pt-band__pic pt-band__pic--bleed pt-arc">
+        <LifeArc
+          tree={tree}
+          birthMs={birthMs}
+          nowMs={nowMs}
+          fromLabel={`Born ${yearOf(birthMs, zone)}`}
+          toLabel={last ? String(yearOf(last.endMs, zone)) : ""}
+          label={
+            cur
+              ? `Your life as an arc of nine chapters, from ${yearOf(birthMs, zone)} to ${last ? yearOf(last.endMs, zone) : ""}. You are in the ${GRAHA_ENGLISH[cur.md.lord]} chapter, ${done} percent through it, at age ${age}.`
+              : "Your life as an arc of nine chapters."
+          }
+        />
+        {cur ? (
+          <div className="pt-arc__center">
+            <p className="pt-band__eyebrow">Your chapter</p>
+            <h2 id="dasha-now-h" className="pt-arc__h">
+              <span className="vh">The</span> {GRAHA_ENGLISH[cur.md.lord]} <span className="vh">chapter</span>
+            </h2>
+            <p className="pt-arc__when">
+              {yearOf(cur.md.startMs, zone)} to {yearOf(cur.md.endMs, zone)} ·{" "}
+              <b>
+                <CountUp value={done} />%
+              </b>{" "}
+              through
+            </p>
+          </div>
+        ) : null}
+      </div>
+      <div className="pt-band__say">
+        {cur ? (
+          <p className="pt-band__line">{cap(CHAPTER_PLAIN[cur.md.lord])}</p>
+        ) : (
+          <p className="pt-band__line">Today falls outside the 120 years of chapters counted from this birth.</p>
+        )}
+      </div>
+    </>
+  );
+}
+
+export function DashaRibbon({ tree, nowMs, zone, yearDays, onBand }: DashaRibbonProps) {
   const nowIdx = tree.findIndex((d) => nowMs >= d.startMs && nowMs < d.endMs);
   const cur = useMemo(() => currentDasha(tree, nowMs), [tree, nowMs]);
   const next = nowIdx >= 0 ? tree[nowIdx + 1] : undefined;
@@ -57,7 +109,29 @@ export function DashaRibbon({ tree, nowMs, zone, yearDays }: DashaRibbonProps) {
 
   return (
     <>
-      {cur ? (
+      {onBand ? (
+        cur ? (
+          <section className="v-card dasha-now dasha-now--rows" aria-label="Inside this chapter, and the next one">
+            <dl className="dasha-now__dl">
+              <div>
+                <dt>Inside it now</dt>
+                <dd>
+                  A shorter <b>{GRAHA_ENGLISH[cur.ad.lord]}</b> stretch until {fmtMonth(cur.ad.endMs, zone)}, bringing{" "}
+                  {CHAPTER_SHORT[cur.ad.lord]} to the front.
+                </dd>
+              </div>
+              {next ? (
+                <div>
+                  <dt>Next chapter</dt>
+                  <dd>
+                    <b>{GRAHA_ENGLISH[next.lord]}</b> from {fmtMonth(next.startMs, zone)}: {CHAPTER_SHORT[next.lord]}.
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          </section>
+        ) : null
+      ) : cur ? (
         <section className="v-card v-card--hero dasha-now" aria-labelledby="dasha-now-h">
           <p className="v-eyebrow">Your chapter now</p>
           <h2 id="dasha-now-h" className="dasha-now__h">

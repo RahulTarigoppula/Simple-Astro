@@ -5,7 +5,9 @@ import { Link } from "react-router";
 import { useActiveProfile, useHere, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { useNowMs } from "../../app/useNow";
 import { InfoDot } from "../../components/ui/Explain";
+import { CountUp, Reveal } from "../../components/ui/Motion";
 import { ChevronRight, Page, Row, Section } from "../../components/ui/Page";
+import { SkyScene, skyPhase } from "../../components/ui/SkyScene";
 import { GRAHA_LORE } from "../../data/lore";
 import { nakBoth } from "../../data/regional";
 import { forecast, periodBounds } from "../../engine/forecast";
@@ -39,23 +41,6 @@ const english = (id: string) => GRAHA_LORE.find((g) => g.id === id)?.english ?? 
 
 function greeting(h: number): string {
   return h < 5 ? "A quiet night" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
-}
-
-/** The day ring: how supportive the day reads, 0 to 100, with the tone word inside. */
-function DayRing({ score, word }: { score: number; word: string }) {
-  const r = 44;
-  const c = 2 * Math.PI * r;
-  const p = Math.max(4, pct(score));
-  return (
-    <div className="home-ring" role="img" aria-label={`${word} day. Support ${pct(score)} out of 100.`}>
-      <svg viewBox="0 0 104 104" aria-hidden="true">
-        <circle cx="52" cy="52" r={r} className="home-ring__track" />
-        <circle cx="52" cy="52" r={r} className="home-ring__fill" strokeDasharray={`${(p / 100) * c} ${c}`} transform="rotate(-90 52 52)" />
-      </svg>
-      <span className="home-ring__num">{pct(score)}</span>
-      <span className="home-ring__of">of 100</span>
-    </div>
-  );
 }
 
 function Made() {
@@ -92,31 +77,53 @@ function Trust() {
   );
 }
 
-function Welcome() {
-  return (
-    <Page label="Vyomaphala home">
-      <section className="v-card v-card--hero home-welcome" aria-labelledby="home-h">
-        <p className="v-eyebrow">
-          Vyomaphala · <span lang="hi">व्योमफल</span>
-        </p>
-        <h1 id="home-h" className="v-title">
-          Your stars, in plain words
-        </h1>
-        <p className="v-lede">
-          Add a birth date, time and place. Vyomaphala works out the chart from real astronomy and tells you what the old tradition says,
-          simply.
-        </p>
-        <div className="v-actions">
-          <Link to="/leaf/new" className="v-btn">
-            Add your birth details
-          </Link>
-          <Link to="/guide" className="v-btn v-btn--quiet">
-            How it works
-          </Link>
-        </div>
-        <p className="v-small v-muted">About a minute. Stays on this device. No sign up.</p>
-      </section>
+// With nobody saved the sky is drawn for the middle of India: the picture is real, the place is a stand-in.
+const INDIA = { lat: 20.6, lon: 78.9 };
 
+function Welcome({ now }: { now: number }) {
+  const settings = useSettings();
+  const hourKey = Math.floor(now / 3_600_000);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the picture is re-read once an hour
+  const p = useMemo(() => {
+    try {
+      return computePanchang(now, INDIA, settings.preset);
+    } catch {
+      return null;
+    }
+  }, [hourKey, settings.preset]);
+  const hero = (
+    <section className="sky-hero sky-hero--welcome" aria-labelledby="home-h">
+      {p ? (
+        <div className="sky-hero__dial" aria-hidden="true">
+          <SkyScene nowMs={now} sunriseMs={p.sunriseMs} sunsetMs={p.sunsetMs} elongation={p.elongation} label="The sky now" />
+          <div className="sky-hero__center">
+            <p className="sky-hero__word sky-hero__word--name" lang="hi">
+              व्योमफल
+            </p>
+            <p className="sky-hero__score">Vyomaphala, the fruit of the sky</p>
+          </div>
+        </div>
+      ) : null}
+      <h1 id="home-h" className="sky-hero__title">
+        Your stars, in plain words
+      </h1>
+      <p className="sky-hero__line">
+        Add a birth date, time and place. Vyomaphala works out the chart from real astronomy and tells you what the old tradition says,
+        simply.
+      </p>
+      <div className="v-actions">
+        <Link to="/leaf/new" className="v-btn">
+          Add your birth details
+        </Link>
+        <Link to="/guide" className="v-btn v-btn--ghost">
+          How it works
+        </Link>
+      </div>
+      <p className="sky-hero__small">About a minute. Stays on this device. No sign up.</p>
+    </section>
+  );
+  return (
+    <Page label="Vyomaphala home" hero={hero} sky={p ? skyPhase(now, p.sunriseMs, p.sunsetMs) : "night"}>
       <Section title="What you get" />
       <ul className="v-list">
         <li>
@@ -153,19 +160,20 @@ function Welcome() {
   );
 }
 
-interface DayProps {
-  profile: Profile;
-  patri: Patri;
-  settings: Settings;
-  now: number;
+interface DayView {
+  hero: React.ReactNode;
+  sky: string;
+  body: React.ReactNode;
 }
 
-function Day({ profile, patri, settings, now }: DayProps) {
+/** The day for one person: the sky hero and the blocks under it. Null until the chart is ready. */
+function useDayView(profile: Profile | null, patri: Patri | null, settings: Settings, now: number): DayView | null {
   // Where the reader is now (the birthplace until they say otherwise): never the chart's own place.
   const { lat, lon, zone, name: placeName } = useHere(profile);
   const [dayStart] = periodBounds("day", now, zone);
 
   const day = useMemo(() => {
+    if (!patri) return null;
     try {
       const f = forecast(patri, "day", dayStart + 43_200_000, zone, settings.preset, { lat, lon });
       const r = personalReading(patri, f.startMs + 43_200_000, settings.preset);
@@ -195,190 +203,222 @@ function Day({ profile, patri, settings, now }: DayProps) {
     }
   }, [hourKey, lat, lon, settings.preset]);
 
-  if (!day) return <div className="v-skel">The day could not be read for this place.</div>;
+  if (!profile || !patri) return null;
+  const date = fmt(now, zone, { weekday: "long", day: "numeric", month: "long" });
+  const hello = `${greeting(hourIn(now, zone))}, ${profile.name}`;
+
+  if (!day || !p) {
+    return {
+      hero: (
+        <section className="sky-hero">
+          <p className="sky-hero__date">{date}</p>
+          <h1 className="sky-hero__hello">{hello}</h1>
+        </section>
+      ),
+      sky: "night",
+      body: <div className="v-skel">The day could not be read for this place.</div>,
+    };
+  }
   const { f, r, g } = day;
   const word = TONE_WORD[f.tone];
   const sorted = [...r.areas].sort((a, b) => b.score - a.score);
-  const span = p ? Math.max(1, p.sunsetMs - p.sunriseMs) : 1;
-  const at = (ms: number) => (p ? Math.min(100, Math.max(0, ((ms - p.sunriseMs) / span) * 100)) : 0);
-  const nowIn = p ? now >= p.sunriseMs && now <= p.sunsetMs : false;
   const inAvoid = now >= g.avoid[0] && now < g.avoid[1];
   const inBest = g.bestHours.find((h) => now >= h.startMs && now < h.endMs);
   const nextBest = g.bestHours.find((h) => h.startMs > now);
+  const nowLine = inAvoid
+    ? `Rāhu Kāla now. Hold new starts until ${t12(g.avoid[1], zone)}.`
+    : inBest
+      ? `A good hour now (${english(inBest.lord)} hour), until ${t12(inBest.endMs, zone)}.`
+      : nextBest
+        ? `Next good hour starts at ${t12(nextBest.startMs, zone)}.`
+        : "The good hours of daylight are over for today.";
 
-  return (
+  const hero = (
+    <section className="sky-hero" data-tone={f.tone} aria-labelledby="home-day-h">
+      <p className="sky-hero__date">{date}</p>
+      <h1 className="sky-hero__hello">{hello}</h1>
+      <div className="sky-hero__dial">
+        <SkyScene
+          nowMs={now}
+          sunriseMs={p.sunriseMs}
+          sunsetMs={p.sunsetMs}
+          elongation={moon?.elongation ?? p.elongation}
+          good={g.bestHours}
+          avoid={g.avoid}
+          riseLabel={t12(p.sunriseMs, zone)}
+          setLabel={t12(p.sunsetMs, zone)}
+          label={`${word} day. Support ${pct(f.score)} out of 100.`}
+        />
+        <div className="sky-hero__center">
+          <p className="sky-hero__eyebrow">Your day</p>
+          <h2 id="home-day-h" className="sky-hero__word">
+            {word}
+          </h2>
+          <p className="sky-hero__score">
+            <b>
+              <CountUp value={pct(f.score)} />
+            </b>{" "}
+            of 100 · {TONE_HINT[f.tone]}
+          </p>
+        </div>
+      </div>
+      <p className="sky-hero__line">{f.headline}</p>
+      <p className="sky-hero__now" data-state={inAvoid ? "avoid" : inBest ? "good" : "idle"}>
+        <i aria-hidden="true" />
+        {nowLine}
+      </p>
+      <div className="v-actions">
+        <Link to={`/forecast/${profile.id}`} className="v-btn">
+          See the full day
+        </Link>
+        <Link to={`/forecast/${profile.id}?p=week`} className="v-btn v-btn--ghost">
+          Week ahead
+        </Link>
+      </div>
+    </section>
+  );
+
+  const body = (
     <>
-      <section className="v-card v-card--hero home-day" data-tone={f.tone} aria-labelledby="home-day-h">
-        <div className="home-day__top">
-          <div className="home-day__text">
-            <p className="v-eyebrow">Your day</p>
-            <h2 id="home-day-h" className="home-day__word">
-              {word}
-            </h2>
-            <p className="home-day__hint">{TONE_HINT[f.tone]}</p>
-          </div>
-          <DayRing score={f.score} word={word} />
-        </div>
-        <p className="home-day__line">{f.headline}</p>
-        <div className="home-do">
-          <div>
-            <h3 className="home-do__h home-do__h--good">Good for</h3>
-            <ul>
-              {g.goodFor.map((t) => (
-                <li key={t}>{t}</li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="home-do__h home-do__h--easy">Go easy on</h3>
-            <ul>
-              {g.easyOn.map((t) => (
-                <li key={t}>{t}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        <div className="v-actions">
-          <Link to={`/forecast/${profile.id}`} className="v-btn">
-            See the full day
-          </Link>
-          <Link to={`/forecast/${profile.id}?p=week`} className="v-btn v-btn--ghost">
-            Week ahead
-          </Link>
-        </div>
-      </section>
-
       <div className="v-cols">
         <div className="v-stack">
-          {p ? (
+          <Reveal i={0}>
+            <div className="v-card home-do">
+              <div>
+                <h2 className="home-do__h home-do__h--good">Good for</h2>
+                <ul>
+                  {g.goodFor.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h2 className="home-do__h home-do__h--easy">Go easy on</h2>
+                <ul>
+                  {g.easyOn.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal i={1}>
             <section className="v-card home-hours" aria-labelledby="home-hours-h">
               <h2 id="home-hours-h" className="home-hours__h">
                 Good times today
               </h2>
-              <p className="home-hours__now">
-                {inAvoid
-                  ? `Right now: Rāhu Kāla. Hold new starts until ${t12(g.avoid[1], zone)}.`
-                  : inBest
-                    ? `Right now: a good hour (${english(inBest.lord)} hour), until ${t12(inBest.endMs, zone)}.`
-                    : nextBest
-                      ? `Next good hour starts at ${t12(nextBest.startMs, zone)}.`
-                      : "The good hours of daylight are over for today."}
-              </p>
-              <div className="home-bar" aria-hidden="true">
-                {g.bestHours.map((h) => (
-                  <span
-                    key={h.startMs}
-                    className="home-bar__good"
-                    style={{ left: `${at(h.startMs)}%`, width: `${at(h.endMs) - at(h.startMs)}%` }}
-                  />
-                ))}
-                <span className="home-bar__avoid" style={{ left: `${at(g.avoid[0])}%`, width: `${at(g.avoid[1]) - at(g.avoid[0])}%` }} />
-                {nowIn ? <span className="home-bar__now" style={{ left: `${at(now)}%` }} /> : null}
-              </div>
-              <div className="home-bar__ends" aria-hidden="true">
-                <span>Sunrise {t12(p.sunriseMs, zone)}</span>
-                <span>Sunset {t12(p.sunsetMs, zone)}</span>
-              </div>
-              <details className="home-times">
-                <summary>All of today's times</summary>
-                <dl className="home-hours__list">
-                  <div>
-                    <dt>
-                      <i className="home-dot home-dot--good" aria-hidden="true" />
-                      Best hours <InfoDot id="hora" />
-                    </dt>
-                    <dd>
-                      {g.bestHours.length ? (
-                        g.bestHours.map((h) => <span key={h.startMs}>{span12(h.startMs, h.endMs, zone)}</span>)
-                      ) : (
-                        <span className="v-muted">None stand out today.</span>
-                      )}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>
-                      <i className="home-dot home-dot--care" aria-hidden="true" />
-                      Pause new starts <InfoDot id="rahu-kala" label="Rāhu Kāla" />
-                    </dt>
-                    <dd>
-                      <span>{span12(g.avoid[0], g.avoid[1], zone)}</span>
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>Colour of the day</dt>
-                    <dd>
-                      <span>{g.colour}</span>
-                    </dd>
-                  </div>
-                </dl>
-              </details>
+              <dl className="home-hours__list">
+                <div>
+                  <dt>
+                    <i className="home-dot home-dot--good" aria-hidden="true" />
+                    Best hours <InfoDot id="hora" />
+                  </dt>
+                  <dd>
+                    {g.bestHours.length ? (
+                      g.bestHours.map((h) => <span key={h.startMs}>{span12(h.startMs, h.endMs, zone)}</span>)
+                    ) : (
+                      <span className="v-muted">None stand out today.</span>
+                    )}
+                  </dd>
+                </div>
+                <div>
+                  <dt>
+                    <i className="home-dot home-dot--care" aria-hidden="true" />
+                    Pause new starts <InfoDot id="rahu-kala" label="Rāhu Kāla" />
+                  </dt>
+                  <dd>
+                    <span>{span12(g.avoid[0], g.avoid[1], zone)}</span>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Daylight</dt>
+                  <dd>
+                    <span>
+                      Sunrise {t12(p.sunriseMs, zone)} · Sunset {t12(p.sunsetMs, zone)}
+                    </span>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Colour of the day</dt>
+                  <dd>
+                    <span>{g.colour}</span>
+                  </dd>
+                </div>
+              </dl>
               <HereLine profile={profile} />
             </section>
-          ) : null}
-
-          <Section
-            title="Your life these weeks"
-            note="From the slower planets, so it changes over weeks, not day to day."
-            action={
-              <Link to={`/forecast/${profile.id}`} className="v-link">
-                Why <ChevronRight size={16} />
-              </Link>
-            }
-          />
-          <ul className="home-areas">
-            {sorted.map((a: AreaReading) => {
-              const t = areaTone(a.score);
-              return (
-                <li key={a.id} data-tone={t}>
-                  <span className="home-areas__l">{a.label}</span>
-                  <span className="home-areas__w">{AREA_WORD[t]}</span>
-                  <span className="v-meter" role="img" aria-label={`${a.label}: ${AREA_WORD[t]}`}>
-                    <span style={{ width: `${Math.max(6, pct(a.score))}%` }} />
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
+          </Reveal>
         </div>
-        <div className="v-stack">
-          <Section title={`More for ${profile.name}`} />
-          <ul className="v-list">
-            {moon ? (
-              <li>
-                <Link to="/today" className="v-row" aria-label="Open today's almanac">
-                  <span className="home-moon" aria-hidden="true">
-                    <MoonDisc elongation={moon.elongation} size={42} />
-                  </span>
-                  <span className="v-row__body">
-                    <span className="v-row__t">Today's almanac</span>
-                    <span className="v-row__s">
-                      {moon.tithi.paksha === "shukla" ? "Growing Moon" : "Fading Moon"}, {Math.round(moon.moonIllumination * 100)}% lit ·
-                      Moon in {nakBoth(moon.nakshatra.index, profile.tradition)}
-                    </span>
-                  </span>
-                  <ChevronRight />
-                </Link>
-              </li>
-            ) : null}
-            <li>
-              <Row to={`/patri/${profile.id}`} icon={<IconChart />} title="Birth chart" sub="Your life in simple words" />
-            </li>
-            <li>
-              <Row to="/milan" icon={<IconMilan />} title="Partner match" sub="How two people fit" />
-            </li>
-            <li>
-              <Row to={`/hast/${profile.id}`} icon={<IconPalm />} title="Palm reading" sub="From a photo of your hand" />
-            </li>
-            <li>
-              <Row to={`/patri/${profile.id}/sky`} icon={<IconSky />} title="Sky at birth" sub="The real stars that night" />
-            </li>
-          </ul>
 
-          <SkyEvents nowMs={now} place={{ lat, lon, name: townOf(placeName) }} zone={zone} preset={settings.preset} limit={2} />
+        <div className="v-stack">
+          <Reveal i={2}>
+            <Section
+              title="Your life these weeks"
+              note="From the slower planets, so it changes over weeks, not day to day."
+              action={
+                <Link to={`/forecast/${profile.id}`} className="v-link">
+                  Why <ChevronRight size={16} />
+                </Link>
+              }
+            />
+            <ul className="home-areas">
+              {sorted.map((a: AreaReading) => {
+                const t = areaTone(a.score);
+                return (
+                  <li key={a.id} data-tone={t}>
+                    <span className="home-areas__l">{a.label}</span>
+                    <span className="home-areas__w">{AREA_WORD[t]}</span>
+                    <span className="v-meter" role="img" aria-label={`${a.label}: ${AREA_WORD[t]}`}>
+                      <span style={{ width: `${Math.max(6, pct(a.score))}%` }} />
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </Reveal>
         </div>
       </div>
+
+      <Reveal i={3}>
+        <Section title={`More for ${profile.name}`} />
+        <ul className="v-list home-more">
+          {moon ? (
+            <li>
+              <Link to="/today" className="v-row" aria-label="Open today's almanac">
+                <span className="home-moon" aria-hidden="true">
+                  <MoonDisc elongation={moon.elongation} size={42} />
+                </span>
+                <span className="v-row__body">
+                  <span className="v-row__t">Today's almanac</span>
+                  <span className="v-row__s">
+                    {moon.tithi.paksha === "shukla" ? "Growing Moon" : "Fading Moon"}, {Math.round(moon.moonIllumination * 100)}% lit · Moon
+                    in {nakBoth(moon.nakshatra.index, profile.tradition)}
+                  </span>
+                </span>
+                <ChevronRight />
+              </Link>
+            </li>
+          ) : null}
+          <li>
+            <Row to={`/patri/${profile.id}`} icon={<IconChart />} title="Birth chart" sub="Your life in simple words" />
+          </li>
+          <li>
+            <Row to="/milan" icon={<IconMilan />} title="Partner match" sub="How two people fit" />
+          </li>
+          <li>
+            <Row to={`/hast/${profile.id}`} icon={<IconPalm />} title="Palm reading" sub="From a photo of your hand" />
+          </li>
+          <li>
+            <Row to={`/patri/${profile.id}/sky`} icon={<IconSky />} title="Sky at birth" sub="The real stars that night" />
+          </li>
+        </ul>
+      </Reveal>
+
+      <SkyEvents nowMs={now} place={{ lat, lon, name: townOf(placeName) }} zone={zone} preset={settings.preset} limit={2} />
     </>
   );
+  return { hero, sky: skyPhase(now, p.sunriseMs, p.sunsetMs), body };
 }
 
 export default function HomeScreen() {
@@ -389,19 +429,23 @@ export default function HomeScreen() {
   const { patri, error } = usePatri(active, settings.preset);
   const { zone } = useHere(active);
 
-  if (profiles === undefined) return <Page label="Vyomaphala home">{null}</Page>;
-  if (!active) return <Welcome />;
+  const ready = !!active && !!patri && patri.profileId === active.id;
+  const view = useDayView(ready ? active : null, ready ? patri : null, settings, now);
 
-  const ready = patri && patri.profileId === active.id;
+  if (profiles === undefined) return <Page label="Vyomaphala home">{null}</Page>;
+  if (!active) return <Welcome now={now} />;
+
+  // The same frame while the chart is being read, so nothing jumps when it arrives.
+  const waiting = (
+    <section className="sky-hero">
+      <p className="sky-hero__date">{fmt(now, zone, { weekday: "long", day: "numeric", month: "long" })}</p>
+      <h1 className="sky-hero__hello">{`${greeting(hourIn(now, zone))}, ${active.name}`}</h1>
+    </section>
+  );
   return (
-    <Page
-      wide
-      label="Vyomaphala home"
-      eyebrow={fmt(now, zone, { weekday: "long", day: "numeric", month: "long" })}
-      title={`${greeting(hourIn(now, zone))}, ${active.name}`}
-    >
-      {ready ? (
-        <Day profile={active} patri={patri} settings={settings} now={now} />
+    <Page wide label="Vyomaphala home" hero={view?.hero ?? waiting} sky={view?.sky ?? "night"}>
+      {view ? (
+        view.body
       ) : error ? (
         <div className="v-card v-empty">
           <p>

@@ -612,3 +612,88 @@
     margin-inline: auto;
   }
 }
+
+/* ── The band (3.1): the invitation, or the traced print with its summary ── */
+.palm-hero h1.bh__eyebrow {
+  margin-top: 14px;
+}
+.palm-hero__art {
+  max-width: 250px;
+  margin-top: 6px;
+}
+.palm-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.palm-art path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.palm-art__hand {
+  stroke: rgba(255, 255, 255, 0.82);
+  stroke-width: 1.8;
+}
+.palm-art__line {
+  stroke: var(--sky-sun);
+  stroke-width: 2.6;
+}
+.palm-art__name {
+  fill: var(--sky-sun);
+  font: 600 12px var(--font-body);
+  letter-spacing: 0.04em;
+}
+.palm-hero > .v-seg {
+  margin-top: 16px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.palm-hero > .v-seg > button {
+  flex: 1 1 0;
+  min-height: 44px;
+}
+.palm-hero__print {
+  max-width: 400px;
+  margin-top: 14px;
+}
+.palm-hero__print .palm-print {
+  border-radius: var(--radius-lg);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+.palm-hero__print .palm-legend {
+  justify-content: center;
+  margin-top: 12px;
+  color: rgba(255, 255, 255, 0.86);
+}
+.palm-hero .palm-sum {
+  gap: 0;
+  margin-top: 8px;
+}
+.palm-hero .palm-sum__lines {
+  margin-top: 14px;
+}
+.palm-hero__btns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin-top: 18px;
+}
+.palm-hero__btns .v-btn {
+  padding: 0 10px;
+}
+.palm-hero .palm-trace {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.1);
+}
+.palm-start {
+  padding: 20px;
+}
+.palm-start .palm-steps {
+  margin: 0;
+}
+.palm-measure {
+  align-self: start;
+}

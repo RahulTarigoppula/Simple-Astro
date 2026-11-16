@@ -1,52 +1,199 @@
-/* Partner match: the two people, the answer set large, five quiet lines, then folds.
-   Ivory and ink: no outlines, no gradients; colour only where it carries a meaning. */
+/* Partner match: the picture band (two discs that overlap by the score, inside the 36 beads),
+   then five quiet lines and folds on the calm page. Gradients live on the band only. */
 
-/* On the result the answer is the headline, so the page title steps back. */
-.mm-result .v-head {
+/* ── The band ──────────────────────────────────────────────────────── */
+.mm-band {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  margin: 0 0 -6px;
+  text-align: center;
+  color: var(--ink);
 }
-.mm-result .v-title {
-  font: 600 0.9375rem / 1.3 var(--font-body);
-  letter-spacing: 0;
-  color: var(--ink-muted);
+.mm-band__text {
+  display: contents;
+}
+.mm-band__eyebrow,
+.mm-band__title,
+.mm-band__lede--top {
+  order: -1;
+}
+.mm-band__eyebrow {
+  margin: 10px 0 0;
+  font: 600 12px var(--font-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+.mm-band__title {
+  margin: 12px 0 0;
+  font: 500 clamp(2.25rem, 10vw, 3rem) / 1.05 var(--font-display);
+  letter-spacing: -0.03em;
+}
+.mm-band__lede {
+  margin: 8px 0 0;
+  max-width: 34ch;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.86);
+  text-wrap: pretty;
+}
+.mm-band__sub {
+  margin: 10px 0 0;
+  font: 500 1.625rem / 1.15 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.mm-band__small {
+  margin: 12px 0 0;
+  max-width: 34ch;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.78);
+}
+.mm-band__stage {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.mm-band__word {
+  margin: 10px 0 0;
+  font: 500 clamp(3.25rem, 17vw, 4.5rem) / 1 var(--font-display);
+  letter-spacing: -0.04em;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25);
+}
+.mm-band__score {
+  margin: 8px 0 0;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.84);
+}
+.mm-band__score b,
+.mm-band__trad b {
+  font: 600 1.0625rem var(--font-body);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.mm-band__trad {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  min-height: 34px;
+  padding: 0 8px 0 14px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.86);
+}
+.mm-band__trad b {
+  font-size: 0.9375rem;
+}
+.mm-band .info-dot {
+  color: rgba(255, 255, 255, 0.8);
+}
+.mm-hero__line {
+  margin: 14px 0 0;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  max-width: 30ch;
+  text-wrap: balance;
+}
+.mm-hero__line + .mm-hero__line {
+  margin-top: 4px;
+}
+.mm-go {
+  margin-top: 18px;
+  min-width: min(100%, 260px);
 }
 
-/* ── The two people ────────────────────────────────────────────────── */
+/* ── The picture ───────────────────────────────────────────────────── */
+.pair {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.pair__stop--a {
+  stop-color: var(--sky-sun);
+}
+.pair__stop--b {
+  stop-color: var(--sky-moon);
+}
+.pair__rim {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.8);
+  stroke-width: 1.25;
+}
+.pair__letter {
+  fill: var(--sky-cloth);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.pair__empty {
+  fill: rgba(255, 255, 255, 0.07);
+  stroke: rgba(255, 255, 255, 0.6);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 7;
+  stroke-linecap: round;
+}
+.pair__plus {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.8);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.pair__stars {
+  fill: var(--star);
+  opacity: 0.5;
+}
+.pair__thread {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.14);
+  stroke-width: 1;
+}
+.pair__bead {
+  fill: rgba(255, 255, 255, 0.3);
+}
+.pair__bead--on {
+  fill: var(--sky-sun);
+}
+.pair__bead-glow {
+  fill: var(--sky-sun);
+  opacity: 0.2;
+}
+
+/* ── The two names under the picture ───────────────────────────────── */
 .mm-pair {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr);
-  align-items: start;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
   width: 100%;
-  max-width: 400px;
-  margin: 8px auto 0;
+  max-width: 340px;
+  margin: 2px auto 0;
 }
-.mm-pair__swap {
-  margin-top: 10px;
+.mm-band--choose .mm-pair {
+  max-width: 300px;
+}
+.mm-band--choose .mm-slot {
+  padding: 4px 2px;
+}
+.mm-slot.is-empty .mm-slot__name {
+  font-size: 1rem;
 }
 .mm-pair__swap:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
-.mm-pair__hint {
-  text-align: center;
-  font-size: 0.9375rem;
-  max-width: 34ch;
-  margin: 0 auto;
-}
-.mm-go {
-  max-width: 400px;
-  margin: 8px auto 0;
-}
 .mm-slot {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
   min-width: 0;
-  min-height: 44px;
-  padding: 0 4px 4px;
+  min-height: 52px;
+  padding: 4px 6px;
   border: 0;
   border-radius: var(--radius-md);
   background: none;
@@ -57,23 +204,8 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.mm-slot .v-avatar,
-.mm-slot__plus {
-  margin-bottom: 8px;
-  transition: transform var(--dur-fast) var(--ease-out);
-}
-.mm-slot:hover .v-avatar,
-.mm-slot:hover .mm-slot__plus {
-  transform: scale(1.04);
-}
-.mm-slot__plus {
-  display: grid;
-  place-items: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: rgba(var(--tint), 0.07);
-  color: var(--ink-muted);
+.mm-slot:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 .mm-slot__name {
   display: flex;
@@ -89,75 +221,63 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.mm-slot.is-empty .mm-slot__name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .mm-slot__caret {
   flex: none;
-  color: var(--ink-muted);
+  color: rgba(255, 255, 255, 0.8);
 }
 .mm-slot__who {
   font-size: 0.8125rem;
   line-height: 1.4;
-  color: var(--ink-muted);
+  color: rgba(255, 255, 255, 0.78);
 }
 
-/* ── The answer ────────────────────────────────────────────────────── */
-.mm-hero {
+@media (min-width: 900px) {
+  .mm-band {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
+    column-gap: 56px;
+    align-items: center;
+    text-align: left;
+    padding: 12px 0 8px;
+  }
+  .mm-band__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .mm-band__stage {
+    grid-column: 2;
+    grid-row: 1;
+    max-width: 440px;
+    margin: 0;
+  }
+  .mm-band__lede,
+  .mm-hero__line {
+    max-width: 44ch;
+  }
+  .mm-hero__line {
+    text-wrap: pretty;
+  }
+}
+
+/* ── Under the band ────────────────────────────────────────────────── */
+.mm-block {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 0 6px;
-  text-align: center;
+  gap: 14px;
 }
-.mm-hero__word {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 540;
-  font-size: clamp(3.25rem, 17vw, 4.5rem);
-  line-height: 1;
-  letter-spacing: -0.035em;
-  color: var(--ink);
+.mm-block > .v-sec {
+  margin-top: 6px;
 }
-.mm-hero__hint {
-  color: var(--ink-muted);
-  font-size: 1rem;
-}
-.mm-hero__meter {
-  width: min(220px, 70%);
-  margin-top: 14px;
-}
-.mm-hero__score {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0 18px;
-  font-size: 0.9375rem;
-  color: var(--ink-muted);
-  font-variant-numeric: tabular-nums;
-}
-.mm-hero__score b {
-  font-weight: 650;
-  color: var(--ink);
-}
-.mm-hero__trad {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.mm-hero__line {
-  margin-top: 12px;
-  font-size: 1.125rem;
-  line-height: 1.5;
-  max-width: 30ch;
-  text-wrap: balance;
-}
-.mm-hero__line + .mm-hero__line {
-  margin-top: 2px;
-}
-.mm-empty__h {
-  margin: 0;
-  font: 540 1.5rem / 1.2 var(--font-display);
-  letter-spacing: -0.02em;
+.mm-what {
+  width: 100%;
+  max-width: 640px;
 }
 
 /* ── The five things: one quiet list ───────────────────────────────── */

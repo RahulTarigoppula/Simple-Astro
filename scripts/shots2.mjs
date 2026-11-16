@@ -19,12 +19,13 @@ const VP = {
 for (const tag of sizes.split("")) {
   const ctx = await browser.newContext({
     viewport: VP[tag],
-    reducedMotion: "reduce",
+    reducedMotion: process.env.MOTION ? "no-preference" : "reduce",
     colorScheme: "dark",
     timezoneId: "Asia/Kolkata",
     locale: "en-IN",
     deviceScaleFactor: 1,
   });
+  if (process.env.AT) await ctx.clock.install({ time: new Date(process.env.AT) });
   const page = await ctx.newPage();
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e)));
@@ -110,7 +111,7 @@ for (const tag of sizes.split("")) {
     // crop to the content height of the scrolling screen
     const h = await page.evaluate(() => {
       const s = document.querySelector("main.screen");
-      const inner = s?.firstElementChild;
+      const inner = s?.lastElementChild;
       return Math.ceil(Math.max(inner?.getBoundingClientRect().bottom ?? 0, 600));
     });
     const vp = page.viewportSize();

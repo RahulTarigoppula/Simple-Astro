@@ -4,17 +4,21 @@
 // its answer as a chip on the right. The Sanskrit names are the small lines, each with its ⓘ.
 import { useMemo } from "react";
 import { InfoDot } from "../../components/ui/Explain";
+import type { Tradition } from "../../data/regional";
 import { GRAHA_ENGLISH, GRAHA_NAMES, ORDINAL } from "../../data/tables/names";
 import { HOUSE_THEME } from "../../engine/ashtakavarga";
-import { chandraBala, currentDashaSummary, moonTransitAt, taraBala } from "../../engine/gochar";
+import { chandraBala, currentDashaSummary, gocharReport, moonTransitAt, taraBala } from "../../engine/gochar";
 import type { Patri } from "../../engine/types";
 import { fmtDate, fmtDayMonth } from "./format";
+import { NowRing } from "./NowRing";
 import "./gochar.css";
 
 export interface DailyStrengthCardProps {
   patri: Patri;
   nowMs: number;
   zone: string;
+  /** The picture band above already gives the day's sentence: show the three rows only. */
+  onBand?: boolean;
 }
 
 const TONE_TEXT = { kind: "Kind", unkind: "Asks care", mixed: "Mixed" } as const;
@@ -26,7 +30,54 @@ const STAR_LINE = {
   unkind: "The day's star asks for a gentler pace.",
 } as const;
 
-export function DailyStrengthCard({ patri, nowMs, zone }: DailyStrengthCardProps) {
+/** The Now view's picture band: the ring of the sky today, then the day's answer in one sentence. */
+export function DayHero({
+  patri,
+  nowMs,
+  zone,
+  tradition,
+}: {
+  patri: Patri;
+  nowMs: number;
+  zone: string;
+  tradition: Tradition | undefined;
+}) {
+  const report = useMemo(() => gocharReport(patri, nowMs), [patri, nowMs]);
+  const moonNow = report.entries.find((e) => e.id === "MO");
+  const house = moonNow?.houseFromMoon ?? 1;
+  const tara = moonNow ? taraBala(patri.grahas.MO.nakshatra, moonNow.transit.nakshatra) : null;
+  const helping = report.entries.filter((e) => e.effective);
+  const theme = HOUSE_THEME[house - 1] ?? "";
+  const names = report.entries.map((e) => `${GRAHA_ENGLISH[e.id]} in area ${e.houseFromMoon}`).join(", ");
+  return (
+    <>
+      <div className="pt-band__pic pt-band__pic--bleed">
+        <NowRing
+          report={report}
+          tradition={tradition}
+          date={fmtDayMonth(nowMs, zone)}
+          label={`The planets today, counted from your Moon sign: ${names}. ${helping.length} of the nine stand where tradition counts them as helpful.`}
+        />
+        <ul className="nowring-key" aria-hidden="true">
+          <li>
+            <i className="is-good" /> Helping you now ({helping.length} of 9)
+          </li>
+          <li>
+            <i className="is-season" /> Saturn's long-season signs
+          </li>
+        </ul>
+      </div>
+      <div className="pt-band__say">
+        <h2 className="pt-band__sentence">
+          Today the Moon is in your {ORDINAL(house)} area: {theme}.
+        </h2>
+        {tara ? <p className="pt-band__line">{STAR_LINE[tara.tone]}</p> : null}
+      </div>
+    </>
+  );
+}
+
+export function DailyStrengthCard({ patri, nowMs, zone, onBand }: DailyStrengthCardProps) {
   const moonNow = useMemo(() => moonTransitAt(nowMs, patri.preset), [nowMs, patri.preset]);
   const tara = taraBala(patri.grahas.MO.nakshatra, moonNow.nakshatra);
   const chandra = chandraBala(patri.grahas.MO.sign, moonNow.sign);
@@ -35,11 +86,18 @@ export function DailyStrengthCard({ patri, nowMs, zone }: DailyStrengthCardProps
   const theme = HOUSE_THEME[chandra.house - 1] ?? "";
 
   return (
-    <section className="v-card v-card--hero gochar-day" aria-label="Today for this chart">
-      <p className="v-eyebrow">Today · {fmtDayMonth(nowMs, zone)}</p>
-      <h2 className="gochar-day__h">
-        Today the Moon is in your {ORDINAL(chandra.house)} area: {theme}. {STAR_LINE[tara.tone]}
-      </h2>
+    <section
+      className={`v-card gochar-day${onBand ? " gochar-day--rows" : " v-card--hero"}`}
+      aria-label={onBand ? "Today's three signals" : "Today for this chart"}
+    >
+      {onBand ? null : (
+        <>
+          <p className="v-eyebrow">Today · {fmtDayMonth(nowMs, zone)}</p>
+          <h2 className="gochar-day__h">
+            Today the Moon is in your {ORDINAL(chandra.house)} area: {theme}. {STAR_LINE[tara.tone]}
+          </h2>
+        </>
+      )}
       <ul className="gochar-day__facts">
         <li title={`${chandra.citation.text}, ${chandra.citation.ref}`}>
           <span className="gochar-day__l">

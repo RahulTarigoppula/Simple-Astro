@@ -70,13 +70,44 @@
   box-shadow: inset 0 0 0 1px var(--card-edge-strong);
 }
 
-/* One short fade for a newly worked-out chart, none with reduced motion. */
-.chart[data-fade="on"] {
-  animation: pt-chart-in 240ms var(--ease-out) both;
+/* A newly worked-out chart draws itself once: the frame line by line, then labels and planets fade in.
+   Still (and whole) with reduced motion. */
+.chart[data-fade="on"] .stroke {
+  stroke-dasharray: 1;
+  animation: pt-chart-draw 1100ms var(--ease-out) both;
+}
+.chart[data-fade="on"] .stroke:nth-of-type(2) {
+  animation-delay: 160ms;
+}
+.chart[data-fade="on"] .stroke:nth-of-type(3) {
+  animation-delay: 280ms;
+}
+.chart[data-fade="on"] .stroke:nth-of-type(4) {
+  animation-delay: 400ms;
+}
+.chart[data-fade="on"] .stroke:nth-of-type(n + 5) {
+  animation-delay: 520ms;
+}
+.chart[data-fade="on"] .signnum,
+.chart[data-fade="on"] .signname,
+.chart[data-fade="on"] .lagna-tick {
+  animation: pt-chart-in 500ms var(--ease-out) 700ms both;
+}
+.chart[data-fade="on"] .graha,
+.chart[data-fade="on"] .tilak {
+  animation: pt-chart-in 700ms var(--ease-out) 1000ms both;
 }
 .chart .tilak {
   transform-box: fill-box;
   transform-origin: center;
+}
+@keyframes pt-chart-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 @keyframes pt-chart-in {
   from {
@@ -84,7 +115,11 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .chart[data-fade="on"] {
+  .chart[data-fade="on"] .stroke,
+  .chart[data-fade="on"] text,
+  .chart[data-fade="on"] .lagna-tick,
+  .chart[data-fade="on"] .tilak {
     animation: none;
+    stroke-dasharray: none;
   }
 }

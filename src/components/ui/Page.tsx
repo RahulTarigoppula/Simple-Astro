@@ -21,6 +21,10 @@ interface PageProps {
   /** 1080 px column for screens with two columns on a desk. */
   wide?: boolean;
   className?: string;
+  /** A full-bleed picture band at the top (always night-toned); the top bar sits on it and the page slides up over it. */
+  hero?: React.ReactNode;
+  /** Which sky paints the band: night, dawn, day, golden, dusk. */
+  sky?: string;
   children: React.ReactNode;
 }
 
@@ -68,39 +72,64 @@ export function Brand() {
   );
 }
 
-export function Page({ label, eyebrow, title, lede, back, backLabel = "Back", noPerson, action, wide, className, children }: PageProps) {
+export function Page({
+  label,
+  eyebrow,
+  title,
+  lede,
+  back,
+  backLabel = "Back",
+  noPerson,
+  action,
+  wide,
+  className,
+  hero,
+  sky = "night",
+  children,
+}: PageProps) {
   const navigate = useNavigate();
+  const top = (
+    <div className="v-top">
+      <div className="v-top__left">
+        {back === undefined || back === false ? (
+          <Brand />
+        ) : typeof back === "string" ? (
+          <Link to={back} className="v-back">
+            <ChevronLeft />
+            {backLabel}
+          </Link>
+        ) : (
+          <button
+            type="button"
+            className="v-back"
+            onClick={() => {
+              if (window.history.length > 1) navigate(-1);
+              else navigate("/");
+            }}
+          >
+            <ChevronLeft />
+            {backLabel}
+          </button>
+        )}
+      </div>
+      <div className="v-top__right">
+        {action}
+        {noPerson ? null : <PersonChip />}
+      </div>
+    </div>
+  );
   return (
     <Screen className={`v-screen${className ? ` ${className}` : ""}`} label={label}>
-      <div className={`v-page${wide ? " v-page--wide" : ""}`}>
-        <div className="v-top">
-          <div className="v-top__left">
-            {back === undefined || back === false ? (
-              <Brand />
-            ) : typeof back === "string" ? (
-              <Link to={back} className="v-back">
-                <ChevronLeft />
-                {backLabel}
-              </Link>
-            ) : (
-              <button
-                type="button"
-                className="v-back"
-                onClick={() => {
-                  if (window.history.length > 1) navigate(-1);
-                  else navigate("/");
-                }}
-              >
-                <ChevronLeft />
-                {backLabel}
-              </button>
-            )}
-          </div>
-          <div className="v-top__right">
-            {action}
-            {noPerson ? null : <PersonChip />}
+      {hero ? (
+        <div className="v-band v-night" data-sky={sky}>
+          <div className={`v-band__in${wide ? " v-band__in--wide" : ""}`}>
+            {top}
+            {hero}
           </div>
         </div>
+      ) : null}
+      <div className={`v-page${wide ? " v-page--wide" : ""}${hero ? " v-page--under" : ""}`}>
+        {hero ? null : top}
         {title || eyebrow || lede ? (
           <header className="v-head">
             {eyebrow ? <p className="v-eyebrow">{eyebrow}</p> : null}

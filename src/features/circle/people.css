@@ -1,18 +1,32 @@
-/* People: one calm row per person in a single list, and one menu sheet for everything else. */
+/* People: one card per person (name, birth, the Moon's sign and star with the Moon as it stood at
+   the birth), and one menu sheet for everything else. */
+.ppl-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 .ppl {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding-right: 12px;
+  padding: 0 10px 0 0;
+  overflow: hidden;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.ppl:hover {
+  transform: translateY(-1px);
 }
 .ppl__main {
   flex: 1;
   display: flex;
-  align-items: center;
-  gap: 14px;
+  align-items: flex-start;
+  gap: 16px;
   min-width: 0;
-  min-height: 92px;
-  padding: 18px 4px 18px 18px;
+  min-height: 104px;
+  padding: 20px 4px 20px 20px;
   border: 0;
   background: none;
   color: var(--ink);
@@ -21,12 +35,19 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.ppl:hover {
-  background: rgba(var(--tint), 0.03);
-}
 .ppl__main:focus-visible {
   outline-offset: -3px;
   border-radius: var(--radius-lg);
+}
+.ppl__main .v-avatar {
+  box-shadow:
+    0 0 0 3px var(--card),
+    0 0 0 4px rgba(var(--tint), 0.14);
+}
+.ppl.is-active .ppl__main .v-avatar {
+  box-shadow:
+    0 0 0 3px var(--card),
+    0 0 0 5px var(--accent-2);
 }
 .ppl__text {
   display: flex;
@@ -41,8 +62,8 @@
   gap: 4px 10px;
 }
 .ppl__n {
-  font: 600 1.125rem / 1.3 var(--font-body);
-  letter-spacing: -0.01em;
+  font: 540 1.375rem / 1.2 var(--font-display);
+  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
 .ppl__name .v-chip {
@@ -50,34 +71,96 @@
   padding: 1px 10px;
   color: var(--ink-muted);
 }
-.ppl__moon {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 14px;
-  font-size: 0.9375rem;
-  line-height: 1.4;
-  color: var(--ink);
-}
 .ppl__birth {
   font-size: 0.875rem;
   line-height: 1.4;
   color: var(--ink-muted);
 }
+.ppl__moon {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin-top: 9px;
+}
+.ppl__moon > span:not(.vh) {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 3px 12px 3px 6px;
+  border-radius: var(--radius-full);
+  background: rgba(var(--tint), 0.06);
+  font-size: 0.875rem;
+  font-weight: 550;
+  line-height: 1.3;
+}
+.ppl-mark {
+  flex: none;
+}
+.ppl-mark__dark {
+  fill: rgba(var(--tint), 0.14);
+  stroke: rgba(var(--tint), 0.3);
+  stroke-width: 1;
+}
+.ppl-mark__lit {
+  fill: var(--moon);
+}
+.ppl-mark__star {
+  fill: var(--accent-2);
+}
 .ppl__more {
   flex: none;
+  align-self: flex-start;
+  margin-top: 14px;
   background: none;
   color: var(--ink-muted);
 }
 .ppl__more:hover {
   color: var(--ink);
 }
-.ppl-add {
-  margin-top: 8px;
+.ppl-end {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 6px;
 }
 .ppl-foot {
   margin-top: 0;
   text-align: center;
   text-wrap: balance;
+}
+.ppl-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 28px 24px 26px;
+  text-align: center;
+}
+.ppl-empty > p {
+  max-width: 40ch;
+  text-wrap: pretty;
+}
+.ppl-art {
+  width: min(100%, 240px);
+  height: auto;
+}
+.ppl-art__line {
+  fill: none;
+  stroke: rgba(var(--tint), 0.2);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+  stroke-linecap: round;
+}
+.ppl-art__star {
+  fill: var(--accent-2);
+}
+.ppl-art__dark {
+  fill: var(--card-hi);
+  stroke: rgba(var(--tint), 0.16);
+}
+.ppl-art__lit {
+  fill: var(--moon);
 }
 .ppl-empty__h,
 .ppl-sheet__h {

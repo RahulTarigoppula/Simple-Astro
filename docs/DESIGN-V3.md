@@ -51,3 +51,21 @@ Do not use: `--aurora` except for avatars, `--glow-*`, `--nebula-*`, `--void-*`,
 - Voice: "tradition says", for reflection; never health, death, money or legal advice, remedies or gemstones.
 - Rahul's own story and the "252 hours" lines are quoted from him: move them, never reword or add to them.
 - Internal names stay (`chowki` DB, storage keys, route paths, engine and repo APIs). Engine output is untouched.
+
+## 3.1: the picture band (the part that should make people say "oh")
+3.0 was clean but plain. From 3.1 every tab opens on a **full-bleed picture band** that shows the answer as a
+picture, then the calm ivory-and-ink page slides up over it with rounded corners.
+- `Page` takes `hero` (the band's content; the top bar is placed on the band for you) and `sky`
+  (`night | dawn | day | golden | dusk`, which paints the band from `--sky-paint-*`). The band has class
+  `v-night`, so every token inside it has its night value and text is ivory in both themes. Reference:
+  `src/features/home/HomeScreen.tsx` (`.sky-hero` in `home.css`).
+- The picture must be **true**: drawn from the engine's numbers for this person and this moment (the Sun on its
+  real arc, the Moon in its real phase, the real stars of a birth star, the real scores of the days ahead). Never
+  decoration for its own sake, never stock imagery, never random.
+- One big serif word or sentence sits on the picture; one primary button at most.
+- Colours on a band: ivory text (`var(--ink)`), `rgba(255, 255, 255, a)` for secondary text and glass,
+  `--sky-sun`, `--sky-moon`, `--sky-good`, `--sky-avoid`, `--star`, `--accent-2`. Gradients are allowed on bands.
+- Motion (`src/components/ui/Motion.tsx`): `Reveal` staggers blocks into place, `CountUp` counts a number up;
+  pictures draw themselves in once (`motion/react`, `pathLength`). Everything stands still under
+  `prefers-reduced-motion` and must look complete when still.
+- Below the band the 3.0 rules hold unchanged.

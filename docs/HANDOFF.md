@@ -4,6 +4,10 @@ Written 2026-10-06 at the end of the first build session. The code, tests, CI wo
 Android shell are in this repository and committed on `main` locally. **Nothing has been pushed
 anywhere**, creating a public repo, a keystore and secrets needs your accounts and your decisions.
 
+## 000. Version 3.1.0 (2026-11-16): the picture bands
+
+You said 3.0 was still not good and asked to be impressed. 3.1.0 keeps the 3.0 page and adds a full-width, animated picture at the top of every tab, each drawn from the real numbers (see the last section of `docs/DESIGN-V3.md` and the 3.1.0 entry in `CHANGELOG.md`). `release/Vyomaphala-3.1.0.apk` (versionCode 310, same key). Not checked on a real phone: how smooth the animations are on a slow phone, the status bar over the picture, camera and haptics. Decisions you may want to reverse: Partner match keeps its own words (Excellent / Strong / Good / Needs work); the Almanac's Moon shrinks on the Slots, Hours and Month tabs; star pages no longer name the ringed brightest star, because it is not always the traditional one.
+
 ## 00. Version 3.0.0 (2026-11-16): the second redesign
 
 You asked for a complete redesign again, cleaner. 3.0.0 changes the look ("ivory and ink": warm paper, serif headings, no outlines, one warm accent) and roughly halves what is on each screen. The rules are in `docs/DESIGN-V3.md`; the way around the app from 2.0 is unchanged. `release/Vyomaphala-3.0.0.apk` is signed with the same key, so it installs over 2.0.0 and keeps saved people (Gradle: `'-PversionCode=300' '-PversionName=3.0.0'`). Still not checked on a real phone: the camera, haptics, the status bar colour, the sticky Save bar with the keyboard open. Decisions you may want to reverse: planet symbols and the sky wheel are now one ink colour (the nine planet colours are gone); the Explore hub no longer shows "In the sky right now"; sunrise and sunset on the Almanac are in the heading, not a tappable row.

@@ -24,6 +24,8 @@ interface Fact {
   to: string;
   glyph: React.ReactNode;
   warn?: string;
+  /** A few words for the tile on the picture band. */
+  short: string;
 }
 
 /** The horizon with a body coming up over it: the rising sign. */
@@ -38,8 +40,8 @@ function RisingMark() {
   );
 }
 
-export function KeyFacts({ profile, patri }: { profile: Profile; patri: Patri }) {
-  const facts = useMemo<Fact[]>(() => {
+function useKeyFacts(profile: Profile, patri: Patri): Fact[] {
+  return useMemo<Fact[]>(() => {
     const L = patri.lagna.sign;
     const mo = patri.grahas.MO;
     const nak = mo.nakshatra;
@@ -67,6 +69,7 @@ export function KeyFacts({ profile, patri }: { profile: Profile; patri: Patri })
         v: rashiName(mo.sign, profile.tradition),
         s: `${sk(mo.sign)}${r(mo.sign)?.western}, the sign of ${r(mo.sign)?.symbol}.`,
         to: `/explore/rashi/${mo.sign}`,
+        short: r(mo.sign)?.western ?? "",
         glyph: <GrahaGlyph id="MO" size={40} />,
       },
       {
@@ -78,6 +81,7 @@ export function KeyFacts({ profile, patri }: { profile: Profile; patri: Patri })
         s: `${skN(nak)}Its name means “${lore?.meaning}”. Quarter (pada) ${mo.pada} · ${lore?.symbol} · deity ${lore?.deity.split(",")[0]}`,
         ...(edge ? { warn: edge } : {}),
         to: `/explore/nakshatra/${nak}`,
+        short: `“${lore?.meaning}”`,
         glyph: <GrahaGlyph id={NAK_LORDS[nak % 9] ?? "KE"} size={40} />,
       },
       {
@@ -88,12 +92,51 @@ export function KeyFacts({ profile, patri }: { profile: Profile; patri: Patri })
         v: rashiName(L, profile.tradition),
         s: `${sk(L)}${r(L)?.western} rising: how you meet the world.`,
         to: `/explore/rashi/${L}`,
+        short: profile.timeUnknown ? "Uncertain" : (r(L)?.western ?? ""),
         glyph: <RisingMark />,
         ...(profile.timeUnknown ? { warn: "Birth time unknown, so this is uncertain." } : {}),
       },
     ];
   }, [patri, profile]);
+}
 
+/** The three key signs as glass tiles on the picture band; each opens its story. */
+export function KeyTiles({ profile, patri }: { profile: Profile; patri: Patri }) {
+  const facts = useKeyFacts(profile, patri);
+  return (
+    <ul className="kt" aria-label="Your three key signs">
+      {facts.map((f) => (
+        <li key={f.key} data-fact={f.key}>
+          <Link to={f.to} className="kt__tile" aria-label={`${f.k}: ${f.v}, ${f.short}. Read its story`}>
+            <span className="kt__k">{f.k}</span>
+            <span className="kt__v">{f.v}</span>
+            <span className="kt__s">{f.short}</span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** What is uncertain about the three key signs (a Moon near an edge, an unknown birth time). */
+export function KeyWarnings({ profile, patri }: { profile: Profile; patri: Patri }) {
+  const warns = useKeyFacts(profile, patri).filter((f) => f.warn);
+  if (warns.length === 0) return null;
+  return (
+    <div className="v-note v-note--warn kt-warn">
+      <span>
+        {warns.map((f) => (
+          <span key={f.key}>
+            <b>{f.k}.</b> {f.warn}{" "}
+          </span>
+        ))}
+      </span>
+    </div>
+  );
+}
+
+export function KeyFacts({ profile, patri }: { profile: Profile; patri: Patri }) {
+  const facts = useKeyFacts(profile, patri);
   return (
     <ul className="kf v-card" aria-label="Your three key signs">
       {facts.map((f) => (

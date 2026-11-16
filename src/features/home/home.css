@@ -327,3 +327,162 @@ a.home-made:hover {
     padding: 0 28px;
   }
 }
+
+/* ── The sky hero: the day read against the real sky ───────────────────── */
+.sky-hero {
+  display: flex;
+  flex-direction: column;
+  color: var(--ink);
+}
+.sky-hero__date {
+  margin: 14px 0 0;
+  font: 600 12px var(--font-body);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+.sky-hero__hello {
+  margin: 6px 0 0;
+  font: 500 1.625rem / 1.15 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.sky-hero__dial {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  margin: 6px auto 0;
+}
+.sky-hero__center {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 13%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+}
+.sky-hero__eyebrow {
+  margin: 0;
+  font: 600 12px var(--font-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+.sky-hero__word {
+  margin: 2px 0 0;
+  font: 500 clamp(3.25rem, 17vw, 4.5rem) / 1 var(--font-display);
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25);
+}
+.sky-hero__score {
+  margin: 6px 0 0;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+.sky-hero__score b {
+  font: 600 1.0625rem var(--font-body);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.sky-hero__line {
+  margin: 18px 0 0;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.sky-hero__now {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.9375rem;
+  font-weight: 550;
+  line-height: 1.35;
+}
+.sky-hero__now i {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+}
+.sky-hero__now[data-state="good"] i {
+  background: var(--sky-good);
+  box-shadow: 0 0 0 5px rgba(143, 240, 168, 0.22);
+}
+.sky-hero__now[data-state="avoid"] i {
+  background: var(--sky-avoid);
+  box-shadow: 0 0 0 5px rgba(255, 143, 155, 0.22);
+}
+.sky-hero .v-actions {
+  margin-top: 18px;
+  flex-wrap: nowrap;
+}
+.sky-hero .v-actions .v-btn {
+  flex: 1 1 0;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+.sky-hero__title {
+  margin: 8px 0 0;
+  font: 500 clamp(2.25rem, 10vw, 3rem) / 1.05 var(--font-display);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.sky-hero__small {
+  margin: 14px 0 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+.sky-hero--welcome .sky-hero__dial {
+  margin-bottom: 4px;
+}
+.home-do.v-card {
+  padding-top: 20px;
+  border-top: 0;
+}
+.home-more {
+  margin-top: 14px;
+}
+.home-areas {
+  margin-top: 14px;
+}
+@media (min-width: 640px) {
+  .sky-hero .v-actions .v-btn {
+    flex: 0 0 auto;
+    padding: 0 28px;
+  }
+}
+@media (min-width: 900px) {
+  .sky-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
+    column-gap: 48px;
+    align-items: center;
+  }
+  .sky-hero > * {
+    grid-column: 1;
+  }
+  .sky-hero__dial {
+    grid-column: 2;
+    grid-row: 1 / span 6;
+    margin: 0;
+  }
+  .sky-hero__hello {
+    font-size: 2.25rem;
+  }
+}
+.sky-hero__word--name {
+  font-size: clamp(2.5rem, 13vw, 3.5rem);
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+.sky-hero--welcome .sky-hero__title {
+  margin-top: 18px;
+}

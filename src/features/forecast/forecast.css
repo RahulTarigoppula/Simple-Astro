@@ -1,5 +1,5 @@
-/* Forecast, 3.0 "ivory and ink": the answer in one large word and one sentence, three calm blocks,
-   then the astrology in one folded card. Built on styles/ui.css; only what is particular lives here. */
+/* Forecast, 3.1: a picture band (the sky of the day, the curve of a week, the bars of a month) with the
+   answer in one large word and one sentence, then calm blocks and the astrology in one folded card. Built on styles/ui.css; only what is particular lives here. */
 
 .fc-sr {
   position: absolute;
@@ -55,12 +55,35 @@
   vertical-align: middle;
 }
 
-/* Period tabs: five equal tabs that fit a 320 px phone */
+/* ── The band: title, period tabs, stepping through time, then the picture and the answer ── */
+.fc-hero {
+  display: flex;
+  flex-direction: column;
+  color: var(--ink);
+}
+.fc-hero__title {
+  margin: 12px 0 0;
+  font: 500 1.625rem / 1.15 var(--font-display);
+  letter-spacing: -0.02em;
+}
+/* Period tabs: five equal glass tabs that fit a 320 px phone */
+.fc-hero .fc-tabs {
+  margin-top: 14px;
+  background: rgba(255, 255, 255, 0.13);
+}
 .fc-tabs > button {
   flex: 1 0 auto;
   min-width: 44px;
   min-height: 44px;
   padding: 0 6px;
+}
+.fc-hero .fc-tabs > button {
+  color: rgba(255, 255, 255, 0.86);
+}
+.fc-hero .fc-tabs > [aria-selected="true"] {
+  background: var(--btn-fill);
+  color: var(--accent-ink);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
 }
 
 /* Stepping through time */
@@ -69,7 +92,10 @@
   grid-template-columns: 44px minmax(0, 1fr) 44px;
   align-items: center;
   gap: 8px;
-  margin-top: 4px;
+  margin-top: 12px;
+}
+.fc-nav .v-chev {
+  color: var(--ink);
 }
 .fc-nav__when {
   display: flex;
@@ -82,52 +108,308 @@
   font: 600 1rem / 1.3 var(--font-body);
   letter-spacing: -0.005em;
 }
-.fc-nav .v-link {
-  min-height: 28px;
-  margin: 0 0 -6px;
-  font-size: 0.875rem;
+.fc-nav__back {
+  min-width: 44px;
+  min-height: 44px;
+  margin: -8px 0 -14px;
+  padding: 0 10px;
+  border: 0;
+  background: none;
+  color: var(--sky-sun);
+  font: 600 0.875rem var(--font-body);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 
-/* The answer */
-.fc-hero {
-  display: flex;
-  flex-direction: column;
+/* The answer in words */
+.fc-answer {
+  margin-top: 14px;
+}
+.fc-hero__eyebrow {
+  margin: 0;
+  font: 600 12px var(--font-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
 }
 .fc-hero__word {
-  margin: 6px 0 0;
-  font: 540 clamp(3rem, 15vw, 4rem) / 1.02 var(--font-display);
-  letter-spacing: -0.035em;
+  margin: 2px 0 0;
+  font: 500 clamp(3.25rem, 17vw, 4.5rem) / 1 var(--font-display);
+  letter-spacing: -0.04em;
   color: var(--ink);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25);
 }
-.fc-score {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 16px;
-}
-.fc-score .v-meter {
-  height: 6px;
-  max-width: 420px;
-}
-.fc-score__n {
+.fc-hero__score {
+  margin: 8px 0 0;
   font-size: 0.9375rem;
-  line-height: 1.4;
-  color: var(--ink-muted);
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.84);
+}
+.fc-hero__score b {
+  font: 600 1.0625rem var(--font-body);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
 }
 .fc-hero__line {
-  margin-top: 18px;
+  margin: 16px 0 0;
   font-size: 1.125rem;
   line-height: 1.5;
   max-width: 60ch;
   text-wrap: pretty;
 }
+.fc-hero__now {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.13);
+  font-size: 0.9375rem;
+  font-weight: 550;
+  line-height: 1.35;
+}
+.fc-hero__now i {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+}
+.fc-hero__now[data-state="good"] i {
+  background: var(--sky-good);
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.16);
+}
+.fc-hero__now[data-state="avoid"] i {
+  background: var(--sky-avoid);
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.16);
+}
+
+/* Day: the sky of that day, the answer inside the Sun's arc */
+.fc-dial {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  margin: 2px auto 0;
+}
+.fc-dial__center {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 13%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+}
+.fc-legend {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 20px;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.86);
+}
+.fc-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.fc-legend i {
+  width: 18px;
+  height: 6px;
+  border-radius: 3px;
+}
+.fc-legend__good {
+  background: var(--sky-good);
+}
+.fc-legend__avoid {
+  background: var(--sky-avoid);
+}
+
+/* Week, month, quarter, year: the scores as a picture, edge to edge on a phone */
+.fc-pic {
+  position: relative;
+  margin: 6px calc(-1 * var(--page-pad)) 0;
+}
+.fc-pic--bars {
+  margin-inline: 0;
+}
+.fc-pic__svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+.fc-pic__rule {
+  stroke: rgba(255, 255, 255, 0.2);
+  stroke-width: 1;
+  stroke-dasharray: 2 6;
+  stroke-linecap: round;
+}
+.fc-pic__band {
+  fill: rgba(255, 255, 255, 0.62);
+  font: 500 11.5px var(--font-body);
+}
+.fc-pic__line {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.28));
+}
+.fc-pic__dot {
+  stroke: rgba(0, 0, 0, 0.22);
+  stroke-width: 1;
+}
+.fc-pic__now {
+  fill: var(--sky-sun);
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+.fc-pic__drop {
+  stroke: var(--sky-sun);
+  stroke-width: 1.5;
+  stroke-dasharray: 1 5;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+.fc-pic__ring {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+.fc-pic__best {
+  fill: var(--ink);
+  font: 650 12.5px var(--font-body);
+  letter-spacing: 0.02em;
+}
+.fc-pic__today {
+  fill: rgba(255, 255, 255, 0.12);
+}
+.fc-pic__bar {
+  fill: var(--ink);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: fc-grow 760ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+.fc-pic__bar[data-t="bright"] {
+  fill: var(--sky-good);
+}
+.fc-pic__bar[data-t="mixed"] {
+  fill-opacity: 0.55;
+}
+.fc-pic__bar[data-t="testing"] {
+  fill: var(--sky-avoid);
+}
+.fc-pic__star {
+  fill: var(--ink);
+}
+.fc-pic__pt {
+  animation: fc-appear 520ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes fc-grow {
+  from {
+    transform: scaleY(0.04);
+    opacity: 0;
+  }
+}
+@keyframes fc-appear {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fc-pic__bar,
+  .fc-pic__pt {
+    animation: none;
+  }
+}
+
+/* The labels under a picture; for a week or quarter each column is one tall button */
+.fc-axis {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+}
+.fc-axis > li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  min-height: 28px;
+}
+.fc-axis__k {
+  font: 500 0.75rem / 1.2 var(--font-body);
+  color: rgba(255, 255, 255, 0.74);
+}
+.fc-axis__n {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 7px;
+  border-radius: var(--radius-full);
+  font: 600 0.875rem / 1 var(--font-body);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.fc-axis__n[data-now] {
+  background: var(--sky-sun);
+  color: var(--accent-ink);
+}
+.fc-pic--tap {
+  padding-bottom: 58px;
+}
+.fc-axis--tap {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+.fc-axis--tap button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  width: 100%;
+  height: 100%;
+  min-height: 44px;
+  padding: 0 0 4px;
+  border: 0;
+  border-radius: 14px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.fc-axis--tap > li {
+  align-items: stretch;
+}
+.fc-axis--tap button:hover,
+.fc-axis--tap button:active {
+  background: rgba(255, 255, 255, 0.07);
+}
+.fc-axis--tap button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -3px;
+}
+
+/* Day: what it suits, then the hours by name */
 .fc-do {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px 20px;
-  margin-top: 22px;
-  padding-top: 20px;
-  border-top: 1px solid var(--card-edge);
 }
 .fc-do__h {
   display: flex;
@@ -164,105 +446,16 @@
     grid-template-columns: 1fr;
   }
 }
-
-/* Day: good times, as one sentence and one bar */
-.fc-hours__now {
-  font-size: 1.125rem;
-  font-weight: 550;
-  line-height: 1.4;
-  letter-spacing: -0.01em;
-  text-wrap: balance;
-}
-.fc-day {
-  margin-top: 20px;
-}
-.fc-daybar {
-  position: relative;
-  height: 10px;
-  border-radius: 5px;
-  background: rgba(var(--tint), 0.08);
-}
-.fc-daybar > span {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  border-radius: 5px;
-}
-.fc-daybar__good {
-  background: var(--good);
-}
-.fc-daybar__avoid {
-  background: var(--care);
-}
-.fc-daybar .fc-daybar__now {
-  top: -5px;
-  bottom: -5px;
-  width: 3px;
-  margin-left: -1.5px;
-  border-radius: 2px;
-  background: var(--ink);
-  box-shadow: 0 0 0 2px var(--card);
-}
-.fc-day__ends,
-.fc-day__key {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px 18px;
-  margin-top: 10px;
-  font-size: 0.875rem;
-  color: var(--ink-muted);
-}
-.fc-day__key {
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  margin-top: 14px;
-  color: var(--ink);
-}
-.fc-day__key > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.fc-in {
-  margin-top: 14px;
-  border-top: 1px solid var(--card-edge);
-}
-.fc-in > summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 52px;
-  list-style: none;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 1rem;
-}
-.fc-in > summary::-webkit-details-marker {
-  display: none;
-}
-.fc-in:not([open]) {
-  margin-bottom: -14px;
-}
-.fc-in:not([open]):has(+ .here-line) {
-  margin-bottom: 0;
-}
-.fc-in + .here-line {
-  margin-top: 0;
-}
-.fc-in[open] + .here-line {
-  margin-top: 16px;
-}
 .fc-times {
   margin: 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-bottom: 4px;
 }
 .fc-times dt {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 0.875rem;
   color: var(--ink-muted);
 }
@@ -332,8 +525,7 @@
 /* the chevron of a row that opens in place */
 summary.fc-line::after,
 .fc-line[aria-expanded]::after,
-.fc-fold > summary::after,
-.fc-in > summary::after {
+.fc-fold > summary::after {
   content: "";
   flex: none;
   grid-column: 3;
@@ -348,8 +540,7 @@ summary.fc-line::after,
 }
 details[open] > summary.fc-line::after,
 .fc-line[aria-expanded="true"]::after,
-.fc-fold[open] > summary::after,
-.fc-in[open] > summary::after {
+.fc-fold[open] > summary::after {
   transform: rotate(-135deg) translate(-2px, -2px);
 }
 .fc-line .v-chev {
@@ -533,8 +724,7 @@ details[open] > summary.fc-line::after,
 .fc-fold > summary::-webkit-details-marker {
   display: none;
 }
-.fc-fold > summary::after,
-.fc-in > summary::after {
+.fc-fold > summary::after {
   margin-right: 3px;
 }
 .fc-fold__s {
@@ -691,10 +881,32 @@ details[open] > summary.fc-line::after,
   }
 }
 
-/* A desk: the two middle blocks sit side by side under the answer */
+/* A desk: the words on the left of the band, the picture on the right; two columns below */
 @media (min-width: 900px) {
   .fc-hero {
-    padding: 32px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
+    column-gap: 56px;
+    align-items: center;
+  }
+  .fc-hero > * {
+    grid-column: 1;
+  }
+  .fc-hero__title {
+    font-size: 2.25rem;
+  }
+  .fc-hero > .fc-tabs,
+  .fc-hero > .fc-nav {
+    max-width: 460px;
+  }
+  .fc-hero > .fc-dial,
+  .fc-hero > .fc-pic {
+    grid-column: 2;
+    grid-row: 1 / span 7;
+    margin: 0;
+  }
+  .fc-hero > .fc-legend {
+    justify-content: flex-start;
   }
   .fc-cols > .fc-block:only-child {
     grid-column: 1 / -1;

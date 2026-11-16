@@ -380,3 +380,68 @@
   background: var(--ink);
   clip-path: inset(0 0 0 50%);
 }
+
+/* ── The three key signs as glass tiles on the picture band ────────────── */
+.kt {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.kt > li {
+  min-width: 0;
+  display: flex;
+}
+.kt__tile {
+  flex: 1;
+  min-width: 0;
+  min-height: 76px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 10px 12px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.11);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--ink);
+  text-decoration: none;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.kt__tile:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+.kt__k {
+  font: 600 11px / 1.2 var(--font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.74);
+}
+.kt__v {
+  font: 500 clamp(0.8125rem, 4.1vw, 1.1875rem) / 1.15 var(--font-display);
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+.kt__s {
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.78);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 359px) {
+  .kt {
+    gap: 6px;
+  }
+  .kt__tile {
+    padding: 10px 6px 10px 8px;
+  }
+  .kt__v {
+    font-size: 0.75rem;
+  }
+  .kt__k {
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+}

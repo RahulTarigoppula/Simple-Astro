@@ -8,8 +8,10 @@ import { useActiveProfile, useHere, useSettings } from "../../app/hooks";
 import { useNowMs } from "../../app/useNow";
 import { DISCLAIMER } from "../../components/ui/Colophon";
 import { InfoDot } from "../../components/ui/Explain";
+import { Reveal } from "../../components/ui/Motion";
 import { ChevronLeft, ChevronRight, Page, Section } from "../../components/ui/Page";
 import { Sheet } from "../../components/ui/Sheet";
+import { skyPhase } from "../../components/ui/SkyScene";
 import { glossary } from "../../data/glossary";
 import { NAKSHATRA_DEV, NAKSHATRA_NAMES, ORDINAL, RITU_NAMES, VARA_DEV, VARA_NAMES } from "../../data/tables/names";
 import { AYANAMSA_LABEL } from "../../engine/ayanamsa";
@@ -25,7 +27,7 @@ import { SkyEvents } from "../cosmic/SkyEvents";
 import { HereLine } from "../here/HereSheet";
 import { ayanaDev, ayanaLatin, karanaDev, rituDev, tithiDev, yogaDev } from "./dev";
 import { MonthGrid, type Ymd } from "./MonthGrid";
-import { MoonFace } from "./moon";
+import { MoonPicture, StarField } from "./moon";
 import { ChoghadiyaPanel, HoraPanel, QualityMark } from "./Periods";
 import { endsLabel, rangeLabel, type ZoneClock, zoneClock } from "./zone";
 import "./today.css";
@@ -665,8 +667,76 @@ export default function TodayScreen() {
   const avoid = rows ? rows.times.filter((r) => r.tone === "avoid") : [];
   const more = rows ? [...rows.times.filter((r) => r.id === "moon"), ...rows.season] : [];
 
+  // The sky behind the Moon is the sky of the moment on show: now for today, sunrise for any other day.
+  const sky = p ? skyPhase(offset === 0 ? tickMs : (leaf?.atMs ?? tickMs), p.sunriseMs, p.sunsetMs) : "night";
+  const starK = sky === "night" ? 1 : sky === "dusk" || sky === "dawn" ? 0.45 : 0;
+  const ready = !!place && !!p && !!periods && !!rows;
+
+  const hero =
+    ready && p ? (
+      <section
+        className="alm-band"
+        data-compact={tab === "day" ? undefined : ""}
+        aria-label={`${rel ? `${rel}, ` : ""}${clock.dateLong(p.sunriseMs)}`}
+      >
+        <StarField strength={starK} />
+        <div className="alm-band__text">
+          <p className="alm-band__eyebrow">
+            Almanac{rel ? ` · ${rel}` : ""} <InfoDot id="panchang" />
+          </p>
+          <div className="alm-band__nav">
+            <button type="button" className="v-iconbtn" aria-label="Previous day" onClick={() => step(-1)}>
+              <ChevronLeft />
+            </button>
+            <p className="alm-band__date" aria-live="polite">
+              {clock.dateLong(p.sunriseMs)}
+            </p>
+            <button type="button" className="v-iconbtn" aria-label="Next day" onClick={() => step(1)}>
+              <ChevronRight size={20} />
+            </button>
+          </div>
+          <h1 className="alm-band__title">{tithiWords(p.tithi)}</h1>
+          <p className="alm-band__small">
+            {p.tithi.name} · Moon {lit}% lit <InfoDot id="tithi" />
+          </p>
+          <p className="alm-band__chips">
+            <span>
+              <span>Sunrise</span> <b>{clock.hm12(p.sunriseMs)}</b>
+            </span>
+            <span>
+              <span>Sunset</span> <b>{clock.hm12(p.sunsetMs)}</b>
+            </span>
+            <span>
+              <span>Moon's star</span> <b>{NAKSHATRA_NAMES[p.nakshatra.index] ?? p.nakshatra.name}</b>
+            </span>
+          </p>
+          {offset !== 0 ? (
+            <button type="button" className="v-btn v-btn--ghost v-btn--sm alm-band__back" onClick={() => step(-offset)}>
+              Back to today
+            </button>
+          ) : null}
+        </div>
+        <div className="alm-band__moon">
+          <MoonPicture
+            elongation={p.elongation}
+            south={south}
+            dark={sky === "night" || sky === "dusk"}
+            label={`The Moon: ${lit}% lit, ${waxing ? "growing" : "fading"}`}
+          />
+        </div>
+        <Tabs tab={tab} onTab={setTab} />
+      </section>
+    ) : (
+      <section className="alm-band">
+        <div className="alm-band__text">
+          <p className="alm-band__eyebrow">Almanac</p>
+          <h1 className="alm-band__title">Today's almanac</h1>
+        </div>
+      </section>
+    );
+
   return (
-    <Page label="Today's almanac" back="/" wide className="alm">
+    <Page label="Today's almanac" back="/" wide className="alm" hero={hero} sky={sky}>
       {!place ? (
         <div className="v-skel">Reading the sky…</div>
       ) : !p || !periods || !rows ? (
@@ -675,54 +745,6 @@ export default function TodayScreen() {
         </div>
       ) : (
         <>
-          <section className="alm-hero" aria-label={`${rel ? `${rel}, ` : ""}${clock.dateLong(p.sunriseMs)}`}>
-            <div className="alm-hero__bar">
-              <div className="alm-hero__when">
-                <p className="v-eyebrow">
-                  Almanac{rel ? ` · ${rel}` : ""} <InfoDot id="panchang" />
-                </p>
-                <p className="alm-hero__date" aria-live="polite">
-                  {clock.dateLong(p.sunriseMs)}
-                </p>
-              </div>
-              <div className="alm-hero__nav">
-                <button type="button" className="v-iconbtn" aria-label="Previous day" onClick={() => step(-1)}>
-                  <ChevronLeft />
-                </button>
-                <button type="button" className="v-iconbtn" aria-label="Next day" onClick={() => step(1)}>
-                  <ChevronRight size={20} />
-                </button>
-              </div>
-            </div>
-            <div className="alm-hero__main">
-              <div className="alm-hero__text">
-                <h1 className="v-title">{tithiWords(p.tithi)}</h1>
-                <p className="alm-hero__small">
-                  {p.tithi.name} · Moon {lit}% lit <InfoDot id="tithi" />
-                </p>
-              </div>
-              <span className="alm-hero__moon" role="img" aria-label={`The Moon: ${lit}% lit, ${waxing ? "growing" : "fading"}`}>
-                <MoonFace k={p.moonIllumination} waxing={waxing} south={south} />
-              </span>
-            </div>
-            <p className="alm-hero__sun">
-              <span>
-                <span>Sunrise</span> <b>{clock.hm12(p.sunriseMs)}</b>
-              </span>
-              <span>
-                <span>Sunset</span> <b>{clock.hm12(p.sunsetMs)}</b>
-              </span>
-              <span>
-                <span>Moon's star</span> <b>{NAKSHATRA_NAMES[p.nakshatra.index] ?? p.nakshatra.name}</b>
-              </span>
-            </p>
-            {offset !== 0 ? (
-              <button type="button" className="v-btn v-btn--ghost v-btn--sm alm-hero__back" onClick={() => step(-offset)}>
-                Back to today
-              </button>
-            ) : null}
-          </section>
-
           <div className="alm-where">
             <HereLine profile={active} />
             {!active || offset !== 0 ? (
@@ -737,7 +759,6 @@ export default function TodayScreen() {
             ) : null}
           </div>
 
-          <Tabs tab={tab} onTab={setTab} />
           <div className="alm-panel" role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
             {tab === "day" ? (
               <>
@@ -748,27 +769,29 @@ export default function TodayScreen() {
                   </div>
                 ) : null}
                 <div className="v-cols">
-                  <div className="v-stack">
+                  <Reveal i={0} className="v-stack">
                     <Section title="The five parts of the day" note="Tap a row for the exact times" />
                     <LimbRows rows={rows.limbs} onOpen={openFoot} label="The five parts of the day" />
-                  </div>
-                  <div className="v-stack">
+                  </Reveal>
+                  <Reveal i={1} className="v-stack">
                     <Section title="Times of day" note="What tradition favours and what it sets aside" />
                     <Windows tone="good" rows={good} clock={clock} onOpen={openFoot} />
                     <Windows tone="avoid" rows={avoid} clock={clock} onOpen={openFoot} />
-                  </div>
+                  </Reveal>
                 </div>
-                <details className="v-fold">
-                  <summary>
-                    <span>
-                      More about this day
-                      <span className="v-fold__s">Moonrise, the Hindu month and the season</span>
-                    </span>
-                  </summary>
-                  <div className="v-fold__body">
-                    <LimbRows rows={more} onOpen={openFoot} label="More about this day" plain />
-                  </div>
-                </details>
+                <Reveal i={2}>
+                  <details className="v-fold">
+                    <summary>
+                      <span>
+                        More about this day
+                        <span className="v-fold__s">Moonrise, the Hindu month and the season</span>
+                      </span>
+                    </summary>
+                    <div className="v-fold__body">
+                      <LimbRows rows={more} onOpen={openFoot} label="More about this day" plain />
+                    </div>
+                  </details>
+                </Reveal>
                 <SkyEvents
                   nowMs={tickMs}
                   place={{ lat: place.lat, lon: place.lon, name: city }}

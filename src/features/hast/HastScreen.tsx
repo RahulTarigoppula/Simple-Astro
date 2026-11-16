@@ -7,6 +7,7 @@ import { Link, useParams, useSearchParams } from "react-router";
 import { useProfile, useSettings } from "../../app/hooks";
 import { DISCLAIMER } from "../../components/ui/Colophon";
 import { InfoDot } from "../../components/ui/Explain";
+import { Reveal } from "../../components/ui/Motion";
 import { Page, Section } from "../../components/ui/Page";
 import { useHold } from "../../components/ui/useHold";
 import { useInkDraw } from "../../components/ui/useInkDraw";
@@ -20,6 +21,8 @@ import { haptics } from "../../platform/haptics";
 import { play } from "../../platform/sound";
 import { countEvent } from "../../platform/stats";
 import { toast } from "../../state/ui";
+import { PalmArt } from "./PalmArt";
+import "../explore/skyart.css";
 import "./hast.css";
 
 const S = 512; // canonical print frame
@@ -238,86 +241,203 @@ export default function HastScreen() {
   const shapeHits = (reading?.hits ?? []).filter((h) => !LINE_ORDER.some((l) => h.ruleId.startsWith(`${l}-`)));
   const foundLines = LINE_ORDER.map((lid) => lines.find((l) => l.id === lid)).filter((l): l is PalmLine => !!l);
 
+  const printEl = capture ? (
+    <div className="bh__pic palm-hero__print">
+      <div
+        className={`palm-print v-night${tracing ? " is-tracing" : ""}`}
+        onPointerDown={(e) => {
+          if (!url || !tracing) return;
+          e.currentTarget.setPointerCapture(e.pointerId);
+          setLive([toCanon(e)]);
+        }}
+        onPointerMove={(e) => {
+          if (!tracing || !live.length) return;
+          const p = toCanon(e);
+          setLive((pts) => [...pts, p]);
+        }}
+        onPointerCancel={() => setLive([])}
+        onPointerUp={() => {
+          if (!tracing || !live.length) return;
+          const raw = live;
+          setLive([]);
+          void commitTrace(raw);
+        }}
+      >
+        {url ? <img src={url} alt={`The ${hand} palm, flattened, with its lines traced`} draggable={false} /> : null}
+        <LineOverlay lines={lines} landmarks={landmarks} inkKey={inkKey} live={live.length > 1 ? pathD(live) : ""} />
+      </div>
+      {lines.length ? (
+        <ul className="palm-legend" aria-label="Lines on the photo">
+          {foundLines.map((l) => (
+            <li key={l.id}>
+              <span className="palm-line__letter" aria-hidden="true">
+                {LETTER[l.id]}
+              </span>
+              {NAME[l.id]}
+              {l.source === "traced" ? " (traced)" : l.confidence < LOW_CONFIDENCE ? " (unsure, dashed)" : ""}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  ) : null;
+
+  const hero = loading ? (
+    <section className="bh">
+      <h1 className="bh__eyebrow">Palm reading</h1>
+    </section>
+  ) : !capture ? (
+    <section className="bh bh--split palm-hero" aria-labelledby="palm-start-h">
+      <h1 className="bh__eyebrow">Palm reading</h1>
+      <h2 id="palm-start-h" className="bh__title bh__title--md">
+        One photo of {name ? `${name}'s` : "your"} {hand} palm
+      </h2>
+      <div className="bh__pic palm-hero__art">
+        <PalmArt hand={hand} />
+      </div>
+      <p className="bh__line">
+        Vyomaphala finds the heart, head and life lines in the photo and tells you what tradition says about each.{" "}
+        <InfoDot id="hast-rekha" label="palm reading" />
+      </p>
+      <HandChoice hand={hand} onChange={setHand} />
+      <div className="v-actions">
+        <Link className="v-btn v-btn--block" to={captureTo} replace onClick={() => countEvent("palm-camera")}>
+          Open the camera
+        </Link>
+      </div>
+      <p className="bh__note">The photo stays on this device. It is never uploaded, and you can delete it any time.</p>
+    </section>
+  ) : (
+    <section className="bh bh--split palm-hero" aria-labelledby="palm-sum-h">
+      <h1 className="bh__eyebrow">Palm reading</h1>
+      <HandChoice hand={hand} onChange={setHand} />
+      {printEl}
+      <div className="palm-sum" aria-live="polite">
+        {reading ? (
+          <>
+            <p className="bh__eyebrow">In short</p>
+            <h2 id="palm-sum-h" className="bh__title">
+              {ELEMENT[reading.element]} hand
+            </h2>
+            {shapeHits[0] ? <p className="bh__line">{shapeHits[0].text}</p> : null}
+            <ul className="palm-sum__lines" aria-label="How clearly each line was seen">
+              {foundLines.map((l) => (
+                <li key={l.id} className={`v-chip ${clarity(l).chip}`}>
+                  {NAME[l.id]}: {clarity(l).word.toLowerCase()}
+                </li>
+              ))}
+              {missing.map((lid) => (
+                <li key={lid} className="v-chip">
+                  {NAME[lid]}: not found
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <h2 id="palm-sum-h" className="bh__line">
+            This photo has the hand marked but no reading yet. Retake it to read the lines.
+          </h2>
+        )}
+      </div>
+      <div className="palm-hero__btns">
+        <Link className="v-btn v-btn--ghost v-btn--sm" to={captureTo} replace>
+          Retake the photo
+        </Link>
+        {reading ? (
+          <button type="button" className="v-btn v-btn--ghost v-btn--sm" aria-pressed={tracing} onClick={() => setTracing((t) => !t)}>
+            {tracing ? "Done tracing" : "Trace a line myself"}
+          </button>
+        ) : null}
+      </div>
+      {tracing && reading ? (
+        <div className="palm-trace">
+          <p>
+            Draw along a line on the photo with your finger.{" "}
+            {weak[0] || missing[0]
+              ? `The ${NAME[(weak[0]?.id ?? missing[0]) as PalmLineId].toLowerCase()} line is traced first.`
+              : "The app works out which line you drew."}
+          </p>
+          {lines.length ? (
+            <fieldset className="palm-nudge">
+              <legend className="v-small">With a keyboard: choose a line, then move it with the arrow keys.</legend>
+              <div className="v-seg">
+                {foundLines.map((l) => (
+                  <button key={l.id} type="button" aria-pressed={selected === l.id} onClick={() => setSelected(l.id)}>
+                    {NAME[l.id]}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                className="v-btn v-btn--ghost v-btn--sm"
+                aria-label={`Nudge the ${NAME[selected]} line with the arrow keys; Shift moves 10 pixels`}
+                onKeyDown={(e) => {
+                  const step = e.shiftKey ? 10 : 1;
+                  const m: Record<string, [number, number]> = {
+                    ArrowLeft: [-step, 0],
+                    ArrowRight: [step, 0],
+                    ArrowUp: [0, -step],
+                    ArrowDown: [0, step],
+                  };
+                  const d = m[e.key];
+                  if (d) {
+                    e.preventDefault();
+                    void nudge(d[0], d[1]);
+                  }
+                }}
+              >
+                Focus here, then press the arrows
+              </button>
+            </fieldset>
+          ) : null}
+        </div>
+      ) : null}
+    </section>
+  );
+
   return (
-    <Page label={`Palm reading: ${name}`} title="Palm reading" back wide={!!capture}>
+    <Page label={`Palm reading: ${name}`} back wide hero={hero} sky="night">
       {loading ? null : (
         <>
-          <HandChoice hand={hand} onChange={setHand} />
-
           {!capture ? (
             <>
-              <section className="v-card palm-start" aria-labelledby="palm-start-h">
-                <h2 id="palm-start-h" className="palm-start__h">
-                  One photo of {name ? `${name}'s` : "your"} {hand} palm
-                </h2>
-                <p className="v-card__sub">
-                  Vyomaphala finds the heart, head and life lines in the photo and tells you what tradition says about each.{" "}
-                  <InfoDot id="hast-rekha" label="palm reading" />
-                </p>
-                <ol className="palm-steps">
-                  <li>
-                    <span className="palm-steps__n" aria-hidden="true">
-                      1
-                    </span>
-                    <span>
-                      <b>Lay your palm flat in good light</b>
-                      <span>Open hand, fingers together, near a window. No flash.</span>
-                    </span>
-                  </li>
-                  <li>
-                    <span className="palm-steps__n" aria-hidden="true">
-                      2
-                    </span>
-                    <span>
-                      <b>Take the photo</b>
-                      <span>Fill the outline with the palm. The button lights up when the picture is sharp.</span>
-                    </span>
-                  </li>
-                  <li>
-                    <span className="palm-steps__n" aria-hidden="true">
-                      3
-                    </span>
-                    <span>
-                      <b>Read the lines</b>
-                      <span>Each line gets a plain sentence, and how clearly it was seen.</span>
-                    </span>
-                  </li>
-                </ol>
-                <Link className="v-btn v-btn--block" to={captureTo} replace onClick={() => countEvent("palm-camera")}>
-                  Open the camera
-                </Link>
-                <p className="v-small v-muted">The photo stays on this device. It is never uploaded, and you can delete it any time.</p>
-              </section>
+              <Reveal i={0}>
+                <section className="v-card palm-start" aria-label="How it goes">
+                  <ol className="palm-steps">
+                    <li>
+                      <span className="palm-steps__n" aria-hidden="true">
+                        1
+                      </span>
+                      <span>
+                        <b>Lay your palm flat in good light</b>
+                        <span>Open hand, fingers together, near a window. No flash.</span>
+                      </span>
+                    </li>
+                    <li>
+                      <span className="palm-steps__n" aria-hidden="true">
+                        2
+                      </span>
+                      <span>
+                        <b>Take the photo</b>
+                        <span>Fill the outline with the palm. The button lights up when the picture is sharp.</span>
+                      </span>
+                    </li>
+                    <li>
+                      <span className="palm-steps__n" aria-hidden="true">
+                        3
+                      </span>
+                      <span>
+                        <b>Read the lines</b>
+                        <span>Each line gets a plain sentence, and how clearly it was seen.</span>
+                      </span>
+                    </li>
+                  </ol>
+                </section>
+              </Reveal>
               <p className="v-small v-muted palm-framing">{framingNote(hand, profile?.handedness ?? "right", settings.handFraming)}</p>
             </>
           ) : (
             <>
-              {reading ? (
-                <section className="v-card v-card--hero palm-sum" aria-labelledby="palm-sum-h" aria-live="polite">
-                  <p className="v-eyebrow">In short</p>
-                  <h2 id="palm-sum-h" className="palm-sum__h">
-                    {ELEMENT[reading.element]} hand
-                  </h2>
-                  {shapeHits[0] ? <p className="palm-sum__p">{shapeHits[0].text}</p> : null}
-                  <ul className="palm-sum__lines" aria-label="How clearly each line was seen">
-                    {foundLines.map((l) => (
-                      <li key={l.id} className={`v-chip ${clarity(l).chip}`}>
-                        {NAME[l.id]}: {clarity(l).word.toLowerCase()}
-                      </li>
-                    ))}
-                    {missing.map((lid) => (
-                      <li key={lid} className="v-chip">
-                        {NAME[lid]}: not found
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ) : (
-                <div className="v-card">
-                  <p>This photo has the hand marked but no reading yet. Retake it to read the lines.</p>
-                </div>
-              )}
-
               {weak.length || missing.length ? (
                 <div className="v-note v-note--warn">
                   <span>
@@ -394,157 +514,57 @@ export default function HastScreen() {
                   </div>
                 ) : null}
 
-                <div className="v-stack">
-                  <Section title="Your palm, traced" />
-                  <div className="v-card palm-printcard">
-                    <div
-                      className={`palm-print v-night${tracing ? " is-tracing" : ""}`}
-                      onPointerDown={(e) => {
-                        if (!url || !tracing) return;
-                        e.currentTarget.setPointerCapture(e.pointerId);
-                        setLive([toCanon(e)]);
-                      }}
-                      onPointerMove={(e) => {
-                        if (!tracing || !live.length) return;
-                        const p = toCanon(e);
-                        setLive((pts) => [...pts, p]);
-                      }}
-                      onPointerCancel={() => setLive([])}
-                      onPointerUp={() => {
-                        if (!tracing || !live.length) return;
-                        const raw = live;
-                        setLive([]);
-                        void commitTrace(raw);
-                      }}
-                    >
-                      {url ? <img src={url} alt={`The ${hand} palm, flattened, with its lines traced`} draggable={false} /> : null}
-                      <LineOverlay lines={lines} landmarks={landmarks} inkKey={inkKey} live={live.length > 1 ? pathD(live) : ""} />
-                    </div>
-                    {lines.length ? (
-                      <ul className="palm-legend" aria-label="Lines on the photo">
-                        {foundLines.map((l) => (
-                          <li key={l.id}>
-                            <span className="palm-line__letter" aria-hidden="true">
-                              {LETTER[l.id]}
-                            </span>
-                            {NAME[l.id]}
-                            {l.source === "traced" ? " (traced)" : l.confidence < LOW_CONFIDENCE ? " (unsure, dashed)" : ""}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                    <div className="palm-printcard__btns">
-                      <Link className="v-btn v-btn--ghost v-btn--sm" to={captureTo} replace>
-                        Retake the photo
-                      </Link>
-                      {reading ? (
-                        <button
-                          type="button"
-                          className="v-btn v-btn--ghost v-btn--sm"
-                          aria-pressed={tracing}
-                          onClick={() => setTracing((t) => !t)}
-                        >
-                          {tracing ? "Done tracing" : "Trace a line myself"}
-                        </button>
-                      ) : null}
-                    </div>
-                    {tracing && reading ? (
-                      <div className="palm-trace">
-                        <p>
-                          Draw along a line on the photo with your finger.{" "}
-                          {weak[0] || missing[0]
-                            ? `The ${NAME[(weak[0]?.id ?? missing[0]) as PalmLineId].toLowerCase()} line is traced first.`
-                            : "The app works out which line you drew."}
-                        </p>
-                        {lines.length ? (
-                          <fieldset className="palm-nudge">
-                            <legend className="v-small">With a keyboard: choose a line, then move it with the arrow keys.</legend>
-                            <div className="v-seg">
-                              {foundLines.map((l) => (
-                                <button key={l.id} type="button" aria-pressed={selected === l.id} onClick={() => setSelected(l.id)}>
-                                  {NAME[l.id]}
-                                </button>
-                              ))}
-                            </div>
-                            <button
-                              type="button"
-                              className="v-btn v-btn--ghost v-btn--sm"
-                              aria-label={`Nudge the ${NAME[selected]} line with the arrow keys; Shift moves 10 pixels`}
-                              onKeyDown={(e) => {
-                                const step = e.shiftKey ? 10 : 1;
-                                const m: Record<string, [number, number]> = {
-                                  ArrowLeft: [-step, 0],
-                                  ArrowRight: [step, 0],
-                                  ArrowUp: [0, -step],
-                                  ArrowDown: [0, step],
-                                };
-                                const d = m[e.key];
-                                if (d) {
-                                  e.preventDefault();
-                                  void nudge(d[0], d[1]);
-                                }
-                              }}
-                            >
-                              Focus here, then press the arrows
-                            </button>
-                          </fieldset>
-                        ) : null}
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-
-              {reading ? (
-                <details className="v-fold">
-                  <summary>
-                    <span>
-                      Measurements
-                      <span className="v-fold__s">What was measured for each sentence, and its source</span>
-                    </span>
-                  </summary>
-                  <div className="v-fold__body">
-                    <p className="v-small v-muted">{framingNote(hand, profile?.handedness ?? "right", settings.handFraming)}</p>
-                    <dl className="palm-facts">
-                      <div>
-                        <dt>Hand shape</dt>
-                        <dd>
-                          {ELEMENT[reading.element]} · width/length {reading.ratios.widthOverLength.toFixed(2)} · finger/palm{" "}
-                          {reading.ratios.fingerOverPalm.toFixed(2)}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt>Fingers</dt>
-                        <dd>
-                          index/ring {reading.ratios.indexOverRing.toFixed(2)} · thumb angle {reading.ratios.thumbAngleDeg.toFixed(0)}°
-                        </dd>
-                      </div>
-                      {foundLines.map((l) => (
-                        <div key={l.id}>
-                          <dt>
-                            {LETTER[l.id]}. {NAME[l.id]} line
-                          </dt>
+                {reading ? (
+                  <details className="v-fold palm-measure">
+                    <summary>
+                      <span>
+                        Measurements
+                        <span className="v-fold__s">What was measured for each sentence, and its source</span>
+                      </span>
+                    </summary>
+                    <div className="v-fold__body">
+                      <p className="v-small v-muted">{framingNote(hand, profile?.handedness ?? "right", settings.handFraming)}</p>
+                      <dl className="palm-facts">
+                        <div>
+                          <dt>Hand shape</dt>
                           <dd>
-                            length {l.metrics.length.toFixed(2)} · curve {l.metrics.curvature.toFixed(2)} · confidence{" "}
-                            {l.confidence.toFixed(2)}
-                            {l.source === "traced" ? " · traced" : ""}
+                            {ELEMENT[reading.element]} · width/length {reading.ratios.widthOverLength.toFixed(2)} · finger/palm{" "}
+                            {reading.ratios.fingerOverPalm.toFixed(2)}
                           </dd>
                         </div>
-                      ))}
-                    </dl>
-                    <ol className="palm-sources">
-                      {reading.hits.map((h: Hit) => (
-                        <li key={h.ruleId}>
-                          <span>{h.text}</span>
-                          <span className="v-small v-muted">
-                            Measured: {h.measured}. Source: {h.citation.text}, {h.citation.ref}
-                          </span>
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-                </details>
-              ) : null}
+                        <div>
+                          <dt>Fingers</dt>
+                          <dd>
+                            index/ring {reading.ratios.indexOverRing.toFixed(2)} · thumb angle {reading.ratios.thumbAngleDeg.toFixed(0)}°
+                          </dd>
+                        </div>
+                        {foundLines.map((l) => (
+                          <div key={l.id}>
+                            <dt>
+                              {LETTER[l.id]}. {NAME[l.id]} line
+                            </dt>
+                            <dd>
+                              length {l.metrics.length.toFixed(2)} · curve {l.metrics.curvature.toFixed(2)} · confidence{" "}
+                              {l.confidence.toFixed(2)}
+                              {l.source === "traced" ? " · traced" : ""}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
+                      <ol className="palm-sources">
+                        {reading.hits.map((h: Hit) => (
+                          <li key={h.ruleId}>
+                            <span>{h.text}</span>
+                            <span className="v-small v-muted">
+                              Measured: {h.measured}. Source: {h.citation.text}, {h.citation.ref}
+                            </span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  </details>
+                ) : null}
+              </div>
             </>
           )}
 

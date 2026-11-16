@@ -14,6 +14,7 @@ export default defineConfig({
           env: { TZ: process.env.TZ ?? "America/Denver" },
           setupFiles: ["src/test/matchers.ts"],
           testTimeout: 30000,
+          hookTimeout: 30000,
         },
       },
       {
@@ -33,6 +34,7 @@ export default defineConfig({
           include: ["src/**/*.test.tsx"],
           setupFiles: ["src/test/setup.ts"],
           globals: true,
+          testTimeout: 15000,
         },
       },
     ],

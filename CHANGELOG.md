@@ -1,5 +1,25 @@
 # Changelog
 
+## 3.1.0 (2026-11-16)
+
+3.0 was clean but plain. 3.1 keeps the calm ivory-and-ink page and opens every tab on a picture: a full-width band at the top that shows the answer as a true picture of the sky, drawn from the same numbers as the text, with the page sliding up over it. Nothing in the engine changed.
+
+### Every picture is real
+- **Today: the living sky.** The colour follows the real hour at your place (night, dawn, day, golden hour, dusk). The Sun rides its arc from sunrise to sunset with the good hours lit in green and Rāhu Kāla in red; after dark the Moon rides the arc in its true phase among stars. The day's word sits inside the arc and the score counts up.
+- **Chart, About you:** your own piece of sky, the real catalogue stars behind the Moon when you were born, with the Moon in its phase that night and your birth star's span lit.
+- **Chart, Life chapters:** your life as one arc, each chapter a segment in proportion to its real dates, with a "You are here" mark.
+- **Chart, Planets:** the birth chart draws itself line by line. **Now:** the twelve signs as a ring with today's planets in their real places.
+- **Forecast:** a day is the sky dial for that day; a week, quarter and year are a flowing curve of the real scores; a month is thirty bars. Today and the best day are marked, and you can tap a day.
+- **Partner match:** two glowing discs that overlap by the real score, inside a ring of 36 beads with the earned points lit.
+- **Almanac:** a large Moon in its true phase, with the lunar day in words.
+- **Explore:** the zodiac as a ring of real stars with the Sun, Moon and planets where they are today; sign, star and planet pages open on that part of the real sky.
+- **Palm:** a hand whose heart, head and life lines draw themselves; after a photo, your traced print is the picture.
+- **Add a person:** steps slide; the last step shows the Moon among the stars of the birth star before you save.
+- **About, the story, and the not-found page** open on real star maps.
+
+### Motion
+- Pictures draw in once, numbers count up, and the blocks under a band rise into place one after another. Everything stands still, and complete, when the phone asks for reduced motion.
+
 ## 3.0.0 (2026-11-16)
 
 A second redesign, of the look and of how much is on each screen. 2.0 fixed the way around the app but still read as a dark dashboard: navy and violet gradients, an outline around everything, small type, boxes inside boxes and very long screens. 3.0 is "ivory and ink": warm paper, ink text, serif headings, one warm accent, cards with no outlines, and about half as much on every screen. The engine, the numbers and everything saved on the device are unchanged. The design is written down in docs/DESIGN-V3.md.

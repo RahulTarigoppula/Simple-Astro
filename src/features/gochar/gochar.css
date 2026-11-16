@@ -456,3 +456,119 @@
 .gochar__reading .gochar__src {
   margin-top: 3px;
 }
+
+/* ── The sky now as a ring, on the picture band ────────────────────────── */
+.nowring {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.nowring__rim {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.42);
+  stroke-width: 1.2;
+}
+.nowring__spoke {
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 1;
+}
+.nowring__season {
+  fill: var(--sky-sun);
+  fill-opacity: 0.2;
+}
+.nowring__num {
+  fill: var(--ink);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.nowring__sign.is-moon .nowring__num {
+  fill: var(--sky-sun);
+}
+.nowring__sign {
+  fill: rgba(255, 255, 255, 0.74);
+  font: 500 10.5px var(--font-body);
+}
+.nowring__sign.is-moon {
+  fill: var(--sky-sun);
+  font-weight: 700;
+}
+.nowring__bead {
+  fill: var(--ink);
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 4;
+  paint-order: stroke;
+}
+.nowring__bead.is-good {
+  fill: var(--sky-good);
+  stroke: rgba(143, 240, 168, 0.3);
+}
+.nowring__bead.is-moon {
+  fill: var(--sky-moon);
+  stroke: none;
+}
+.nowring__halo {
+  fill: rgba(255, 255, 255, 0.2);
+}
+.nowring__lead {
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 1;
+}
+.nowring__planet {
+  fill: rgba(255, 255, 255, 0.86);
+  font: 550 10.5px var(--font-body);
+}
+.nowring__planet.is-good {
+  fill: var(--sky-good);
+}
+.nowring__planet.is-moon {
+  fill: var(--ink);
+  font-weight: 700;
+}
+.nowring__k {
+  fill: rgba(255, 255, 255, 0.72);
+  font: 600 9.5px var(--font-body);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.nowring__date {
+  fill: var(--ink);
+  font: 500 17px var(--font-display);
+}
+.nowring-key {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 18px;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+.nowring-key li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.nowring-key i {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.nowring-key i.is-good {
+  background: var(--sky-good);
+}
+.nowring-key i.is-season {
+  width: 16px;
+  border-radius: 3px;
+  background: rgba(255, 217, 138, 0.42);
+}
+.gochar-day--rows .gochar-day__facts {
+  margin-top: 0;
+}
+.gochar-day--rows .gochar-day__facts li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}

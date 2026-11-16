@@ -1,6 +1,9 @@
 // The Chart tab, #/patri/:id. Four views so it is never one endless scroll:
 //   About you (the reading in simple words) · Life chapters (daśā) · Planets (the kundli, the planet
 //   table and folds for the deep material; ?v=chart) · Now (today in one sentence, Saturn's seasons).
+// Every view opens on the picture band (3.1): the name, the birth line and the view tabs sit on a night
+// sky, then the view's own true picture (the stars behind the birth Moon, the life arc, the chart drawn
+// line by line, the planets today on a ring) with its one large answer.
 // The view lives in the URL (?v=). Nothing is computed until its view, or its fold, is opened.
 import { useEffect, useId, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
@@ -8,9 +11,10 @@ import { usePatri, useProfile, useSettings, useSettingsLoaded } from "../../app/
 import { useNowMs } from "../../app/useNow";
 import { Colophon } from "../../components/ui/Colophon";
 import { InfoDot } from "../../components/ui/Explain";
+import { Reveal } from "../../components/ui/Motion";
 import { ChevronRight, Page, Row, Section } from "../../components/ui/Page";
 import { Sheet } from "../../components/ui/Sheet";
-import { chartStyleFor, nakBoth, rashiBoth, type Tradition } from "../../data/regional";
+import { chartStyleFor, nakBoth, rashiBoth, rashiName, type Tradition } from "../../data/regional";
 import { saveSettings } from "../../data/repo";
 import { GRAHA_ABBR_LAT, GRAHA_ENGLISH, GRAHA_NAMES, NAKSHATRA_NAMES, SIGN_NAMES } from "../../data/tables/names";
 import { boundaryNote, PRESET_SHORT } from "../../engine/boundary";
@@ -31,18 +35,19 @@ import { VARGA_NAMES } from "../../engine/vargas";
 import { haptics } from "../../platform/haptics";
 import { isNative } from "../../platform/native";
 import { IconChart, IconForecast } from "../chowki/icons";
-import { LifeReading } from "../cosmic/LifeReading";
+import { LifeHero, LifeReading } from "../cosmic/LifeReading";
 import { MeetGrahas } from "../cosmic/MeetGrahas";
-import { DailyStrengthCard, GocharSection } from "../gochar";
+import { DailyStrengthCard, DayHero, GocharSection } from "../gochar";
 import { reckonSadeSati } from "../gochar/GocharSection";
 import { ChartFigure } from "./ChartFigure";
-import { DashaRibbon } from "./DashaRibbon";
+import { ChapterHero, DashaRibbon } from "./DashaRibbon";
 import { AshtakavargaSection } from "./extras/AshtakavargaSection";
 import { BhavaChalitTable } from "./extras/BhavaChalitTable";
 import { GrahaLedger } from "./GrahaLedger";
 import { KundliChart } from "./KundliChart";
 import { TimeUnknownNote } from "./TimeUnknownNote";
 import "./patri.css";
+import "./band.css";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const PAGER: VargaNumber[] = [9, 2, 3, 7, 10, 12, 30, 60];
@@ -134,6 +139,11 @@ export default function PatriScreen() {
   const view: View = isView(v) ? v : "about";
   const [printing, setPrinting] = useState(false);
   const panelId = useId();
+  // The figure stands on the band and the planet table on the page under it: they share what is lit.
+  const [lit, setLit] = useState<GrahaId | null>(null);
+  const personStyle = chartStyleFor(profile?.tradition);
+  const [style, setStyle] = useState(personStyle ?? settings.chartStyle);
+  useEffect(() => setStyle(personStyle ?? settings.chartStyle), [personStyle, settings.chartStyle]);
 
   useEffect(() => {
     if (profile && settings.activeProfileId !== profile.id) void saveSettings({ activeProfileId: profile.id });
@@ -209,17 +219,44 @@ export default function PatriScreen() {
 
   const b = profile.birth;
   const ready = patri && patri.profileId === profile.id ? patri : null;
-  const common = { profile, settings, nowMs };
+  const script: "devanagari" | "latin" = profile.tradition === "telugu" || profile.tradition === "tamil" ? "latin" : settings.chartScript;
+  const figure = { style, script, lit, onLit: setLit, onFlip: () => setStyle((s) => (s === "north" ? "south" : "north")) };
+  const common = { profile, settings, nowMs, figure };
+  const zone = b.zone;
 
-  return (
-    <Page
-      label={`Birth chart of ${profile.name}`}
-      eyebrow="Birth chart"
-      title={profile.name}
-      wide
-      className="pt"
-      lede={
-        <>
+  const tabs = (
+    <div className="v-seg pt-seg pt-seg--glass" role="tablist" aria-label="Views of this chart">
+      {VIEWS.map(([k, label], i) => (
+        <button
+          key={k}
+          type="button"
+          role="tab"
+          id={`${panelId}-${k}`}
+          aria-selected={k === view}
+          aria-controls={panelId}
+          tabIndex={k === view ? 0 : -1}
+          onClick={() => show(k)}
+          onKeyDown={(e) => {
+            const j = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : -1;
+            const to = VIEWS[j];
+            if (!to) return;
+            e.preventDefault();
+            show(to[0]);
+            (e.currentTarget.parentElement?.children[j] as HTMLElement | undefined)?.focus();
+          }}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+
+  const live = ready && !printing ? ready : null;
+  const hero = (
+    <div className="pt-band" data-view={live ? view : "wait"}>
+      <header className="pt-band__head">
+        <h1 className="pt-name">{profile.name}</h1>
+        <p className="pt-birth">
           {b.localD} {MONTHS[b.localMo - 1]} {b.localY} ·{" "}
           {profile.timeUnknown
             ? "time unknown (worked out for noon)"
@@ -228,9 +265,28 @@ export default function PatriScreen() {
           <Link to={`/leaf/${profile.id}/edit`} className="v-link pt-edit" aria-label="Edit birth details">
             Edit
           </Link>
-        </>
-      }
-    >
+        </p>
+        {live ? tabs : null}
+      </header>
+      {live ? (
+        // keyed by view, so each picture draws itself in when its tab is opened
+        <section className="pt-band__view" key={view} aria-label={HERO_LABEL[view]}>
+          {view === "about" ? (
+            <LifeHero profile={profile} patri={live} />
+          ) : view === "chapters" ? (
+            <ChapterHero tree={live.dasha} nowMs={nowMs} zone={zone} birthMs={b.utcMs} />
+          ) : view === "chart" ? (
+            <ChartHero profile={profile} patri={live} {...figure} />
+          ) : (
+            <DayHero patri={live} nowMs={nowMs} zone={zone} tradition={profile.tradition} />
+          )}
+        </section>
+      ) : null}
+    </div>
+  );
+
+  return (
+    <Page label={`Birth chart of ${profile.name}`} wide className="pt" hero={hero} sky="night">
       {error ? (
         <p className="v-note v-note--care" role="alert">
           <span aria-hidden="true">⚑</span>
@@ -282,47 +338,71 @@ export default function PatriScreen() {
           ))}
         </>
       ) : (
-        <>
-          <div className="v-seg pt-seg" role="tablist" aria-label="Views of this chart">
-            {VIEWS.map(([k, label], i) => (
-              <button
-                key={k}
-                type="button"
-                role="tab"
-                id={`${panelId}-${k}`}
-                aria-selected={k === view}
-                aria-controls={panelId}
-                tabIndex={k === view ? 0 : -1}
-                onClick={() => show(k)}
-                onKeyDown={(e) => {
-                  const j = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : -1;
-                  const to = VIEWS[j];
-                  if (!to) return;
-                  e.preventDefault();
-                  show(to[0]);
-                  (e.currentTarget.parentElement?.children[j] as HTMLElement | undefined)?.focus();
-                }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <div className="pt-view" role="tabpanel" id={panelId} aria-labelledby={`${panelId}-${view}`} key={view}>
-            <ViewBody
-              view={view}
-              {...common}
-              patri={ready}
-              onShow={show}
-              onRecompute={recompute}
-              onPrint={() => {
-                reckonSadeSati(ready);
-                setPrinting(true);
-              }}
-            />
-          </div>
-        </>
+        <div className="pt-view" role="tabpanel" id={panelId} aria-labelledby={`${panelId}-${view}`} key={view}>
+          <ViewBody
+            view={view}
+            {...common}
+            patri={ready}
+            onShow={show}
+            onRecompute={recompute}
+            onPrint={() => {
+              reckonSadeSati(ready);
+              setPrinting(true);
+            }}
+          />
+        </div>
       )}
     </Page>
+  );
+}
+
+const HERO_LABEL: Record<View, string> = {
+  about: "You, in three words",
+  chapters: "Your life chapter now",
+  chart: "Your birth chart",
+  now: "Today for this chart",
+};
+
+interface FigureState {
+  style: "north" | "south";
+  script: "devanagari" | "latin";
+  lit: GrahaId | null;
+  onLit: (g: GrahaId | null) => void;
+  onFlip: () => void;
+}
+
+const inkKeyOf = (patri: Patri) => `${patri.profileId}|${patri.presetHash}|${patri.computedAt}`;
+
+/** The Planets picture band: the birth chart itself, drawn line by line the first time it is seen. */
+function ChartHero({ profile, patri, ...fig }: { profile: Profile; patri: Patri } & FigureState) {
+  const inkKey = inkKeyOf(patri);
+  const skipInk = useMemo(() => {
+    const seen = drawn.has(inkKey);
+    drawn.add(inkKey);
+    return seen;
+  }, [inkKey]);
+  const t = profile.tradition;
+  return (
+    <>
+      <div className="pt-band__say">
+        <h2 id="pt-fig-h" className="pt-band__h">
+          <span className="pt-band__eyebrow">Birth chart</span>{" "}
+          <span className="pt-band__word">
+            {profile.timeUnknown ? `Moon in ${rashiName(patri.grahas.MO.sign, t)}` : `${rashiName(patri.lagna.sign, t)} rising`}
+          </span>
+        </h2>
+        <p className="pt-band__cap">
+          Where the planets stood at the moment of birth. Touch one to read it. <InfoDot id="patri" label="the birth chart" />
+        </p>
+      </div>
+      <div className="pt-band__pic pt-fig">
+        <ChartFigure patri={patri} inkKey={inkKey} skipInk={skipInk} {...fig} />
+        <p className="pt-cap">
+          The gold mark is the rising sign (Lagna), {SIGN_NAMES[patri.lagna.sign]} {formatDms(patri.lagna.degInSign)}. Sanskrit: Rāśi chart
+          (D1), whole-sign houses.
+        </p>
+      </div>
+    </>
   );
 }
 
@@ -332,6 +412,7 @@ interface ViewProps {
   patri: Patri;
   settings: Settings;
   nowMs: number;
+  figure: FigureState;
   printing?: boolean;
   onShow: (v: View) => void;
   onRecompute: () => void;
@@ -342,11 +423,13 @@ function ViewBody(p: ViewProps) {
   const zone = p.profile.birth.zone;
   switch (p.view) {
     case "about":
-      return <LifeReading profile={p.profile} patri={p.patri} nowMs={p.nowMs} onChapters={() => p.onShow("chapters")} />;
+      return (
+        <LifeReading profile={p.profile} patri={p.patri} nowMs={p.nowMs} onChapters={() => p.onShow("chapters")} onBand={!p.printing} />
+      );
     case "chapters":
       return (
         <>
-          <DashaRibbon tree={p.patri.dasha} nowMs={p.nowMs} zone={zone} yearDays={p.patri.preset.dashaYearDays} />
+          <DashaRibbon tree={p.patri.dasha} nowMs={p.nowMs} zone={zone} yearDays={p.patri.preset.dashaYearDays} onBand={!p.printing} />
           <table className="ledger print-only" aria-hidden="true">
             <tbody>
               {p.patri.dasha.map((md) => (
@@ -372,8 +455,12 @@ function ViewBody(p: ViewProps) {
     case "now":
       return (
         <>
-          <DailyStrengthCard patri={p.patri} nowMs={p.nowMs} zone={zone} />
-          <GocharSection patri={p.patri} nowMs={p.nowMs} zone={zone} forceOpen={!!p.printing} />
+          <Reveal i={0}>
+            <DailyStrengthCard patri={p.patri} nowMs={p.nowMs} zone={zone} onBand={!p.printing} />
+          </Reveal>
+          <Reveal i={1}>
+            <GocharSection patri={p.patri} nowMs={p.nowMs} zone={zone} forceOpen={!!p.printing} />
+          </Reveal>
           <ul className="v-list">
             <li>
               <Row
@@ -389,52 +476,35 @@ function ViewBody(p: ViewProps) {
   }
 }
 
-function ChartView({ profile, patri, settings, printing, onRecompute, onPrint }: ViewProps) {
+function ChartView({ profile, patri, settings, figure, printing, onRecompute, onPrint }: ViewProps) {
   const b = profile.birth;
   const zone = b.zone;
   const tradition = profile.tradition;
   const p = patri.preset;
-  const [lit, setLit] = useState<GrahaId | null>(null);
+  const { lit, onLit: setLit, style, script } = figure;
   const [foot, setFoot] = useState<Foot>(null);
-  const personStyle = chartStyleFor(tradition);
-  const [style, setStyle] = useState(personStyle ?? settings.chartStyle);
-  useEffect(() => setStyle(personStyle ?? settings.chartStyle), [personStyle, settings.chartStyle]);
-  const script = tradition === "telugu" || tradition === "tamil" ? "latin" : settings.chartScript;
-
-  const inkKey = `${patri.profileId}|${patri.presetHash}|${patri.computedAt}`;
-  const skipInk = useMemo(() => {
-    const seen = drawn.has(inkKey);
-    drawn.add(inkKey);
-    return seen;
-  }, [inkKey]);
+  const inkKey = inkKeyOf(patri);
+  // The finer charts in the folds draw themselves in when opened; print shows everything at once.
+  const skipInk = !!printing;
 
   const formed = patri.yogas.filter((y) => y.strength !== "cancelled").length;
   const nearEdge = Object.values(patri.grahas).some((g) => g.boundary) || patri.lagna.boundary;
 
   return (
     <>
-      <div className="v-cols">
+      {printing ? (
         <section className="v-card pt-fig" aria-labelledby="pt-fig-h">
           <h2 id="pt-fig-h" className="pt-h">
-            Birth chart <InfoDot id="patri" label="the birth chart" />
+            Birth chart
           </h2>
-          <p className="v-card__sub">Where the planets stood at the moment of birth. Touch one to read it.</p>
-          <ChartFigure
-            patri={patri}
-            style={style}
-            script={script}
-            inkKey={inkKey}
-            skipInk={skipInk || !!printing}
-            lit={lit}
-            onLit={setLit}
-            onFlip={() => setStyle((s) => (s === "north" ? "south" : "north"))}
-          />
+          <ChartFigure patri={patri} inkKey={inkKey} skipInk {...figure} />
           <p className="pt-cap">
             The gold mark is the rising sign (Lagna), {SIGN_NAMES[patri.lagna.sign]} {formatDms(patri.lagna.degInSign)}. Sanskrit: Rāśi
             chart (D1), whole-sign houses.
           </p>
         </section>
-
+      ) : null}
+      <Reveal i={0}>
         <section className="v-card pt-planets" aria-labelledby="pt-planets-h">
           <h2 id="pt-planets-h" className="pt-h">
             The nine planets <InfoDot id="graha" label="graha" />
@@ -456,11 +526,13 @@ function ChartView({ profile, patri, settings, printing, onRecompute, onPrint }:
             </p>
           ) : null}
         </section>
-      </div>
+      </Reveal>
 
-      <section className="v-card" aria-label="Meet the planets">
-        <MeetGrahas patri={patri} />
-      </section>
+      <Reveal i={1}>
+        <section className="v-card" aria-label="Meet the planets">
+          <MeetGrahas patri={patri} />
+        </section>
+      </Reveal>
 
       <Section title="Full detail" />
       <div className="pt-folds">
@@ -472,13 +544,13 @@ function ChartView({ profile, patri, settings, printing, onRecompute, onPrint }:
           {() => <Almanac patri={patri} zone={zone} tradition={tradition} setFoot={setFoot} />}
         </Fold>
         <Fold title="Divisional charts" sub="Varga: Navāṃśa (D9) and seven more finer charts" forced={printing}>
-          {() => <Vargas patri={patri} style={style} script={script} inkKey={inkKey} skipInk={skipInk || !!printing} />}
+          {() => <Vargas patri={patri} style={style} script={script} inkKey={inkKey} skipInk={skipInk} />}
         </Fold>
         <Fold title="Planet patterns" sub={`Yoga: ${formed} formed in this chart`} forced={printing}>
           {() => <Yogas patri={patri} setFoot={setFoot} />}
         </Fold>
         <Fold title="Strength points" sub="Aṣṭakavarga: how much support each sign holds" forced={printing}>
-          {() => <AshtakavargaSection patri={patri} script={script} style={style} skipInk={skipInk || !!printing} />}
+          {() => <AshtakavargaSection patri={patri} script={script} style={style} skipInk={skipInk} />}
         </Fold>
         <Fold title="House cusps" sub="Bhāva Chalit: where each house starts and ends by degree" forced={printing}>
           {() => <BhavaChalitTable patri={patri} />}

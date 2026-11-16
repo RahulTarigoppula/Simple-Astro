@@ -87,22 +87,7 @@
   font-size: 18px;
 }
 
-/* The story page: the picture, the invitation, then the chapters */
-.story-top {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin: 4px 0 6px;
-}
-.story-top__art .story-art {
-  max-height: 168px;
-}
-.story-top .v-head {
-  margin: 4px 0 0;
-}
-.story-top .v-btn {
-  align-self: flex-start;
-}
+/* The story page: the chapters */
 .story-chapters__n {
   font: 540 1.0625rem / 1 var(--font-display);
 }
