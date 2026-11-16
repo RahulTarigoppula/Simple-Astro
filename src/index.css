@@ -2,6 +2,7 @@
 @import "./styles/tokens.css";
 @import "./styles/kit.css";
 @import "./styles/astral.css";
+@import "./styles/ui.css";
 
 @theme inline {
   --color-bg: var(--bg);

@@ -207,3 +207,32 @@
   --sky-cloth: #070a1c;
   --sky-cloth-deep: #04050d;
 }
+
+/* ── 2.0 "clear sky": calm solid surfaces, one scale, semantic tones ── */
+:root {
+  --ink-muted: #b7bde2;
+  --card: #10153a;
+  --card-2: #171d4b;
+  --card-hi: #20275c;
+  --card-edge: rgba(190, 200, 255, 0.13);
+  --card-edge-strong: rgba(190, 200, 255, 0.28);
+  --good: #4ade80;
+  --good-soft: rgba(74, 222, 128, 0.13);
+  --calm: #7dd3fc;
+  --calm-soft: rgba(125, 211, 252, 0.13);
+  --mixed: #fbbf24;
+  --mixed-soft: rgba(251, 191, 36, 0.13);
+  --care: #fb7185;
+  --care-soft: rgba(251, 113, 133, 0.13);
+  --violet-soft: rgba(139, 92, 246, 0.16);
+  --gold-soft: rgba(245, 196, 107, 0.14);
+  --nav-h: 62px;
+  --page-w: 720px;
+  --page-pad: 16px;
+  --ledge-height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+}
+:root[data-theme="day"] {
+  --card: #161d52;
+  --card-2: #1e2764;
+  --card-hi: #283275;
+}

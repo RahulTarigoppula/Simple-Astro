@@ -21,7 +21,7 @@ export const router = createHashRouter([
     // The desk paints its own teak while the first lazy screen arrives; nothing to hydrate.
     hydrateFallbackElement: <div className="desk" aria-busy="true" />,
     children: [
-      { index: true, lazy: screen("chowki/ChowkiScreen") },
+      { index: true, lazy: screen("home/HomeScreen") },
       { path: "today", lazy: screen("today/TodayScreen"), errorElement: <RouteError /> },
       { path: "circle", lazy: screen("circle/CircleScreen"), errorElement: <RouteError /> },
       { path: "leaf/new", lazy: screen("leaf/LeafScreen"), errorElement: <RouteError /> },
