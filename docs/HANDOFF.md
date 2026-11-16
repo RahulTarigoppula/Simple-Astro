@@ -4,6 +4,31 @@ Written 2026-10-06 at the end of the first build session. The code, tests, CI wo
 Android shell are in this repository and committed on `main` locally. **Nothing has been pushed
 anywhere**, creating a public repo, a keystore and secrets needs your accounts and your decisions.
 
+## 0. Version 2.0.0 (2026-11-16): the redesign, and what is left for you
+
+The whole app was redesigned in one unattended session; what changed is in CHANGELOG.md and the design is in docs/DESIGN-V2.md. Everything is committed on `main` locally. **Nothing was pushed**, so the live site still shows 1.3.0 until you push.
+
+- **To publish the website:** `git push origin main` (GitHub Pages deploys it; phones that have the app open update themselves).
+- **The Android app:** `release/Vyomaphala-2.0.0.apk` is signed with the same key as 1.3.0, so it installs over it and keeps everyone's saved people. In PowerShell the Gradle arguments must be quoted: `& .gradlew.bat --no-daemon ':app:assembleRelease' '-PversionCode=200' '-PversionName=2.0.0'`.
+- **Checked:** 775 unit tests, 26 browser tests (phone and desktop profiles, dark and light), lint, types, licences, bundle size. Not checked on a real phone: the camera, haptics, the status bar colour in the light theme, and the feel of the sticky Save bar with the on-screen keyboard.
+
+Decisions taken without you (all reversible):
+
+| Decision | Why |
+|---|---|
+| Five tabs (Today, Chart, Forecast, Match, Explore); People and Settings behind the person chip | Six overlapping tabs and a hidden person switch were the main sources of confusion. |
+| Home is "Today" for the chosen person; the feature list is gone | The first screen should answer "how is my day", not list what the app can do. |
+| Add a person is four steps with a Save button; hold-to-save is gone (hold stays for deleting) | Holding a seal was not discoverable. All the old checks are kept. |
+| The intro's Skip and last slide go straight in; its "How to use" slide is removed | The welcome screen and the Guide do that job. The name's meaning moved to the last slide. |
+| Theme: Auto follows the phone; "Day" is a real light theme | Auto used to follow the Sun at the birthplace, which nobody could predict, and Day was still dark. |
+| "Where you are now" (Settings, Today, Almanac, Forecast) | Hours and sunrise were for the birthplace, wrong for anyone who has moved. Default is still the birthplace. |
+| Chart figure labelled Su, Mo, Ma… by default | Devanagari abbreviations could not be read by many of the family; Devanagari is a choice under Settings, Advanced. |
+| One scale of words: Strong, Good, Mixed, Go gently | Bright/Steady/Mixed/Quiet on one screen and Strong/Good/Mixed/Go gently on another read as contradictions. |
+| "Partner match" is the one name (was also Partner Compatibility) | One thing, one name. |
+| The planet facts still list each planet's gem | It is existing lore text; say if you want it removed. |
+
+Known gaps: the Hindi/Tamil/Telugu interface is still not built; a draft of the add-person form is kept only until the tab is closed; the brass-era classes that remain in src/styles/kit.css style a few inner pieces (ledgers, sheets) and can be folded into ui.css later.
+
 ## 1. The web build, live
 
 The code is on https://github.com/RahulTarigoppula/Simple-Astro (`main`). GitHub Pages deploys every push to `main` through

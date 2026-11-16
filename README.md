@@ -63,14 +63,14 @@ Useful one-off scripts (all outside-the-repo downloads are cached in `%TEMP%`):
 ## Ship it
 
 - **Web:** every push to `main` runs `.github/workflows/pages.yml` and deploys to https://rahultarigoppula.github.io/Simple-Astro/.
-- **Android:** a signed, sideloadable APK is attached to each GitHub Release (`git tag v1.3.0 && git push origin v1.3.0`
+- **Android:** a signed, sideloadable APK is attached to each GitHub Release (`git tag v2.0.0 && git push origin v2.0.0`
   once the four `ANDROID_*` secrets exist, see [docs/HANDOFF.md](docs/HANDOFF.md) §2). To build it on your own machine:
   a JDK 21 and the Android SDK (platform 36, build-tools 36.0.0), then
 
   ```bash
   VITE_BASE_PATH=/ VITE_PLATFORM=android npm run build   # no service worker in the APK
   npx cap sync android
-  cd android && ./gradlew :app:assembleRelease -PversionCode=130 -PversionName=1.3.0
+  cd android && ./gradlew :app:assembleRelease -PversionCode=200 -PversionName=2.0.0
   ```
 
   with `ANDROID_KEYSTORE_FILE`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD` set in the
