@@ -68,7 +68,7 @@ describe("Today, the home screen", () => {
     await upsertProfile(REFERENCE_PROFILE);
     await saveSettings({ activeProfileId: ID, preset: DEFAULT_PRESET });
     renderAt();
-    const hero = (await screen.findByText(/^Your day/, {}, { timeout: 8000 })).closest("section") as HTMLElement;
+    const hero = (await screen.findByText(/^Your day$/, {}, { timeout: 8000 })).closest("section") as HTMLElement;
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/, Rahul$/);
     expect(within(hero).getByRole("heading", { level: 2 })).toHaveTextContent(/^(Strong|Good|Mixed|Go gently)$/);
     expect(within(hero).getByRole("img")).toHaveAccessibleName(/day\. Support \d+ out of 100\./);

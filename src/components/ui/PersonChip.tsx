@@ -36,7 +36,7 @@ export function PersonChip() {
   if (profiles === undefined) return null;
 
   // A screen that is about one person (its id is in the address) names that person, and follows a switch.
-  const m = /^\/(patri|forecast|hast)\/([^/]+)(\/.*)?$/.exec(loc.pathname);
+  const m = /^\/(patri|forecast|hast|journal|pick)\/([^/]+)(\/.*)?$/.exec(loc.pathname);
   const shown = (m ? profiles.find((p) => p.id === m[2]) : undefined) ?? active;
 
   const choose = (p: Profile) => {

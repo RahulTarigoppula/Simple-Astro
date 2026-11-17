@@ -33,12 +33,12 @@ import {
 } from "../../engine/types";
 import { VARGA_NAMES } from "../../engine/vargas";
 import { haptics } from "../../platform/haptics";
-import { isNative } from "../../platform/native";
 import { IconChart, IconForecast } from "../chowki/icons";
 import { LifeHero, LifeReading } from "../cosmic/LifeReading";
 import { MeetGrahas } from "../cosmic/MeetGrahas";
 import { DailyStrengthCard, DayHero, GocharSection } from "../gochar";
 import { reckonSadeSati } from "../gochar/GocharSection";
+import { ShareButton } from "../share/ShareCard";
 import { ChartFigure } from "./ChartFigure";
 import { ChapterHero, DashaRibbon } from "./DashaRibbon";
 import { AshtakavargaSection } from "./extras/AshtakavargaSection";
@@ -272,7 +272,12 @@ export default function PatriScreen() {
         // keyed by view, so each picture draws itself in when its tab is opened
         <section className="pt-band__view" key={view} aria-label={HERO_LABEL[view]}>
           {view === "about" ? (
-            <LifeHero profile={profile} patri={live} />
+            <>
+              <LifeHero profile={profile} patri={live} />
+              <div className="v-actions share-row">
+                <ShareButton kind="stars" profile={profile} patri={live} />
+              </div>
+            </>
           ) : view === "chapters" ? (
             <ChapterHero tree={live.dasha} nowMs={nowMs} zone={zone} birthMs={b.utcMs} />
           ) : view === "chart" ? (
@@ -476,7 +481,7 @@ function ViewBody(p: ViewProps) {
   }
 }
 
-function ChartView({ profile, patri, settings, figure, printing, onRecompute, onPrint }: ViewProps) {
+function ChartView({ profile, patri, settings, figure, printing, onRecompute }: ViewProps) {
   const b = profile.birth;
   const zone = b.zone;
   const tradition = profile.tradition;
@@ -558,11 +563,9 @@ function ChartView({ profile, patri, settings, figure, printing, onRecompute, on
       </div>
 
       <div className="v-actions pt-tools">
-        {isNative() ? null : (
-          <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={onPrint}>
-            Print or save as PDF
-          </button>
-        )}
+        <Link to={`/report/${profile.id}`} className="v-btn v-btn--ghost v-btn--sm">
+          Birth report to print
+        </Link>
         <button type="button" className="v-btn v-btn--quiet v-btn--sm" onClick={onRecompute}>
           Work it out again
         </button>

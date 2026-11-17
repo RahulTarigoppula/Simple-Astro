@@ -364,6 +364,317 @@
 .ev--eclipse .ev__title {
   color: var(--mixed);
 }
+/* Moon phases: a lit disc, an empty ring, a half. The lit part is always the Moon's own colour, in both themes. */
+.ev-moon {
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--moon);
+  box-shadow: inset 0 0 0 1.5px var(--card-edge-strong);
+}
+.ev-moon--new {
+  background: rgba(var(--tint), 0.06);
+}
+.ev-moon--half {
+  background: linear-gradient(90deg, rgba(var(--tint), 0.06) 50%, var(--moon) 50%);
+}
+
+/* ── The three key signs: three rows in one card ───────────────────────── */
+.kf {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  overflow: hidden;
+}
+.kf__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+}
+.kf__row + .kf__row {
+  border-top: 1px solid var(--card-edge);
+}
+.kf__row:hover {
+  background: rgba(var(--tint), 0.04);
+}
+.kf__glyph {
+  flex: none;
+}
+.kf__body {
+  flex: 1;
+  min-width: 0;
+}
+.kf__k {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+.kf__term::before {
+  content: "· ";
+}
+.kf__k .info-dot {
+  position: relative;
+  z-index: 1;
+}
+.kf__v {
+  display: block;
+  color: var(--ink);
+  font: 600 1.1875rem / 1.3 var(--font-body);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+/* the whole row is the link's target */
+.kf__v::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.kf__s {
+  margin-top: 1px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+.kf__warn {
+  margin-top: 4px;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--mixed);
+}
+
+/* ── Plus points, watch out for, in love, at work: one card, hairlines ─── */
+.life__traits {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.life__pm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 359px) {
+  .life__pm {
+    grid-template-columns: 1fr;
+  }
+}
+.life__k {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font: 600 0.9375rem / 1.3 var(--font-body);
+  color: var(--ink);
+}
+.life__k::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--good);
+}
+.life__k--minus::before {
+  background: var(--mixed);
+}
+.life__pm ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+.life__dl {
+  margin: 0;
+  display: grid;
+}
+.life__dl > div {
+  padding-top: 16px;
+  border-top: 1px solid var(--card-edge);
+}
+.life__dl > div + div {
+  margin-top: 16px;
+}
+.life__dl dt {
+  font: 600 0.9375rem / 1.3 var(--font-body);
+  color: var(--ink);
+}
+.life__dl dd {
+  margin: 4px 0 0;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+@media (min-width: 720px) {
+  .life__dl {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--card-edge);
+  }
+  .life__dl > div,
+  .life__dl > div + div {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+}
+.life__p {
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+/* The same birth in other traditions: plain rows inside the fold, not a card in a card */
+.life__more .cosmic-profile {
+  margin: 0 -20px -20px;
+  border-top: 1px solid var(--card-edge);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: none;
+  box-shadow: none;
+}
+.cosmic-profile .v-row__icon {
+  background: none;
+}
+
+/* ── Meet the planets: a strip of marks that scrolls sideways ──────────── */
+.meet__sub {
+  margin-bottom: 12px;
+}
+.meet__k {
+  margin: 0 0 2px;
+  font: 600 1.0625rem / 1.3 var(--font-body);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.meet ul {
+  list-style: none;
+  margin: 0 -20px;
+  padding: 0 14px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 76px;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.meet ul::-webkit-scrollbar {
+  display: none;
+}
+.meet__a {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 6px;
+  min-height: 84px;
+  padding: 6px 2px 0;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  text-align: center;
+}
+.meet__a:hover {
+  background: rgba(var(--tint), 0.05);
+}
+.meet__t {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.meet__s {
+  margin-top: -4px;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  color: var(--ink-muted);
+}
+@media (min-width: 900px) {
+  .meet ul {
+    margin: 0;
+    padding: 0;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+  }
+}
+
+/* ── Sky events ────────────────────────────────────────────────────────── */
+.sky-events__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.ev-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+.ev {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid var(--card-edge);
+}
+.ev:first-child {
+  border-top: 0;
+}
+.ev:last-child {
+  padding-bottom: 0;
+}
+.ev__icon {
+  display: grid;
+  place-items: center;
+}
+.ev__body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.ev__title {
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.ev__note {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+.ev__when {
+  display: grid;
+  justify-items: end;
+  text-align: right;
+  gap: 1px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+.ev__day {
+  color: var(--ink);
+}
+.ev__time {
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+.ev__rel {
+  color: var(--accent-text);
+}
+.ev--muted .ev__title {
+  color: var(--ink-muted);
+}
+.ev--eclipse .ev__title {
+  color: var(--mixed);
+}
 /* Moon phases: a full disc, an empty ring, a half */
 .ev-moon {
   display: block;

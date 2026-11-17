@@ -1,5 +1,18 @@
 import { Link, useLocation } from "react-router";
-import { IconChart, IconCircle, IconDrawer, IconForecast, IconGuide, IconMilan, IconSky, IconToday } from "../features/chowki/icons";
+import {
+  IconChart,
+  IconCircle,
+  IconDrawer,
+  IconFamily,
+  IconFestival,
+  IconForecast,
+  IconGuide,
+  IconJournal,
+  IconMilan,
+  IconPick,
+  IconSky,
+  IconToday,
+} from "../features/chowki/icons";
 import { useActiveProfile, useProfiles } from "./hooks";
 
 interface Tab {
@@ -42,6 +55,13 @@ export function Ledge() {
     },
     { to: "/explore", label: "Explore", name: "Explore the sky and its stories", icon: <IconSky />, on: /^\/(explore|story|about)/ },
   ];
+  // Desktop only: the side rail has room for the tools that phones reach from Today and Explore.
+  const more: Tab[] = [
+    { to: "/pick", label: "Pick a day", name: "Pick a good day", icon: <IconPick />, on: /^\/pick/ },
+    { to: "/festivals", label: "Festivals", name: "Festivals and fasts", icon: <IconFestival />, on: /^\/festivals/ },
+    { to: "/family", label: "Family", name: "Family today", icon: <IconFamily />, on: /^\/family/ },
+    { to: "/journal", label: "Journal", name: "Your days, noted", icon: <IconJournal />, on: /^\/journal/ },
+  ];
   const foot: Tab[] = [
     { to: "/circle", label: "People", name: "Your saved people", icon: <IconCircle />, on: /^\/circle/ },
     { to: "/guide", label: "How to use", name: "How to use Vyomaphala", icon: <IconGuide />, on: /^\/guide/ },
@@ -71,6 +91,7 @@ export function Ledge() {
         Vyomaphala
       </Link>
       {tabs.map(item)}
+      <div className="v-nav__more">{more.map(item)}</div>
       <div className="v-nav__foot">{foot.map(item)}</div>
     </nav>
   );

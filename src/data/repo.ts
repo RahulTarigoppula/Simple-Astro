@@ -17,7 +17,17 @@ import {
   type ProfileId,
   type Settings,
 } from "../engine/types";
-import { type BlobRow, db, type MetaKey, type PlaceCacheRow, type ReadingRow } from "./db";
+import {
+  type BlobRow,
+  db,
+  JOURNAL_NOTE_MAX,
+  type JournalMood,
+  type JournalRow,
+  type JournalTone,
+  type MetaKey,
+  type PlaceCacheRow,
+  type ReadingRow,
+} from "./db";
 
 // ─── errors ────────────────────────────────────────────────────────────────────
 
@@ -80,11 +90,12 @@ export async function upsertProfile(profile: Profile, now: number = Date.now()):
 
 /**
  * Burn: delete a profile and everything derived from or attached to it, cached charts,
- * palm captures, their photos, readings and milans, in ONE transaction. No tombstones.
+ * palm captures, their photos, readings, milans and day notes, in ONE transaction. No tombstones.
  * Clears `settings.activeProfileId` when it pointed at the burnt profile.
  */
 export async function burnProfile(id: ProfileId): Promise<void> {
-  await db.transaction("rw", [db.profiles, db.patris, db.palms, db.blobs, db.readings, db.milans, db.settings], async () => {
+  const stores = [db.profiles, db.patris, db.palms, db.blobs, db.readings, db.milans, db.settings, db.journal];
+  await db.transaction("rw", stores, async () => {
     const palms = await db.palms.where("profileId").equals(id).toArray();
     const blobKeys = palms.flatMap((p) => [p.originalBlobKey, p.rectifiedBlobKey]);
     await db.blobs.bulkDelete(blobKeys);
@@ -95,6 +106,7 @@ export async function burnProfile(id: ProfileId): Promise<void> {
     await db.palms.where("profileId").equals(id).delete();
     await db.patris.where("profileId").equals(id).delete();
     await db.milans.filter((m) => m.a === id || m.b === id).delete();
+    await db.journal.where("profileId").equals(id).delete();
     await db.profiles.delete(id);
     const s = await db.settings.get("app");
     if (s && s.value.activeProfileId === id) {
@@ -327,6 +339,69 @@ export async function getMilan(
   const row = await db.milans.get([a, b, presetHash]);
   if (!row || school === undefined) return row;
   return (row.ashtakootaSchool ?? "pyjhora") === school ? row : undefined;
+}
+
+// ─── journal ("Your days") ─────────────────────────────────────────────────────
+
+const DAY_KEY = /^\d{4}-\d{2}-\d{2}$/;
+const TONES: readonly JournalTone[] = ["bright", "steady", "mixed", "testing"];
+
+export interface JournalInput {
+  profileId: ProfileId;
+  /** "YYYY-MM-DD", the civil day in the reader's zone. */
+  day: string;
+  mood: JournalMood;
+  /** Omit to keep the note already stored; an empty string removes it. */
+  note?: string;
+  /** What the app said for that day. Only used when the entry is first made (or had none). */
+  predictedTone?: JournalTone | null;
+  predictedScore?: number | null;
+}
+
+/**
+ * Insert or update the entry for one person and one day. `createdAt` is preserved, and so is the
+ * prediction stored when the entry was first made: an edit changes the person's word and note only.
+ */
+export async function saveJournalEntry(input: JournalInput, now: number = Date.now()): Promise<JournalRow> {
+  if (!DAY_KEY.test(input.day)) throw new StorageError("INVALID", `day ${input.day}`);
+  if (![1, 2, 3, 4].includes(input.mood)) throw new StorageError("INVALID", `mood ${String(input.mood)}`);
+  return guard("saveJournalEntry", () =>
+    db.transaction("rw", [db.profiles, db.journal], async () => {
+      if (!(await db.profiles.get(input.profileId))) throw new StorageError("NOT_FOUND", `profile ${input.profileId}`);
+      const prev = await db.journal.get([input.profileId, input.day]);
+      const note = (input.note === undefined ? (prev?.note ?? "") : input.note).trim().slice(0, JOURNAL_NOTE_MAX);
+      const tone = prev?.predictedTone ?? input.predictedTone ?? null;
+      const score = prev?.predictedTone != null ? prev.predictedScore : (input.predictedScore ?? null);
+      const row: JournalRow = {
+        profileId: input.profileId,
+        day: input.day,
+        mood: input.mood,
+        predictedTone: tone !== null && TONES.includes(tone) ? tone : null,
+        predictedScore: typeof score === "number" && Number.isFinite(score) ? Math.max(-1, Math.min(1, score)) : null,
+        createdAt: prev?.createdAt ?? now,
+        updatedAt: now,
+      };
+      if (note) row.note = note;
+      await db.journal.put(row);
+      return row;
+    }),
+  );
+}
+
+export async function getJournalEntry(profileId: ProfileId, day: string): Promise<JournalRow | undefined> {
+  return db.journal.get([profileId, day]);
+}
+
+/** A person's entries, oldest first; `from` and `to` are inclusive day keys. */
+export async function listJournal(profileId: ProfileId, range: { from?: string; to?: string } = {}): Promise<JournalRow[]> {
+  return db.journal
+    .where("[profileId+day]")
+    .between([profileId, range.from ?? ""], [profileId, range.to ?? "\uffff"], true, true)
+    .toArray();
+}
+
+export async function deleteJournalEntry(profileId: ProfileId, day: string): Promise<void> {
+  await db.journal.delete([profileId, day]);
 }
 
 // ─── place cache ───────────────────────────────────────────────────────────────

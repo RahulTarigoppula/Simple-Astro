@@ -37,6 +37,12 @@ test("zero leakage across a full session", async ({ page, baseURL }) => {
     `#/milan/${id}/${id}`,
     "#/drawer",
     "#/explore",
+    `#/pick/${id}`,
+    "#/festivals",
+    "#/family",
+    `#/journal/${id}`,
+    `#/year/${id}`,
+    `#/report/${id}`,
     `#/hast/${id}`,
     `#/patri/${id}/sky`,
   ]) {

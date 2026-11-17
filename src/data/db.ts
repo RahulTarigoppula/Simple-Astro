@@ -6,7 +6,7 @@ import type { HandCapture, MilanResult, PalmReading, Patri, Place, Profile, Prof
 
 export const DB_NAME = "chowki";
 /** Bumped together with a new `db.version(n)` block + upgrade function + migration test. */
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 /** Cached chart, disposable derived data, primary key [profileId+presetHash]. */
 export type PatriRow = Patri;
@@ -37,6 +37,28 @@ export interface SettingsRow {
   value: Settings;
 }
 
+/** How a day really went, in the person's own word: 4 great, 3 good, 2 mixed, 1 hard. */
+export type JournalMood = 1 | 2 | 3 | 4;
+export type JournalTone = "bright" | "steady" | "mixed" | "testing";
+export const JOURNAL_NOTE_MAX = 280;
+
+/** One day of "Your days", primary key [profileId+day]. Never leaves the device except inside a backup. */
+export interface JournalRow {
+  profileId: ProfileId;
+  /** The civil day in the reader's zone, "YYYY-MM-DD". */
+  day: string;
+  mood: JournalMood;
+  /** A few words of their own, at most JOURNAL_NOTE_MAX characters. */
+  note?: string;
+  /** What the app said for that day when the entry was first made (null when it could not be read).
+   *  Stored, never recomputed, so a later engine change cannot rewrite the comparison. */
+  predictedTone: JournalTone | null;
+  /** The day's score then, -1 … +1. */
+  predictedScore: number | null;
+  createdAt: number;
+  updatedAt: number;
+}
+
 export type MetaKey = "presetRevision" | "lastExportAt" | "lastImportAt";
 export interface MetaRow {
   key: MetaKey;
@@ -60,8 +82,16 @@ export const SCHEMA_V1 = {
   meta: "key",
 } as const;
 
-export type TableName = keyof typeof SCHEMA_V1;
-export const TABLE_NAMES = Object.keys(SCHEMA_V1) as TableName[];
+/** Version 2 (app 4.0) adds `journal`: purely additive, so it needs no upgrade function. */
+export const SCHEMA_V2 = {
+  ...SCHEMA_V1,
+  journal: "[profileId+day], profileId, day",
+} as const;
+
+/** The stores of the current version. Backup, restore and wipe walk this list. */
+export const SCHEMA = SCHEMA_V2;
+export type TableName = keyof typeof SCHEMA;
+export const TABLE_NAMES = Object.keys(SCHEMA) as TableName[];
 
 export class ChowkiDB extends Dexie {
   declare profiles: EntityTable<Profile, "id">;
@@ -73,10 +103,13 @@ export class ChowkiDB extends Dexie {
   declare places: EntityTable<PlaceCacheRow, "name">;
   declare settings: EntityTable<SettingsRow, "key">;
   declare meta: EntityTable<MetaRow, "key">;
+  declare journal: Table<JournalRow, [ProfileId, string]>;
 
   constructor(name: string = DB_NAME) {
     super(name);
     this.version(1).stores(SCHEMA_V1);
+    // Only the new store is declared; Dexie carries the version-1 stores and their rows over untouched.
+    this.version(2).stores({ journal: SCHEMA_V2.journal });
   }
 }
 

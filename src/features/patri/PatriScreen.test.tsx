@@ -166,7 +166,7 @@ describe("the Chart tab", () => {
     // how it was calculated, and the standing disclaimer
     expect(screen.getByText("How this was calculated").closest("details")).toHaveTextContent("2449425.5798");
     expect(screen.getByText(/Based on classical Jyotisha/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Print/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Birth report to print" })).toHaveAttribute("href", expect.stringContaining("/report/"));
   });
 
   it("explains an almanac line in a sheet", async () => {

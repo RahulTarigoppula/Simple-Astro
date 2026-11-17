@@ -122,8 +122,8 @@
 }
 .home-hours__h {
   margin: 0;
-  font: 600 0.9375rem var(--font-body);
-  color: var(--ink-muted);
+  font: 540 1.25rem / 1.2 var(--font-display);
+  letter-spacing: -0.01em;
 }
 .home-hours__now {
   margin: 6px 0 18px;
@@ -196,31 +196,48 @@
   transform: rotate(-135deg) translate(-2px, -2px);
 }
 .home-hours__list {
-  margin: 4px 0 12px;
+  margin: 8px 0 4px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
 }
 .home-hours__list > div {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 12px 0;
+}
+.home-hours__list > div + div {
+  border-top: 1px solid var(--card-edge);
 }
 .home-hours__list dt {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 600;
+  min-width: 0;
+  color: var(--ink-muted);
   font-size: 0.9375rem;
 }
 .home-hours__list dd {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  color: var(--ink-muted);
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+  font-weight: 600;
   font-size: 0.9375rem;
   font-variant-numeric: tabular-nums;
+}
+.home-hours__list dd > span {
+  white-space: nowrap;
+}
+.home-hours__list dd .v-muted {
+  white-space: normal;
+  font-weight: 400;
+}
+.home-hours__cap::first-letter {
+  text-transform: uppercase;
 }
 .home-dot {
   width: 8px;

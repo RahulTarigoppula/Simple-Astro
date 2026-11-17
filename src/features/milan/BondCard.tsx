@@ -19,7 +19,7 @@ const first = (n: string) => n.split(/\s+/)[0] ?? n;
 type Tone = "bright" | "steady" | "mixed" | "testing";
 const LEVEL_TONE: Record<BondLevel, Tone> = { strong: "bright", good: "steady", mixed: "mixed", weak: "testing" };
 const LEVEL_WORD: Record<BondLevel, string> = { strong: "Strong", good: "Good", mixed: "Mixed", weak: "Needs care" };
-const BAND_WORD: Record<MilanResult["band"], string> = {
+export const BAND_WORD: Record<MilanResult["band"], string> = {
   excellent: "Excellent",
   "very-good": "Strong",
   acceptable: "Good",
@@ -101,13 +101,15 @@ interface BondProps {
   patA: Patri;
   patB: Patri;
   onCopy: () => void;
+  /** Set before "Copy summary" (the share button). */
+  actions?: React.ReactNode;
   /** The two people's Manglik facts, shown under the plain sentence in the Manglik fold. */
   manglikFacts?: React.ReactNode;
   /** More folds (the 36 points, Porutham, charts, method), listed after the plain ones. */
   children?: React.ReactNode;
 }
 
-export function BondCard({ r, pa, pb, patA, patB, onCopy, manglikFacts, children }: BondProps) {
+export function BondCard({ r, pa, pb, patA, patB, onCopy, actions, manglikFacts, children }: BondProps) {
   const an = first(pa.name);
   const bn = first(pb.name);
   const b = useMemo(() => bondReading(r, an, bn), [r, an, bn]);
@@ -200,6 +202,7 @@ export function BondCard({ r, pa, pb, patA, patB, onCopy, manglikFacts, children
 
       <Reveal i={3} className="mm-block">
         <div className="mm-copy">
+          {actions}
           <button type="button" className="v-btn v-btn--quiet v-btn--sm" onClick={onCopy}>
             Copy summary
           </button>

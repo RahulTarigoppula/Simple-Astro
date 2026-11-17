@@ -432,6 +432,7 @@ export default function DrawerScreen() {
           <ul className="set-kept">
             <li>The people you add: name, birth date, time and place.</li>
             <li>Palm photos, only if you take one.</li>
+            <li>Your days: how you said each day went, and any note you wrote.</li>
             <li>Your settings, and charts it has already worked out (to open faster).</li>
             <li>Place names you searched online, for up to 90 days.</li>
           </ul>

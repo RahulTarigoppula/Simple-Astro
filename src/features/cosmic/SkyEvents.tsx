@@ -171,8 +171,8 @@ export function SkyEvents({ nowMs, place, zone, preset, days = 45, limit = 8 }: 
             Next {days} days at {place.name.split(",")[0]}
           </p>
         </div>
-        <Link to="/explore" className="v-link">
-          Explore <ChevronRight size={16} />
+        <Link to="/festivals" className="v-link">
+          Festivals <ChevronRight size={16} />
         </Link>
       </header>
       {shown.length === 0 ? (

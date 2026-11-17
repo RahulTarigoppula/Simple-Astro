@@ -119,3 +119,32 @@ export const IconNumbers = (p: IconProps) => (
     <path d="M14 10.2a2.4 2.4 0 1 1-2.4-2.4A2.4 2.4 0 0 1 14 10.2v3.3a2.8 2.8 0 0 1-4.6 2.1" />
   </Svg>
 );
+/** A calendar page with one day marked: pick a good day. */
+export const IconPick = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+    <path d="M3.5 9.5h17M8 3v4M16 3v4M8.8 14.6l2.2 2.2 4.4-4.6" />
+  </Svg>
+);
+/** A lamp (dīpa): festivals and fasts. */
+export const IconFestival = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 3c1.8 2 2.6 3.4 2.6 4.8a2.6 2.6 0 0 1-5.2 0C9.4 6.4 10.2 5 12 3z" />
+    <path d="M4 13h16c0 4-3.4 6.5-8 6.5S4 17 4 13zM9 21h6" />
+  </Svg>
+);
+/** A small house with people in it: the family's day. */
+export const IconFamily = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3.5 11.5L12 4l8.5 7.5M5.5 10v9.5h13V10" />
+    <circle cx="9.5" cy="13.5" r="1.6" />
+    <circle cx="14.5" cy="13.5" r="1.6" />
+    <path d="M7.5 19.5c.3-1.6 1-2.5 2-2.5s1.7.9 2 2.5M12.5 19.5c.3-1.6 1-2.5 2-2.5s1.7.9 2 2.5" />
+  </Svg>
+);
+/** A notebook with a pencil stroke: the journal of days. */
+export const IconJournal = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M6 3.5h11a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H6zM6 3.5v17M3.5 8H6M3.5 12H6M3.5 16H6M10 9h5M10 13h3.5" />
+  </Svg>
+);

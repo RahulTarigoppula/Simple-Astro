@@ -59,6 +59,7 @@
   backdrop-filter: blur(18px);
 }
 .v-nav__brand,
+.v-nav__more,
 .v-nav__foot {
   display: none;
 }
@@ -144,6 +145,14 @@
   .v-nav__item.is-active .v-nav__icon {
     background: none;
     color: var(--ink);
+  }
+  .v-nav__more {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--card-edge);
   }
   .v-nav__foot {
     display: flex;

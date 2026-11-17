@@ -253,8 +253,15 @@ export async function renderPoster(scene: PaintedScene, text: PosterText): Promi
   return canvas;
 }
 
-/** Save the poster: anchor download on the web, cache + share sheet on Android. */
-export async function savePoster(canvas: HTMLCanvasElement, filename: string): Promise<void> {
+/**
+ * Save a drawn canvas as a PNG: anchor download on the web, cache + share sheet on Android.
+ * The labels are the share sheet's; the sky poster keeps its own (the share cards pass theirs).
+ */
+export async function savePoster(
+  canvas: HTMLCanvasElement,
+  filename: string,
+  labels: { title: string; dialogTitle: string } = { title: "Rooftop sky", dialogTitle: "Share the poster" },
+): Promise<void> {
   const dataUrl = canvas.toDataURL("image/png");
   if (isNative()) {
     const [{ Filesystem, Directory }, { Share }] = await Promise.all([import("@capacitor/filesystem"), import("@capacitor/share")]);
@@ -263,7 +270,7 @@ export async function savePoster(canvas: HTMLCanvasElement, filename: string): P
       data: dataUrl.slice(dataUrl.indexOf(",") + 1),
       directory: Directory.Cache,
     });
-    await Share.share({ title: "Rooftop sky", url: res.uri, dialogTitle: "Share the poster" });
+    await Share.share({ title: labels.title, url: res.uri, dialogTitle: labels.dialogTitle });
     return;
   }
   const a = document.createElement("a");

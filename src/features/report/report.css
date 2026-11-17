@@ -1,0 +1,786 @@
+/* The birth report: a picture band, then one sheet of paper holding the whole chart as a document.
+   Built on styles/ui.css; tokens only. Everything inside the sheet is sized in em from `.rp-paper`, so
+   print can set the body size in points once. Reused pieces (the reading in simple words, the three key
+   signs, the kundli figure) are restyled only inside `.report`; their own screens are untouched. */
+
+/* ── The band ─────────────────────────────────────────────────────────── */
+.rp-band {
+  display: flex;
+  flex-direction: column;
+  color: var(--ink);
+  min-width: 0;
+}
+.rp-band__pic {
+  width: calc(100% + 2 * var(--page-pad));
+  max-width: 520px;
+  margin: 4px calc(-1 * var(--page-pad)) 0;
+  align-self: center;
+  min-width: 0;
+}
+.rp-band__say {
+  min-width: 0;
+}
+.rp-band__title {
+  margin: 10px 0 0;
+  font: 500 clamp(1.75rem, 8vw, 2.5rem) / 1.08 var(--font-display);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.rp-band__lede {
+  margin: 10px 0 0;
+  max-width: 46ch;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+  text-wrap: pretty;
+}
+.rp-band__actions {
+  margin-top: 18px;
+}
+.rp-band__native {
+  margin: 18px 0 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+@media (min-width: 900px) {
+  .rp-band {
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 40px;
+    padding-top: 8px;
+  }
+  .rp-band__pic {
+    flex: 1 1 0;
+    width: auto;
+    max-width: 460px;
+    margin: 0;
+  }
+  .rp-band__say {
+    flex: 1 1 0;
+  }
+}
+
+/* ── The sheet ────────────────────────────────────────────────────────── */
+.rp-paper {
+  --rp-rule: var(--card-edge-strong);
+  --rp-hair: var(--card-edge);
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 28px 20px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+  font: 400 1rem / 1.5 var(--font-body);
+  display: flex;
+  flex-direction: column;
+  gap: 2.25em;
+  min-width: 0;
+}
+@media (min-width: 720px) {
+  .rp-paper {
+    padding: 48px 52px 40px;
+  }
+}
+.rp-sec {
+  min-width: 0;
+}
+.rp-paper p {
+  margin: 0;
+}
+.rp-sk {
+  font-weight: 400;
+  font-size: 0.86em;
+  color: var(--ink-muted);
+  letter-spacing: 0;
+}
+.rp-quiet {
+  color: var(--ink-muted);
+}
+.rp-h {
+  margin: 0 0 0.7em;
+  padding-bottom: 0.35em;
+  border-bottom: 1px solid var(--rp-rule);
+  font: 540 1.375em / 1.2 var(--font-display);
+  letter-spacing: -0.015em;
+}
+.rp-h .rp-sk {
+  font: 400 0.64em var(--font-body);
+  margin-left: 0.35em;
+}
+.rp-h3 {
+  margin: 0 0 0.45em;
+  font: 600 1em / 1.3 var(--font-body);
+}
+.rp-lead {
+  max-width: 68ch;
+  color: var(--ink-muted);
+  font-size: 0.9375em;
+}
+.rp-note {
+  margin-top: 0.9em !important;
+  font-size: 0.8125em;
+  line-height: 1.5;
+  color: var(--ink-muted);
+  text-wrap: pretty;
+}
+
+/* ── 1. Cover ─────────────────────────────────────────────────────────── */
+.rp-cover__kind {
+  font: 600 0.8125em / 1.3 var(--font-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.rp-cover__name {
+  margin: 0.15em 0 0;
+  font: 520 2.25em / 1.1 var(--font-display);
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.rp-cover__sk {
+  margin-top: 0.4em !important;
+  font-size: 0.875em;
+  color: var(--ink-muted);
+}
+.rp-facts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75em 1.5em;
+  margin: 1.25em 0 0;
+  padding: 1em 0 0;
+  border-top: 1px solid var(--rp-rule);
+}
+.rp-fact {
+  min-width: 0;
+}
+.rp-fact dt {
+  font-size: 0.8125em;
+  line-height: 1.35;
+  color: var(--ink-muted);
+}
+.rp-fact dd {
+  margin: 0.1em 0 0;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.rp-fact dd .rp-quiet {
+  font-weight: 400;
+}
+.rp-fact__sub {
+  display: block;
+  font-weight: 400;
+  font-size: 0.8125em;
+  color: var(--ink-muted);
+}
+@media (min-width: 560px) {
+  .rp-facts--birth {
+    grid-template-columns: 1fr 1fr 1.4fr;
+  }
+  .rp-facts--almanac {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* the three key signs (KeyFacts), laid flat on the sheet */
+.rp-keys {
+  margin-top: 1.25em;
+  padding-top: 0.4em;
+  border-top: 1px solid var(--rp-rule);
+}
+.report .rp-keys .kf {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
+}
+.report .rp-keys .kf__row {
+  padding: 0.75em 0;
+  gap: 0.75em;
+  align-items: flex-start;
+}
+.report .rp-keys .kf__row:hover {
+  background: none;
+}
+.report .rp-keys .kf__row + .kf__row {
+  border-top: 1px solid var(--rp-hair);
+}
+.report .rp-keys .kf__k,
+.report .rp-keys .kf__s,
+.report .rp-keys .kf__warn {
+  font-size: 0.8125em;
+}
+.report .rp-keys .kf__v {
+  font-size: 1.25em;
+  font-family: var(--font-display);
+  font-weight: 540;
+}
+.report .rp-paper .info-dot,
+.report .rp-paper .v-chev {
+  display: none;
+}
+@media (min-width: 640px) {
+  .report .rp-keys .kf {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0 1.5em;
+  }
+  .report .rp-keys .kf__row + .kf__row {
+    border-top: 0;
+  }
+}
+
+/* ── 2. In simple words (LifeReading), flat on the sheet, without its doors to other screens ── */
+.report .rp-words .life {
+  gap: 1.1em;
+}
+.report .rp-words .v-card {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+.report .rp-words .life .v-sec,
+.report .rp-words .life .v-list,
+.report .rp-words .life__more,
+.report .rp-words .kt-warn {
+  display: none;
+}
+.report .rp-words .life__lead {
+  font-size: 1em;
+  max-width: none;
+}
+.report .rp-words .life__born {
+  font-size: 0.9375em;
+}
+.report .rp-words .life .v-foot {
+  margin: 0;
+  text-align: left;
+  font-size: 0.8125em;
+}
+
+/* ── 3. The two charts ────────────────────────────────────────────────── */
+.rp-pair {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5em;
+}
+@media (min-width: 560px) {
+  .rp-pair {
+    grid-template-columns: 1fr 1fr;
+    gap: 2em;
+  }
+}
+.rp-fig {
+  margin: 0;
+  min-width: 0;
+}
+.rp-fig .chart-wrap {
+  max-width: 400px;
+  margin: 0 auto;
+}
+.rp-fig .chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.rp-fig figcaption {
+  margin-top: 0.6em;
+  text-align: center;
+  line-height: 1.35;
+}
+.rp-fig__s {
+  display: block;
+  font-size: 0.8125em;
+  color: var(--ink-muted);
+}
+
+/* ── 4 and 5. Tables ──────────────────────────────────────────────────── */
+.rp-scroll {
+  overflow-x: auto;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+.rp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875em;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+}
+.rp-table th,
+.rp-table td {
+  padding: 0.5em 0.9em 0.5em 0;
+  border: 0;
+  border-bottom: 1px solid var(--rp-hair);
+  background: none;
+  text-align: left;
+  vertical-align: top;
+  font-weight: 400;
+  color: var(--ink);
+}
+.rp-table th:last-child,
+.rp-table td:last-child {
+  padding-right: 0;
+}
+.rp-table thead th {
+  border-bottom: 1px solid var(--rp-rule);
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+.rp-table tbody th {
+  font-weight: 600;
+}
+.rp-table .rp-num {
+  text-align: right;
+  white-space: nowrap;
+}
+.rp-table .rp-sk {
+  display: block;
+}
+.rp-table--planets {
+  min-width: 600px;
+}
+.rp-pada {
+  font-weight: 600;
+}
+.rp-table tr.is-now th,
+.rp-table tr.is-now td {
+  font-weight: 650;
+  background: rgba(var(--tint), 0.05);
+}
+.rp-now {
+  display: inline-block;
+  margin-left: 0.4em;
+  padding: 0 0.5em;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-full);
+  font-size: 0.78em;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.rp-table--dasha .rp-sk {
+  display: inline;
+}
+.rp-table--dasha td {
+  white-space: nowrap;
+}
+.rp-cols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5em;
+  margin-top: 1em;
+}
+@media (min-width: 640px) {
+  .rp-cols {
+    grid-template-columns: 1.15fr 1fr;
+    gap: 2.25em;
+    align-items: start;
+  }
+}
+.rp-col {
+  min-width: 0;
+}
+
+/* ── 6. Combinations ──────────────────────────────────────────────────── */
+.rp-yogalist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9em;
+}
+.rp-yoga__n {
+  font-weight: 600;
+}
+.rp-yoga__p {
+  font-size: 0.9375em;
+  max-width: 76ch;
+}
+.rp-yoga__src {
+  font-weight: 400;
+  font-size: 0.8125em;
+  color: var(--ink-muted);
+}
+
+/* ── 7. Method ────────────────────────────────────────────────────────── */
+.rp-method {
+  padding: 1.1em 1.25em;
+  border-radius: var(--radius-md);
+  background: rgba(var(--tint), 0.05);
+  font-size: 0.875em;
+}
+.rp-method__dl {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35em 2em;
+  margin: 0;
+}
+.rp-method__dl > div {
+  display: flex;
+  gap: 0.6em;
+  min-width: 0;
+}
+.rp-method__dl dt {
+  flex: 0 0 6.2em;
+  color: var(--ink-muted);
+}
+.rp-method__dl dd {
+  margin: 0;
+  min-width: 0;
+}
+@media (min-width: 640px) {
+  .rp-method__dl {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.rp-footer {
+  margin-top: 0.9em !important;
+  padding-top: 0.8em;
+  border-top: 1px solid var(--rp-hair);
+  font: 500 italic 1.0625em / 1.4 var(--font-display);
+}
+
+/* ── Print: A4 portrait, the sheet only, near-black on white whatever the theme ───────────── */
+@page report {
+  size: A4 portrait;
+  margin: 14mm;
+}
+@media print {
+  /* the named page keeps this size and margin to the report: other screens print as before */
+  html:has(main.report) {
+    page: report;
+  }
+  .report {
+    --ink: color-mix(in srgb, black 90%, white);
+    --ink-muted: color-mix(in srgb, black 66%, white);
+    --ink-faint: color-mix(in srgb, black 50%, white);
+    --accent-text: var(--ink);
+    --accent-2: var(--ink);
+    --good: var(--ink);
+    --mixed: var(--ink);
+    --care: var(--ink);
+    --card: white;
+    --card-edge: color-mix(in srgb, black 22%, white);
+    --card-edge-strong: color-mix(in srgb, black 55%, white);
+    --tint: 0, 0, 0;
+    color: var(--ink);
+    background: white !important;
+  }
+  /* app chrome: the tab bar or rail, the band with its top bar, person chip and buttons */
+  .v-nav,
+  .desk__top,
+  .sw-tab,
+  .report .v-band,
+  .report .v-top,
+  .report .v-note,
+  .report .v-skel {
+    display: none !important;
+  }
+  .report .v-page {
+    display: block;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .report .rp-paper {
+    display: block;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: none;
+    font-size: 10.5pt;
+    line-height: 1.42;
+    orphans: 3;
+    widows: 3;
+  }
+  .report .rp-sec {
+    margin: 0 0 5.5mm;
+    break-inside: avoid;
+  }
+  .report .rp-sec:last-child {
+    margin-bottom: 0;
+  }
+  /* a long list of combinations may run over a page, but never through one of them */
+  .report .rp-yogas {
+    break-inside: auto;
+  }
+  .report .rp-yogalist li,
+  .report .rp-fig,
+  .report .rp-pair,
+  .report .rp-table,
+  .report .rp-table tr,
+  .report .rp-col,
+  .report .rp-facts,
+  .report .rp-keys,
+  .report .life__traits {
+    break-inside: avoid;
+  }
+  .report .rp-h,
+  .report .rp-h3,
+  .report .rp-lead {
+    break-after: avoid;
+  }
+  .report a,
+  .report a:visited {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+  .report a::after {
+    content: none !important;
+  }
+
+  /* cover */
+  .report .rp-cover__name {
+    font-size: 26pt;
+  }
+  .report .rp-facts {
+    margin-top: 5mm;
+    padding-top: 4mm;
+  }
+  .report .rp-facts--birth {
+    grid-template-columns: 1fr 1fr 1.4fr;
+  }
+  .report .rp-facts--almanac {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .report .rp-keys {
+    margin-top: 5mm;
+  }
+  .report .rp-keys .kf {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0 6mm;
+  }
+  .report .rp-keys .kf__row {
+    padding: 3mm 0 0;
+    border-top: 0 !important;
+  }
+  .report .rp-keys .kf__glyph {
+    display: none;
+  }
+  .report .rp-keys .kf__k,
+  .report .rp-keys .kf__s,
+  .report .rp-keys .kf__warn {
+    font-size: 8.5pt;
+  }
+  .report .rp-keys .kf__v {
+    font-size: 14pt;
+  }
+  .report .rp-keys .kf__v::after {
+    content: none !important;
+  }
+
+  /* the reading: the app sizes these in rem, paper wants points */
+  .report .rp-words .life {
+    gap: 3.5mm;
+  }
+  .report .rp-words .life__hero {
+    gap: 2.5mm;
+  }
+  .report .rp-words .life__lead {
+    font-size: 10.5pt;
+    line-height: 1.45;
+  }
+  .report .rp-words .life__born {
+    padding-top: 2.5mm;
+    font-size: 10pt;
+  }
+  .report .rp-words .life__pm {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8mm;
+  }
+  .report .rp-words .life__k,
+  .report .rp-words .life__dl dt {
+    margin-bottom: 1.5mm;
+    font-size: 10pt;
+  }
+  /* backgrounds are not printed, so the two marks are drawn with borders: solid for plus, hollow for care */
+  .report .rp-words .life__k::before {
+    box-sizing: border-box;
+    width: 7px;
+    height: 7px;
+    background: none;
+    border: 1px solid var(--ink);
+  }
+  .report .rp-words .life__k--plus::before {
+    border-width: 3.5px;
+  }
+  .report .rp-words .life__pm ul {
+    gap: 1mm;
+    font-size: 10pt;
+    color: var(--ink);
+  }
+  .report .rp-words .life__traits {
+    gap: 0;
+  }
+  .report .rp-words .life__dl {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8mm;
+    margin: 3.5mm 0 0;
+    padding-top: 3mm;
+    border-top: 1px solid var(--card-edge);
+    font-size: 10pt;
+  }
+  .report .rp-words .life__dl > div,
+  .report .rp-words .life__dl > div + div {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .report .rp-words .life__dl dd {
+    margin-top: 0;
+    color: var(--ink);
+  }
+  .report .rp-words .life .v-foot {
+    font-size: 8.5pt;
+    color: var(--ink-muted);
+  }
+
+  /* charts: side by side, plain black line work */
+  .report .rp-pair {
+    grid-template-columns: 1fr 1fr;
+    gap: 10mm;
+  }
+  .report .rp-fig .chart-wrap {
+    max-width: 78mm;
+  }
+  :root:root .report .chart .stroke {
+    stroke: black;
+    stroke-opacity: 1;
+    stroke-width: 1.2px;
+    stroke-dasharray: none;
+    animation: none;
+  }
+  :root:root .report .chart .lagna-tick {
+    stroke: black;
+  }
+  :root:root .report .chart .tilak,
+  :root:root .report .chart .graha {
+    fill: black;
+  }
+  .report .chart text,
+  .report .chart .tilak,
+  .report .chart .lagna-tick {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  /* tables: nothing scrolls, nothing is clipped */
+  .report .rp-scroll {
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+  }
+  .report .rp-table {
+    font-size: 9.5pt;
+  }
+  .report .rp-table--planets {
+    min-width: 0;
+  }
+  .report .rp-table th,
+  .report .rp-table td {
+    padding: 1.15mm 3mm 1.15mm 0;
+  }
+  .report .rp-table--dasha {
+    font-size: 9pt;
+  }
+  .report .rp-table--dasha th,
+  .report .rp-table--dasha td {
+    padding: 1.1mm 2mm 1.1mm 0;
+    white-space: nowrap;
+  }
+  .report .rp-lead {
+    max-width: none;
+    font-size: 9.5pt;
+  }
+  .report .rp-cols {
+    margin-top: 3mm;
+  }
+  /* combinations in two columns, each kept whole */
+  .report .rp-yogalist {
+    display: block;
+    columns: 2;
+    column-gap: 9mm;
+  }
+  .report .rp-yogalist li {
+    margin: 0 0 2.2mm;
+  }
+  .report .rp-yoga__n {
+    font-size: 10pt;
+  }
+  .report .rp-yoga__p {
+    font-size: 9pt;
+    line-height: 1.38;
+  }
+  .report .rp-yoga__src {
+    font-size: 8.5pt;
+  }
+  .report .rp-table tr.is-now th,
+  .report .rp-table tr.is-now td {
+    background: none;
+  }
+  .report .rp-cols {
+    grid-template-columns: 1.12fr 1fr;
+    gap: 8mm;
+    align-items: start;
+  }
+  .report .rp-note {
+    font-size: 8.5pt;
+  }
+  /* the method box closes the document: it never starts a page by itself */
+  .report .rp-method {
+    padding: 2.6mm 4.5mm;
+    border: 1px solid var(--card-edge-strong);
+    border-radius: 2mm;
+    background: none;
+    font-size: 8.5pt;
+    break-before: avoid;
+  }
+  /* on paper the method runs on as a few lines of small print */
+  .report .rp-method__dl {
+    display: block;
+    line-height: 1.5;
+  }
+  .report .rp-method__dl > div,
+  .report .rp-method__dl dt,
+  .report .rp-method__dl dd {
+    display: inline;
+  }
+  .report .rp-method__dl dt::after {
+    content: ": ";
+  }
+  .report .rp-method__dl dd {
+    color: var(--ink);
+  }
+  .report .rp-method__dl dd::after {
+    content: ".  ";
+    white-space: pre-wrap;
+  }
+  .report .rp-method .rp-h3 {
+    margin-bottom: 1mm;
+    font-size: 9pt;
+  }
+  .report .rp-footer {
+    margin-top: 2mm !important;
+    padding-top: 1.6mm;
+    font-size: 10.5pt;
+  }
+}

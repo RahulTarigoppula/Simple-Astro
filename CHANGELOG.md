@@ -1,5 +1,29 @@
 # Changelog
 
+## 4.0.0 (2026-11-17)
+
+3.x made the app good to look at. 4.0 makes it do far more: seven new features, each worked out on the device from the same engine, each opening on a true picture. The engine's existing results are unchanged.
+
+### New
+- **Pick a good day.** Choose what you want to do (start something new, travel, an important talk, begin a course, move home, buy for the home, a celebration, creative work) and see the best days ahead for you, soonest first, each with its reasons for and against in plain words and the best time of that day. Weighs the lunar day, the weekday, the class of the Moon's star, and for a person the tārā-bala and candra-bala from their birth star and Moon sign. Two weeks, 45 days or three months.
+- **Festivals and fasts.** The Hindu festival calendar for the year ahead, computed for your place from the real Moon and Sun: about thirty festivals, each chosen by its own rule (the lunar day at sunrise, midday, dusk or midnight), every Ekādaśī by name, Pradoṣa, full and new Moon days, Saṅkaṣṭī, the Sun's entries and eclipses. Each row says how its day was chosen and opens that day's almanac. Tested against the published 2026 and 2027 dates.
+- **Family today.** Everyone saved on the device on one screen: each person's day in a word and a number on a shared picture, best day first, with what the day is best for; and the family's coming birthdays and monthly star birthdays.
+- **Your days (journal).** One tap a day to say how the day really went, with an optional note. The journal shows the weeks as a grid, what you said inside what the sky had said, and how often the two agreed. A mirror, not a score. Kept only on the device and included in the encrypted backup.
+- **Share cards.** "My day", "Our match" and "My stars" as a picture to send to family: drawn on the device, first name only, with a switch to hide the name. Never the birth date, time or place.
+- **Your year ahead.** The next twelve months as a short tap-through story: best months, months to go gently, your life chapter, where Jupiter and Saturn travel for you, your strongest areas, and the days worth circling.
+- **Birth report.** The whole birth chart as a clean three-page document to print or save as a PDF: birth details, the reading in simple words, the birth and ninth-part charts, the planet table, life chapters with dates, the notable combinations and the method.
+- **Name sound.** The opening sound tradition gives a name from the quarter of the birth star, under "Your birth in other traditions".
+
+### Better
+- Today now carries the journal card, the next good day, the family's day and the next festival, and a share button on the sky.
+- The "Good times today" card is a proper two-column list.
+- The almanac opens on any date from a link (`#/today?d=2026-11-24`).
+- Full and half Moons in "Coming up in the sky" are drawn in the Moon's own colour in the light theme (the full Moon was a black disc).
+- The desktop side menu lists the new screens.
+
+### Data
+- The on-device database moves to schema version 2 (one new table, `journal`). Existing data is kept as is. A backup made by 4.0 cannot be restored by an older build; older backups restore in 4.0.
+
 ## 3.1.0 (2026-11-16)
 
 3.0 was clean but plain. 3.1 keeps the calm ivory-and-ink page and opens every tab on a picture: a full-width band at the top that shows the answer as a true picture of the sky, drawn from the same numbers as the text, with the page sliding up over it. Nothing in the engine changed.

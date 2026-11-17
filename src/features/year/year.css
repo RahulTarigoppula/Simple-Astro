@@ -1,0 +1,773 @@
+/* "Your year ahead": a full-screen story on the night sky. A phone-width column, centred on a dark
+   backdrop on wider screens. Everything inside is .v-night: ivory text, white glass, sky tokens. */
+.year-screen__hold {
+  height: 100dvh;
+}
+.yr {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--sky-cloth-deep);
+  color: var(--ink);
+  font-family: var(--font-body);
+  outline: none;
+}
+.yr__col {
+  --glow: var(--sky-sun);
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  width: min(100vw, 430px);
+  height: 100dvh;
+  padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+  background:
+    radial-gradient(130% 46% at 50% 0%, color-mix(in srgb, var(--glow) 17%, transparent), transparent 72%), var(--sky-paint-night);
+  overflow: hidden;
+}
+.yr__col[data-mood="green"] {
+  --glow: var(--sky-good);
+}
+.yr__col[data-mood="moon"] {
+  --glow: var(--star);
+}
+.yr__col[data-mood="rose"] {
+  --glow: var(--sky-avoid);
+}
+@media (min-width: 560px) and (min-height: 640px) {
+  .yr__col {
+    height: min(100dvh - 48px, 900px);
+    border-radius: 32px;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 40px 120px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* progress segments */
+.yr__bars {
+  display: flex;
+  gap: 4px;
+  padding: 12px 14px 0;
+}
+.yr__bars span {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.26);
+  overflow: hidden;
+}
+.yr__bars i {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  transform-origin: left center;
+}
+.yr__top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 0 22px;
+}
+.yr__caption {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 550;
+  color: rgba(255, 255, 255, 0.82);
+  font-variant-numeric: tabular-nums;
+}
+.yr__close,
+.yr__nav {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.yr__close:hover,
+.yr__nav:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.18);
+}
+.yr__nav:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+.yr :focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.yr__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px 12px;
+}
+.yr__count {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.76);
+  font-variant-numeric: tabular-nums;
+}
+
+/* the stage and a slide */
+.yr__stage {
+  min-height: 0;
+  padding: 0 22px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.yr__stage[data-tall] {
+  touch-action: pan-y;
+}
+.yr__stage::-webkit-scrollbar {
+  display: none;
+}
+.yr-slide {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  animation: yr-in 420ms var(--ease-out) both;
+}
+@keyframes yr-in {
+  from {
+    opacity: 0;
+  }
+}
+.yr-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-block: auto;
+  padding: 10px 0 12px;
+  min-width: 0;
+}
+.yr-body--title,
+.yr-body--close {
+  text-align: center;
+}
+.yr-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* words */
+.yr-eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--sky-sun);
+}
+.yr-h {
+  margin: 0;
+  font: 520 2.125rem / 1.1 var(--font-display);
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.yr-h--sm {
+  font-size: 1.625rem;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+.yr-lead {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+.yr-lead--sm {
+  font-size: 1.0625rem;
+}
+.yr-para {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+  text-wrap: pretty;
+}
+.yr-para--sm {
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+.yr-para--tight {
+  margin-top: 10px;
+}
+.yr-para__s {
+  color: rgba(255, 255, 255, 0.74);
+}
+.yr-note {
+  margin: 8px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.74);
+}
+.yr-note--key {
+  margin: -4px 0 0;
+  text-align: center;
+}
+.yr-term {
+  margin: -6px 0 0;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+.yr-term span {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+.yr-wait {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+.yr-body--title .yr-wait,
+.yr-body--close .yr-wait {
+  justify-content: center;
+}
+.yr-wait i {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sky-sun);
+  animation: yr-breathe 1.6s ease-in-out infinite alternate;
+}
+@keyframes yr-breathe {
+  from {
+    opacity: 0.35;
+  }
+}
+
+/* 1. the ring */
+.yr-ring {
+  position: relative;
+  width: min(100%, 322px);
+  margin: 0 auto;
+}
+.yr-ring--empty {
+  aspect-ratio: 1;
+}
+.yr-ring svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.yr-ring__track {
+  fill: rgba(255, 255, 255, 0.07);
+}
+.yr-ring__petal[data-tone="steady"] {
+  opacity: 0.92;
+}
+.yr-ring__petal[data-tone="mixed"] {
+  fill-opacity: 0.5;
+}
+.yr-ring__m {
+  fill: rgba(255, 255, 255, 0.78);
+  font: 550 11.5px var(--font-body);
+}
+.yr-ring__m.is-now {
+  fill: var(--sky-sun);
+  font-weight: 700;
+}
+.yr-ring__now,
+.yr-ring__star {
+  fill: var(--sky-sun);
+}
+.yr-ring__center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  pointer-events: none;
+}
+.yr-ring__k {
+  margin: 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+.yr-ring__word {
+  margin: 2px 0;
+  font: 520 2.75rem / 1 var(--font-display);
+  letter-spacing: -0.03em;
+}
+.yr-ring__word[data-long] {
+  font-size: 1.875rem;
+}
+.yr-ring__n {
+  margin: 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-variant-numeric: tabular-nums;
+}
+.yr-ring-sm .yr-ring {
+  width: 168px;
+}
+.yr-ring-sm .yr-ring__m {
+  display: none;
+}
+.yr-ring-sm .yr-ring__word {
+  font-size: 1.5rem;
+}
+.yr-ring-sm .yr-ring__word[data-long] {
+  font-size: 1.0625rem;
+}
+
+/* 2 and 3. the curve */
+.yr-curve {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.yr-curve__line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.yr-curve__dot {
+  fill: rgba(255, 255, 255, 0.8);
+}
+.yr-curve__halo {
+  fill: color-mix(in srgb, var(--sky-sun) 24%, transparent);
+}
+.yr-curve__pick {
+  fill: var(--sky-sun);
+}
+.yr-curve[data-kind="gentle"] .yr-curve__halo {
+  fill: color-mix(in srgb, var(--star) 16%, transparent);
+}
+.yr-curve[data-kind="gentle"] .yr-curve__pick {
+  fill: var(--sky-cloth);
+  stroke: var(--star);
+  stroke-width: 3;
+}
+.yr-curve__name {
+  fill: var(--ink);
+  font: 650 14px var(--font-body);
+}
+.yr-curve__axis {
+  fill: rgba(255, 255, 255, 0.7);
+  font: 500 11px var(--font-body);
+}
+.yr-curve__axis.is-on {
+  fill: var(--ink);
+  font-weight: 700;
+}
+.yr-picks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.yr-picks li + li {
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+.yr-picks__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 2px 12px;
+  padding: 11px 0;
+}
+.yr-picks__m {
+  font: 520 1.625rem / 1.15 var(--font-display);
+  letter-spacing: -0.015em;
+}
+.yr-picks__y {
+  font: 500 0.875rem var(--font-body);
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, 0.72);
+}
+.yr-picks__w {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.86);
+  font-variant-numeric: tabular-nums;
+}
+.yr-picks__why {
+  grid-column: 1 / -1;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+/* 4. the chapter */
+.yr-arc {
+  margin: 4px -4px 0;
+}
+.yr-ribbon {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 2px;
+}
+.yr-ribbon__seg {
+  fill: rgba(255, 255, 255, 0.34);
+}
+.yr-ribbon__seg.is-now {
+  fill: var(--sky-sun);
+}
+.yr-ribbon__name {
+  fill: rgba(255, 255, 255, 0.9);
+  font: 600 11.5px var(--font-body);
+}
+.yr-ribbon__when {
+  fill: rgba(255, 255, 255, 0.76);
+  font: 500 11px var(--font-body);
+}
+.yr-ribbon__here {
+  fill: var(--ink);
+  stroke: var(--sky-sun);
+  stroke-width: 3;
+}
+
+/* 5. the wheel */
+.yr-wheel {
+  display: block;
+  width: min(100%, 236px);
+  height: auto;
+  margin: 0 auto;
+  overflow: visible;
+}
+.yr-wheel__rim {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.24);
+  stroke-width: 1;
+}
+.yr-wheel__spoke {
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 1;
+}
+.yr-wheel__house {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 50;
+}
+.yr-wheel__n {
+  fill: rgba(255, 255, 255, 0.66);
+  font: 500 15px var(--font-body);
+}
+.yr-wheel__n.is-on {
+  fill: var(--ink);
+  font-weight: 700;
+  font-size: 17px;
+}
+.yr-wheel__moon {
+  fill: var(--sky-moon);
+}
+.yr-wheel__you {
+  fill: var(--sky-cloth);
+  font: 700 15px var(--font-body);
+}
+.yr-wheel__path {
+  fill: none;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+.yr-wheel [data-graha="JU"] {
+  --p: var(--sky-sun);
+}
+.yr-wheel [data-graha="SA"] {
+  --p: var(--star);
+}
+.yr-wheel__path,
+.yr-wheel__ring,
+.yr-wheel__lead {
+  stroke: var(--p);
+}
+.yr-wheel__path {
+  stroke-opacity: 0.55;
+}
+.yr-wheel__from {
+  fill: var(--sky-cloth);
+  stroke: var(--p);
+  stroke-width: 2.5;
+}
+.yr-wheel__to {
+  fill: var(--p);
+}
+.yr-wheel__ring {
+  fill: none;
+  stroke-width: 1.6;
+}
+.yr-wheel__lead {
+  stroke-width: 1;
+  stroke-opacity: 0.5;
+}
+.yr-wheel__name {
+  fill: var(--ink);
+  font: 650 17px var(--font-body);
+}
+.yr-season {
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.88);
+}
+.yr-season b {
+  font-weight: 650;
+  color: var(--ink);
+}
+.yr-season__term {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* 6. the areas */
+.yr-areas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.yr-area {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 6px 12px;
+}
+.yr-area__t {
+  font: 520 1.4375rem / 1.15 var(--font-display);
+  letter-spacing: -0.012em;
+}
+.yr-area__w {
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+.yr-area__bar {
+  grid-column: 1 / -1;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+.yr-area__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ink);
+}
+.yr-area[data-tone="bright"] .yr-area__bar span {
+  background: var(--sky-good);
+}
+.yr-area.is-soft .yr-area__bar span {
+  background: var(--sky-moon);
+  opacity: 0.75;
+}
+.yr-area.is-soft .yr-area__t {
+  font-size: 1.25rem;
+}
+.yr-area__s {
+  grid-column: 1 / -1;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.76);
+  font-variant-numeric: tabular-nums;
+}
+.yr-tend {
+  margin-top: 6px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+.yr-tend__k {
+  margin: 0 0 8px;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* 7. the days */
+.yr-body--days {
+  gap: 10px;
+}
+.yr-grid {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+  overflow: visible;
+}
+.yr-grid__wd,
+.yr-grid__mo {
+  fill: rgba(255, 255, 255, 0.74);
+  font: 500 10.5px var(--font-body);
+}
+.yr-grid__mo {
+  font-weight: 650;
+  fill: rgba(255, 255, 255, 0.86);
+}
+.yr-grid__dot {
+  fill: var(--ink);
+}
+.yr-grid__pick {
+  fill: var(--sky-sun);
+}
+.yr-grid__k {
+  fill: var(--sky-cloth);
+  font: 750 11.5px var(--font-body);
+}
+.yr-grid__fest {
+  fill: none;
+  stroke: var(--sky-good);
+  stroke-width: 1.5;
+}
+.yr-grid__today {
+  fill: none;
+  stroke: var(--sky-sun);
+  stroke-width: 1.2;
+  stroke-dasharray: 2.5 2.5;
+}
+.yr-days {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.yr-days li + li {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+.yr-days__row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 6px 0;
+}
+.yr-days__k {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--sky-sun);
+  color: var(--sky-cloth);
+  font-size: 0.875rem;
+  font-weight: 750;
+}
+.yr-days__body {
+  min-width: 0;
+}
+.yr-days__t {
+  display: block;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+.yr-days__w {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+.yr-days__s {
+  display: block;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.78);
+}
+.yr-also {
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+.yr-also p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.9);
+}
+.yr-also p + p {
+  margin-top: 8px;
+}
+.yr-also .yr-wait {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+.yr-also__k {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.74);
+}
+.yr-also__fest {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 8px 1px 2px;
+  border: 1.5px solid var(--sky-good);
+  transform: rotate(45deg);
+}
+
+/* 8. the closing */
+.yr-body--close {
+  gap: 16px;
+}
+.yr-reflect {
+  margin: 0;
+  font: italic 500 1.25rem / 1.35 var(--font-display);
+  color: var(--sky-sun);
+}
+.yr-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+.yr-foot {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+@media (max-height: 700px) {
+  .yr-h {
+    font-size: 1.75rem;
+  }
+  .yr-h--sm {
+    font-size: 1.4375rem;
+  }
+  .yr-body {
+    gap: 10px;
+  }
+  .yr-ring {
+    width: min(100%, 260px);
+  }
+  .yr-wheel {
+    width: min(100%, 240px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .yr-slide,
+  .yr-wait i {
+    animation: none;
+  }
+}

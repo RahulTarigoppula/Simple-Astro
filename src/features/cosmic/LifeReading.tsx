@@ -255,6 +255,17 @@ export function LifeReading({ profile, patri, nowMs, onChapters, onBand }: LifeR
           <li>
             <Row to="/milan" icon={<IconMilan />} title="Partner match" sub="How two people fit, with a score" />
           </li>
+          <li>
+            <Row
+              to={`/report/${profile.id}`}
+              icon={<IconChart />}
+              title="Birth report"
+              sub="The whole chart as a document to print or save as PDF"
+            />
+          </li>
+          <li>
+            <Row to={`/year/${profile.id}`} icon={<IconForecast />} title="Your year ahead" sub="The next twelve months as a short story" />
+          </li>
         </ul>
       </Reveal>
 
@@ -263,7 +274,7 @@ export function LifeReading({ profile, patri, nowMs, onChapters, onBand }: LifeR
           <summary>
             <span>
               Your birth in other traditions
-              <span className="v-fold__s">Western Sun sign, the Chinese year and your numbers</span>
+              <span className="v-fold__s">Your name sound, Western Sun sign, Chinese year and numbers</span>
             </span>
           </summary>
           <div className="v-fold__body">

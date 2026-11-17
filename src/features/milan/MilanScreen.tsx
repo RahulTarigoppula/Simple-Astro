@@ -30,6 +30,7 @@ import { haptics } from "../../platform/haptics";
 import { toast } from "../../state/ui";
 import { IconMilan } from "../chowki/icons";
 import { type ChartBody, KundliChart } from "../patri/KundliChart";
+import { ShareButton } from "../share/ShareCard";
 import { BondBand, BondCard, Fold, ORDER_NOTE } from "./BondCard";
 import { Mala } from "./Mala";
 import { PairPicture } from "./PairPicture";
@@ -430,6 +431,7 @@ function MilanScreen() {
                 patA={patA}
                 patB={patB}
                 onCopy={() => void copySummary()}
+                actions={<ShareButton kind="match" className="share-btn--lead" a={pa.name} b={pb.name} result={r} />}
                 manglikFacts={
                   <>
                     <dl className="mm-facts">

@@ -49,6 +49,7 @@ export const CITE = {
   muhurtaHora: c("Muhūrta tradition", "Horā"),
   muhurtaKala: c("Muhūrta tradition", "Brahma-muhūrta and Godhūli"),
   muhurtaTithiDay: c("Muhūrta tradition", "Udaya tithi"),
+  muhurtaDayChoice: c("Muhūrta tradition", "Choosing a day"),
   suryaSiddhanta14: c("Sūrya Siddhānta", "ch. 14"),
 } as const satisfies Record<string, Citation>;
 

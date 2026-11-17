@@ -1,6 +1,6 @@
 // Today: the first screen answers "how is my day?" for the chosen person, then offers the doors to
 // everything else. With nobody added yet it is a short welcome with one thing to do.
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { useActiveProfile, useHere, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { useNowMs } from "../../app/useNow";
@@ -10,13 +10,30 @@ import { ChevronRight, Page, Row, Section } from "../../components/ui/Page";
 import { SkyScene, skyPhase } from "../../components/ui/SkyScene";
 import { GRAHA_LORE } from "../../data/lore";
 import { nakBoth } from "../../data/regional";
+import { inDaysWords, nextFestival } from "../../engine/festivals";
 import { forecast, periodBounds } from "../../engine/forecast";
 import { computePanchang } from "../../engine/panchang";
 import { type AreaReading, dayGuide, personalReading } from "../../engine/personal";
 import type { Patri, Profile, Settings } from "../../engine/types";
-import { IconChart, IconForecast, IconMilan, IconPalm, IconSky, IconStory, IconToday } from "../chowki/icons";
+import {
+  IconChart,
+  IconFestival,
+  IconForecast,
+  IconJournal,
+  IconMilan,
+  IconPalm,
+  IconPick,
+  IconSky,
+  IconStory,
+  IconToday,
+} from "../chowki/icons";
 import { SkyEvents } from "../cosmic/SkyEvents";
+import { FamilyTeaser } from "../family/FamilyTeaser";
 import { HereLine, townOf } from "../here/HereSheet";
+import { JournalPrompt } from "../journal/JournalPrompt";
+import { type PickTeaser, pickTeaser } from "../pick/teaser";
+import { ShareButton } from "../share/ShareCard";
+import { YearTeaser } from "../year/YearTeaser";
 import { MoonDisc } from "./MoonDisc";
 import "./home.css";
 
@@ -193,6 +210,27 @@ function useDayView(profile: Profile | null, patri: Patri | null, settings: Sett
       return null;
     }
   }, [dayStart, lat, lon, settings.preset]);
+  // The next good day to begin something: two weeks of almanac, so it is read after the day itself is on screen.
+  const [pick, setPick] = useState<PickTeaser | null>(null);
+  const [fest, setFest] = useState<string | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-read when the civil day, the place or the person changes, not every minute
+  useEffect(() => {
+    if (!patri) return;
+    const id = setTimeout(() => {
+      try {
+        setPick(pickTeaser(patri, now, { lat, lon, zone }, settings.preset));
+      } catch {
+        setPick(null);
+      }
+      try {
+        const n = nextFestival(now, { lat, lon }, zone, settings.preset);
+        setFest(n ? `${n.festival.name}, ${inDaysWords(n.inDays)}` : null);
+      } catch {
+        setFest(null);
+      }
+    }, 400);
+    return () => clearTimeout(id);
+  }, [patri, dayStart, lat, lon, zone, settings.preset]);
   const hourKey = Math.floor(now / 3_600_000);
   // biome-ignore lint/correctness/useExhaustiveDependencies: the Moon's lunar day and star are re-read once an hour, not every minute
   const moon = useMemo(() => {
@@ -274,6 +312,19 @@ function useDayView(profile: Profile | null, patri: Patri | null, settings: Sett
         <Link to={`/forecast/${profile.id}?p=week`} className="v-btn v-btn--ghost">
           Week ahead
         </Link>
+        <ShareButton
+          kind="day"
+          iconOnly
+          label="Share my day"
+          name={profile.name}
+          zone={zone}
+          nowMs={now}
+          forecast={f}
+          guide={g}
+          sunriseMs={p.sunriseMs}
+          sunsetMs={p.sunsetMs}
+          elongation={moon?.elongation ?? p.elongation}
+        />
       </div>
     </section>
   );
@@ -334,21 +385,21 @@ function useDayView(profile: Profile | null, patri: Patri | null, settings: Sett
                 <div>
                   <dt>Daylight</dt>
                   <dd>
-                    <span>
-                      Sunrise {t12(p.sunriseMs, zone)} · Sunset {t12(p.sunsetMs, zone)}
-                    </span>
+                    <span>Sunrise {t12(p.sunriseMs, zone)}</span>
+                    <span>Sunset {t12(p.sunsetMs, zone)}</span>
                   </dd>
                 </div>
                 <div>
                   <dt>Colour of the day</dt>
                   <dd>
-                    <span>{g.colour}</span>
+                    <span className="home-hours__cap">{g.colour}</span>
                   </dd>
                 </div>
               </dl>
               <HereLine profile={profile} />
             </section>
           </Reveal>
+          <JournalPrompt profile={profile} zone={zone} nowMs={now} tone={f.tone} score={f.score} />
         </div>
 
         <div className="v-stack">
@@ -401,16 +452,37 @@ function useDayView(profile: Profile | null, patri: Patri | null, settings: Sett
             </li>
           ) : null}
           <li>
-            <Row to={`/patri/${profile.id}`} icon={<IconChart />} title="Birth chart" sub="Your life in simple words" />
+            <Row
+              to={pick?.to ?? `/pick/${profile.id}`}
+              icon={<IconPick />}
+              title="Pick a good day"
+              sub={pick?.sub ?? "The best days ahead for what you want to do"}
+            />
           </li>
           <li>
-            <Row to="/milan" icon={<IconMilan />} title="Partner match" sub="How two people fit" />
+            <FamilyTeaser />
+          </li>
+          <li>
+            <YearTeaser profile={profile} />
+          </li>
+          <li>
+            <Row
+              to="/festivals"
+              icon={<IconFestival />}
+              title="Festivals and fasts"
+              sub={fest ? `Next: ${fest}` : "The Hindu calendar for the year ahead, for your place"}
+            />
+          </li>
+          <li>
+            <Row
+              to={`/journal/${profile.id}`}
+              icon={<IconJournal />}
+              title="Your days"
+              sub="How the days really went, beside what the sky said"
+            />
           </li>
           <li>
             <Row to={`/hast/${profile.id}`} icon={<IconPalm />} title="Palm reading" sub="From a photo of your hand" />
-          </li>
-          <li>
-            <Row to={`/patri/${profile.id}/sky`} icon={<IconSky />} title="Sky at birth" sub="The real stars that night" />
           </li>
         </ul>
       </Reveal>

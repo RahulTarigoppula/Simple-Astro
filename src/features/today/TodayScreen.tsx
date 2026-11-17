@@ -544,6 +544,16 @@ function Tabs({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void }) {
   );
 }
 
+/** Whole days from today to the `d=YYYY-MM-DD` in the address, 0 when absent or not a date. Kept within ten years. */
+export function offsetFromQuery(hash: string, now: Date = new Date()): number {
+  const m = /[?&]d=(\d{4})-(\d{2})-(\d{2})(?:&|$)/.exec(hash);
+  if (!m) return 0;
+  const target = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const n = Math.round((target - today) / 86_400_000);
+  return Number.isFinite(n) && Math.abs(n) <= 3660 ? n : 0;
+}
+
 export default function TodayScreen() {
   const active = useActiveProfile();
   const settings = useSettings();
@@ -555,7 +565,8 @@ export default function TodayScreen() {
   // planet-hour highlight) and, once it passes the next sunrise, re-bases on the new day.
   const [baseMs, setBaseMs] = useState(() => Date.now());
   const tickMs = useNowMs(30_000);
-  const [offset, setOffset] = useState(0);
+  // `?d=YYYY-MM-DD` opens the almanac on that day (the festival list links here).
+  const [offset, setOffset] = useState(() => offsetFromQuery(window.location.hash));
   const [foot, setFoot] = useState<Foot | null>(null);
   const setExplain = useUi((s) => s.setExplain);
   const [tab, setTab] = useState<Tab>("day");

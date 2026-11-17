@@ -16,15 +16,17 @@ import {
   ImportError,
   ITERATIONS,
   importEnvelope,
+  importPlaintext,
   readHeader,
   resetUnsealThrottle,
   seal,
   unseal,
 } from "./crypto";
 import { db, SCHEMA_VERSION, TABLE_NAMES } from "./db";
-import { castPatri, putPlaceCache, saveMilan, savePalmCapture, saveReading, saveSettings, upsertProfile } from "./repo";
+import { castPatri, putPlaceCache, saveJournalEntry, saveMilan, savePalmCapture, saveReading, saveSettings, upsertProfile } from "./repo";
 
 const PASS = "haldi and lac, 1987";
+const JOURNAL_NOTE = "a quiet day by the tamarind tree";
 
 async function wipe(): Promise<void> {
   await Promise.all(TABLE_NAMES.map((t) => db.table(t).clear()));
@@ -44,6 +46,11 @@ async function seedEverything(): Promise<void> {
   await saveReading(makeReading(cap.id));
   await saveMilan(makeMilan("p-1", "p-2"));
   await putPlaceCache("Madurai", [{ name: "Madurai", country: "IN", lat: 9.9187, lon: 78.1198, source: "open-meteo" }], 99);
+  await saveJournalEntry(
+    { profileId: "p-1", day: "2026-11-16", mood: 4, note: JOURNAL_NOTE, predictedTone: "steady", predictedScore: 0.25 },
+    7,
+  );
+  await saveJournalEntry({ profileId: "p-2", day: "2026-11-17", mood: 1, predictedTone: null, predictedScore: null }, 8);
 }
 
 /** Every row of every table, with Blobs replaced by {type, bytes} so equality is byte-level. */
@@ -158,6 +165,17 @@ describe("exportEnvelope / importEnvelope", () => {
     const summary = await importEnvelope(env, PASS);
     expect(summary.header.preset).toBe("drik-mean");
     expect(summary.counts.blobs).toBe(2);
+    expect(summary.counts.journal).toBe(2);
+    expect(await db.journal.get(["p-1", "2026-11-16"])).toEqual({
+      profileId: "p-1",
+      day: "2026-11-16",
+      mood: 4,
+      note: JOURNAL_NOTE,
+      predictedTone: "steady",
+      predictedScore: 0.25,
+      createdAt: 7,
+      updatedAt: 7,
+    });
     const after = await dumpAll();
     // meta.lastExportAt is stamped after the snapshot, so it is the only expected difference
     expect({ ...after, meta: [] }).toEqual({ ...beforeWithMeta, meta: [] });
@@ -180,6 +198,21 @@ describe("exportEnvelope / importEnvelope", () => {
     expect(await db.profiles.count()).toBe(2);
   });
 
+  it("a backup made before the journal existed (schema 1) restores, and leaves no days behind", async () => {
+    await seedEverything();
+    const doc = JSON.parse(await exportPlaintext()) as { schema: number; tables: Record<string, unknown[]> };
+    expect(doc.schema).toBe(SCHEMA_VERSION);
+    expect(doc.tables.journal).toHaveLength(2);
+    // what a 3.x build wrote: schema 1, no journal table at all
+    const { journal: _journal, ...v1Tables } = doc.tables;
+    const old = JSON.stringify({ ...doc, schema: 1, tables: v1Tables });
+    const counts = await importPlaintext(old);
+    expect(counts.profiles).toBe(2);
+    expect(counts.journal).toBe(0);
+    expect(await db.journal.count()).toBe(0);
+    expect(await db.profiles.count()).toBe(2);
+  });
+
   it("a wrong passphrase leaves the drawer untouched", async () => {
     await seedEverything();
     const env = await exportEnvelope(PASS);
@@ -196,7 +229,18 @@ describe("exportEnvelope / importEnvelope", () => {
     const bytes = new Uint8Array(await env.arrayBuffer());
     const latin1 = Array.from(bytes, (b) => String.fromCharCode(b)).join("");
     const utf8 = new TextDecoder().decode(bytes);
-    for (const needle of [SECRET_NAME, SECRET_PLACE, "Second Leaf", "Madurai", "data:image", "Tamil Nadu", "p-1"]) {
+    expect(plain).toContain(JOURNAL_NOTE);
+    for (const needle of [
+      SECRET_NAME,
+      SECRET_PLACE,
+      "Second Leaf",
+      "Madurai",
+      "data:image",
+      "Tamil Nadu",
+      "p-1",
+      JOURNAL_NOTE,
+      "tamarind",
+    ]) {
       expect(latin1.includes(needle), needle).toBe(false); // …and not in the envelope
       expect(utf8.includes(needle), needle).toBe(false);
     }

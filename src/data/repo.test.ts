@@ -6,29 +6,35 @@ import { fakePatri, makeCapture, makeMilan, makeProfile, makeReading, photoBytes
 const computePatri = vi.hoisted(() => vi.fn());
 vi.mock("../engine/patri", () => ({ computePatri }));
 
-import { db, SCHEMA_V1, TABLE_NAMES } from "./db";
+import Dexie from "dexie";
+import { ChowkiDB, db, SCHEMA, SCHEMA_V1, SCHEMA_VERSION, TABLE_NAMES } from "./db";
 import {
   burnProfile,
   castPatri,
   clearPatriCache,
+  deleteJournalEntry,
   deletePalmCapture,
   deleteProfile,
   getBlob,
   getBlobUrl,
+  getJournalEntry,
   getMilan,
   getPlaceCache,
   getPresetRevision,
   getSettings,
   isPatriStale,
+  listJournal,
   mergeSettings,
   patriCacheKeys,
   putPlaceCache,
+  saveJournalEntry,
   saveMilan,
   savePalmCapture,
   saveReading,
   saveSettings,
   storageEstimate,
   upsertProfile,
+  wipeEverything,
 } from "./repo";
 
 beforeEach(async () => {
@@ -39,13 +45,152 @@ beforeEach(async () => {
 });
 
 describe("db schema", () => {
-  it("opens version 1 with exactly the §5 tables (places keyed by query name)", async () => {
+  it("opens version 2 with the §5 tables plus journal (places keyed by query name)", async () => {
     await db.open();
-    expect(db.verno).toBe(1);
-    expect(db.tables.map((t) => t.name).sort()).toEqual(Object.keys(SCHEMA_V1).sort());
+    expect(db.verno).toBe(2);
+    expect(SCHEMA_VERSION).toBe(2);
+    expect(db.tables.map((t) => t.name).sort()).toEqual(Object.keys(SCHEMA).sort());
+    expect(Object.keys(SCHEMA).sort()).toEqual([...Object.keys(SCHEMA_V1), "journal"].sort());
+    expect(db.journal.schema.primKey.keyPath).toEqual(["profileId", "day"]);
     expect(db.patris.schema.primKey.keyPath).toEqual(["profileId", "presetHash"]);
     expect(db.milans.schema.primKey.keyPath).toEqual(["a", "b", "presetHash"]);
     expect(db.places.schema.primKey.keyPath).toBe("name");
+  });
+});
+
+describe("migration 1 → 2", () => {
+  it("a version-1 database with people in it opens under version 2 with nothing lost", async () => {
+    const name = "chowki-migration-1-2";
+    await Dexie.delete(name);
+    // The database exactly as builds before 4.0 created it.
+    const v1 = new Dexie(name);
+    v1.version(1).stores(SCHEMA_V1);
+    await v1.open();
+    expect(v1.verno).toBe(1);
+    expect(v1.tables.map((t) => t.name)).not.toContain("journal");
+    const people = [makeProfile("p-1"), makeProfile("p-2", { name: "Second Leaf" })];
+    const patri = fakePatri(people[0] as Profile);
+    const capture = { ...makeCapture("p-1", "c-1"), originalBlobKey: "p-1/c-1/original", rectifiedBlobKey: "p-1/c-1/rectified" };
+    await v1.table("profiles").bulkAdd(people);
+    await v1.table("patris").add(patri);
+    await v1.table("palms").add(capture);
+    await v1.table("blobs").add({ key: "p-1/c-1/original", blob: new Blob([photoBytes(7)], { type: "image/jpeg" }), type: "image/jpeg" });
+    await v1.table("readings").add({ ...makeReading("c-1"), profileId: "p-1" });
+    await v1.table("milans").add(makeMilan("p-1", "p-2"));
+    await v1.table("places").add({ name: "madurai", results: [], fetchedAt: 5 });
+    await v1.table("settings").add({ key: "app", value: { ...DEFAULT_SETTINGS, activeProfileId: "p-2" } });
+    await v1.table("meta").add({ key: "presetRevision", value: 3 });
+    const before: Record<string, unknown[]> = {};
+    for (const t of Object.keys(SCHEMA_V1)) before[t] = await v1.table(t).toArray();
+    v1.close();
+
+    const v2 = new ChowkiDB(name);
+    await v2.open();
+    try {
+      expect(v2.verno).toBe(2);
+      for (const t of Object.keys(SCHEMA_V1)) {
+        const rows = await v2.table(t).toArray();
+        if (t === "blobs") {
+          expect(rows).toHaveLength(1);
+          const row = rows[0] as { key: string; blob: Blob; type: string };
+          expect(row.key).toBe("p-1/c-1/original");
+          expect(row.type).toBe("image/jpeg");
+        } else expect(rows, t).toEqual(before[t]);
+      }
+      expect((await v2.profiles.toArray()).map((p) => p.id).sort()).toEqual(["p-1", "p-2"]);
+      expect((await v2.settings.get("app"))?.value.activeProfileId).toBe("p-2");
+      // the new store is there, empty, and takes a row
+      expect(await v2.journal.count()).toBe(0);
+      await v2.journal.put({
+        profileId: "p-1",
+        day: "2026-11-17",
+        mood: 3,
+        predictedTone: "steady",
+        predictedScore: 0.2,
+        createdAt: 1,
+        updatedAt: 1,
+      });
+      expect(await v2.journal.where("profileId").equals("p-1").count()).toBe(1);
+    } finally {
+      v2.close();
+      await Dexie.delete(name);
+    }
+  });
+});
+
+describe("journal", () => {
+  it("saves one entry per person per day, trims the note, and reads a range oldest first", async () => {
+    await upsertProfile(makeProfile("p-1"));
+    await upsertProfile(makeProfile("p-2"));
+    const a = await saveJournalEntry(
+      { profileId: "p-1", day: "2026-11-15", mood: 4, note: `  ${"x".repeat(400)}  `, predictedTone: "bright", predictedScore: 0.6 },
+      100,
+    );
+    expect(a).toMatchObject({ profileId: "p-1", day: "2026-11-15", mood: 4, predictedTone: "bright", predictedScore: 0.6 });
+    expect(a.note).toHaveLength(280);
+    expect(a.createdAt).toBe(100);
+    await saveJournalEntry({ profileId: "p-1", day: "2026-11-17", mood: 2, predictedTone: "mixed", predictedScore: -0.1 }, 101);
+    await saveJournalEntry({ profileId: "p-1", day: "2026-10-31", mood: 1, predictedTone: null, predictedScore: null }, 102);
+    await saveJournalEntry({ profileId: "p-2", day: "2026-11-16", mood: 3 }, 103);
+
+    expect((await listJournal("p-1")).map((r) => r.day)).toEqual(["2026-10-31", "2026-11-15", "2026-11-17"]);
+    expect((await listJournal("p-1", { from: "2026-11-01", to: "2026-11-15" })).map((r) => r.day)).toEqual(["2026-11-15"]);
+    expect((await listJournal("p-1", { from: "2026-11-15" })).map((r) => r.day)).toEqual(["2026-11-15", "2026-11-17"]);
+    expect((await listJournal("p-2")).map((r) => r.day)).toEqual(["2026-11-16"]);
+    expect(await getJournalEntry("p-2", "2026-11-16")).toMatchObject({ mood: 3, predictedTone: null, predictedScore: null });
+    expect((await getJournalEntry("p-2", "2026-11-16"))?.note).toBeUndefined();
+    expect(await getJournalEntry("p-1", "2026-11-16")).toBeUndefined();
+    expect(await db.journal.count()).toBe(4);
+  });
+
+  it("an edit changes the word and the note but never what the sky had said, nor createdAt", async () => {
+    await upsertProfile(makeProfile("p-1"));
+    const base = { profileId: "p-1", day: "2026-11-17" };
+    await saveJournalEntry({ ...base, mood: 3, note: "long walk", predictedTone: "steady", predictedScore: 0.2 }, 100);
+    // a later engine would say something else for that day: the stored prediction stands
+    const b = await saveJournalEntry({ ...base, mood: 1, predictedTone: "testing", predictedScore: -0.8 }, 200);
+    expect(b).toEqual({
+      ...base,
+      mood: 1,
+      note: "long walk",
+      predictedTone: "steady",
+      predictedScore: 0.2,
+      createdAt: 100,
+      updatedAt: 200,
+    });
+    const c = await saveJournalEntry({ ...base, mood: 1, note: "" }, 300);
+    expect("note" in c).toBe(false);
+    expect(await db.journal.count()).toBe(1);
+    // an entry made while the day could not be read takes a prediction once one is offered
+    await saveJournalEntry({ profileId: "p-1", day: "2026-11-16", mood: 2 }, 1);
+    const d = await saveJournalEntry({ profileId: "p-1", day: "2026-11-16", mood: 2, predictedTone: "mixed", predictedScore: -0.2 }, 2);
+    expect(d).toMatchObject({ predictedTone: "mixed", predictedScore: -0.2 });
+
+    await deleteJournalEntry("p-1", "2026-11-17");
+    expect(await getJournalEntry("p-1", "2026-11-17")).toBeUndefined();
+    expect(await db.journal.count()).toBe(1);
+  });
+
+  it("refuses a malformed day, a mood off the scale and an unknown person", async () => {
+    await upsertProfile(makeProfile("p-1"));
+    await expect(saveJournalEntry({ profileId: "p-1", day: "17/11/2026", mood: 3 })).rejects.toMatchObject({ code: "INVALID" });
+    await expect(saveJournalEntry({ profileId: "p-1", day: "2026-11-17", mood: 5 as 4 })).rejects.toMatchObject({ code: "INVALID" });
+    await expect(saveJournalEntry({ profileId: "nobody", day: "2026-11-17", mood: 3 })).rejects.toMatchObject({ code: "NOT_FOUND" });
+    expect(await db.journal.count()).toBe(0);
+  });
+
+  it("burning a person removes their days and nobody else's; wiping removes all of them", async () => {
+    await upsertProfile(makeProfile("p-1"));
+    await upsertProfile(makeProfile("p-2"));
+    await saveJournalEntry({ profileId: "p-1", day: "2026-11-16", mood: 3 });
+    await saveJournalEntry({ profileId: "p-1", day: "2026-11-17", mood: 4 });
+    await saveJournalEntry({ profileId: "p-2", day: "2026-11-17", mood: 2 });
+    await deleteProfile("p-1");
+    expect(await db.journal.where("profileId").equals("p-1").count()).toBe(0);
+    expect((await listJournal("p-2")).map((r) => r.day)).toEqual(["2026-11-17"]);
+    await wipeEverything();
+    expect(await db.journal.count()).toBe(0);
+    expect(await db.profiles.count()).toBe(0);
   });
 });
 

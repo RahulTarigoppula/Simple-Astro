@@ -1,0 +1,426 @@
+/* "Your days": the one-tap card, the grid of days on the band, the month list. */
+
+/* The four words borrow the app's four meaning colours (defined here from existing tokens). */
+[data-mood="4"] {
+  --said: var(--good);
+  --said-soft: var(--good-soft);
+}
+[data-mood="3"] {
+  --said: var(--calm);
+  --said-soft: var(--calm-soft);
+}
+[data-mood="2"] {
+  --said: var(--mixed);
+  --said-soft: var(--mixed-soft);
+}
+[data-mood="1"] {
+  --said: var(--care);
+  --said-soft: var(--care-soft);
+}
+
+/* ── The day dot: fill = what you said, ring = what the sky said ───────── */
+.jr-dot {
+  display: block;
+  flex: none;
+  overflow: visible;
+}
+.jr-dot__ring {
+  fill: none;
+  stroke: var(--tone, var(--ink-muted));
+  stroke-width: 2.5;
+}
+.jr-dot__ring[data-half="lower"] {
+  stroke-dasharray: 4 4.115;
+}
+.jr-dot__fill {
+  fill: var(--said, var(--ink-muted));
+}
+.jr-dot__face circle {
+  fill: var(--accent-ink);
+}
+.jr-dot__face path {
+  fill: none;
+  stroke: var(--accent-ink);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+/* ── The one-tap card ──────────────────────────────────────────────────── */
+.jr-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.jr-prompt__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.jr-prompt__q {
+  margin: 0;
+  font: 540 1.4375rem / 1.2 var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.jr-prompt__skip {
+  color: var(--ink-muted);
+  font-weight: 550;
+  padding: 0 4px;
+}
+.jr-prompt__sub {
+  margin: -6px 0 2px;
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+}
+.jr-pick {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.jr-pick__one {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 88px;
+  padding: 10px 4px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: rgba(var(--tint), 0.06);
+  color: var(--ink);
+  font: 600 0.9375rem var(--font-body);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
+}
+.jr-pick__one .jr-face {
+  color: var(--said);
+}
+.jr-pick__one:hover {
+  background: var(--said-soft);
+}
+.jr-pick__one:active {
+  transform: scale(0.97);
+}
+.jr-pick__one[aria-pressed="true"] {
+  background: var(--said-soft);
+  box-shadow: inset 0 0 0 2px var(--said);
+}
+.jr-pick__one:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.jr-prompt__thanks {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.4;
+}
+.jr-prompt__thanks b {
+  font-weight: 650;
+}
+.jr-prompt__face {
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: var(--said);
+}
+.jr-prompt__note {
+  margin: 0;
+  padding-left: 40px;
+  color: var(--ink-muted);
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+.jr-prompt__after {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 22px;
+  min-height: 44px;
+}
+.jr-prompt__after .v-link {
+  margin: 0;
+}
+.jr-prompt__after .jr-prompt__open {
+  margin-left: auto;
+}
+.jr-note {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.jr-note__area {
+  display: block;
+  width: 100%;
+  min-height: 96px;
+  padding: 12px 16px;
+  border: 1.5px solid var(--card-edge-strong);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--ink);
+  font: 400 1rem / 1.5 var(--font-body);
+  resize: vertical;
+}
+.jr-note__area:focus {
+  outline: none;
+  border-color: var(--ink);
+  box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.22);
+}
+
+/* Answered: one quiet line that opens the journal */
+.jr-quiet {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 8px 18px;
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+  color: var(--ink-muted);
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+.jr-quiet:hover {
+  background: var(--card-2);
+}
+.jr-quiet__t {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.jr-quiet__go {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  color: var(--accent-text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── The band: the record as a picture ─────────────────────────────────── */
+.jr-hero {
+  display: flex;
+  flex-direction: column;
+  color: var(--ink);
+}
+.jr-hero__eyebrow {
+  margin: 14px 0 0;
+  font: 600 12px var(--font-body);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+.jr-hero__answer {
+  margin: 8px 0 0;
+  font: 500 clamp(1.875rem, 8.4vw, 2.5rem) / 1.12 var(--font-display);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.jr-hero__line {
+  margin: 12px 0 0;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.86);
+  text-wrap: pretty;
+}
+.jr-hero__pic {
+  width: 100%;
+  max-width: 440px;
+  margin: 22px auto 0;
+}
+.jr-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.jr-grid__head,
+.jr-grid__week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.jr-grid__head span {
+  text-align: center;
+  font: 600 12px var(--font-body);
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.72);
+  padding-bottom: 4px;
+}
+.jr-cell {
+  display: flex;
+  min-width: 0;
+}
+.jr-cell > button,
+.jr-cell--future {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  min-height: 58px;
+  padding: 3px 0;
+  border: 0;
+  border-radius: 14px;
+  background: none;
+  color: inherit;
+  font: inherit;
+}
+.jr-cell > button {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.jr-cell > button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.jr-cell__dot {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+}
+.jr-cell__none {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.34);
+}
+.jr-cell__n {
+  font: 500 12px / 1 var(--font-body);
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.78);
+}
+.jr-cell--future {
+  justify-content: flex-end;
+  padding-bottom: 5px;
+}
+.jr-cell--future .jr-cell__n {
+  color: rgba(255, 255, 255, 0.4);
+}
+.jr-cell[data-today] > button {
+  background: rgba(255, 255, 255, 0.12);
+}
+.jr-cell[data-today] .jr-cell__n {
+  color: var(--accent-2);
+  font-weight: 700;
+}
+.jr-cell[data-today] .jr-cell__none {
+  width: 22px;
+  height: 22px;
+  background: none;
+  border: 2px dashed var(--accent-2);
+}
+.jr-legend {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.86);
+}
+.jr-legend li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.jr-legend b {
+  font-weight: 600;
+  color: var(--ink);
+}
+@media (min-width: 900px) {
+  .jr-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
+    column-gap: 56px;
+    align-items: center;
+  }
+  .jr-hero__pic {
+    margin: 8px 0 0;
+  }
+  .jr-hero__answer {
+    font-size: 2.75rem;
+  }
+}
+
+/* ── The list of days ──────────────────────────────────────────────────── */
+.jr-row {
+  align-items: flex-start;
+}
+.jr-row__dot {
+  flex: none;
+  padding-top: 2px;
+}
+.jr-row__date {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
+.jr-row__sky {
+  display: block;
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+}
+.jr-row__note {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+}
+.jr-older {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+.jr-older__h {
+  margin: 4px 18px 0;
+  font: 600 0.9375rem var(--font-body);
+  color: var(--ink-muted);
+}
+.jr-older__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.jr-older__list > li + li {
+  border-top: 1px solid var(--card-edge);
+}
+
+/* ── The sheet for one day ─────────────────────────────────────────────── */
+.jr-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 14px 12px;
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+.jr-edit__h {
+  margin: 0;
+  font: 540 1.5rem / 1.2 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.jr-edit__sky {
+  margin: -6px 0 4px;
+  color: var(--ink-muted);
+}
+.jr-edit__actions {
+  margin-top: 4px;
+}

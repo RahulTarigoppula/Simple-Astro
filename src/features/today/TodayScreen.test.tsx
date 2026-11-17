@@ -226,3 +226,15 @@ describe("TodayScreen", { timeout: 60_000 }, () => {
     expect(screen.getByRole("grid").querySelector("button[aria-current='date']")).toBeNull();
   });
 });
+
+describe("opening the almanac on a given day", () => {
+  it("reads ?d= as whole days from today, and ignores anything else", async () => {
+    const { offsetFromQuery } = await import("./TodayScreen");
+    const now = new Date(2026, 10, 17, 9, 0);
+    expect(offsetFromQuery("#/today?d=2026-11-24", now)).toBe(7);
+    expect(offsetFromQuery("#/today?d=2026-11-16", now)).toBe(-1);
+    expect(offsetFromQuery("#/today", now)).toBe(0);
+    expect(offsetFromQuery("#/today?d=soon", now)).toBe(0);
+    expect(offsetFromQuery("#/today?d=9999-01-01", now)).toBe(0);
+  });
+});

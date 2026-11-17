@@ -9,6 +9,7 @@ import { ChevronRight, Row } from "../../components/ui/Page";
 import { GRAHA_LORE, NAKSHATRA_LORE, RASHI_LORE } from "../../data/lore";
 import { nakBoth, nakName, rashiBoth, rashiName } from "../../data/regional";
 import { NAK_LORDS, NAKSHATRA_NAMES, SIGN_NAMES } from "../../data/tables/names";
+import { nameSounds } from "../../engine/namesounds";
 import { birthNumbers, chineseZodiac, NUMBER_GRAHA, tropicalSunSign } from "../../engine/profile";
 import type { Patri, Profile } from "../../engine/types";
 import "./cosmic.css";
@@ -168,7 +169,16 @@ export function CosmicProfile({ profile, patri }: { profile: Profile; patri: Pat
     const west = tropicalSunSign(profile.birth.utcMs);
     const cz = chineseZodiac(profile.birth.utcMs);
     const n = birthNumbers(profile.birth.localY, profile.birth.localMo, profile.birth.localD);
+    const mo = patri.grahas.MO;
+    const ns = nameSounds(mo.nakshatra, mo.pada);
     return [
+      {
+        key: "name",
+        title: `Name sound: ${ns.own}`,
+        sub: `By the birth star's quarter, tradition starts a name with this sound. The star's four: ${ns.all.join(", ")}`,
+        to: `/explore/nakshatra/${mo.nakshatra}`,
+        glyph: <span className="cp-sign cp-sign--cn">{ns.own}</span>,
+      },
       {
         key: "sun",
         title: `Sun sign: ${rashiName(su.sign, profile.tradition)}`,

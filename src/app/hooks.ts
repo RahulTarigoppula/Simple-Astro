@@ -1,7 +1,7 @@
 // The read side of the one-way data flow: Dexie live queries + memoised engine calls.
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useState } from "react";
-import { db } from "../data/db";
+import { db, type JournalRow } from "../data/db";
 import { castPatri } from "../data/repo";
 import { safeZone } from "../engine/time";
 import { DEFAULT_SETTINGS, type EnginePreset, type HerePlace, type Patri, type Profile, type Settings } from "../engine/types";
@@ -36,6 +36,14 @@ export function useActiveProfile(): Profile | null | undefined {
   if (profiles === undefined) return undefined;
   if (profiles.length === 0) return null;
   return profiles.find((p) => p.id === settings.activeProfileId) ?? profiles[0] ?? null;
+}
+
+/** A person's day notes, oldest first, live. undefined while loading (or with no person). */
+export function useJournal(profileId: string | null | undefined): JournalRow[] | undefined {
+  return useLiveQuery(
+    async () => (profileId ? db.journal.where("[profileId+day]").between([profileId, ""], [profileId, "\uffff"]).toArray() : undefined),
+    [profileId],
+  );
 }
 
 export interface Here extends HerePlace {

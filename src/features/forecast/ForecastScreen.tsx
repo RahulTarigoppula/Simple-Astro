@@ -18,6 +18,7 @@ import { safeZone } from "../../engine/time";
 import { countEvent } from "../../platform/stats";
 import { IconForecast } from "../chowki/icons";
 import { HereLine } from "../here/HereSheet";
+import { ShareButton } from "../share/ShareCard";
 import { ContactsFold, DashaFold, EventsFold, Fold, MethodFold, MoonFold, SaturnFold, StrengthFold, TransitsFold } from "./Folds";
 import { MonthGrid, MonthRows, WeekList } from "./PeriodViews";
 import { AreasCard, DoLists, HoursCard, hoursLine } from "./PersonalSections";
@@ -312,6 +313,21 @@ export default function ForecastScreen() {
               <i aria-hidden="true" />
               {hours.text}
             </p>
+          ) : null}
+          {period === "day" && sky && guide ? (
+            <div className="v-actions share-row">
+              <ShareButton
+                kind="day"
+                name={profile.name}
+                zone={zone}
+                nowMs={nowMs}
+                forecast={f}
+                guide={guide}
+                sunriseMs={sky.riseMs}
+                sunsetMs={sky.setMs}
+                elongation={sky.elongation}
+              />
+            </div>
           ) : null}
           <p className="fc-sr" aria-live="polite">
             {periodLabel(period, f.startMs, f.endMs, zone)}: {TONE_WORD[f.tone]}, {pct(f.score)} of 100.

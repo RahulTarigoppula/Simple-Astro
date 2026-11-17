@@ -4,6 +4,23 @@ Written 2026-10-06 at the end of the first build session. The code, tests, CI wo
 Android shell are in this repository and committed on `main` locally. **Nothing has been pushed
 anywhere**, creating a public repo, a keystore and secrets needs your accounts and your decisions.
 
+## 0000. Version 4.0.0 (2026-11-17): seven new features
+
+You asked for the live site to be reviewed and for many more features, built without supervision. What was found on the live site and what was added is in the 4.0.0 entry of `CHANGELOG.md`. In short: Pick a good day, Festivals and fasts, Family today, the journal ("Your days"), share cards, Your year ahead, the printable Birth report, and the name sound. `release/Vyomaphala-4.0.0.apk` (versionCode 400) is signed with the same key as before, so it installs over the old one.
+
+Decisions taken (all reversible):
+- **Festival dates follow the engine**, each festival by its own rule. They match the published 2026 and 2027 dates that were checked, except Janmāṣṭamī 2027, where the engine gives 24 August (the lunar day covers midnight that night); many calendars print the 25th. Families keep some festivals a day apart; the screen says so.
+- **Pick a good day** uses the same Moon-strength list as the rest of the app (4th, 8th, 12th set aside). The weights between its five factors are a judgement, documented in `src/engine/pickday.ts`.
+- **The journal needs database schema 2.** Old data is kept. A backup made by 4.0 will not restore in a 3.x build.
+- **Your year ahead reads twelve month forecasts**, so its overall word can differ from the Forecast "Year" tab, which reads the calendar year from the slow planets only.
+- **The birth report shows full birth details**, because it is the document the owner hands over. Share cards never do.
+- **The birth report prints Kuja doṣa lines** exactly as the engine reports them (including "cancelled").
+- The old "Print or save as PDF" button on the Planets view now opens the birth report.
+
+Not verified: anything on a real phone (share sheet, story gestures, animation speed); printing in Firefox or Safari; a paper print.
+
+How the work was split is in `docs/AGENT-BRIEF-V4.md`: one brief, one feature folder per feature, the lead wires entry points.
+
 ## 000. Version 3.1.0 (2026-11-16): the picture bands
 
 You said 3.0 was still not good and asked to be impressed. 3.1.0 keeps the 3.0 page and adds a full-width, animated picture at the top of every tab, each drawn from the real numbers (see the last section of `docs/DESIGN-V3.md` and the 3.1.0 entry in `CHANGELOG.md`). `release/Vyomaphala-3.1.0.apk` (versionCode 310, same key). Not checked on a real phone: how smooth the animations are on a slow phone, the status bar over the picture, camera and haptics. Decisions you may want to reverse: Partner match keeps its own words (Excellent / Strong / Good / Needs work); the Almanac's Moon shrinks on the Slots, Hours and Month tabs; star pages no longer name the ringed brightest star, because it is not always the traditional one.

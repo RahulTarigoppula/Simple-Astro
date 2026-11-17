@@ -1,0 +1,131 @@
+/* The share sheet: a live preview of the card, one switch, two actions. */
+.share-btn {
+  gap: 8px;
+}
+.share-btn svg {
+  flex: none;
+}
+/* the button on a picture band, under the words; and beside another quiet action */
+.share-row {
+  margin-top: 16px;
+}
+.share-btn--lead {
+  margin-inline-end: 8px;
+}
+
+.share-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 6px var(--page-pad, 20px) calc(12px + env(safe-area-inset-bottom, 0px));
+  font-family: var(--font-body);
+  color: var(--ink);
+}
+.share-sheet__h {
+  margin: 0;
+  font: 540 1.5rem / 1.15 var(--font-display);
+  letter-spacing: -0.02em;
+}
+/* .v-night only lends the card its night tokens: the stage itself stays the sheet's colour */
+.share-sheet .share-sheet__stage {
+  display: grid;
+  place-items: center;
+  background: none;
+}
+.share-sheet__card {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: min(46dvh, 440px);
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-md);
+  background: var(--sky-cloth);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  transition: opacity 200ms ease;
+}
+.share-sheet__stage[data-state="drawing"] .share-sheet__card {
+  opacity: 0.5;
+}
+
+/* "Hide my name": the whole row is the switch */
+.share-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: rgba(var(--tint), 0.05);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.share-switch__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.share-switch__t {
+  font-weight: 600;
+}
+.share-switch__s {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+.share-switch__track {
+  position: relative;
+  flex: none;
+  width: 48px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: rgba(var(--tint), 0.22);
+  transition: background 160ms ease;
+}
+.share-switch__track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: translate 160ms ease;
+}
+.share-switch[aria-checked="true"] .share-switch__track {
+  background: var(--good);
+}
+.share-switch[aria-checked="true"] .share-switch__track::after {
+  translate: 20px 0;
+}
+
+.share-sheet__actions {
+  align-items: center;
+}
+.share-sheet__actions .v-btn {
+  flex: 1 1 auto;
+}
+.share-sheet__actions .v-btn--quiet {
+  flex: 0 0 auto;
+}
+.share-sheet__small {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .share-sheet__card,
+  .share-switch__track,
+  .share-switch__track::after {
+    transition: none;
+  }
+}

@@ -20,7 +20,7 @@ import { mulberry32 } from "../../engine/math";
 import { birthNumbers, CHINESE_ANIMALS, chineseZodiac, NUMBER_GRAHA, nameNumber, personalYear } from "../../engine/profile";
 import { GRAHA_IDS, type GrahaId } from "../../engine/types";
 import { countEvent } from "../../platform/stats";
-import { IconNumbers, IconSky, IconStory, IconToday } from "../chowki/icons";
+import { IconFestival, IconNumbers, IconPick, IconSky, IconStory, IconToday } from "../chowki/icons";
 import { BeltRing, BeltStrip, bodiesOf, englishOf, MoonMark, SignMark, SkyWindow, StarDot, skyWords } from "./SkyArt";
 import { SkyWheel, type WheelSel } from "./SkyWheel";
 import { panelFor, slidesFor } from "./skyStories";
@@ -1067,6 +1067,12 @@ function Hub() {
           </li>
           <li>
             <Row to="/today" icon={<IconToday />} title="Today's almanac" sub="The Hindu calendar for today" />
+          </li>
+          <li>
+            <Row to="/festivals" icon={<IconFestival />} title="Festivals and fasts" sub="The year ahead, worked out for your place" />
+          </li>
+          <li>
+            <Row to="/pick" icon={<IconPick />} title="Pick a good day" sub="The best days ahead for what you want to do" />
           </li>
           <li>
             <Row to="/explore/wheel" icon={<IconSky />} title="The sky wheel" sub="Turn the whole sky and tap any part of it" />
