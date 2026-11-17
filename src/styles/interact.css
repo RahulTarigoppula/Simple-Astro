@@ -1,0 +1,369 @@
+/* ==========================================================================
+   Vyomaphala · how a touch is answered.
+   Loaded after ui.css. Four parts: (1) every control answers a press at once, (2) the screen and
+   tab-bar motion, (3) swipe and segmented-pill helpers, (4) loading skeletons (.v-sk).
+   Colours come from tokens only; every movement stops under prefers-reduced-motion.
+   ========================================================================== */
+
+/* ── 1. Press ──────────────────────────────────────────────────────────── */
+/* No grey flash, no 300 ms wait, no double-tap zoom on anything you can press.
+   :where() keeps this at zero specificity, so a control that sets its own touch-action keeps it. */
+:where(
+  a,
+  button,
+  summary,
+  label,
+  select,
+  input,
+  textarea,
+  [role="button"],
+  [role="tab"],
+  [role="switch"],
+  [role="checkbox"],
+  [role="radio"]
+) {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.v-btn,
+.v-iconbtn,
+.v-back,
+.v-person,
+.v-seg > button,
+.v-seg > a,
+a.v-chip,
+button.v-chip,
+a.v-card,
+button.v-card {
+  transition:
+    transform 80ms var(--ease-out),
+    opacity 80ms var(--ease-out),
+    background-color 80ms var(--ease-out);
+}
+a.v-row,
+button.v-row,
+summary,
+.v-link {
+  transition:
+    background-color 80ms var(--ease-out),
+    opacity 80ms var(--ease-out);
+}
+.v-nav__icon {
+  transition:
+    transform 80ms var(--ease-out),
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+/* A finger has no hover: without this the last thing tapped stays lit until something else is tapped. */
+@media (hover: none) {
+  .v-btn:hover {
+    opacity: 1;
+  }
+  a.v-row:hover,
+  button.v-row:hover {
+    background: none;
+  }
+  .v-nav__item:not(.is-active):hover {
+    color: var(--ink-muted);
+  }
+}
+
+.v-btn:not(:disabled, [aria-disabled="true"]):active {
+  transform: scale(0.97);
+  opacity: 0.86;
+}
+.v-iconbtn:not(:disabled):active,
+.v-back:active,
+.v-person:active {
+  transform: scale(0.94);
+  opacity: 0.8;
+}
+.v-seg > button:not([aria-selected="true"], [aria-pressed="true"], [aria-checked="true"]):active,
+.v-seg > a:not([aria-current="page"]):active {
+  transform: scale(0.96);
+  opacity: 0.7;
+}
+a.v-chip:active,
+button.v-chip:active {
+  transform: scale(0.96);
+  opacity: 0.8;
+}
+a.v-card:active,
+button.v-card:active {
+  transform: scale(0.985);
+  opacity: 0.9;
+}
+a.v-row:active,
+button.v-row:not(:disabled):active {
+  background: rgba(var(--tint), 0.08);
+}
+summary:active,
+.v-link:active {
+  opacity: 0.6;
+}
+.v-nav__item:active .v-nav__icon {
+  transform: scale(0.9);
+}
+.v-nav__item:active {
+  color: var(--ink);
+}
+
+/* Segmented tabs were 40 px tall: every control is at least 44. */
+.v-seg > button,
+.v-seg > a {
+  min-height: 44px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v-btn:not(:disabled, [aria-disabled="true"]):active,
+  .v-iconbtn:not(:disabled):active,
+  .v-back:active,
+  .v-person:active,
+  .v-seg > button:active,
+  .v-seg > a:active,
+  a.v-chip:active,
+  button.v-chip:active,
+  a.v-card:active,
+  button.v-card:active,
+  .v-nav__item:active .v-nav__icon {
+    transform: none;
+  }
+}
+
+/* ── 2. Screens and the tab bar ────────────────────────────────────────── */
+/* A new screen is never a hard cut and never a wait: 140 ms, once, when it mounts. */
+.screen-enter {
+  animation: v-arrive 140ms var(--ease-out) both;
+}
+@keyframes v-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen-enter {
+    animation: none;
+  }
+}
+@media print {
+  .screen-enter {
+    animation: none;
+  }
+}
+
+/* The mark of the tab you are on is one shape (Ledge.tsx, a shared layout) that slides between tabs.
+   On a phone it fills the icon's pill; on a desk the icon is not positioned, so it fills the row. */
+.v-nav__item {
+  position: relative;
+  isolation: isolate;
+}
+.v-nav__icon {
+  position: relative;
+}
+.v-nav__pill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--btn-fill);
+  pointer-events: none;
+}
+.v-nav .v-nav__item.is-active .v-nav__icon {
+  background: none;
+}
+@media (min-width: 900px) {
+  .v-nav__icon {
+    position: static;
+  }
+  .v-nav__pill {
+    background: rgba(var(--tint), 0.08);
+  }
+  .v-nav .v-nav__item.is-active {
+    background: none;
+  }
+}
+
+/* ── 3. Swipes and the segmented pill ──────────────────────────────────── */
+/* For the element that takes useSwipe's handlers: up and down stay the browser's, sideways is ours. */
+.v-swipe {
+  touch-action: pan-y;
+}
+
+/* `.v-seg.v-seg--pill` with <SegPill> inside the selected button: the pill is the background. */
+.v-seg--pill > button,
+.v-seg--pill > a {
+  position: relative;
+  isolation: isolate;
+}
+.v-seg.v-seg--pill > button[aria-selected="true"],
+.v-seg.v-seg--pill > button[aria-pressed="true"],
+.v-seg.v-seg--pill > button[aria-checked="true"],
+.v-seg.v-seg--pill > a[aria-current="page"] {
+  background: none;
+  box-shadow: none;
+}
+.v-seg__pill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--seg-pill, var(--seg-on, var(--card-hi)));
+  box-shadow: var(--shadow-1);
+  pointer-events: none;
+}
+
+/* What a swipe brings in arrives from the side it came from (set data-dir="next|prev" on a parent). */
+[data-dir="next"] > .v-slide {
+  animation: v-slide-next 180ms var(--ease-out) both;
+}
+[data-dir="prev"] > .v-slide {
+  animation: v-slide-prev 180ms var(--ease-out) both;
+}
+@keyframes v-slide-next {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
+@keyframes v-slide-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-dir] > .v-slide {
+    animation: none;
+  }
+}
+
+/* A small glass pill on a picture band ("Today"): the button is 44 px tall, the pill inside is 30. */
+.v-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: 600 0.8125rem var(--font-body);
+  cursor: pointer;
+}
+.v-pill > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 14px;
+  border-radius: var(--radius-full);
+  background: rgba(var(--tint), 0.14);
+  transition:
+    transform 80ms var(--ease-out),
+    opacity 80ms var(--ease-out);
+}
+.v-pill:active > span {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+.v-pill-in {
+  animation: v-pill-in 160ms var(--ease-out) both;
+}
+@keyframes v-pill-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .v-pill:active > span {
+    transform: none;
+  }
+  .v-pill-in {
+    animation: none;
+  }
+}
+
+/* ── 4. Loading: the shapes of what is coming ──────────────────────────── */
+/* <div class="v-sk" role="status" aria-busy="true">
+     <span class="v-sk__label">Reading the sky…</span>      (read aloud, not seen)
+     <div class="v-sk--card">
+       <i class="v-sk--line" style="--w: 45%"></i>
+       <i class="v-sk--line"></i>
+       <i class="v-sk--line" style="--w: 70%"></i>
+     </div>
+   </div>
+   `.v-sk--dial` is the half-circle of a sky dial, for a picture band. */
+.v-sk {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+.v-sk__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.v-sk--card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 132px;
+  padding: 22px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+}
+.v-sk--line,
+.v-sk--dial {
+  display: block;
+  flex: none;
+  background-color: rgba(var(--tint), 0.09);
+  background-image: linear-gradient(100deg, rgba(var(--tint), 0) 30%, rgba(var(--tint), 0.1) 50%, rgba(var(--tint), 0) 70%);
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  background-position: 130% 0;
+  animation: v-sk-shimmer 2.2s ease-in-out infinite;
+}
+.v-sk--line {
+  width: var(--w, 100%);
+  height: 14px;
+  border-radius: var(--radius-full);
+}
+.v-sk--line:first-child {
+  height: 18px;
+}
+.v-sk--dial {
+  width: min(100%, 440px);
+  aspect-ratio: 2 / 1;
+  margin: 8px auto 0;
+  border: 2px solid rgba(var(--tint), 0.16);
+  border-bottom-width: 1px;
+  border-radius: 999px 999px 0 0;
+  background-color: rgba(var(--tint), 0.04);
+}
+@keyframes v-sk-shimmer {
+  from {
+    background-position: 130% 0;
+  }
+  to {
+    background-position: -130% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .v-sk--line,
+  .v-sk--dial {
+    animation: none;
+    background-image: none;
+  }
+}

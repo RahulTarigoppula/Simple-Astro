@@ -521,8 +521,13 @@ function MilanScreen() {
                 </Fold>
               </BondCard>
             ) : (
-              <div className="v-skel" role="status">
-                Reading both charts…
+              <div className="v-sk" role="status" aria-busy="true">
+                <span className="v-sk__label">Reading both charts…</span>
+                <div className="v-sk--card" aria-hidden="true">
+                  <i className="v-sk--line" style={{ "--w": "40%" } as React.CSSProperties} />
+                  <i className="v-sk--line" />
+                  <i className="v-sk--line" style={{ "--w": "74%" } as React.CSSProperties} />
+                </div>
               </div>
             )
           ) : null}

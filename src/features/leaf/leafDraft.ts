@@ -18,6 +18,8 @@ export interface Draft {
   handedness: "right" | "left";
   timeUnknown: boolean;
   tradition: Tradition;
+  /** True once the tradition was picked by hand (or belongs to a saved person); until then one is suggested. */
+  traditionSet: boolean;
 }
 
 /** Nothing is assumed: the date, the hour and the place all start empty. */
@@ -36,6 +38,7 @@ export function freshDraft(): Draft {
     handedness: "right",
     timeUnknown: false,
     tradition: "north",
+    traditionSet: false,
   };
 }
 
@@ -87,6 +90,8 @@ function draftOf(x: unknown): Draft | null {
     handedness: x.handedness === "left" ? "left" : "right",
     timeUnknown: x.timeUnknown === true,
     tradition: x.tradition === "telugu" || x.tradition === "tamil" ? x.tradition : "north",
+    // a draft kept before this field existed: a tradition other than the starting one was picked by hand
+    traditionSet: x.traditionSet === true || x.tradition === "telugu" || x.tradition === "tamil",
   };
 }
 

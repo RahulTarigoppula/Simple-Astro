@@ -89,8 +89,10 @@
     background var(--dur-fast) var(--ease-out),
     color var(--dur-fast) var(--ease-out);
 }
-.v-nav__item:hover {
-  color: var(--ink);
+@media (hover: hover) {
+  .v-nav__item:hover {
+    color: var(--ink);
+  }
 }
 .v-nav__item.is-active {
   color: var(--ink);
@@ -261,8 +263,10 @@
   text-decoration: none;
   cursor: pointer;
 }
-.v-back:hover {
-  background: rgba(var(--tint), 0.1);
+@media (hover: hover) {
+  .v-back:hover {
+    background: rgba(var(--tint), 0.1);
+  }
 }
 .v-iconbtn {
   display: inline-grid;
@@ -276,8 +280,10 @@
   text-decoration: none;
   cursor: pointer;
 }
-.v-iconbtn:hover {
-  background: rgba(var(--tint), 0.1);
+@media (hover: hover) {
+  .v-iconbtn:hover {
+    background: rgba(var(--tint), 0.1);
+  }
 }
 
 /* Page heading */
@@ -340,8 +346,10 @@
   text-decoration: none;
   cursor: pointer;
 }
-.v-person:hover {
-  background: rgba(var(--tint), 0.1);
+@media (hover: hover) {
+  .v-person:hover {
+    background: rgba(var(--tint), 0.1);
+  }
 }
 .v-person__name {
   overflow: hidden;
@@ -444,9 +452,11 @@
   padding: 24px;
   background: linear-gradient(165deg, rgba(var(--accent-rgb), 0.13), rgba(var(--accent-rgb), 0) 58%), var(--card);
 }
-a.v-card:hover,
-button.v-card:hover {
-  background: var(--card-2);
+@media (hover: hover) {
+  a.v-card:hover,
+  button.v-card:hover {
+    background: var(--card-2);
+  }
 }
 .v-card__title {
   margin: 0 0 4px;
@@ -528,8 +538,10 @@ button.v-card:hover {
   white-space: nowrap;
   cursor: pointer;
 }
-.v-link:hover {
-  color: var(--ink);
+@media (hover: hover) {
+  .v-link:hover {
+    color: var(--ink);
+  }
 }
 
 /* ── Rows: a list you can tap ──────────────────────────────────────────── */
@@ -561,9 +573,11 @@ button.v-card:hover {
   text-decoration: none;
   cursor: pointer;
 }
-a.v-row:hover,
-button.v-row:hover {
-  background: rgba(var(--tint), 0.04);
+@media (hover: hover) {
+  a.v-row:hover,
+  button.v-row:hover {
+    background: rgba(var(--tint), 0.04);
+  }
 }
 .v-row__icon {
   display: grid;
@@ -638,8 +652,10 @@ button.v-row:hover {
     opacity var(--dur-fast) var(--ease-out);
   -webkit-tap-highlight-color: transparent;
 }
-.v-btn:hover {
-  opacity: 0.9;
+@media (hover: hover) {
+  .v-btn:hover {
+    opacity: 0.9;
+  }
 }
 .v-btn:active {
   transform: scale(0.98);
@@ -655,25 +671,31 @@ button.v-row:hover {
   background: rgba(var(--tint), 0.07);
   color: var(--ink);
 }
-.v-btn--ghost:hover {
-  background: rgba(var(--tint), 0.11);
-  opacity: 1;
+@media (hover: hover) {
+  .v-btn--ghost:hover {
+    background: rgba(var(--tint), 0.11);
+    opacity: 1;
+  }
 }
 .v-btn--quiet {
   background: none;
   color: var(--accent-text);
   padding: 0 12px;
 }
-.v-btn--quiet:hover {
-  background: rgba(var(--tint), 0.06);
-  opacity: 1;
+@media (hover: hover) {
+  .v-btn--quiet:hover {
+    background: rgba(var(--tint), 0.06);
+    opacity: 1;
+  }
 }
 .v-btn--danger {
   background: var(--care-soft);
   color: var(--care);
 }
-.v-btn--danger:hover {
-  opacity: 0.85;
+@media (hover: hover) {
+  .v-btn--danger:hover {
+    opacity: 0.85;
+  }
 }
 .v-btn--sm {
   min-height: 44px;
@@ -722,9 +744,11 @@ button.v-row:hover {
   align-items: center;
   justify-content: center;
 }
-.v-seg > button:hover,
-.v-seg > a:hover {
-  color: var(--ink);
+@media (hover: hover) {
+  .v-seg > button:hover,
+  .v-seg > a:hover {
+    color: var(--ink);
+  }
 }
 .v-seg > [aria-selected="true"],
 .v-seg > [aria-pressed="true"],
@@ -1213,4 +1237,12 @@ dialog.sheet-dialog {
 .sky-scene[data-phase="night"] .sky-scene__good,
 .sky-scene[data-phase="night"] .sky-scene__avoid {
   opacity: 0.55;
+}
+
+/* A narrow phone: the mark alone stands for the name, so Find and the person fit beside it. */
+@media (max-width: 359px) {
+  .v-top .v-brand {
+    gap: 0;
+    font-size: 0;
+  }
 }

@@ -1,0 +1,246 @@
+/* Find: the sheet that reaches every screen. Tokens only; the button itself is a plain .v-iconbtn. */
+.find {
+  display: flex;
+  flex-direction: column;
+  min-height: min(70dvh, 620px);
+  padding: 0 var(--page-pad, 20px) calc(8px + env(safe-area-inset-bottom, 0px));
+  font-family: var(--font-body);
+  color: var(--ink);
+}
+
+/* The search box stays put while results scroll under it. */
+.find__bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0 12px;
+  background: var(--surface-solid);
+}
+.find__box {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.find__mag {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  display: grid;
+  transform: translateY(-50%);
+  color: var(--ink-muted);
+  pointer-events: none;
+}
+.find__input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 48px 0 46px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: rgba(var(--tint), 0.07);
+  color: var(--ink);
+  font: 500 1.0625rem var(--font-body);
+  appearance: none;
+}
+.find__input::placeholder {
+  color: var(--ink-muted);
+  opacity: 1;
+}
+.find__input:focus {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.find__clear {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+.find__clear:hover {
+  color: var(--ink);
+}
+.find__close {
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  margin-right: -10px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--ink);
+  font: 600 0.9375rem var(--font-body);
+  cursor: pointer;
+}
+.find__close:hover {
+  background: rgba(var(--tint), 0.06);
+}
+
+.find__h {
+  margin: 20px 0 10px;
+  font: 600 0.875rem / 1.3 var(--font-body);
+  color: var(--ink-muted);
+}
+.find-group:first-child .find__h {
+  margin-top: 4px;
+}
+.find__note {
+  margin: 18px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+.find__keys {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .find__keys {
+    display: block;
+  }
+}
+
+/* Tiles: the main screens, big enough for a thumb */
+.find-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.find-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 100%;
+  min-height: 92px;
+  padding: 12px 6px;
+  border-radius: var(--radius-md);
+  background: rgba(var(--tint), 0.05);
+  color: var(--ink);
+  font: 600 0.875rem / 1.25 var(--font-body);
+  text-align: center;
+  text-decoration: none;
+  text-wrap: balance;
+}
+.find-tile:hover {
+  background: rgba(var(--tint), 0.09);
+}
+.find-tile svg {
+  flex: none;
+}
+@media (min-width: 560px) {
+  .find-tiles {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+/* "Ask" chips */
+.find-asks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.find-ask {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: rgba(var(--tint), 0.07);
+  color: var(--ink);
+  font: 550 0.9375rem var(--font-body);
+  cursor: pointer;
+}
+.find-ask:hover {
+  background: rgba(var(--tint), 0.11);
+}
+
+/* Results */
+.find-results {
+  margin: 0 -10px;
+}
+.find-group .find__h {
+  padding: 0 10px;
+}
+.find-opt {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 62px;
+  padding: 9px 10px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  scroll-margin: 80px 0 12px;
+}
+.find-opt:hover {
+  background: rgba(var(--tint), 0.04);
+}
+/* The row Enter will open: a filled ground and a bar at its edge, so colour is not the only sign. */
+.find-opt[aria-selected="true"] {
+  background: rgba(var(--tint), 0.07);
+  box-shadow: inset 3px 0 0 var(--focus);
+}
+.find-opt__body {
+  flex: 1;
+  min-width: 0;
+}
+.find-opt__t,
+.find-opt__s {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.find-opt__t {
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+.find-opt__s {
+  margin-top: 2px;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+
+/* Nothing found */
+.find-none {
+  padding: 18px 0 0;
+}
+.find-none__t {
+  margin: 0;
+  font: 540 1.375rem / 1.2 var(--font-display);
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+.find-none__p {
+  margin: 8px 0 14px;
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+
+.find-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

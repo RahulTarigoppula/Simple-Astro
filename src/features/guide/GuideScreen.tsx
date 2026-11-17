@@ -16,6 +16,11 @@ const STEPS: Array<{ title: string; body: string; to: string }> = [
   { title: "Check today", body: "The Hindu almanac for any day and place.", to: "/today" },
   { title: "Explore the myths", body: "Every planet, sign and star has a story.", to: "/explore" },
   { title: "Match a partner", body: "How two people fit, scored out of 100 from the 36-point Guna Milan.", to: "/milan" },
+  { title: "Ask about today", body: "On Today, tap what you have in mind (travel, a talk, a new start) for a plain answer.", to: "/" },
+  { title: "Pick a good day", body: "The best days ahead for what you want to do, with the reasons.", to: "/pick" },
+  { title: "Follow the festivals", body: "The Hindu calendar for the year ahead, worked out for your place.", to: "/festivals" },
+  { title: "See the whole family", body: "Everyone saved on this device on one screen, with coming birthdays.", to: "/family" },
+  { title: "Note how days went", body: "One tap a day, kept beside what the sky had said.", to: "/journal" },
 ];
 
 function Fold({ title, children }: { title: string; children: React.ReactNode }) {
@@ -53,7 +58,7 @@ export default function GuideScreen() {
       className="guide"
     >
       <Reveal i={0} className="v-stack guide-block">
-        <Section title="Six things you can do" id="g-how" />
+        <Section title="What you can do" id="g-how" />
         <ol className="v-list guide-steps" aria-labelledby="g-how">
           {STEPS.map((s, i) => (
             <li key={s.title}>
@@ -71,7 +76,8 @@ export default function GuideScreen() {
           ))}
         </ol>
         <p className="guide-tip">
-          Wherever you see <span className="guide-i">ⓘ</span> next to a word, tap it for a plain-English explanation.
+          Wherever you see <span className="guide-i">ⓘ</span> next to a word, tap it for a plain-English explanation. The magnifier at the
+          top of every screen finds any screen, person, planet, festival or word.
         </p>
       </Reveal>
 

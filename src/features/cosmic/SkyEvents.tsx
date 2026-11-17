@@ -1,15 +1,16 @@
 // "Coming up in the sky": Moon phases, Ekādaśī, eclipses (seen here or not), saṅkrāntis, sign changes
 // and retrograde stations for the weeks ahead, each in one plain line.
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router";
 import { InfoDot } from "../../components/ui/Explain";
 import { GrahaGlyph } from "../../components/ui/GrahaGlyph";
 import { ChevronRight } from "../../components/ui/Page";
 import { GRAHA_LORE, RASHI_LORE } from "../../data/lore";
-import { type SkyEvent, skyEvents } from "../../engine/events";
+import type { SkyEvent } from "../../engine/events";
 import type { EnginePreset } from "../../engine/types";
 import "./cosmic.css";
 import { formatClock12, safeZone } from "../../engine/time";
+import { useCompute } from "../../platform/compute";
 
 const HOUR = 3_600_000;
 
@@ -119,39 +120,10 @@ interface Props {
   limit?: number;
 }
 
-const cache = new Map<string, SkyEvent[]>();
-
-/** The 45-day search costs about a second on a slow phone: it runs after the first paint, once per hour and place. */
+/** The 45-day search costs about a second on a slow phone: it runs in the background, once per hour and place. */
 function useSkyEvents(hourKey: number, days: number, lat: number, lon: number, preset: EnginePreset): SkyEvent[] | null {
   const key = `${hourKey}|${days}|${lat.toFixed(3)}|${lon.toFixed(3)}|${preset.ayanamsa}|${preset.node}`;
-  const [events, setEvents] = useState<SkyEvent[] | null>(() => cache.get(key) ?? null);
-  useEffect(() => {
-    const hit = cache.get(key);
-    if (hit) {
-      setEvents(hit);
-      return;
-    }
-    let live = true;
-    const run = () => {
-      let out: SkyEvent[] = [];
-      try {
-        out = skyEvents(hourKey * HOUR, days, { lat, lon }, preset);
-      } catch {
-        out = [];
-      }
-      if (cache.size > 24) cache.clear();
-      cache.set(key, out);
-      if (live) setEvents(out);
-    };
-    const idle = (window as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
-    const handle = idle ? idle(run, { timeout: 1500 }) : window.setTimeout(run, 50);
-    return () => {
-      live = false;
-      if (idle) (window as { cancelIdleCallback?: (h: number) => void }).cancelIdleCallback?.(handle);
-      else clearTimeout(handle);
-    };
-  }, [key, hourKey, days, lat, lon, preset]);
-  return events;
+  return useCompute("skyEvents", { fromMs: hourKey * HOUR, days, place: { lat, lon }, preset }, key) ?? null;
 }
 
 export function SkyEvents({ nowMs, place, zone, preset, days = 45, limit = 8 }: Props) {

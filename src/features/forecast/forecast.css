@@ -85,6 +85,21 @@
   color: var(--accent-ink);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
 }
+.fc-hero .fc-tabs {
+  --seg-pill: var(--btn-fill);
+}
+/* A step through time brings the week, month or year picture in from the side it came from. */
+.fc-hero[data-dir="next"] > .fc-pic {
+  animation: v-slide-next 180ms var(--ease-out) both;
+}
+.fc-hero[data-dir="prev"] > .fc-pic {
+  animation: v-slide-prev 180ms var(--ease-out) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fc-hero[data-dir] > .fc-pic {
+    animation: none;
+  }
+}
 
 /* Stepping through time */
 .fc-nav {
@@ -108,18 +123,19 @@
   font: 600 1rem / 1.3 var(--font-body);
   letter-spacing: -0.005em;
 }
+/* The way back to now: a small glass pill (.v-pill in interact.css) with a 44 px target. */
 .fc-nav__back {
-  min-width: 44px;
-  min-height: 44px;
-  margin: -8px 0 -14px;
-  padding: 0 10px;
-  border: 0;
-  background: none;
-  color: var(--sky-sun);
-  font: 600 0.875rem var(--font-body);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
+  margin: -5px 0 -12px;
+}
+.fc-nav__back > span {
+  background: rgba(255, 255, 255, 0.16);
+}
+.fc-nav__back > span::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sky-sun);
 }
 
 /* The answer in words */

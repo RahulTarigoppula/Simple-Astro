@@ -13,6 +13,31 @@ const screen = (path: string) => async () => {
   return { Component: m.default };
 };
 
+/** The main tabs, fetched and parsed ahead of the first tap on them. */
+const WARM = ["today/TodayScreen", "patri/PatriScreen", "forecast/ForecastScreen", "milan/MilanScreen", "explore/ExploreScreen"];
+
+/** After the first paint, load the main tabs' chunks one at a time whenever the browser is idle. Never in tests. */
+export function warmScreens(): void {
+  if (import.meta.env.MODE === "test" || typeof window === "undefined") return;
+  type IdleWin = { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+  const idle = (run: () => void): void => {
+    const w = window as unknown as IdleWin;
+    if (typeof w.requestIdleCallback === "function") w.requestIdleCallback(run, { timeout: 4000 });
+    else window.setTimeout(run, 300);
+  };
+  const step = (i: number): void => {
+    const path = WARM[i];
+    if (!path) return;
+    idle(() => {
+      const next = () => step(i + 1);
+      // a chunk that cannot be fetched now is fetched when its tab is tapped
+      (screens[`../features/${path}.tsx`]?.() ?? Promise.resolve()).then(next, next);
+    });
+  };
+  // the first screen and its own background reading come first
+  window.setTimeout(() => step(0), 1500);
+}
+
 /** The twelve routes of §4, hash-based so Pages deep links need no rewrite. */
 export const router = createHashRouter([
   {

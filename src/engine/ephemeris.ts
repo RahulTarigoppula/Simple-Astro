@@ -54,7 +54,7 @@ export function astroTimeToMs(t: AstroTime): number {
   return (t.ut + 2451545.0 - JD_UNIX_EPOCH) * MS_PER_DAY;
 }
 
-function position(body: PlanetId, t: AstroTime): EclipticPosition {
+function solve(body: PlanetId, t: AstroTime): EclipticPosition {
   if (body === "SU") {
     const s = A.SunPosition(t); // apparent, already ECT (light-time ≙ annual aberration)
     return { lon: s.elon, lat: s.elat };
@@ -68,6 +68,33 @@ function position(body: PlanetId, t: AstroTime): EclipticPosition {
   return { lon: e.elon, lat: e.elat };
 }
 
+// An exact memo: searches that bisect (sign changes, stations, forecasts) ask for the same body at
+// the same instant again and again. The key is the body and the instant itself (`t.ut`, from which
+// astronomy-engine derives everything else), so a hit is the very number a fresh solve would give.
+const MEMO_MAX = 4096;
+const perBody = <T>(): Record<PlanetId, Map<number, T>> => ({
+  SU: new Map(),
+  MO: new Map(),
+  MA: new Map(),
+  ME: new Map(),
+  JU: new Map(),
+  VE: new Map(),
+  SA: new Map(),
+});
+const POSITIONS = perBody<EclipticPosition>();
+const SPEEDS = perBody<number>();
+
+function position(body: PlanetId, t: AstroTime): EclipticPosition {
+  const memo = POSITIONS[body];
+  const hit = memo.get(t.ut);
+  // a fresh object each time: no caller can disturb what is kept
+  if (hit) return { lon: hit.lon, lat: hit.lat };
+  const p = solve(body, t);
+  if (memo.size >= MEMO_MAX) memo.clear();
+  memo.set(t.ut, p);
+  return { lon: p.lon, lat: p.lat };
+}
+
 const HOUR = 1 / 24;
 
 export const astronomyEngineEphemeris: Ephemeris = {
@@ -78,9 +105,15 @@ export const astronomyEngineEphemeris: Ephemeris = {
     return position(body, t).lon;
   },
   speed(body, t) {
+    const memo = SPEEDS[body];
+    const hit = memo.get(t.ut);
+    if (hit !== undefined) return hit;
     const a = position(body, t.AddDays(-HOUR)).lon;
     const b = position(body, t.AddDays(+HOUR)).lon;
-    return signedDelta(a, b) / (2 * HOUR); // handles the 360 → 0 wrap
+    const v = signedDelta(a, b) / (2 * HOUR); // handles the 360 → 0 wrap
+    if (memo.size >= MEMO_MAX) memo.clear();
+    memo.set(t.ut, v);
+    return v;
   },
   greenwichApparentSiderealTime(t) {
     return A.SiderealTime(t) * 15;

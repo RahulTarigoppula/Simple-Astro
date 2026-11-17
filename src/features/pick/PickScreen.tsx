@@ -1,7 +1,7 @@
 // Pick a good day: choose what you want to do and see the best days ahead for it, the way the old
 // muhūrta manuals weigh a day (lunar day, weekday, the Moon's star, your own birth star and Moon sign).
 // The band is the coming weeks drawn from the real scores; the reasons are folded under each day.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
 import { useActiveProfile, useHere, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { useNowMs } from "../../app/useNow";
@@ -13,7 +13,7 @@ import {
   type Activity,
   type ActivityId,
   activityOf,
-  daySkies,
+  type DaySky,
   type PickDay,
   type PickReason,
   personOf,
@@ -21,6 +21,8 @@ import {
   scoreDay,
 } from "../../engine/pickday";
 import { safeZone } from "../../engine/time";
+import { PRESET_HASH } from "../../engine/types";
+import { useCompute } from "../../platform/compute";
 import { english, fmt, span12, TONE_WORD, type Tone } from "../forecast/util";
 import { HereLine } from "../here/HereSheet";
 import "./pick.css";
@@ -32,6 +34,7 @@ const RANGES = [
 ] as const;
 type RangeDays = (typeof RANGES)[number]["days"];
 const STEP = 5;
+const NO_SKIES: DaySky[] = [];
 const TONES: Tone[] = ["bright", "steady", "mixed", "testing"];
 
 const vars = (o: Record<string, string | number>) => o as React.CSSProperties;
@@ -199,6 +202,11 @@ export default function PickScreen() {
   const zone = safeZone(hereZone);
 
   const [activityId, setActivityId] = useState<ActivityId>(() => activityOf(search.get("for")).id);
+  // The address can change under an open screen (Find, a link from Today): follow it.
+  const forParam = search.get("for");
+  useEffect(() => {
+    setActivityId(activityOf(forParam).id);
+  }, [forParam]);
   const [range, setRange] = useState<RangeDays>(45);
   const [shown, setShown] = useState(STEP);
   const activity: Activity = activityOf(activityId);
@@ -213,14 +221,17 @@ export default function PickScreen() {
   };
 
   const [dayStart] = periodBounds("day", now, zone);
-  // The sky of each day is the same whatever is being planned, so it is read once per range and place.
-  const skies = useMemo(() => {
-    try {
-      return daySkies(dayStart, range, { lat, lon }, zone, settings.preset);
-    } catch {
-      return [];
-    }
-  }, [dayStart, range, lat, lon, zone, settings.preset]);
+  // The sky of each day is the same whatever is being planned, so it is read once per range and place,
+  // in the background. While a new range is being read the days already on screen stay.
+  const read = useCompute(
+    "daySkies",
+    { fromMs: dayStart, days: range, place: { lat, lon }, zone, preset: settings.preset },
+    `${dayStart}|${range}|${lat},${lon}|${zone}|${PRESET_HASH(settings.preset)}`,
+  );
+  const lastRead = useRef(read);
+  if (read) lastRead.current = read;
+  const skies = read ?? lastRead.current ?? NO_SKIES;
+  const reading = !read && !lastRead.current;
 
   const person = useMemo(() => (profile && patri && patri.profileId === profile.id ? personOf(patri) : null), [profile, patri]);
   const days = useMemo(() => skies.map((s) => scoreDay(s, activityId, person)), [skies, activityId, person]);
@@ -234,7 +245,7 @@ export default function PickScreen() {
   if (profiles === undefined) return <Page label="Pick a good day">{null}</Page>;
 
   // With a person on screen, wait for the chart so the ranking does not change under the reader's eyes.
-  const waiting = !!profile && !person && !error;
+  const waiting = (!!profile && !person && !error) || reading;
   const best = ranked[0];
   const top = new Set(ranked.slice(0, 3).map((d) => d.startMs));
   const rangeWords = RANGES.find((r) => r.days === range)?.words ?? "";
@@ -328,7 +339,18 @@ export default function PickScreen() {
       ) : null}
 
       {waiting ? (
-        <div className="v-skel">Reading the sky…</div>
+        <div className="v-sk" role="status" aria-busy="true">
+          <span className="v-sk__label">Reading the sky…</span>
+          <div className="v-sk--card" aria-hidden="true">
+            <i className="v-sk--line" style={{ "--w": "42%" } as React.CSSProperties} />
+            <i className="v-sk--line" />
+            <i className="v-sk--line" style={{ "--w": "78%" } as React.CSSProperties} />
+          </div>
+          <div className="v-sk--card" aria-hidden="true">
+            <i className="v-sk--line" style={{ "--w": "60%" } as React.CSSProperties} />
+            <i className="v-sk--line" />
+          </div>
+        </div>
       ) : (
         <Reveal i={2}>
           <Section

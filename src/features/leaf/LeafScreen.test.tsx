@@ -46,7 +46,12 @@ function renderLeaf(at = "/leaf/new") {
   return { router, ...render(<RouterProvider router={router} />) };
 }
 
-const next = () => fireEvent.click(screen.getByRole("button", { name: "Next" }));
+/** The primary button says what comes next ("Next: birth place"), so it is found by how it starts. */
+const next = () => fireEvent.click(screen.getByRole("button", { name: /^Next: / }));
+/** The last step's button for a new person: "Save and see my chart" (the first person) or "... the chart". */
+/** After an Edit on the last step, the primary button goes straight back there. */
+const done = () => fireEvent.click(screen.getByRole("button", { name: "Done: check again" }));
+const SAVE = /^Save and see (my|the) chart$/;
 /** The Back button under the step (the page also has one in its top bar; both walk back). */
 const back = () => fireEvent.click(screen.getAllByRole("button", { name: "Back" }).at(-1) as HTMLElement);
 const onStep = (n: number) => screen.findByText(`Step ${n} of 4`);
@@ -85,16 +90,67 @@ describe("LeafScreen: adding a person, step by step", () => {
     await db.patris.clear();
   });
 
-  it("starts empty on Who and names the problem when the name is missing", async () => {
+  it("starts on the name alone: one box, ready to type in, and nothing else is asked", async () => {
     renderLeaf();
     await onStep(1);
     expect(screen.getByRole("heading", { level: 1, name: "Add a person" })).toBeInTheDocument();
-    expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("");
-    expect(screen.getByRole("radio", { name: /^North Indian/ })).toBeChecked();
+    expect(screen.getByRole("heading", { level: 2, name: "What is your name?" })).toBeInTheDocument();
+    expect(screen.getByText("Everything you type stays on this device.")).toBeInTheDocument();
+    const name = screen.getByRole("textbox", { name: "Name" });
+    expect(name).toHaveValue("");
+    await waitFor(() => expect(name).toHaveFocus());
+    // The only field on the step: no tradition, no writing hand, no other box.
+    expect(screen.getAllByRole("textbox")).toHaveLength(1);
+    expect(screen.queryByRole("radio")).toBeNull();
+    expect(screen.queryByRole("combobox")).toBeNull();
+    expect(screen.getByRole("button", { name: "Next: birth date and time" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Step 2: When" })).toBeDisabled();
+  });
+
+  it("says a missing name beside the box, only after Next, and puts the cursor back in it", async () => {
+    renderLeaf();
+    await onStep(1);
+    const name = screen.getByRole("textbox", { name: "Name" });
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(name).not.toHaveAttribute("aria-invalid");
+    name.blur();
     next();
-    expect(await screen.findByRole("alert")).toHaveTextContent("Type a name to go on.");
+    const said = await screen.findByRole("alert");
+    expect(said).toHaveTextContent("Type a name to go on.");
+    expect(name).toHaveAttribute("aria-invalid", "true");
+    expect(name.getAttribute("aria-describedby")?.split(" ")).toContain(said.id);
+    expect(name.parentElement).toContainElement(said); // beside the field, not down in the action bar
+    expect(within(screen.getByTestId("leaf-actions")).queryByRole("alert")).toBeNull();
+    await waitFor(() => expect(name).toHaveFocus());
     expect(screen.getByText("Step 1 of 4")).toBeInTheDocument();
+    // Spaces are not a name.
+    type("Name", "   ");
+    next();
+    expect(screen.getByText("Step 1 of 4")).toBeInTheDocument();
+    // Enter goes on once there is one, and the message is gone.
+    type("Name", "Asha");
+    fireEvent.submit(name.closest("form") as HTMLFormElement);
+    await onStep(2);
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("asks about 'you' for the first person and about 'them' once somebody is saved", async () => {
+    const first = renderLeaf();
+    await fillWho();
+    expect(screen.getByRole("heading", { level: 2, name: "When were you born?" })).toBeInTheDocument();
+    await fillWhen();
+    expect(screen.getByRole("heading", { level: 2, name: "Where were you born?" })).toBeInTheDocument();
+    first.unmount();
+    sessionStorage.clear();
+
+    await upsertProfile(REFERENCE_PROFILE);
+    renderLeaf();
+    await onStep(1);
+    expect(screen.getByRole("heading", { level: 2, name: "What is their name?" })).toBeInTheDocument();
+    type("Name", "Asha");
+    next();
+    await onStep(2);
+    expect(screen.getByRole("heading", { level: 2, name: "When were they born?" })).toBeInTheDocument();
   });
 
   it("cannot pass When without am or pm, and reads the time back once it is tapped", async () => {
@@ -144,6 +200,12 @@ describe("LeafScreen: adding a person, step by step", () => {
     fillDate();
     const unknown = screen.getByRole("switch", { name: "I don't know the time" });
     expect(unknown).not.toBeChecked();
+    // One line, before it is tapped, says it is fine and what still works.
+    expect(unknown).toHaveAccessibleDescription(
+      /^That is fine\. The Moon sign and birth star usually still work; only the rising sign needs the time\./,
+    );
+    // It sits with the time boxes, above the read-back, so it is seen without scrolling.
+    expect(unknown.compareDocumentPosition(screen.getByTestId("birth-readback")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     fireEvent.click(unknown);
     expect(unknown).toBeChecked();
     expect(screen.getByRole("combobox", { name: "Hour" })).toBeDisabled();
@@ -154,7 +216,9 @@ describe("LeafScreen: adding a person, step by step", () => {
     next();
     await onStep(4);
     expect(screen.getByRole("region", { name: "Check before you save" })).toHaveTextContent("needs the time");
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    expect(screen.getByTestId("birth-readback")).toHaveTextContent("Born Monday 14 March 1994, time of birth not known, noon is used");
+    expect(screen.getByText("The time of birth is not known, so noon is used and the rising sign is left out.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: SAVE }));
     await waitFor(async () => expect(await db.profiles.count()).toBe(1));
     const saved = (await db.profiles.toArray())[0];
     expect(saved?.timeUnknown).toBe(true);
@@ -170,11 +234,15 @@ describe("LeafScreen: adding a person, step by step", () => {
     expect(search).toHaveValue("");
     // Before any attempt the step only explains itself.
     expect(screen.getByText("The place you pick will show here.")).toBeInTheDocument();
-    expect(screen.queryByText("Not chosen yet.")).toBeNull();
+    expect(screen.queryByText(/Not chosen yet/)).toBeNull();
     expect(screen.queryByRole("alert")).toBeNull();
     next();
-    expect(await screen.findByRole("alert")).toHaveTextContent("Pick the place of birth from the list.");
-    expect(screen.getByText("Not chosen yet.")).toBeInTheDocument();
+    // Said in the box under the search field, which the field points at; the cursor goes back to the field.
+    const said = await screen.findByRole("alert");
+    expect(said).toHaveTextContent("Not chosen yet. Pick the place of birth from the list.");
+    expect(search.getAttribute("aria-describedby")?.split(" ")).toContain(said.id);
+    expect(search).toHaveAttribute("aria-invalid", "true");
+    expect(within(screen.getByTestId("leaf-actions")).queryByRole("alert")).toBeNull();
     // Typing alone is not a choice.
     fireEvent.change(search, { target: { value: "Be" } });
     next();
@@ -186,6 +254,7 @@ describe("LeafScreen: adding a person, step by step", () => {
     expect(found).not.toHaveTextContent(/\d\.\d/);
     fireEvent.click(found);
     expect(screen.getByText("Bengaluru, Karnataka, India")).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).toBeNull();
     next();
     await onStep(4);
     expect(screen.getByRole("heading", { name: "Check and save" })).toHaveFocus();
@@ -229,14 +298,37 @@ describe("LeafScreen: adding a person, step by step", () => {
     fireEvent.click(screen.getByRole("button", { name: "Step 4: Check" }));
     await onStep(4);
     const review = screen.getByRole("main");
-    expect(review).toHaveTextContent("Asha");
-    expect(review).toHaveTextContent("14 March 1994, 7:25 in the morning (07:25)");
-    expect(review).toHaveTextContent("Bengaluru, Karnataka, India");
+    // What was entered is said back as three short lines, each with its own way to change it.
+    const lines = within(screen.getByRole("list", { name: "What was entered" })).getAllByRole("listitem");
+    expect(lines).toHaveLength(3);
+    expect(lines[0]).toHaveTextContent("Asha");
+    expect(lines[1]).toHaveTextContent("Born Monday 14 March 1994, 7:25 in the morning (07:25)");
+    expect(lines[2]).toHaveTextContent("in Bengaluru, Karnataka, India");
+    expect(within(lines[0] as HTMLElement).getByRole("button", { name: "Change the name" })).toHaveTextContent("Edit");
+    expect(within(lines[1] as HTMLElement).getByRole("button", { name: "Change the date and time" })).toHaveTextContent("Edit");
+    expect(within(lines[2] as HTMLElement).getByRole("button", { name: "Change the place" })).toHaveTextContent("Edit");
     expect(review).toHaveTextContent("Coordinates: 12.9716 N · 77.5946 E"); // kept for the technical fold
+    // Edit opens that step with everything still there, and one tap returns to the review.
+    fireEvent.click(screen.getByRole("button", { name: "Change the date and time" }));
+    await onStep(2);
+    expect(screen.getByRole("combobox", { name: "Hour" })).toHaveValue("7");
+    expect(screen.queryByRole("button", { name: /^Next: / })).toBeNull();
+    // ...but not past a mistake: the same checks hold on the way back.
+    fireEvent.click(screen.getByRole("radio", { name: "pm" }));
+    choose("Month", "2");
+    type("Day", "31");
+    fireEvent.click(screen.getByRole("button", { name: "Done: check again" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("February 1994 has only 28 days.");
+    expect(screen.getByText("Step 2 of 4")).toBeInTheDocument();
+    choose("Month", "3");
+    type("Day", "14");
+    fireEvent.click(screen.getByRole("radio", { name: "am" }));
+    fireEvent.click(screen.getByRole("button", { name: "Done: check again" }));
+    await onStep(4);
     const facts = screen.getByRole("region", { name: "Check before you save" });
     expect(within(facts).getByText("Revatī")).toBeInTheDocument();
     expect(facts).toHaveTextContent(/Quarter \(pada\) [1-4]/);
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    fireEvent.click(screen.getByRole("button", { name: SAVE }));
     await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/patri\//));
     const all = await db.profiles.toArray();
     expect(all).toHaveLength(1);
@@ -259,7 +351,8 @@ describe("LeafScreen: adding a person, step by step", () => {
     expect(check).toHaveTextContent("Mīna");
     expect(screen.getByTestId("birth-readback")).toHaveTextContent("14 March 1994, 7:25 in the morning (07:25)");
     expect(screen.getByRole("status", { name: /Julian Day/ })).toHaveTextContent("ASIA/KOLKATA");
-    const save = screen.getByRole("button", { name: /^save/i });
+    expect(screen.getByRole("note")).toHaveTextContent("This is an example person, so you can look around.");
+    const save = screen.getByRole("button", { name: "Save and see the chart" });
     fireEvent.click(save);
     fireEvent.click(save); // an impatient second tap saves nothing more
     await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/patri\//));
@@ -321,23 +414,141 @@ describe("LeafScreen: adding a person, step by step", () => {
     expect(screen.queryByRole("button", { name: /fill in an example/i })).toBeNull();
   });
 
-  it("the tradition and the writing hand chosen on Who are what is saved", async () => {
+  it("the tradition and the writing hand are chosen on the last step, show what changes, and are what is saved", async () => {
     const { router } = renderLeaf();
-    await onStep(1);
-    type("Name", "Latha");
-    fireEvent.click(screen.getByRole("radio", { name: /^Telugu/ }));
-    fireEvent.click(screen.getByRole("radio", { name: "Left" }));
-    next();
-    await onStep(2);
+    await fillWho();
     await fillWhen();
     await pickPlace();
     next();
     await onStep(4);
-    expect(screen.getByRole("main")).toHaveTextContent("Telugu · left-handed");
-    expect(screen.getByRole("region", { name: "Check before you save" })).toHaveTextContent("Meenam (Mīna)");
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    // Sensible starting points: North Indian for a birth in Karnataka, and the right hand.
+    const trad = screen.getByRole("radiogroup", { name: /^Names and chart style/ });
+    expect(within(trad).getAllByRole("radio")).toHaveLength(3);
+    expect(within(trad).getByRole("radio", { name: "North Indian" })).toBeChecked();
+    expect(trad).toHaveAccessibleDescription(/^Sanskrit names and the diamond-shaped chart\./);
+    expect(screen.getByRole("radio", { name: "Right" })).toBeChecked();
+    const facts = screen.getByRole("region", { name: "Check before you save" });
+    expect(facts).not.toHaveTextContent("Meenam");
+    // Picking another one changes the names in the check card at once, and the line under the choice.
+    fireEvent.click(within(trad).getByRole("radio", { name: "Telugu" }));
+    expect(within(trad).getByRole("radio", { name: "Telugu" })).toBeChecked();
+    expect(trad).toHaveAccessibleDescription(/^Telugu names beside the Sanskrit, and the square South Indian chart\./);
+    expect(facts).toHaveTextContent("Meenam (Mīna)");
+    // The writing hand is under "More options".
+    const more = screen.getByText("More options").closest("details") as HTMLElement;
+    fireEvent.click(within(more).getByRole("radio", { name: "Left" }));
+    fireEvent.click(screen.getByRole("button", { name: SAVE }));
     await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/patri\//));
-    expect((await db.profiles.toArray())[0]).toMatchObject({ name: "Latha", tradition: "telugu", handedness: "left" });
+    expect((await db.profiles.toArray())[0]).toMatchObject({ name: "Asha", tradition: "telugu", handedness: "left" });
+  });
+
+  it("suggests the tradition from the birth place, and a choice made by hand is never overruled", async () => {
+    const { router } = renderLeaf();
+    await fillWho();
+    await fillWhen();
+    fireEvent.change(screen.getByRole("searchbox", { name: "Place of birth" }), { target: { value: "Vijayaw" } });
+    fireEvent.click(await screen.findByRole("button", { name: /^Vijayawada/ }));
+    next();
+    await onStep(4);
+    expect(screen.getByRole("radio", { name: "Telugu" })).toBeChecked(); // Andhra Pradesh
+    // Change the place: the suggestion follows it.
+    fireEvent.click(screen.getByRole("button", { name: "Change the place" }));
+    await onStep(3);
+    await pickPlace();
+    done();
+    await onStep(4);
+    expect(screen.getByRole("radio", { name: "North Indian" })).toBeChecked();
+    // Picked by hand: it stays, whatever the place.
+    fireEvent.click(screen.getByRole("radio", { name: "Tamil" }));
+    fireEvent.click(screen.getByRole("button", { name: "Change the place" }));
+    await onStep(3);
+    fireEvent.change(screen.getByRole("searchbox", { name: "Place of birth" }), { target: { value: "Vijayaw" } });
+    fireEvent.click(await screen.findByRole("button", { name: /^Vijayawada/ }));
+    done();
+    await onStep(4);
+    expect(screen.getByRole("radio", { name: "Tamil" })).toBeChecked();
+    fireEvent.click(screen.getByRole("button", { name: SAVE }));
+    await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/patri\//));
+    expect((await db.profiles.toArray())[0]).toMatchObject({ tradition: "tamil", handedness: "right" });
+  });
+
+  it("starts the next person on the tradition the family already uses", async () => {
+    await upsertProfile({ ...REFERENCE_PROFILE, tradition: "tamil" });
+    const { router } = renderLeaf();
+    await fillWho();
+    await fillWhen();
+    await pickPlace(); // Bengaluru would suggest North Indian; the family's own choice comes first
+    next();
+    await onStep(4);
+    expect(screen.getByRole("radio", { name: "Tamil" })).toBeChecked();
+    fireEvent.click(screen.getByRole("button", { name: "Save and see the chart" }));
+    await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/patri\//));
+    const asha = (await db.profiles.toArray()).find((p) => p.name === "Asha");
+    expect(asha).toMatchObject({ tradition: "tamil", handedness: "right" });
+  });
+});
+
+describe("LeafScreen: /leaf/new?example=1", () => {
+  beforeEach(async () => {
+    sessionStorage.clear();
+    await db.profiles.clear();
+    await db.settings.clear();
+    await db.patris.clear();
+  });
+
+  it("opens the last step with the example filled in, and one tap saves exactly that person", async () => {
+    const { router } = renderLeaf("/leaf/new?example=1");
+    await onStep(4);
+    const lines = within(screen.getByRole("list", { name: "What was entered" })).getAllByRole("listitem");
+    expect(lines[0]).toHaveTextContent("Rahul");
+    expect(lines[1]).toHaveTextContent("Born Monday 14 March 1994, 7:25 in the morning (07:25)");
+    expect(lines[2]).toHaveTextContent("in Bengaluru, Karnataka, India");
+    const check = screen.getByRole("region", { name: "Check before you save" });
+    expect(check).toHaveTextContent("Revatī");
+    expect(check).toHaveTextContent("Mīna");
+    expect(screen.getByRole("status", { name: /Julian Day/ })).toHaveTextContent("ASIA/KOLKATA");
+    expect(screen.getByRole("note")).toHaveTextContent("This is an example person");
+    // The flag is used once and leaves the address, so a reload keeps later changes.
+    await waitFor(() => expect(router.state.location.search).toBe("?step=4"));
+    fireEvent.click(screen.getByRole("button", { name: "Save and see the chart" }));
+    await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/patri\//));
+    const all = await db.profiles.toArray();
+    expect(all).toHaveLength(1);
+    expect(all[0]).toMatchObject({ name: "Rahul", handedness: REFERENCE_PROFILE.handedness, tradition: "north" });
+    expect(all[0]?.birth.utcMs).toBe(REFERENCE_PROFILE.birth.utcMs);
+    expect(all[0]?.birth).toMatchObject({ localH: 7, localMi: 25, zone: "Asia/Kolkata" });
+    // Back from the chart does not land in the form.
+    router.navigate(-1);
+    await waitFor(() => expect(router.state.location.pathname).toBe("/"));
+  });
+
+  it("replaces a half-typed draft, and 'Use my own details' goes back to an empty first step", async () => {
+    const first = renderLeaf();
+    await onStep(1);
+    type("Name", "Somebody half typed");
+    await waitFor(() => expect(sessionStorage.getItem("vyom-leaf-draft")).not.toBeNull());
+    first.unmount();
+
+    renderLeaf("/leaf/new?example=1");
+    await onStep(4);
+    expect(screen.getByRole("main")).toHaveTextContent("Rahul");
+    expect(screen.getByRole("main")).not.toHaveTextContent("Somebody half typed");
+    fireEvent.click(screen.getByRole("button", { name: "Use my own details" }));
+    await onStep(1);
+    expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("");
+    expect(screen.getByRole("button", { name: "Step 2: When" })).toBeDisabled();
+    await waitFor(() => expect(sessionStorage.getItem("vyom-leaf-draft")).toBeNull());
+    expect(await db.profiles.count()).toBe(0);
+  });
+
+  it("does nothing when a saved person is being edited", async () => {
+    const other: Profile = { ...REFERENCE_PROFILE, id: "test-other", name: "Meena" };
+    await upsertProfile(other);
+    renderLeaf("/leaf/test-other/edit?example=1");
+    await onStep(4);
+    expect(screen.getByRole("main")).toHaveTextContent("Meena");
+    expect(screen.queryByRole("note")).toBeNull();
+    expect(screen.getByRole("button", { name: "Save changes" })).toBeInTheDocument();
   });
 });
 
@@ -354,29 +565,37 @@ describe("LeafScreen: the draft and the action bar", () => {
     await onStep(1);
     const bar = screen.getByTestId("leaf-actions");
     expect(bar).toHaveClass("leaf-foot");
-    expect(within(bar).getByRole("button", { name: "Next" })).toBeInTheDocument();
+    // The button says what happens next; the first step has nothing to go back to.
+    expect(within(bar).getByRole("button", { name: "Next: birth date and time" })).toBeInTheDocument();
+    expect(within(bar).queryByRole("button", { name: "Back" })).toBeNull();
     expect(bar.nextElementSibling).toBeNull(); // nothing sits under the bar
-    // The problem is said inside the bar, so it is seen wherever the page is scrolled.
+    type("Name", "Asha");
     next();
-    expect(within(bar).getByRole("alert")).toHaveTextContent("Type a name to go on.");
-    fireEvent.click(screen.getByRole("button", { name: /fill in an example/i }));
+    await onStep(2);
+    expect(within(screen.getByTestId("leaf-actions")).getByRole("button", { name: "Next: birth place" })).toBeInTheDocument();
+    expect(within(screen.getByTestId("leaf-actions")).getByRole("button", { name: "Back" })).toBeInTheDocument();
+    await fillWhen();
+    expect(within(screen.getByTestId("leaf-actions")).getByRole("button", { name: "Next: check it" })).toBeInTheDocument();
+    await pickPlace();
+    next();
     await onStep(4);
     const last = screen.getByTestId("leaf-actions");
-    expect(within(last).getByRole("button", { name: "Save" })).toBeInTheDocument();
+    expect(within(last).getByRole("button", { name: "Save and see my chart" })).toBeInTheDocument();
     expect(within(last).getByRole("button", { name: "Back" })).toBeInTheDocument();
     expect(last.nextElementSibling).toBeNull();
   });
 
   it("brings everything back after the screen is left and opened again, on the same step", async () => {
     const first = renderLeaf();
-    await onStep(1);
-    type("Name", "Asha");
-    fireEvent.click(screen.getByRole("radio", { name: /^Telugu/ }));
-    fireEvent.click(screen.getByRole("radio", { name: "Left" }));
-    next();
-    await onStep(2);
+    await fillWho();
     await fillWhen();
     await pickPlace();
+    next();
+    await onStep(4);
+    fireEvent.click(screen.getByRole("radio", { name: "Telugu" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Left" }));
+    back();
+    await onStep(3);
     fireEvent.click(screen.getByText("Advanced"));
     fireEvent.click(screen.getByRole("radio", { name: "Bombay +04:51" }));
     expect(JSON.parse(sessionStorage.getItem("vyom-leaf-draft") ?? "{}")).toMatchObject({ name: "Asha", place: { name: "Bengaluru" } });
@@ -398,9 +617,11 @@ describe("LeafScreen: the draft and the action bar", () => {
     back();
     await onStep(1);
     expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("Asha");
-    expect(screen.getByRole("radio", { name: /^Telugu/ })).toBeChecked();
-    expect(screen.getByRole("radio", { name: "Left" })).toBeChecked();
     expect(screen.getByText("Carrying on where you left off.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Step 4: Check" }));
+    await onStep(4);
+    expect(screen.getByRole("radio", { name: "Telugu" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Left" })).toBeChecked();
   });
 
   it("'Start again' throws the draft away", async () => {
@@ -435,7 +656,7 @@ describe("LeafScreen: the draft and the action bar", () => {
     await onStep(4);
     expect(screen.getByRole("main")).toHaveTextContent("Rahul");
     expect(JSON.parse(sessionStorage.getItem("vyom-leaf-draft") ?? "{}")).toMatchObject({ name: "Rahul", y: 1994 });
-    fireEvent.click(screen.getByRole("button", { name: /^save/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Save and see the chart" }));
     await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/patri\//));
     expect((await db.profiles.toArray())[0]?.name).toBe("Rahul");
   });
@@ -448,7 +669,7 @@ describe("LeafScreen: the draft and the action bar", () => {
     next();
     await onStep(4);
     expect(sessionStorage.getItem("vyom-leaf-draft")).not.toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    fireEvent.click(screen.getByRole("button", { name: SAVE }));
     await waitFor(() => expect(router.state.location.pathname).toMatch(/^\/patri\//));
     expect(sessionStorage.getItem("vyom-leaf-draft")).toBeNull();
     unmount();
@@ -543,12 +764,30 @@ describe("LeafScreen: editing a person", () => {
     expect(all[0]?.birth.localH).toBe(19);
   });
 
+  it("shows the saved tradition and writing hand, and lets both be changed", async () => {
+    const saved: Profile = { ...REFERENCE_PROFILE, id: "test-latha", name: "Latha", tradition: "tamil", handedness: "left" };
+    await upsertProfile(saved);
+    // Somebody else in the family uses another tradition: the saved person's own is what shows.
+    await upsertProfile({ ...REFERENCE_PROFILE, id: "test-newer", name: "Newer", tradition: "telugu", updatedAt: saved.updatedAt + 1000 });
+    const { router } = renderLeaf("/leaf/test-latha/edit");
+    await onStep(4);
+    expect(screen.getByRole("radio", { name: "Tamil" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Left" })).toBeChecked();
+    expect(screen.queryByRole("note")).toBeNull(); // a saved person is never called the example
+    fireEvent.click(screen.getByRole("radio", { name: "North Indian" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Right" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    await waitFor(() => expect(router.state.location.pathname).toBe("/patri/test-latha"));
+    expect(await db.profiles.get("test-latha")).toMatchObject({ name: "Latha", tradition: "north", handedness: "right" });
+    expect((await db.profiles.get("test-latha"))?.birth.utcMs).toBe(REFERENCE_PROFILE.birth.utcMs);
+  });
+
   it("does not pre-fill noon for a person whose time is not known", async () => {
     const unknown: Profile = { ...REFERENCE_PROFILE, id: "test-unknown", name: "Meena", timeUnknown: true };
     await upsertProfile(unknown);
     renderLeaf("/leaf/test-unknown/edit");
     await onStep(4);
-    expect(screen.getByTestId("birth-readback")).toHaveTextContent("time of birth not known, noon is used");
+    expect(screen.getByTestId("birth-readback")).toHaveTextContent("Born Monday 14 March 1994, time of birth not known, noon is used");
     expect(screen.getByRole("region", { name: "Check before you save" })).toHaveTextContent("needs the time");
     fireEvent.click(screen.getByRole("button", { name: "Change the date and time" }));
     await onStep(2);

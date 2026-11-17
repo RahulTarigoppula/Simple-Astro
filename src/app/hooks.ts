@@ -1,6 +1,6 @@
 // The read side of the one-way data flow: Dexie live queries + memoised engine calls.
 import { useLiveQuery } from "dexie-react-hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { db, type JournalRow } from "../data/db";
 import { castPatri } from "../data/repo";
 import { safeZone } from "../engine/time";
@@ -15,8 +15,9 @@ export function useSettings(): Settings {
 /** undefined until IndexedDB has answered, use it where a default would be a wrong answer. */
 export function useSettingsLoaded(): Settings | undefined {
   const row = useLiveQuery(async () => (await db.settings.get("app")) ?? null, []);
-  if (row === undefined) return undefined;
-  return row ? mergeRow(row.value) : DEFAULT_SETTINGS;
+  // One object per stored row: `settings` and `settings.preset` keep their identity between renders,
+  // so effects and memos that depend on them do not run again on every render.
+  return useMemo(() => (row === undefined ? undefined : row ? mergeRow(row.value) : DEFAULT_SETTINGS), [row]);
 }
 
 /** undefined while loading, [] when the bundle is empty. */

@@ -7,6 +7,7 @@
 
 ## Summary
 
+- **4.1.0:** faster (background worker, Today kept between visits), a Find sheet for every screen, a simpler add-person flow, a touchable hour timeline and "Is today good for…?", swipes and pressed states throughout.
 - **4.0.0:** seven new features: pick a good day, festivals and fasts for your place, family today, a journal of how the days really went, share cards, your year ahead as a story, and a printable birth report.
 - **3.1.0:** every tab opens on a true picture of the sky (the Sun on its real arc with the good hours lit, your own stars at birth, the week as a curve, two overlapping moons for a match), with motion throughout.
 - **3.0.0:** a second redesign of the look, "ivory and ink": warm paper, serif headings, cards without outlines, and about half as much on every screen. Design notes in [docs/DESIGN-V3.md](docs/DESIGN-V3.md).
@@ -66,14 +67,14 @@ Useful one-off scripts (all outside-the-repo downloads are cached in `%TEMP%`):
 ## Ship it
 
 - **Web:** every push to `main` runs `.github/workflows/pages.yml` and deploys to https://rahultarigoppula.github.io/Simple-Astro/.
-- **Android:** a signed, sideloadable APK is attached to each GitHub Release (`git tag v4.0.0 && git push origin v4.0.0`
+- **Android:** a signed, sideloadable APK is attached to each GitHub Release (`git tag v4.1.0 && git push origin v4.1.0`
   once the four `ANDROID_*` secrets exist, see [docs/HANDOFF.md](docs/HANDOFF.md) §2). To build it on your own machine:
   a JDK 21 and the Android SDK (platform 36, build-tools 36.0.0), then
 
   ```bash
   VITE_BASE_PATH=/ VITE_PLATFORM=android npm run build   # no service worker in the APK
   npx cap sync android
-  cd android && ./gradlew :app:assembleRelease -PversionCode=400 -PversionName=4.0.0
+  cd android && ./gradlew :app:assembleRelease -PversionCode=410 -PversionName=4.1.0
   ```
 
   with `ANDROID_KEYSTORE_FILE`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD` set in the

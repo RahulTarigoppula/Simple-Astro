@@ -385,7 +385,7 @@ export function pickTone(score: number): PickTone {
 }
 
 /** The planetary hours that suit each undertaking (the hour of the graha that stands for it). */
-const HORA_FOR: Record<ActivityId, readonly GrahaId[]> = {
+export const HORA_FOR: Record<ActivityId, readonly GrahaId[]> = {
   new: ["JU", "ME", "VE"],
   travel: ["ME", "MO", "VE"],
   talk: ["ME", "JU"],

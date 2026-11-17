@@ -1,10 +1,13 @@
 // Forecasts for a day, week, month, quarter or year, read the classical way (gochara from the natal
 // Moon, Tārā/Candra-bala, the running daśā). The band at the top is the answer as a picture (the sky
 // of the day, the curve of the week, the bars of the month); the astrology is folded below.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
 import { useActiveProfile, useHere, usePatri, useProfiles, useSettings } from "../../app/hooks";
 import { useNowMs } from "../../app/useNow";
+import { SegPill, useKeepInView } from "../../components/ui/gesture/SegPill";
+import { useArrowKeys } from "../../components/ui/gesture/useArrowKeys";
+import { useSwipe } from "../../components/ui/gesture/useSwipe";
 import { CountUp, Reveal } from "../../components/ui/Motion";
 import { ChevronLeft, ChevronRight, Page, Section } from "../../components/ui/Page";
 import { SkyScene, skyPhase } from "../../components/ui/SkyScene";
@@ -15,6 +18,7 @@ import { computePanchang } from "../../engine/panchang";
 import { dayGuide, personalReading } from "../../engine/personal";
 import { personalYear } from "../../engine/profile";
 import { safeZone } from "../../engine/time";
+import { haptics } from "../../platform/haptics";
 import { countEvent } from "../../platform/stats";
 import { IconForecast } from "../chowki/icons";
 import { HereLine } from "../here/HereSheet";
@@ -136,9 +140,12 @@ export default function ForecastScreen() {
   const { zone, lat, lon } = useHere(profile);
   const atMs = at ?? nowMs;
 
+  // Which way the reader last moved through time, so the new picture arrives from that side.
+  const [dir, setDir] = useState<"next" | "prev" | null>(null);
   const show = (p: Period, when: number | null) => {
     setPeriod(p);
     setAt(when);
+    setDir(null);
     setSearch(p === "day" ? {} : { p }, { replace: true });
   };
 
@@ -190,6 +197,28 @@ export default function ForecastScreen() {
     }
   }, [patri, weekStart, weekEnd, zone, settings.preset]);
 
+  // One step through time, the same from an arrow button, a swipe on the band or an arrow key.
+  const canStep = f !== null;
+  const go = (d: 1 | -1) => {
+    if (!canStep) return;
+    setDir(d === 1 ? "next" : "prev");
+    setAt(shift(period, atMs, zone, d));
+    haptics.selection();
+  };
+  const backToNow = () => {
+    if (f) setDir(nowMs < f.startMs ? "prev" : "next");
+    setAt(null);
+    haptics.selection();
+  };
+  const swipe = useSwipe({ onLeft: () => go(1), onRight: () => go(-1), disabled: !canStep });
+  useArrowKeys(
+    () => go(-1),
+    () => go(1),
+    canStep,
+  );
+  const tabsRef = useRef<HTMLDivElement>(null);
+  useKeepInView(tabsRef, period);
+
   if (profiles === undefined) return <Page label="Forecast">{null}</Page>;
   if (!profile) return <Empty />;
 
@@ -214,11 +243,11 @@ export default function ForecastScreen() {
   const openMonth = (ms: number) => show("month", ms);
 
   const hero = (
-    <section className="fc-hero" data-period={period} aria-labelledby="fc-h">
+    <section className="fc-hero v-swipe" data-period={period} data-dir={dir ?? undefined} aria-labelledby="fc-h" {...swipe}>
       <h1 id="fc-h" className="fc-hero__title">
         {profile.name}'s forecast
       </h1>
-      <div className="v-seg fc-tabs" role="tablist" aria-label="Forecast period">
+      <div ref={tabsRef} className="v-seg v-seg--pill fc-tabs" role="tablist" aria-label="Forecast period" data-noswipe="">
         {PERIODS.map((p) => (
           <button
             key={p.id}
@@ -230,6 +259,7 @@ export default function ForecastScreen() {
               show(p.id, null);
             }}
           >
+            {period === p.id ? <SegPill id="fc-period" /> : null}
             {p.label}
           </button>
         ))}
@@ -237,29 +267,29 @@ export default function ForecastScreen() {
       {f ? (
         <>
           <div className="fc-nav">
-            <button
-              type="button"
-              className="v-iconbtn"
-              aria-label={`Previous ${period}`}
-              onClick={() => setAt(shift(period, atMs, zone, -1))}
-            >
+            <button type="button" className="v-iconbtn" aria-label={`Previous ${period}`} onClick={() => go(-1)}>
               <ChevronLeft />
             </button>
             <div className="fc-nav__when">
               <span className="fc-nav__label">{periodLabel(period, f.startMs, f.endMs, zone)}</span>
               {isNow ? null : (
-                <button type="button" className="fc-nav__back" onClick={() => setAt(null)}>
-                  Back to now
+                <button
+                  type="button"
+                  className="v-pill v-pill-in fc-nav__back"
+                  aria-label={`Back to ${THIS[period].toLowerCase()}`}
+                  onClick={backToNow}
+                >
+                  <span>{THIS[period]}</span>
                 </button>
               )}
             </div>
-            <button type="button" className="v-iconbtn" aria-label={`Next ${period}`} onClick={() => setAt(shift(period, atMs, zone, 1))}>
+            <button type="button" className="v-iconbtn" aria-label={`Next ${period}`} onClick={() => go(1)}>
               <ChevronRight size={20} />
             </button>
           </div>
 
           {period === "day" && sky && guide ? (
-            <div className="fc-dial" key={f.startMs}>
+            <div className="fc-dial v-slide" key={f.startMs}>
               <SkyScene
                 nowMs={skyAt}
                 sunriseMs={sky.riseMs}
@@ -277,7 +307,7 @@ export default function ForecastScreen() {
             </div>
           ) : (
             <>
-              <div className="fc-answer">
+              <div className="fc-answer v-slide" key={`a-${period}-${f.startMs}`}>
                 <Answer f={f} eyebrow={eyebrow} />
               </div>
               {period === "day" ? null : (
@@ -333,7 +363,9 @@ export default function ForecastScreen() {
             {periodLabel(period, f.startMs, f.endMs, zone)}: {TONE_WORD[f.tone]}, {pct(f.score)} of 100.
           </p>
         </>
-      ) : null}
+      ) : ready ? null : (
+        <span className="v-sk--dial" aria-hidden="true" />
+      )}
     </section>
   );
   const band = period === "day" && sky && guide ? (isNow ? skyPhase(nowMs, sky.riseMs, sky.setMs) : "day") : "night";
@@ -403,8 +435,24 @@ export default function ForecastScreen() {
 
           <p className="v-foot">A traditional reading for reflection, never a prediction or advice.</p>
         </>
+      ) : ready ? (
+        <div className="v-skel" role="status">
+          This period could not be read.
+        </div>
       ) : (
-        <div className="v-skel">{ready ? "This period could not be read." : "Reading the sky…"}</div>
+        <div className="v-sk" role="status" aria-busy="true">
+          <span className="v-sk__label">Reading the sky…</span>
+          <div className="v-sk--card" aria-hidden="true">
+            <i className="v-sk--line" style={{ "--w": "42%" } as React.CSSProperties} />
+            <i className="v-sk--line" />
+            <i className="v-sk--line" style={{ "--w": "78%" } as React.CSSProperties} />
+          </div>
+          <div className="v-sk--card" aria-hidden="true">
+            <i className="v-sk--line" style={{ "--w": "34%" } as React.CSSProperties} />
+            <i className="v-sk--line" style={{ "--w": "88%" } as React.CSSProperties} />
+            <i className="v-sk--line" style={{ "--w": "64%" } as React.CSSProperties} />
+          </div>
+        </div>
       )}
     </Page>
   );

@@ -1,3 +1,4 @@
+import { motion, useReducedMotion } from "motion/react";
 import { Link, useLocation } from "react-router";
 import {
   IconChart,
@@ -13,6 +14,7 @@ import {
   IconSky,
   IconToday,
 } from "../features/chowki/icons";
+import { haptics } from "../platform/haptics";
 import { useActiveProfile, useProfiles } from "./hooks";
 
 interface Tab {
@@ -23,12 +25,23 @@ interface Tab {
   on: RegExp;
 }
 
+const EASE = [0.22, 0.8, 0.2, 1] as const;
+
+/** Brings the screen on show back to its top (a tap on the tab you are already on). */
+export function scrollScreenToTop(): void {
+  const calm = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+  for (const el of Array.from(document.querySelectorAll<HTMLElement>("main.screen, main.screen .scrollport"))) {
+    if (el.scrollTop > 0 && typeof el.scrollTo === "function") el.scrollTo({ top: 0, behavior: calm ? "auto" : "smooth" });
+  }
+}
+
 /** The five tabs: Today · Chart · Forecast · Match · Explore. People and Settings live behind the
  *  person chip (and at the foot of the rail on a desk). */
 export function Ledge() {
   const active = useActiveProfile();
   const profiles = useProfiles();
   const { pathname } = useLocation();
+  const still = useReducedMotion();
   const second = profiles?.find((p) => p.id !== active?.id);
   const tabs: Tab[] = [
     { to: "/", label: "Today", name: "Today", icon: <IconToday />, on: /^\/($|today)/ },
@@ -76,8 +89,24 @@ export function Ledge() {
         className={`v-nav__item${on ? " is-active" : ""}`}
         aria-label={t.name}
         aria-current={on ? "page" : undefined}
+        onClick={(e) => {
+          if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+          if (on && t.to === pathname) {
+            // Already here: the tab is a way back to the top, not a reload.
+            e.preventDefault();
+            scrollScreenToTop();
+          } else if (!on) haptics.selection();
+        }}
       >
         <span className="v-nav__icon" aria-hidden="true">
+          {on ? (
+            <motion.span
+              layoutId="v-nav-pill"
+              className="v-nav__pill"
+              style={{ borderRadius: 999 }}
+              transition={still ? { duration: 0 } : { type: "tween", duration: 0.22, ease: EASE }}
+            />
+          ) : null}
           {t.icon}
         </span>
         <span aria-hidden="true">{t.label}</span>

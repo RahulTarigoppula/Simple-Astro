@@ -10,11 +10,13 @@ import { ChevronRight, Page, Row, Section } from "../../components/ui/Page";
 import { SkyScene, skyPhase } from "../../components/ui/SkyScene";
 import { GRAHA_LORE } from "../../data/lore";
 import { nakBoth } from "../../data/regional";
-import { inDaysWords, nextFestival } from "../../engine/festivals";
-import { forecast, periodBounds } from "../../engine/forecast";
+import { inDaysWords } from "../../engine/festivals";
+import { type Forecast, forecast, periodBounds } from "../../engine/forecast";
+import { horas } from "../../engine/muhurta";
 import { computePanchang } from "../../engine/panchang";
-import { type AreaReading, dayGuide, personalReading } from "../../engine/personal";
-import type { Patri, Profile, Settings } from "../../engine/types";
+import { type AreaReading, type DayGuide, dayGuide, personalReading } from "../../engine/personal";
+import type { Panchang, Patri, Profile, Settings } from "../../engine/types";
+import { useCompute } from "../../platform/compute";
 import {
   IconChart,
   IconFestival,
@@ -31,9 +33,10 @@ import { SkyEvents } from "../cosmic/SkyEvents";
 import { FamilyTeaser } from "../family/FamilyTeaser";
 import { HereLine, townOf } from "../here/HereSheet";
 import { JournalPrompt } from "../journal/JournalPrompt";
-import { type PickTeaser, pickTeaser } from "../pick/teaser";
 import { ShareButton } from "../share/ShareCard";
 import { YearTeaser } from "../year/YearTeaser";
+import { AskToday } from "./AskToday";
+import { DayTimeline } from "./DayTimeline";
 import { MoonDisc } from "./MoonDisc";
 import "./home.css";
 
@@ -99,6 +102,8 @@ const INDIA = { lat: 20.6, lon: 78.9 };
 
 function Welcome({ now }: { now: number }) {
   const settings = useSettings();
+  // Nobody is saved: nothing of a person's day stays behind.
+  useEffect(forgetDay, []);
   const hourKey = Math.floor(now / 3_600_000);
   // biome-ignore lint/correctness/useExhaustiveDependencies: the picture is re-read once an hour
   const p = useMemo(() => {
@@ -132,11 +137,16 @@ function Welcome({ now }: { now: number }) {
         <Link to="/leaf/new" className="v-btn">
           Add your birth details
         </Link>
-        <Link to="/guide" className="v-btn v-btn--ghost">
-          How it works
+        <Link to="/leaf/new?example=1" className="v-btn v-btn--ghost">
+          Try an example
         </Link>
       </div>
-      <p className="sky-hero__small">About a minute. Stays on this device. No sign up.</p>
+      <p className="sky-hero__small">
+        About a minute. Stays on this device. No sign up.{" "}
+        <Link to="/guide" className="sky-hero__how">
+          How it works
+        </Link>
+      </p>
     </section>
   );
   return (
@@ -183,69 +193,105 @@ interface DayView {
   body: React.ReactNode;
 }
 
-/** The day for one person: the sky hero and the blocks under it. Null until the chart is ready. */
+/** What Today shows of a day, as plain data: worked out once, then kept so the next opening is instant. */
+interface DayData {
+  f: Forecast;
+  areas: AreaReading[];
+  g: DayGuide;
+  sun: { sunriseMs: number; sunsetMs: number; nextSunriseMs: number; weekday: Panchang["vara"]["index"]; elongation: number };
+}
+const DAY_CACHE = "vyom-day-cache";
+function readDay(key: string): DayData | null {
+  if (!key) return null;
+  try {
+    const o = JSON.parse(localStorage.getItem(DAY_CACHE) ?? "null") as { key?: string; data?: DayData } | null;
+    return o?.key === key && o.data ? o.data : null;
+  } catch {
+    return null;
+  }
+}
+function keepDay(key: string, data: DayData): void {
+  try {
+    localStorage.setItem(DAY_CACHE, JSON.stringify({ key, data }));
+  } catch {
+    // storage may be full or unavailable: the day is simply worked out again next time
+  }
+}
+/** Forget the kept day (nobody is saved any more). */
+function forgetDay(): void {
+  try {
+    localStorage.removeItem(DAY_CACHE);
+  } catch {
+    // nothing to forget
+  }
+}
+
+/** The day for one person: the sky hero and the blocks under it. Null until the day is known. */
 function useDayView(profile: Profile | null, patri: Patri | null, settings: Settings, now: number): DayView | null {
   // Where the reader is now (the birthplace until they say otherwise): never the chart's own place.
   const { lat, lon, zone, name: placeName } = useHere(profile);
   const [dayStart] = periodBounds("day", now, zone);
 
-  const day = useMemo(() => {
-    if (!patri) return null;
+  // Same person, same details, same day, same place, same method, same build: the same answer.
+  const key = profile
+    ? [__APP_VERSION__, profile.id, profile.updatedAt, dayStart, lat, lon, zone, JSON.stringify(settings.preset)].join("|")
+    : "";
+  const kept = useMemo(() => readDay(key), [key]);
+  const fresh = useMemo((): DayData | null => {
+    if (kept || !patri) return null;
     try {
       const f = forecast(patri, "day", dayStart + 43_200_000, zone, settings.preset, { lat, lon });
       const r = personalReading(patri, f.startMs + 43_200_000, settings.preset);
       const g = dayGuide(patri, f.startMs + 43_200_000, { lat, lon }, settings.preset, r.areas);
-      return { f, r, g };
+      // The almanac of today's civil day (read at local noon), so its sunrise and sunset match the hours
+      // even between midnight and sunrise.
+      const p = computePanchang(dayStart + 43_200_000, { lat, lon }, settings.preset);
+      return {
+        f,
+        areas: r.areas,
+        g,
+        sun: {
+          sunriseMs: p.sunriseMs,
+          sunsetMs: p.sunsetMs,
+          nextSunriseMs: p.nextSunriseMs,
+          weekday: p.vara.index,
+          elongation: p.elongation,
+        },
+      };
     } catch {
       return null;
     }
-  }, [patri, dayStart, zone, settings.preset, lat, lon]);
-
-  // The almanac of today's civil day (read at local noon), so its sunrise and sunset match the hours above
-  // even between midnight and sunrise.
-  const p = useMemo(() => {
-    try {
-      return computePanchang(dayStart + 43_200_000, { lat, lon }, settings.preset);
-    } catch {
-      return null;
-    }
-  }, [dayStart, lat, lon, settings.preset]);
-  // The next good day to begin something: two weeks of almanac, so it is read after the day itself is on screen.
-  const [pick, setPick] = useState<PickTeaser | null>(null);
-  const [fest, setFest] = useState<string | null>(null);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: re-read when the civil day, the place or the person changes, not every minute
+  }, [kept, patri, dayStart, zone, settings.preset, lat, lon]);
   useEffect(() => {
-    if (!patri) return;
+    if (fresh && key) keepDay(key, fresh);
+  }, [fresh, key]);
+  const day = kept ?? fresh;
+  // The next good day to begin something and the next festival: weeks of almanac, so both are read in
+  // the background and arrive after the day itself is on screen.
+  const pick = useCompute("pickTeaser", patri ? { patri, nowMs: now, here: { lat, lon, zone }, preset: settings.preset } : null, key);
+  const nextFest = useCompute("nextFestival", profile ? { nowMs: now, place: { lat, lon }, zone, preset: settings.preset } : null, key);
+  const fest = nextFest ? `${nextFest.name}, ${inDaysWords(nextFest.inDays)}` : null;
+  // The Moon's lunar day and star: read after the day is on screen, then once an hour.
+  const hourKey = Math.floor(now / 3_600_000);
+  const [moon, setMoon] = useState<Panchang | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-read once an hour, not every minute
+  useEffect(() => {
     const id = setTimeout(() => {
       try {
-        setPick(pickTeaser(patri, now, { lat, lon, zone }, settings.preset));
+        setMoon(computePanchang(now, { lat, lon }, settings.preset));
       } catch {
-        setPick(null);
+        setMoon(null);
       }
-      try {
-        const n = nextFestival(now, { lat, lon }, zone, settings.preset);
-        setFest(n ? `${n.festival.name}, ${inDaysWords(n.inDays)}` : null);
-      } catch {
-        setFest(null);
-      }
-    }, 400);
+    }, 0);
     return () => clearTimeout(id);
-  }, [patri, dayStart, lat, lon, zone, settings.preset]);
-  const hourKey = Math.floor(now / 3_600_000);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the Moon's lunar day and star are re-read once an hour, not every minute
-  const moon = useMemo(() => {
-    try {
-      return computePanchang(now, { lat, lon }, settings.preset);
-    } catch {
-      return null;
-    }
   }, [hourKey, lat, lon, settings.preset]);
 
-  if (!profile || !patri) return null;
+  if (!profile || (!patri && !day)) return null;
+
   const date = fmt(now, zone, { weekday: "long", day: "numeric", month: "long" });
   const hello = `${greeting(hourIn(now, zone))}, ${profile.name}`;
 
-  if (!day || !p) {
+  if (!day) {
     return {
       hero: (
         <section className="sky-hero">
@@ -257,12 +303,13 @@ function useDayView(profile: Profile | null, patri: Patri | null, settings: Sett
       body: <div className="v-skel">The day could not be read for this place.</div>,
     };
   }
-  const { f, r, g } = day;
+  const { f, areas, g, sun: p } = day;
   const word = TONE_WORD[f.tone];
-  const sorted = [...r.areas].sort((a, b) => b.score - a.score);
+  const sorted = [...areas].sort((a, b) => b.score - a.score);
   const inAvoid = now >= g.avoid[0] && now < g.avoid[1];
   const inBest = g.bestHours.find((h) => now >= h.startMs && now < h.endMs);
   const nextBest = g.bestHours.find((h) => h.startMs > now);
+  const dayHours = horas(p.sunriseMs, p.sunsetMs, p.nextSunriseMs, p.weekday).day;
   const nowLine = inAvoid
     ? `Rāhu Kāla now. Hold new starts until ${t12(g.avoid[1], zone)}.`
     : inBest
@@ -359,51 +406,66 @@ function useDayView(profile: Profile | null, patri: Patri | null, settings: Sett
               <h2 id="home-hours-h" className="home-hours__h">
                 Good times today
               </h2>
-              <dl className="home-hours__list">
-                <div>
-                  <dt>
-                    <i className="home-dot home-dot--good" aria-hidden="true" />
-                    Best hours <InfoDot id="hora" />
-                  </dt>
-                  <dd>
-                    {g.bestHours.length ? (
-                      g.bestHours.map((h) => <span key={h.startMs}>{span12(h.startMs, h.endMs, zone)}</span>)
-                    ) : (
-                      <span className="v-muted">None stand out today.</span>
-                    )}
-                  </dd>
-                </div>
-                <div>
-                  <dt>
-                    <i className="home-dot home-dot--care" aria-hidden="true" />
-                    Pause new starts <InfoDot id="rahu-kala" label="Rāhu Kāla" />
-                  </dt>
-                  <dd>
-                    <span>{span12(g.avoid[0], g.avoid[1], zone)}</span>
-                  </dd>
-                </div>
-                <div>
-                  <dt>Daylight</dt>
-                  <dd>
-                    <span>Sunrise {t12(p.sunriseMs, zone)}</span>
-                    <span>Sunset {t12(p.sunsetMs, zone)}</span>
-                  </dd>
-                </div>
-                <div>
-                  <dt>Colour of the day</dt>
-                  <dd>
-                    <span className="home-hours__cap">{g.colour}</span>
-                  </dd>
-                </div>
-              </dl>
+              <DayTimeline hours={dayHours} good={g.bestHours} avoid={g.avoid} nowMs={now} zone={zone} />
+              <details className="home-alltimes">
+                <summary>All of today's times</summary>
+                <dl className="home-hours__list">
+                  <div>
+                    <dt>
+                      <i className="home-dot home-dot--good" aria-hidden="true" />
+                      Best hours <InfoDot id="hora" />
+                    </dt>
+                    <dd>
+                      {g.bestHours.length ? (
+                        g.bestHours.map((h) => <span key={h.startMs}>{span12(h.startMs, h.endMs, zone)}</span>)
+                      ) : (
+                        <span className="v-muted">None stand out today.</span>
+                      )}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <i className="home-dot home-dot--care" aria-hidden="true" />
+                      Pause new starts <InfoDot id="rahu-kala" label="Rāhu Kāla" />
+                    </dt>
+                    <dd>
+                      <span>{span12(g.avoid[0], g.avoid[1], zone)}</span>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Daylight</dt>
+                    <dd>
+                      <span>Sunrise {t12(p.sunriseMs, zone)}</span>
+                      <span>Sunset {t12(p.sunsetMs, zone)}</span>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Colour of the day</dt>
+                    <dd>
+                      <span className="home-hours__cap">{g.colour}</span>
+                    </dd>
+                  </div>
+                </dl>
+              </details>
               <HereLine profile={profile} />
             </section>
           </Reveal>
-          <JournalPrompt profile={profile} zone={zone} nowMs={now} tone={f.tone} score={f.score} />
+          {patri ? (
+            <Reveal i={2}>
+              <AskToday
+                patri={patri}
+                profileId={profile.id}
+                dayStartMs={dayStart}
+                place={{ lat, lon }}
+                zone={zone}
+                preset={settings.preset}
+              />
+            </Reveal>
+          ) : null}
         </div>
 
         <div className="v-stack">
-          <Reveal i={2}>
+          <Reveal i={3}>
             <Section
               title="Your life these weeks"
               note="From the slower planets, so it changes over weeks, not day to day."
@@ -413,7 +475,7 @@ function useDayView(profile: Profile | null, patri: Patri | null, settings: Sett
                 </Link>
               }
             />
-            <ul className="home-areas">
+            <ul className="home-areas home-areas--line">
               {sorted.map((a: AreaReading) => {
                 const t = areaTone(a.score);
                 return (
@@ -428,14 +490,15 @@ function useDayView(profile: Profile | null, patri: Patri | null, settings: Sett
               })}
             </ul>
           </Reveal>
+          <JournalPrompt profile={profile} zone={zone} nowMs={now} tone={f.tone} score={f.score} />
         </div>
       </div>
 
-      <Reveal i={3}>
+      <Reveal i={4}>
         <Section title={`More for ${profile.name}`} />
-        <ul className="v-list home-more">
+        <ul className="home-tiles">
           {moon ? (
-            <li>
+            <li className="home-tiles__wide">
               <Link to="/today" className="v-row" aria-label="Open today's almanac">
                 <span className="home-moon" aria-hidden="true">
                   <MoonDisc elongation={moon.elongation} size={42} />
@@ -502,7 +565,7 @@ export default function HomeScreen() {
   const { zone } = useHere(active);
 
   const ready = !!active && !!patri && patri.profileId === active.id;
-  const view = useDayView(ready ? active : null, ready ? patri : null, settings, now);
+  const view = useDayView(active ?? null, ready ? patri : null, settings, now);
 
   if (profiles === undefined) return <Page label="Vyomaphala home">{null}</Page>;
   if (!active) return <Welcome now={now} />;
@@ -528,7 +591,16 @@ export default function HomeScreen() {
           </Link>
         </div>
       ) : (
-        <div className="v-skel">Reading the sky…</div>
+        <div className="v-sk" role="status" aria-busy="true">
+          <span className="v-sk__label">Reading the sky…</span>
+          {[0, 1, 2].map((k) => (
+            <div key={k} className="v-sk--card" aria-hidden="true">
+              <i className="v-sk--line" style={{ "--w": "42%" } as React.CSSProperties} />
+              <i className="v-sk--line" />
+              <i className="v-sk--line" style={{ "--w": "78%" } as React.CSSProperties} />
+            </div>
+          ))}
+        </div>
       )}
       <Made />
       <p className="v-foot">A traditional reading for reflection, never a prediction or advice.</p>

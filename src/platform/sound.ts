@@ -33,6 +33,7 @@ export const setCalmSound = (on: boolean): void => {
   calm = on;
 };
 
+/** Build the context (cheap: no noise yet). Called off the gesture itself, see `unlockAudioOnFirstGesture`. */
 function ensure(): AudioContext | null {
   if (ctx) return ctx;
   const AC =
@@ -40,15 +41,53 @@ function ensure(): AudioContext | null {
       ? (window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)
       : undefined;
   if (!AC) return null;
-  ctx = new AC();
-  master = ctx.createGain();
-  master.gain.value = enabled ? 0.5 : 0;
-  master.connect(ctx.destination);
-  const len = Math.floor(ctx.sampleRate * 0.6);
-  noise = ctx.createBuffer(1, len, ctx.sampleRate);
+  try {
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = enabled ? 0.5 : 0;
+    master.connect(ctx.destination);
+  } catch {
+    ctx = null;
+    master = null;
+  }
+  return ctx;
+}
+
+/** 0.6 s of white noise, made the first time a sound needs it. */
+function noiseOf(c: AudioContext): AudioBuffer {
+  if (noise) return noise;
+  const len = Math.floor(c.sampleRate * 0.6);
+  noise = c.createBuffer(1, len, c.sampleRate);
   const ch = noise.getChannelData(0);
   for (let i = 0; i < len; i++) ch[i] = rng() * 2 - 1;
-  return ctx;
+  return noise;
+}
+
+type IdleWin = { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+/** True once the reader has touched the page: only then may a context start. */
+let gestured = false;
+let warming = false;
+
+/**
+ * Build and start the context when the browser next has a moment, never inside the tap that asked
+ * for it: opening the audio device can take half a second, and the tap's own work (a navigation,
+ * a sheet) must paint first. A page that has been touched may start audio later (sticky activation).
+ */
+function warm(): void {
+  if (ctx || warming || !gestured || !enabled || typeof window === "undefined") return;
+  warming = true;
+  const run = (): void => {
+    warming = false;
+    if (!enabled) return;
+    const c = ensure();
+    if (c && c.state !== "running") void c.resume().catch(() => undefined);
+  };
+  // Let the tap's own screen arrive and paint first, then wait for a quiet moment.
+  window.setTimeout(() => {
+    const w = window as unknown as IdleWin;
+    if (typeof w.requestIdleCallback === "function") w.requestIdleCallback(run, { timeout: 2000 });
+    else run();
+  }, 1200);
 }
 
 const UNLOCK_EVENTS = ["touchstart", "touchend", "pointerdown", "pointerup", "keydown"] as const;
@@ -59,14 +98,25 @@ export function unlockAudioOnFirstGesture(): void {
     for (const ev of UNLOCK_EVENTS) window.removeEventListener(ev, unlock);
   };
   function unlock(): void {
-    const c = ensure();
-    if (!c || c.state === "running") {
+    gestured = true;
+    // Sound switched off in Settings: nothing is built. The listeners stay, for when it is switched on.
+    if (!enabled) return;
+    const c = ctx;
+    if (!c) {
+      warm();
+      return;
+    }
+    if (c.state === "running") {
       removeAll();
       return;
     }
-    void c.resume().then(() => {
-      if (c.state === "running") removeAll();
-    });
+    // an existing context resumes at once; this is cheap
+    void c
+      .resume()
+      .then(() => {
+        if (c.state === "running") removeAll();
+      })
+      .catch(() => undefined);
   }
   for (const ev of UNLOCK_EVENTS) window.addEventListener(ev, unlock, { passive: true });
 }
@@ -108,9 +158,8 @@ function burst(
   freq: number,
   q = 1,
 ): void {
-  if (!noise) return;
   const s = c.createBufferSource();
-  s.buffer = noise;
+  s.buffer = noiseOf(c);
   const f = c.createBiquadFilter();
   f.type = filter;
   f.frequency.value = freq;
@@ -128,8 +177,11 @@ const MIN_GAP: Partial<Record<SoundId, number>> = { tick: 40, tickBright: 40, be
 export function play(id: SoundId, level = 1): void {
   if (!enabled) return;
   if (calm && (id === "scratch" || id === "creak")) return;
-  const c = ensure();
-  if (!c || !master || c.state !== "running") return;
+  const c = ctx;
+  if (!c || !master || c.state !== "running") {
+    warm();
+    return;
+  }
   const now = performance.now();
   const gap = MIN_GAP[id];
   if (gap && now - (lastPlayed.get(id) ?? -1e9) < gap) return;
@@ -191,7 +243,7 @@ export function rustle(velocityPxPerS: number): void {
   const now = performance.now();
   if (now - lastRustle < 110) return;
   lastRustle = now;
-  const c = ensure();
+  const c = ctx;
   if (!c || !master || !enabled || c.state !== "running") return;
   const level = Math.min(1, Math.abs(velocityPxPerS) / 2400);
   burst(c, master, c.currentTime + 0.005, 0.09 * level, 0.12, "bandpass", 2600 + rng() * 1200, 0.8);

@@ -85,6 +85,10 @@ export function enteredWrong(v: Pick<BirthFieldValues, "y" | "mo" | "d">): boole
   return v.d > 0 && v.mo > 0 && v.y >= YEAR_MIN && v.y <= YEAR_MAX && !isValidCivil(v.y, v.mo, v.d, 0, 0);
 }
 
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
+/** The day of the week of a real date ("Monday"); families often remember it, so it is one more check. */
+export const weekdayOf = (y: number, mo: number, d: number): string => WEEKDAYS[new Date(Date.UTC(y, mo - 1, d)).getUTCDay()] ?? "";
+
 const show = (n: number) => (n > 0 ? String(n) : "");
 
 /** A number box that keeps what is being typed and commits only whole numbers (0 otherwise). */
@@ -258,13 +262,22 @@ export function Readback({
   mi,
   timeUnknown,
   urgent,
-}: Omit<Props, "onChange"> & { /** Next was pressed with something missing: say it as an alert. */ urgent?: boolean }) {
+  lead,
+  weekday,
+}: Omit<Props, "onChange"> & {
+  /** Next was pressed with something missing: say it as an alert. */
+  urgent?: boolean;
+  /** A word before the date on the review ("Born"). */
+  lead?: string;
+  /** Say the day of the week before the date. */
+  weekday?: boolean;
+}) {
   const v: BirthFieldValues = { y, mo, d, hour12, ampm, mi };
   const h = hourOf(v);
   const missing = missingText(v, timeUnknown);
   const pristine = missing !== null && !urgent && nothingEntered(v, timeUnknown);
   const warn = missing !== null && (urgent === true || enteredWrong(v));
-  const dateText = dateFilled(v) ? `${d} ${MONTH_NAMES[mo - 1]} ${y}` : "";
+  const dateText = dateFilled(v) ? `${weekday ? `${weekdayOf(y, mo, d)} ` : ""}${d} ${MONTH_NAMES[mo - 1]} ${y}` : "";
   const timeText = timeUnknown ? "time of birth not known, noon is used" : h >= 0 ? clockWords(h, mi) : "";
   return (
     <p
@@ -277,6 +290,7 @@ export function Readback({
         <span>{pristine ? READBACK_HINT : missing}</span>
       ) : (
         <>
+          {lead ? `${lead} ` : null}
           <b>{dateText}</b>
           {timeText ? (
             <>

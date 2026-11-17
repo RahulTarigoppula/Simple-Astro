@@ -1,7 +1,10 @@
-// Add or edit a person, as four short steps: Who (name, tradition, writing hand), When (date, and the
-// time on a 12-hour clock with am/pm chosen by hand), Where (the place, searched and picked, never
-// assumed) and Check (everything read back, with the Moon sign, birth star and rising sign, so a wrong
-// am/pm, day or town is caught before it is saved). One tap on Save saves one person.
+// Add or edit a person, as four short steps, one question each: Who (just the name), When (date, and
+// the time on a 12-hour clock with am/pm chosen by hand, or "I don't know the time"), Where (the place,
+// searched and picked, never assumed) and Check (everything read back in a sentence, with the Moon sign,
+// birth star and rising sign, so a wrong am/pm, day or town is caught before it is saved).
+// The family's tradition and the writing hand are not questions on the way: a tradition is suggested
+// (the family's, else from the birth place) and both can be changed on the last step.
+// `/leaf/new?example=1` opens the last step with the example person filled in.
 // The step lives in the address (?step=2), so the Back button walks the steps and never drops what was typed.
 // What was typed is also kept as a draft for this tab (leafDraft.ts), so leaving the form or a reload loses nothing.
 import tzlookup from "@photostructure/tz-lookup";
@@ -10,7 +13,7 @@ import { DateTime } from "luxon";
 import { motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router";
-import { useProfile, useSettings } from "../../app/hooks";
+import { useProfile, useProfiles, useSettings } from "../../app/hooks";
 import { DigitSet } from "../../components/ui/DigitSet";
 import { InfoDot } from "../../components/ui/Explain";
 import { Page } from "../../components/ui/Page";
@@ -56,7 +59,20 @@ function draftFromProfile(p: Profile): Draft {
     handedness: p.handedness,
     timeUnknown: p.timeUnknown === true,
     tradition: p.tradition ?? "north",
+    traditionSet: true,
   };
+}
+
+/** The example person, exactly as the "Fill in an example" link fills it. */
+const exampleDraft = (): Draft => draftFromProfile(REFERENCE_PROFILE);
+
+/** The tradition most families from this birth place follow, when the place says anything about it. */
+function traditionOfPlace(p: Place | null): Tradition | null {
+  if (!p || (p.country !== "IN" && p.country !== "India")) return null;
+  const state = (p.admin1 ?? "").trim().toLowerCase();
+  if (state === "andhra pradesh" || state === "telangana") return "telugu";
+  if (state === "tamil nadu" || state === "puducherry") return "tamil";
+  return null;
 }
 
 /** Country codes as the names people say. Anything else is looked up, and failing that the code is shown. */
@@ -138,15 +154,30 @@ function shownResults(q: string, found: Place[]): Place[] {
 const roughly = (p: Place) =>
   `near ${Math.abs(p.lat).toFixed(1)}° ${p.lat >= 0 ? "N" : "S"}, ${Math.abs(p.lon).toFixed(1)}° ${p.lon >= 0 ? "E" : "W"}`;
 
+/** The steps. `you` is the wording for the very first person (nobody saved yet), `they` for everyone after. */
 const STEPS = [
-  { label: "Who", title: "Who is this for?", hint: "Four short steps, about a minute. Everything stays on this device." },
+  {
+    label: "Who",
+    you: "What is your name?",
+    they: "What is their name?",
+    hint: "Everything you type stays on this device.",
+    go: "Next: birth date and time",
+  },
   {
     label: "When",
-    title: "When were they born?",
-    hint: "The time matters most: a few hours changes the rising sign, and a wrong am/pm can change the Moon sign and birth star.",
+    you: "When were you born?",
+    they: "When were they born?",
+    hint: "A wrong am/pm can change the birth star.",
+    go: "Next: birth place",
   },
-  { label: "Where", title: "Where were they born?", hint: "" },
-  { label: "Check", title: "Check and save", hint: "Read it back once. Nothing leaves this device." },
+  {
+    label: "Where",
+    you: "Where were you born?",
+    they: "Where were they born?",
+    hint: "Type the first letters of the town or city, then tap it in the list.",
+    go: "Next: check it",
+  },
+  { label: "Check", you: "Check and save", they: "Check and save", hint: "Read it back once. Nothing leaves this device.", go: "" },
 ] as const;
 const LAST = STEPS.length - 1;
 const NAK_SPAN = 360 / 27;
@@ -183,14 +214,17 @@ function Tick() {
 export default function LeafScreen() {
   const { id } = useParams();
   const editing = useProfile(id);
+  const people = useProfiles();
   const settings = useSettings();
   const navigate = useNavigate();
   const location = useLocation();
   const [params] = useSearchParams();
   const key = draftKey(id);
+  // "?example=1": the example person, filled in and opened on the last step (it replaces a kept draft).
+  const wantsExample = !id && params.get("example") === "1";
   // "Add a person" picks up the draft this tab was keeping, if there is one.
-  const [kept] = useState(() => (id ? null : readDraft(draftKey())));
-  const [draft, setDraft] = useState<Draft>(() => kept ?? freshDraft());
+  const [kept] = useState(() => (id || wantsExample ? null : readDraft(draftKey())));
+  const [draft, setDraft] = useState<Draft>(() => (wantsExample ? exampleDraft() : (kept ?? freshDraft())));
   const [restored, setRestored] = useState(kept !== null);
   const [loadedFrom, setLoadedFrom] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -199,6 +233,7 @@ export default function LeafScreen() {
   const [online, setOnline] = useState<"idle" | "asking" | "busy" | "failed">("idle");
   const [manual, setManual] = useState(false);
   const [tried, setTried] = useState(false);
+  const [nudge, setNudge] = useState(0);
   const [leaving, setLeaving] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null);
   const lastSign = useRef(-1);
@@ -255,6 +290,13 @@ export default function LeafScreen() {
 
   const set = useCallback(<K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v })), []);
   const patch = useCallback((p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p })), []);
+
+  // The tradition: what was picked by hand, else the family's (the person saved last), else what the
+  // birth place suggests, else North Indian. It only changes names and the way the chart is drawn.
+  const suggested: Tradition = people?.[0]?.tradition ?? traditionOfPlace(draft.place) ?? "north";
+  const tradition: Tradition = draft.traditionSet ? draft.tradition : suggested;
+  const isExample = !id && sameDraft(draft, exampleDraft());
+  const first = !id && people?.length === 0 && !isExample; // the very first person is nearly always the one holding the phone
 
   const offsetOverrideMin = draft.override === "bombay" ? BOMBAY_TIME : draft.override === "manual" ? draft.manualOffsetMin : undefined;
 
@@ -349,11 +391,13 @@ export default function LeafScreen() {
   const firstBad = problems.findIndex((p) => p !== null);
   const reach = firstBad === -1 ? LAST : firstBad; // the furthest step that may be opened
   const asked = Number(params.get("step"));
-  const wanted = Number.isInteger(asked) && asked >= 1 && asked <= STEPS.length ? asked - 1 : id ? LAST : 0;
+  const wanted = Number.isInteger(asked) && asked >= 1 && asked <= STEPS.length ? asked - 1 : id || wantsExample ? LAST : 0;
   const step = Math.min(wanted, reach);
   const problem = step < LAST ? (problems[step] ?? null) : resolved.m ? null : (problems[2] ?? "These birth details cannot be saved yet.");
+  const shownProblem = tried ? problem : null; // said only after Next was pressed, beside the field it is about
   const trail = (location.state ?? {}) as Trail;
   const depth = trail.depth ?? 0;
+  const fromReview = step < LAST && depth > 0 && trail.from === LAST;
   // Which way the step slides in: forward from the right, back from the left. Still for less motion, and in tests.
   const reduced = useReducedMotion();
   const still = !!reduced || import.meta.env.MODE === "test";
@@ -362,7 +406,18 @@ export default function LeafScreen() {
   useEffect(() => {
     lastStep.current = step;
   }, [step]);
-  const ready = id ? loadedFrom === id : loadedFrom === null;
+  const ready = (id ? loadedFrom === id : loadedFrom === null) && people !== undefined;
+
+  // "?example=1" (also when this screen was already open): fill the example in, then drop the flag
+  // from the address so a reload or Back does not fill it in again over what was changed since.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only the flag itself re-runs this
+  useEffect(() => {
+    if (!wantsExample) return;
+    setDraft(exampleDraft());
+    setRestored(false);
+    setTried(false);
+    navigate({ search: `?step=${LAST + 1}` }, { replace: true, state: location.state });
+  }, [wantsExample]);
 
   // Keep the draft as it changes. A form with nothing new in it keeps nothing.
   useEffect(() => {
@@ -388,13 +443,15 @@ export default function LeafScreen() {
   const next = () => {
     if (problem) {
       setTried(true);
+      setNudge((n) => n + 1); // the sentence beside the field says what is missing: bring it into view
       play("dull");
-      // On When the sentence under the fields says what is missing: bring it into view.
-      const read = step === 1 ? body.current?.querySelector<HTMLElement>(".bf-read") : null;
-      if (read && typeof read.scrollIntoView === "function") read.scrollIntoView({ block: "nearest" });
       return;
     }
-    goTo(step + 1);
+    // Came here from an Edit on the last step: one tap returns there, to the same history entry.
+    if (fromReview) {
+      setTried(false);
+      navigate(-1);
+    } else goTo(step + 1);
   };
   const back = () => {
     setTried(false);
@@ -403,15 +460,25 @@ export default function LeafScreen() {
     else navigate({ search: `?step=${step}` }, { replace: true, state: trail });
   };
 
-  // A new step starts at its top with its first field focused (never on the very first screen: that
-  // would raise the keyboard over the page before anything has been read).
+  useEffect(() => {
+    if (!nudge) return;
+    const said = body.current?.querySelector<HTMLElement>('[role="alert"]');
+    if (said && typeof said.scrollIntoView === "function") said.scrollIntoView({ block: "nearest" });
+    // ...and put the cursor back in the box it is about, so typing answers it straight away.
+    body.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus({ preventScroll: true });
+  }, [nudge]);
+
+  // A new step starts at its top with its first field focused. The first screen is one question and
+  // one box, so the name box is ready to type in as soon as the screen opens.
   const shown = useRef<number | null>(null);
   useEffect(() => {
     if (!ready) return;
-    if (shown.current === null || shown.current === step) {
+    if (shown.current === null) {
       shown.current = step;
+      if (step === 0) body.current?.querySelector<HTMLElement>("[data-autofocus]")?.focus({ preventScroll: true });
       return;
     }
+    if (shown.current === step) return;
     shown.current = step;
     const form = body.current;
     const scroller = form?.closest("main");
@@ -448,7 +515,7 @@ export default function LeafScreen() {
       name,
       birth: resolved.m,
       handedness: draft.handedness,
-      tradition: draft.tradition,
+      tradition,
       ...(draft.timeUnknown ? { timeUnknown: true } : {}),
       createdAt: editing?.createdAt ?? now,
       updatedAt: now,
@@ -522,9 +589,15 @@ export default function LeafScreen() {
   const fillExample = () => {
     // The example replaces whatever draft was being kept.
     setRestored(false);
-    setDraft(draftFromProfile(REFERENCE_PROFILE));
+    setDraft(exampleDraft());
     play("tick");
     goTo(LAST);
+  };
+
+  /** From the example on the last step: empty the form and start at the name. */
+  const enterOwn = () => {
+    startAgain();
+    if (step !== 0) navigate({ search: "?step=1" }, { replace: true, state: location.state });
   };
 
   const pre1955India = draft.y > 0 && draft.y < 1955 && draft.place?.country === "IN";
@@ -532,6 +605,8 @@ export default function LeafScreen() {
   const offAbs = Math.abs(draft.manualOffsetMin);
   const strip = resolved.m;
   const title = id ? "Edit person" : "Add a person";
+  const now = STEPS[step] ?? STEPS[0];
+  const saveLabel = id ? "Save changes" : first ? "Save and see my chart" : "Save and see the chart";
 
   if (id && editing === null) {
     return (
@@ -637,16 +712,12 @@ export default function LeafScreen() {
           transition={{ duration: 0.6, ease: [0.22, 0.8, 0.2, 1] }}
         >
           <div className="leaf-ask-head">
-            <h2 className="v-title leaf-q" tabIndex={-1} data-autofocus={step === LAST ? "" : undefined}>
-              {STEPS[step]?.title}
+            <h2 className="v-title leaf-q" id="leaf-q" tabIndex={-1} data-autofocus={step === LAST ? "" : undefined}>
+              {first ? now.you : now.they}
             </h2>
-            {step === 2 ? (
-              <p className="v-lede" id="leaf-place-hint">
-                Type the first letters of the town or city, then tap it in the list.
-              </p>
-            ) : (
-              <p className="v-lede">{STEPS[step]?.hint}</p>
-            )}
+            <p className="v-lede" id={step === 2 ? "leaf-place-hint" : "leaf-hint"}>
+              {now.hint}
+            </p>
           </div>
 
           {step === 0 ? (
@@ -660,12 +731,12 @@ export default function LeafScreen() {
                 </div>
               ) : null}
               <div className="v-field">
-                <label className="v-label" htmlFor="leaf-name">
+                <label className="vh" htmlFor="leaf-name">
                   Name
                 </label>
                 <input
                   id="leaf-name"
-                  className="v-input"
+                  className="v-input leaf-name"
                   type="text"
                   value={draft.name}
                   placeholder="For example, Rahul"
@@ -675,51 +746,24 @@ export default function LeafScreen() {
                   enterKeyHint="next"
                   maxLength={60}
                   data-autofocus=""
+                  aria-describedby={shownProblem ? "leaf-name-err leaf-hint" : "leaf-hint"}
+                  aria-invalid={shownProblem ? true : undefined}
                   onChange={(e) => set("name", e.target.value)}
                 />
+                {shownProblem ? (
+                  <p className="v-error leaf-problem" id="leaf-name-err" role="alert">
+                    {shownProblem}
+                  </p>
+                ) : null}
               </div>
-
-              <div className="v-field">
-                <span className="v-label" id="leaf-trad-l">
-                  Which tradition does the family follow?
-                </span>
-                <div className="leaf-choices" role="radiogroup" aria-labelledby="leaf-trad-l" aria-describedby="leaf-trad-s">
-                  {(Object.keys(TRADITION_LABEL) as Tradition[]).map((k) => (
-                    <button
-                      key={k}
-                      type="button"
-                      role="radio"
-                      className="leaf-choice"
-                      aria-checked={draft.tradition === k}
-                      onClick={() => set("tradition", k)}
-                    >
-                      <span className="leaf-choice__body">
-                        <span className="leaf-choice__t">{TRADITION_LABEL[k]}</span>
-                        <span className="leaf-choice__s">{TRADITION_NOTE[k]}</span>
-                      </span>
-                      <span className="leaf-choice__tick" aria-hidden="true">
-                        <Tick />
-                      </span>
-                    </button>
-                  ))}
+              {!id && (restored || (!draft.name && !draft.d && !draft.place)) ? (
+                <div className="leaf-example">
+                  <span className="v-muted">Just looking around?</span>
+                  <button type="button" className="v-link" onClick={fillExample}>
+                    Fill in an example (Rahul, 14 Mar 1994)
+                  </button>
                 </div>
-                <span className="v-hint" id="leaf-trad-s">
-                  Only the names and the way the chart is drawn change. The calculation is the same everywhere in India.
-                </span>
-              </div>
-
-              <div className="v-field">
-                <span className="v-label" id="leaf-hand-l">
-                  Writing hand <span className="leaf-label-s">for the palm reading</span>
-                </span>
-                <div className="v-seg leaf-seg" role="radiogroup" aria-labelledby="leaf-hand-l">
-                  {(["right", "left"] as const).map((h) => (
-                    <button key={h} type="button" role="radio" aria-checked={draft.handedness === h} onClick={() => set("handedness", h)}>
-                      {h === "right" ? "Right" : "Left"}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              ) : null}
             </>
           ) : null}
 
@@ -727,16 +771,6 @@ export default function LeafScreen() {
             <>
               <DateFields y={draft.y} mo={draft.mo} d={draft.d} onChange={patch} />
               <TimeFields hour12={draft.hour12} ampm={draft.ampm} mi={draft.mi} timeUnknown={draft.timeUnknown} onChange={patch} />
-              <Readback
-                y={draft.y}
-                mo={draft.mo}
-                d={draft.d}
-                hour12={draft.hour12}
-                ampm={draft.ampm}
-                mi={draft.mi}
-                timeUnknown={draft.timeUnknown}
-                urgent={tried}
-              />
               <div className="leaf-switchrow">
                 <button
                   type="button"
@@ -753,10 +787,20 @@ export default function LeafScreen() {
                   <span className="leaf-switch__knob" aria-hidden="true" />
                 </button>
                 <p className="v-hint" id="leaf-unknown-s">
-                  Noon is used. The Moon sign and birth star usually still hold; the rising sign, houses and life-chapter dates will not be
-                  reliable, and the chart will say so. <InfoDot id="unknown-time" />
+                  That is fine. The Moon sign and birth star usually still work; only the rising sign needs the time.{" "}
+                  <InfoDot id="unknown-time" />
                 </p>
               </div>
+              <Readback
+                y={draft.y}
+                mo={draft.mo}
+                d={draft.d}
+                hour12={draft.hour12}
+                ampm={draft.ampm}
+                mi={draft.mi}
+                timeUnknown={draft.timeUnknown}
+                urgent={tried}
+              />
             </>
           ) : null}
 
@@ -776,6 +820,7 @@ export default function LeafScreen() {
                   autoComplete="off"
                   enterKeyHint="search"
                   aria-describedby="leaf-place-hint leaf-place-chosen"
+                  aria-invalid={shownProblem && !draft.place ? true : undefined}
                   data-autofocus=""
                   onChange={(e) => {
                     setQuery(e.target.value);
@@ -827,7 +872,8 @@ export default function LeafScreen() {
               <div
                 className={`leaf-chosen${draft.place ? " is-set" : tried ? " is-missing" : ""}`}
                 id="leaf-place-chosen"
-                aria-live="polite"
+                role={!draft.place && tried ? "alert" : undefined}
+                aria-live={!draft.place && tried ? undefined : "polite"}
               >
                 {draft.place ? (
                   <>
@@ -840,13 +886,17 @@ export default function LeafScreen() {
                     </span>
                   </>
                 ) : (
-                  <span>{tried ? "Not chosen yet." : "The place you pick will show here."}</span>
+                  <span>{tried ? "Not chosen yet. Pick the place of birth from the list." : "The place you pick will show here."}</span>
                 )}
               </div>
 
               {clockTrouble ? (
-                <p className="v-note v-note--warn" role="status">
+                <p className="v-note v-note--warn" role={shownProblem ? "alert" : "status"}>
                   {clockTrouble}
+                </p>
+              ) : draft.place && shownProblem ? (
+                <p className="v-error leaf-problem" role="alert">
+                  {shownProblem}
                 </p>
               ) : null}
               {draft.override !== "none" ? (
@@ -981,6 +1031,58 @@ export default function LeafScreen() {
 
           {step === LAST ? (
             <>
+              {isExample ? (
+                <div className="v-note leaf-kept" role="note">
+                  <span>This is an example person, so you can look around.</span>
+                  <button type="button" className="v-btn v-btn--ghost v-btn--sm" onClick={enterOwn}>
+                    Use my own details
+                  </button>
+                </div>
+              ) : null}
+              <ul className="v-card v-card--flush leaf-review" aria-label="What was entered">
+                <li>
+                  <p className="leaf-review__name">{draft.name.trim()}</p>
+                  <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the name" onClick={() => goTo(0)}>
+                    Edit
+                  </button>
+                </li>
+                <li>
+                  <Readback
+                    y={draft.y}
+                    mo={draft.mo}
+                    d={draft.d}
+                    hour12={draft.hour12}
+                    ampm={draft.ampm}
+                    mi={draft.mi}
+                    timeUnknown={draft.timeUnknown}
+                    lead="Born"
+                    weekday
+                  />
+                  <button
+                    type="button"
+                    className="v-btn v-btn--quiet v-btn--sm"
+                    aria-label="Change the date and time"
+                    onClick={() => goTo(1)}
+                  >
+                    Edit
+                  </button>
+                </li>
+                <li>
+                  <p>
+                    {draft.place ? (
+                      <>
+                        in <b>{placeLabel(draft.place)}</b>
+                      </>
+                    ) : (
+                      "Place not chosen yet"
+                    )}
+                  </p>
+                  <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the place" onClick={() => goTo(2)}>
+                    Edit
+                  </button>
+                </li>
+              </ul>
+
               {check ? (
                 <figure className="leaf-sky v-night">
                   <SkyWindow
@@ -993,73 +1095,13 @@ export default function LeafScreen() {
                   />
                   <figcaption>
                     <span className="leaf-sky__k">Born under</span>
-                    <span className="leaf-sky__v">{nakBoth(check.nak, draft.tradition)}</span>
+                    <span className="leaf-sky__v">{nakBoth(check.nak, tradition)}</span>
                     <span className="leaf-sky__s">
                       Moon in {SIGN_WESTERN[check.moonSign]} · the real sky at that moment{draft.timeUnknown ? " (noon)" : ""}
                     </span>
                   </figcaption>
                 </figure>
               ) : null}
-              <dl className="v-card v-card--flush leaf-review">
-                <div>
-                  <dt>Name</dt>
-                  <dd>{draft.name.trim()}</dd>
-                  <dd className="leaf-review__act">
-                    <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the name" onClick={() => goTo(0)}>
-                      Change
-                    </button>
-                  </dd>
-                </div>
-                <div>
-                  <dt>Born</dt>
-                  <dd>
-                    <Readback
-                      y={draft.y}
-                      mo={draft.mo}
-                      d={draft.d}
-                      hour12={draft.hour12}
-                      ampm={draft.ampm}
-                      mi={draft.mi}
-                      timeUnknown={draft.timeUnknown}
-                    />
-                  </dd>
-                  <dd className="leaf-review__act">
-                    <button
-                      type="button"
-                      className="v-btn v-btn--quiet v-btn--sm"
-                      aria-label="Change the date and time"
-                      onClick={() => goTo(1)}
-                    >
-                      Change
-                    </button>
-                  </dd>
-                </div>
-                <div>
-                  <dt>Place</dt>
-                  <dd>{draft.place ? placeLabel(draft.place) : "Not chosen yet"}</dd>
-                  <dd className="leaf-review__act">
-                    <button type="button" className="v-btn v-btn--quiet v-btn--sm" aria-label="Change the place" onClick={() => goTo(2)}>
-                      Change
-                    </button>
-                  </dd>
-                </div>
-                <div>
-                  <dt>Tradition</dt>
-                  <dd>
-                    {TRADITION_LABEL[draft.tradition]} · {draft.handedness === "right" ? "right-handed" : "left-handed"}
-                  </dd>
-                  <dd className="leaf-review__act">
-                    <button
-                      type="button"
-                      className="v-btn v-btn--quiet v-btn--sm"
-                      aria-label="Change the tradition or writing hand"
-                      onClick={() => goTo(0)}
-                    >
-                      Change
-                    </button>
-                  </dd>
-                </div>
-              </dl>
 
               <section className={`leaf-check${check ? "" : " is-waiting"}`} aria-labelledby="leaf-check-h" aria-live="polite">
                 <div className="v-sec">
@@ -1071,27 +1113,27 @@ export default function LeafScreen() {
                       <div>
                         <dt>Moon sign (rāśi)</dt>
                         <dd>
-                          {rashiBoth(check.moonSign, draft.tradition)}
+                          {rashiBoth(check.moonSign, tradition)}
                           <small>{SIGN_WESTERN[check.moonSign]}</small>
                         </dd>
                       </div>
                       <div>
                         <dt>Birth star (nakṣatra)</dt>
                         <dd>
-                          {nakBoth(check.nak, draft.tradition)}
+                          {nakBoth(check.nak, tradition)}
                           <small>Quarter (pada) {check.pada}</small>
                         </dd>
                       </div>
                       <div>
                         <dt>Rising sign (lagna)</dt>
                         <dd>
-                          {draft.timeUnknown ? "needs the time" : rashiBoth(check.lagnaSign, draft.tradition)}
+                          {draft.timeUnknown ? "needs the time" : rashiBoth(check.lagnaSign, tradition)}
                           {draft.timeUnknown ? null : <small>{SIGN_WESTERN[check.lagnaSign]}</small>}
                         </dd>
                       </div>
                     </dl>
                     <p className="leaf-check__p">
-                      If this is not what the family knows, the usual culprits are am/pm, the day, or the town. Tap Change above and watch
+                      If this is not what the family knows, the usual culprits are am/pm, the day, or the town. Tap Edit above and watch
                       this update.
                     </p>
                   </>
@@ -1117,39 +1159,67 @@ export default function LeafScreen() {
                 </p>
               ) : null}
 
+              <div className="v-field leaf-trad">
+                <span className="v-label" id="leaf-trad-l">
+                  Names and chart style <span className="leaf-label-s">the family's tradition</span>
+                </span>
+                <div className="v-seg leaf-seg" role="radiogroup" aria-labelledby="leaf-trad-l" aria-describedby="leaf-trad-s">
+                  {(Object.keys(TRADITION_LABEL) as Tradition[]).map((k) => (
+                    <button
+                      key={k}
+                      type="button"
+                      role="radio"
+                      aria-checked={tradition === k}
+                      onClick={() => patch({ tradition: k, traditionSet: true })}
+                    >
+                      {TRADITION_LABEL[k]}
+                    </button>
+                  ))}
+                </div>
+                <span className="v-hint" id="leaf-trad-s" aria-live="polite">
+                  {TRADITION_NOTE[tradition]} The calculation is the same for all three.
+                </span>
+              </div>
+
               <details className="v-fold">
                 <summary>
                   <span>
-                    Technical details
-                    <span className="v-fold__s">Time zone, clock offset and Julian Day, as worked out.</span>
+                    More options
+                    <span className="v-fold__s">Writing hand for the palm reading, and the technical details.</span>
                   </span>
                 </summary>
                 <div className="v-fold__body">
-                  {stripEl}
-                  {draft.place ? <p className="leaf-ll leaf-coords">Coordinates: {latLon(draft.place)}</p> : null}
+                  <div className="v-field">
+                    <span className="v-label" id="leaf-hand-l">
+                      Writing hand <span className="leaf-label-s">for the palm reading</span>
+                    </span>
+                    <div className="v-seg leaf-seg" role="radiogroup" aria-labelledby="leaf-hand-l">
+                      {(["right", "left"] as const).map((h) => (
+                        <button
+                          key={h}
+                          type="button"
+                          role="radio"
+                          aria-checked={draft.handedness === h}
+                          onClick={() => set("handedness", h)}
+                        >
+                          {h === "right" ? "Right" : "Left"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="v-field">
+                    <span className="v-label">Worked out</span>
+                    {stripEl}
+                    {draft.place ? <p className="leaf-ll leaf-coords">Coordinates: {latLon(draft.place)}</p> : null}
+                  </div>
                 </div>
               </details>
             </>
-          ) : null}
-
-          {step === 0 && !id && (restored || (!draft.name && !draft.d && !draft.place)) ? (
-            <div className="leaf-example">
-              <span className="v-muted">Just looking around?</span>
-              <button type="button" className="v-link" onClick={fillExample}>
-                Fill in an example (Rahul, 14 Mar 1994)
-              </button>
-            </div>
           ) : null}
         </motion.div>
 
         {/* The way forward stays in reach: this bar is pinned to the bottom of the scrolling page. */}
         <div className="leaf-foot" data-testid="leaf-actions">
-          {/* On When the sentence under the fields already says what is missing. */}
-          {tried && problem && step !== 1 ? (
-            <p className="v-error leaf-problem" role="alert">
-              {problem}
-            </p>
-          ) : null}
           <div className="leaf-foot__row">
             {step > 0 ? (
               <button type="button" className="v-btn v-btn--ghost" onClick={back}>
@@ -1158,11 +1228,11 @@ export default function LeafScreen() {
             ) : null}
             {step === LAST ? (
               <button type="submit" className="v-btn leaf-foot__go" disabled={!resolved.m}>
-                {id ? "Save changes" : "Save"}
+                {saveLabel}
               </button>
             ) : (
               <button type="submit" className="v-btn leaf-foot__go">
-                Next
+                {fromReview ? "Done: check again" : now.go}
               </button>
             )}
           </div>

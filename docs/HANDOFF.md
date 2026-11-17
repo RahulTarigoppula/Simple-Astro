@@ -4,6 +4,19 @@ Written 2026-10-06 at the end of the first build session. The code, tests, CI wo
 Android shell are in this repository and committed on `main` locally. **Nothing has been pushed
 anywhere**, creating a public repo, a keystore and secrets needs your accounts and your decisions.
 
+## 00000. Version 4.1.0 (2026-11-17): faster, simpler, interactive
+
+You asked for the app to be optimised and made more user friendly, simple, interactive and intuitive. What changed is in the 4.1.0 entry of `CHANGELOG.md`. In short: heavy work moved to a background worker and Today's day is kept between visits; a Find sheet reaches every screen; adding a person starts with just a name; Today has a touchable hour timeline and "Is today good for…?"; swipes, pressed states and skeletons throughout. `release/Vyomaphala-4.1.0.apk` (versionCode 410) is signed with the same key.
+
+Decisions taken (all reversible):
+- **Today's day is kept in `localStorage`** under `vyom-day-cache` (one entry: the forecast, life areas, hours and sunrise/sunset for the active person and day). It never leaves the device, is replaced daily, and goes with "delete everything" or when nobody is saved.
+- **Tradition is pre-selected** when adding a person: the last saved person's, else Telugu for Andhra Pradesh/Telangana, Tamil for Tamil Nadu/Puducherry, else North Indian. A choice made by hand is never overruled.
+- **The hour timeline calls an hour "good"** exactly where the day guide already did; what an hour's planet suits is taken from the table "Pick a good day" already used.
+- **Hover styles are mouse-only** now, and segmented controls are 44 px tall everywhere.
+- The first-load script is about 37 kB larger (gzip) than 4.0; the check budget (350 kB) still passes.
+
+Not verified: anything on a real phone (touch feel, haptics, the keyboard over the add-person form, sound start on iOS Safari); the background worker inside the Android WebView (it falls back to idle-time work if it cannot start).
+
 ## 0000. Version 4.0.0 (2026-11-17): seven new features
 
 You asked for the live site to be reviewed and for many more features, built without supervision. What was found on the live site and what was added is in the 4.0.0 entry of `CHANGELOG.md`. In short: Pick a good day, Festivals and fasts, Family today, the journal ("Your days"), share cards, Your year ahead, the printable Birth report, and the name sound. `release/Vyomaphala-4.0.0.apk` (versionCode 400) is signed with the same key as before, so it installs over the old one.

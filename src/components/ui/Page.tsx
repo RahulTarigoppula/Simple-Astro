@@ -1,6 +1,7 @@
 // The one page frame every 2.0 screen is written in: a top bar (back or brand on the left, the
 // person on the right), an optional heading, then a single centred column of cards.
 import { Link, useNavigate } from "react-router";
+import { FindButton } from "../../features/find/FindButton";
 import { PersonChip } from "./PersonChip";
 import { Screen } from "./Screen";
 
@@ -114,6 +115,7 @@ export function Page({
       </div>
       <div className="v-top__right">
         {action}
+        {noPerson ? null : <FindButton />}
         {noPerson ? null : <PersonChip />}
       </div>
     </div>

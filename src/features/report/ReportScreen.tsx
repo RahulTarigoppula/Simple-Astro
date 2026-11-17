@@ -93,7 +93,18 @@ export default function ReportScreen() {
   if (profile === undefined) {
     return (
       <Page label="Birth report" eyebrow="Birth report" className="report">
-        <div className="v-skel">Reading the sky…</div>
+        <div className="v-sk" role="status" aria-busy="true">
+          <span className="v-sk__label">Reading the sky…</span>
+          <div className="v-sk--card" aria-hidden="true">
+            <i className="v-sk--line" style={{ "--w": "42%" } as React.CSSProperties} />
+            <i className="v-sk--line" />
+            <i className="v-sk--line" style={{ "--w": "78%" } as React.CSSProperties} />
+          </div>
+          <div className="v-sk--card" aria-hidden="true">
+            <i className="v-sk--line" style={{ "--w": "60%" } as React.CSSProperties} />
+            <i className="v-sk--line" />
+          </div>
+        </div>
       </Page>
     );
   }

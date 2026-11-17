@@ -503,3 +503,25 @@ a.home-made:hover {
 .sky-hero--welcome .sky-hero__title {
   margin-top: 18px;
 }
+.home-hours__sub {
+  margin: 4px 0 0;
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+}
+.sky-hero__how {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 359px) {
+  .sky-hero .v-actions {
+    flex-wrap: wrap;
+  }
+  .sky-hero .v-actions .v-btn {
+    flex: 1 1 auto;
+  }
+}

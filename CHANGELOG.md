@@ -1,5 +1,29 @@
 # Changelog
 
+## 4.1.0 (2026-11-17)
+
+4.0 added a great deal. 4.1 makes it quicker, simpler to find your way in, and something you can touch. The engine's results are unchanged.
+
+### Faster
+- **Heavy reckoning runs in the background.** The year story, sky events, the family's day, the next good day, festivals and the days of "Pick a good day" are worked out in a web worker (`src/platform/compute`), so the screen never freezes while they arrive, and each answer is remembered while the app is open. Without worker support the same work runs when the screen is idle.
+- **Today opens at once on a repeat visit.** The worked-out day is kept on the device (one entry, replaced each day, removed with "delete everything") and shown before the chart is even read.
+- **The first tap no longer stalls.** Sound start-up moved out of the tap; nothing is built at all when sound is off.
+- **Tabs are warmed.** After the first screen is up, the other tabs' code is loaded quietly.
+- Measured on the production build with the processor slowed four times (a mid-range phone): Chart tab 3.8 s to 0.5 s, Forecast 1.6 s to 1.0 s, Today on a repeat visit 1.1 s to 0.4 s, and the longest freeze on Today from 0.9 s to 0.1 s.
+- Planet positions asked for twice within one reckoning are remembered exactly (same numbers, fewer sums).
+
+### Simpler
+- **Find anything.** A magnifier at the top of every screen (also "/" or Ctrl/Cmd+K) opens one sheet: tiles for every main screen, and a search across screens, people, planets, signs, stars, festivals, things to do and every explained word. Spelling is forgiving ("rahu", "sade sati", "kundli", "panchang").
+- **Adding a person.** Step one is only the name. Tradition is chosen for you (the family's, else from the birth place) and can be changed on the last step; writing hand moved under "More options". Messages appear beside the field. The last step reads everything back with an Edit on each line. "Try an example" on the welcome screen is one tap and one confirm.
+- **Today is shorter and clearer.** The doors to everything else are tiles with a live line each, the life areas take one line each, and the times list is folded under the timeline.
+- "How to use" lists everything the app now does.
+
+### Interactive
+- **The day under your finger.** "Good times today" is a timeline of the twelve daylight hours: tap or slide along it to read any hour (good, ordinary, or the pause), with "now" marked. One control for the keyboard too.
+- **"Is today good for…?"** Tap what you have in mind (travel, an important talk, a new start…) for today's answer in a word, the reason for and against, the best time, and the way to better days.
+- **Swipe** the Forecast and the almanac left or right to move a day (or week, month…); arrow keys do the same; a pill brings you back to today.
+- **Every touch answers.** Pressed states on every control, no tap delay, a tab mark that slides, tapping the current tab scrolls to the top, a short fade between screens, and skeletons in place of "Reading the sky…". Hover styles apply only where there is a mouse. All still under "reduce motion".
+
 ## 4.0.0 (2026-11-17)
 
 3.x made the app good to look at. 4.0 makes it do far more: seven new features, each worked out on the device from the same engine, each opening on a true picture. The engine's existing results are unchanged.

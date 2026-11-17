@@ -10,9 +10,10 @@ import { useNowMs } from "../../app/useNow";
 import { Reveal } from "../../components/ui/Motion";
 import { ChevronRight, Page } from "../../components/ui/Page";
 import { skyPhase } from "../../components/ui/SkyScene";
-import { daysUntil, type Festival, type FestivalKind, festivalsBetween, inDaysWords } from "../../engine/festivals";
+import { daysUntil, type Festival, type FestivalKind, inDaysWords } from "../../engine/festivals";
 import { computePanchang } from "../../engine/panchang";
 import { type EnginePreset, PRESET_HASH } from "../../engine/types";
+import { compute, peek } from "../../platform/compute";
 import { fmt, t12 } from "../forecast/util";
 import { HereSheet, townOf } from "../here/HereSheet";
 import { MoonPicture, StarField } from "../today/moon";
@@ -49,44 +50,59 @@ interface Ahead {
   failed: boolean;
 }
 
-type Idle = { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (h: number) => void };
+const pieceKey = (key: string, i: number): string => `${key}|${i}`;
 
-/** The festivals from today on: the next two months straight after the first paint, the rest of the year in idle time. */
+/** What is already kept of the year for this day, place and preset: the pieces read so far, in order. */
+function kept(key: string): Ahead & { key: string } {
+  const list: Festival[] = [];
+  const seen = new Set<string>();
+  let pieces = 0;
+  for (; pieces < PIECES.length; pieces++) {
+    const got = peek("festivalsBetween", pieceKey(key, pieces));
+    if (!got) break;
+    for (const f of got) {
+      if (seen.has(f.key)) continue;
+      seen.add(f.key);
+      list.push(f);
+    }
+  }
+  return { key, list, pieces, failed: false };
+}
+
+/** The festivals from today on: the next two months first, then the rest of the year, all read in the background. */
 function useAhead(dayStart: number, lat: number, lon: number, elevation: number | undefined, zone: string, preset: EnginePreset): Ahead {
   const key = `${dayStart}|${lat}|${lon}|${elevation ?? ""}|${zone}|${PRESET_HASH(preset)}`;
-  const [state, setState] = useState<Ahead & { key: string }>({ key, list: [], pieces: 0, failed: false });
+  const [state, setState] = useState<Ahead & { key: string }>(() => kept(key));
   // biome-ignore lint/correctness/useExhaustiveDependencies: `key` stands for the day, the place and the preset
   useEffect(() => {
     let live = true;
-    let handle = 0;
-    let viaIdle = false;
-    const w = window as unknown as Idle;
+    const start = kept(key);
+    setState(start);
+    // no day yet (the person is still being read): nothing to look up
+    if (!dayStart || start.pieces >= PIECES.length) return;
     const place = { lat, lon, ...(elevation !== undefined ? { elevation } : {}) };
-    const acc: Festival[] = [];
-    setState({ key, list: [], pieces: 0, failed: false });
-    const step = (i: number) => {
-      if (!live) return;
-      const piece = PIECES[i];
-      if (!piece) return;
-      try {
-        const got = festivalsBetween(dayStart + piece[0] * DAY + 12 * HOUR, dayStart + piece[1] * DAY + 12 * HOUR, place, zone, preset);
-        const seen = new Set(acc.map((f) => f.key));
-        for (const f of got) if (!seen.has(f.key)) acc.push(f);
-        setState({ key, list: [...acc], pieces: i + 1, failed: false });
-      } catch {
-        setState({ key, list: [...acc], pieces: PIECES.length, failed: true });
-        return;
+    const acc = [...start.list];
+    void (async () => {
+      for (let i = start.pieces; i < PIECES.length; i++) {
+        const piece = PIECES[i] as readonly [number, number];
+        try {
+          const got = await compute(
+            "festivalsBetween",
+            { fromMs: dayStart + piece[0] * DAY + 12 * HOUR, toMs: dayStart + piece[1] * DAY + 12 * HOUR, place, zone, preset },
+            pieceKey(key, i),
+          );
+          if (!live) return;
+          const seen = new Set(acc.map((f) => f.key));
+          for (const f of got) if (!seen.has(f.key)) acc.push(f);
+          setState({ key, list: [...acc], pieces: i + 1, failed: false });
+        } catch {
+          if (live) setState({ key, list: [...acc], pieces: PIECES.length, failed: true });
+          return;
+        }
       }
-      viaIdle = !!w.requestIdleCallback;
-      handle = w.requestIdleCallback
-        ? w.requestIdleCallback(() => step(i + 1), { timeout: 1200 })
-        : window.setTimeout(() => step(i + 1), 60);
-    };
-    handle = window.setTimeout(() => step(0), 0);
+    })();
     return () => {
       live = false;
-      if (viaIdle) w.cancelIdleCallback?.(handle);
-      else window.clearTimeout(handle);
     };
   }, [key]);
   return state.key === key ? state : { list: [], pieces: 0, failed: false };
@@ -351,7 +367,18 @@ export default function FestivalsScreen() {
 
       <Reveal i={2} className="fest-list">
         {ahead.pieces === 0 && !ahead.failed ? (
-          <div className="v-skel">Reading the sky…</div>
+          <div className="v-sk" role="status" aria-busy="true">
+            <span className="v-sk__label">Reading the sky…</span>
+            <div className="v-sk--card" aria-hidden="true">
+              <i className="v-sk--line" style={{ "--w": "42%" } as React.CSSProperties} />
+              <i className="v-sk--line" />
+              <i className="v-sk--line" style={{ "--w": "78%" } as React.CSSProperties} />
+            </div>
+            <div className="v-sk--card" aria-hidden="true">
+              <i className="v-sk--line" style={{ "--w": "60%" } as React.CSSProperties} />
+              <i className="v-sk--line" />
+            </div>
+          </div>
         ) : groups.length === 0 ? (
           <p className="v-card v-muted" role="status">
             {ahead.failed

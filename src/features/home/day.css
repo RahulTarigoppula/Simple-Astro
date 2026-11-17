@@ -1,0 +1,390 @@
+/* Today's interactive pieces: the hour timeline, "Is today good for…?", and the shortcut tiles. */
+
+/* ── The timeline: twelve hours of daylight under one finger ───────────── */
+.tl {
+  display: flex;
+  flex-direction: column;
+  margin-top: 14px;
+}
+.tl__track {
+  position: relative;
+  height: 56px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.tl__track:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.tl__segs {
+  position: absolute;
+  inset: 0 0 8px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 3px;
+  align-items: end;
+}
+.tl__segs i {
+  height: 46%;
+  border-radius: 5px;
+  background: rgba(var(--tint), 0.12);
+  transition:
+    height 0.18s ease,
+    opacity 0.18s ease;
+}
+/* Height as well as colour says what an hour is: tall is good, hatched is the pause. */
+.tl__segs i[data-kind="good"] {
+  height: 82%;
+  background: var(--good);
+}
+.tl__segs i[data-kind="pause"] {
+  height: 46%;
+  background: repeating-linear-gradient(135deg, var(--care) 0 4px, var(--care-soft) 4px 8px);
+}
+.tl__segs i[data-on] {
+  height: 100%;
+  box-shadow:
+    0 0 0 2px var(--card),
+    0 0 0 4px var(--ink);
+}
+.tl__rahu {
+  position: absolute;
+  bottom: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--care);
+}
+.tl__now {
+  position: absolute;
+  top: -4px;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--ink);
+  pointer-events: none;
+}
+.tl__now::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+.tl__ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+.tl__detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 92px;
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(var(--tint), 0.05);
+}
+.tl__detail b {
+  font: 540 1.25rem / 1.2 var(--font-display);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.tl__what {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+.tl__what i {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(var(--tint), 0.35);
+}
+.tl__detail[data-kind="good"] .tl__what {
+  color: var(--good);
+}
+.tl__detail[data-kind="good"] .tl__what i {
+  background: var(--good);
+}
+.tl__detail[data-kind="pause"] .tl__what {
+  color: var(--care);
+}
+.tl__detail[data-kind="pause"] .tl__what i {
+  background: var(--care);
+}
+.tl__why {
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+.tl__back {
+  align-self: flex-start;
+  min-height: 44px;
+  margin: 2px 0 -6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-text);
+  font: 600 0.9375rem var(--font-body);
+  cursor: pointer;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tl__segs i {
+    transition: none;
+  }
+}
+
+/* All the times, for those who want the list */
+.home-alltimes {
+  margin-top: 6px;
+}
+.home-alltimes > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  list-style: none;
+  cursor: pointer;
+  font: 600 0.9375rem var(--font-body);
+  color: var(--ink);
+}
+.home-alltimes > summary::-webkit-details-marker {
+  display: none;
+}
+.home-alltimes > summary::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  border-right: 2px solid var(--ink-muted);
+  border-bottom: 2px solid var(--ink-muted);
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 0.2s ease;
+}
+.home-alltimes[open] > summary::after {
+  transform: rotate(-135deg) translate(-2px, -2px);
+}
+
+/* ── Is today good for…? ───────────────────────────────────────────────── */
+.ask {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ask__h {
+  margin: 0;
+  font: 540 1.25rem / 1.2 var(--font-display);
+  letter-spacing: -0.01em;
+}
+.ask__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.ask__chips legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.ask__chips button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--card-edge-strong);
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--ink);
+  font: 550 0.9375rem var(--font-body);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+.ask__chips button[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--card);
+}
+.ask__hint {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+.ask__answer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: rgba(var(--tint), 0.05);
+}
+.ask__word {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+}
+.ask__word b {
+  font: 540 1.75rem / 1.1 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.ask__answer[data-tone="bright"] .ask__word b,
+.ask__answer[data-tone="steady"] .ask__word b {
+  color: var(--good);
+}
+.ask__answer[data-tone="mixed"] .ask__word b {
+  color: var(--mixed);
+}
+.ask__answer[data-tone="testing"] .ask__word b {
+  color: var(--care);
+}
+.ask__word span {
+  font-weight: 600;
+}
+.ask__why {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+.ask__why li {
+  position: relative;
+  padding-left: 22px;
+}
+.ask__why li::before {
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ask__why li[data-side="for"]::before {
+  content: "+";
+  color: var(--good);
+}
+.ask__why li[data-side="against"]::before {
+  content: "−";
+  color: var(--care);
+}
+.ask__why li[data-side="time"]::before {
+  content: "◷";
+}
+.ask .v-link {
+  margin: 0;
+  white-space: normal;
+  text-align: left;
+}
+
+/* ── Shortcut tiles: the doors to everything else, two across ──────────── */
+.home-tiles {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.home-tiles > li {
+  display: flex;
+  min-width: 0;
+}
+.home-tiles > li > .v-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 128px;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+}
+.home-tiles > li > a.v-row:hover {
+  background: var(--card);
+}
+.home-tiles .v-chev {
+  display: none;
+}
+.home-tiles .v-row__s {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.home-tiles > li.home-tiles__wide {
+  grid-column: 1 / -1;
+}
+.home-tiles > li.home-tiles__wide > .v-row {
+  flex-direction: row;
+  align-items: center;
+  min-height: 76px;
+}
+@media (min-width: 900px) {
+  .home-tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 339px) {
+  .home-tiles {
+    grid-template-columns: 1fr;
+  }
+  .home-tiles > li > .v-row {
+    flex-direction: row;
+    align-items: center;
+    min-height: 76px;
+  }
+}
+
+/* Life areas, one line each */
+.home-areas.home-areas--line li {
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) 5.25rem;
+  align-items: center;
+  padding: 12px 0;
+}
+.home-areas.home-areas--line .v-meter {
+  grid-column: auto;
+  grid-row: 1;
+  grid-column-start: 2;
+}
+.home-areas.home-areas--line .home-areas__w {
+  grid-column-start: 3;
+  grid-row: 1;
+  text-align: right;
+}
+@media (max-width: 359px) {
+  .home-areas.home-areas--line li {
+    grid-template-columns: minmax(0, 1fr) 5.25rem;
+  }
+  .home-areas.home-areas--line .v-meter {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .home-areas.home-areas--line .home-areas__w {
+    grid-column-start: 2;
+  }
+}

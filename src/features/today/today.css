@@ -153,6 +153,12 @@
   color: var(--sky-cloth);
   box-shadow: none;
 }
+.alm-band .alm-seg {
+  --seg-pill: var(--ink);
+}
+.alm-band .alm-seg .v-seg__pill {
+  box-shadow: none;
+}
 /* Slots, hours and the month are long lists: the band steps back so they start on the first screen. */
 .alm-band[data-compact] .alm-band__moon {
   width: 104px;

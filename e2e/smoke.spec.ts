@@ -75,7 +75,7 @@ test("birth fields read the time back in plain words and refuse 31 February", as
   await page.getByRole("combobox", { name: "Month" }).selectOption("2");
   await page.getByRole("textbox", { name: "Day" }).fill("31");
   await expect(page.getByTestId("birth-readback")).toContainText("February 1994 has only 28 days");
-  await page.getByRole("button", { name: "Next" }).click();
+  await page.getByRole("button", { name: /^(Next|Done)/ }).click();
   await expect(page.getByText("Step 2 of 4")).toBeVisible();
   await expect(page.getByRole("button", { name: "Step 4: Check" })).toBeDisabled();
 });

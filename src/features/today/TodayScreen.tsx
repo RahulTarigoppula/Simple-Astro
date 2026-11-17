@@ -8,6 +8,9 @@ import { useActiveProfile, useHere, useSettings } from "../../app/hooks";
 import { useNowMs } from "../../app/useNow";
 import { DISCLAIMER } from "../../components/ui/Colophon";
 import { InfoDot } from "../../components/ui/Explain";
+import { SegPill, useKeepInView } from "../../components/ui/gesture/SegPill";
+import { useArrowKeys } from "../../components/ui/gesture/useArrowKeys";
+import { useSwipe } from "../../components/ui/gesture/useSwipe";
 import { Reveal } from "../../components/ui/Motion";
 import { ChevronLeft, ChevronRight, Page, Section } from "../../components/ui/Page";
 import { Sheet } from "../../components/ui/Sheet";
@@ -509,6 +512,7 @@ const dayNumberOf = (v: Ymd): number => Math.round(Date.UTC(v.y, v.m - 1, v.d) /
 
 function Tabs({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void }) {
   const ref = useRef<HTMLDivElement>(null);
+  useKeepInView(ref, tab);
   const onKey = (e: React.KeyboardEvent) => {
     const i = TABS.findIndex((t) => t.id === tab);
     const j =
@@ -521,7 +525,7 @@ function Tabs({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void }) {
     ref.current?.querySelector<HTMLButtonElement>(`#tab-${next.id}`)?.focus();
   };
   return (
-    <div ref={ref} className="v-seg alm-seg" role="tablist" aria-label="Almanac views" onKeyDown={onKey}>
+    <div ref={ref} className="v-seg v-seg--pill alm-seg" role="tablist" aria-label="Almanac views" data-noswipe="" onKeyDown={onKey}>
       {TABS.map((t) => (
         <button
           key={t.id}
@@ -534,6 +538,7 @@ function Tabs({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void }) {
           tabIndex={tab === t.id ? 0 : -1}
           onClick={() => onTab(t.id)}
         >
+          {tab === t.id ? <SegPill id="alm-view" /> : null}
           <span>
             {t.lead ? <span className="alm-seg__lead">{t.lead}</span> : null}
             <span className="alm-seg__short">{t.short}</span>
@@ -631,6 +636,18 @@ export default function TodayScreen() {
     haptics.selection();
   };
 
+  // The same step from a swipe on the band or an arrow key as from the two arrow buttons.
+  const [dir, setDir] = useState<"next" | "prev" | null>(null);
+  const turn = (delta: 1 | -1) => {
+    setDir(delta === 1 ? "next" : "prev");
+    step(delta);
+  };
+  const swipe = useSwipe({ onLeft: () => turn(1), onRight: () => turn(-1) });
+  useArrowKeys(
+    () => turn(-1),
+    () => turn(1),
+  );
+
   const rows = leaf ? buildRows(leaf, clock, preset) : null;
 
   const p = leaf?.p;
@@ -661,6 +678,7 @@ export default function TodayScreen() {
   const pick = (v: Ymd) => {
     if (!base) return;
     const target = dayNumberOf(v) - clock.dayNumber(base.sunriseMs);
+    setDir(null);
     step(target - offset);
     setTab("day"); // the grid is its own view: picking a day shows that day
   };
@@ -686,8 +704,10 @@ export default function TodayScreen() {
   const hero =
     ready && p ? (
       <section
-        className="alm-band"
+        className="alm-band v-swipe"
         data-compact={tab === "day" ? undefined : ""}
+        data-dir={dir ?? undefined}
+        {...swipe}
         aria-label={`${rel ? `${rel}, ` : ""}${clock.dateLong(p.sunriseMs)}`}
       >
         <StarField strength={starK} />
@@ -696,13 +716,13 @@ export default function TodayScreen() {
             Almanac{rel ? ` · ${rel}` : ""} <InfoDot id="panchang" />
           </p>
           <div className="alm-band__nav">
-            <button type="button" className="v-iconbtn" aria-label="Previous day" onClick={() => step(-1)}>
+            <button type="button" className="v-iconbtn" aria-label="Previous day" onClick={() => turn(-1)}>
               <ChevronLeft />
             </button>
             <p className="alm-band__date" aria-live="polite">
               {clock.dateLong(p.sunriseMs)}
             </p>
-            <button type="button" className="v-iconbtn" aria-label="Next day" onClick={() => step(1)}>
+            <button type="button" className="v-iconbtn" aria-label="Next day" onClick={() => turn(1)}>
               <ChevronRight size={20} />
             </button>
           </div>
@@ -722,12 +742,19 @@ export default function TodayScreen() {
             </span>
           </p>
           {offset !== 0 ? (
-            <button type="button" className="v-btn v-btn--ghost v-btn--sm alm-band__back" onClick={() => step(-offset)}>
+            <button
+              type="button"
+              className="v-btn v-btn--ghost v-btn--sm alm-band__back"
+              onClick={() => {
+                setDir(offset > 0 ? "prev" : "next");
+                step(-offset);
+              }}
+            >
               Back to today
             </button>
           ) : null}
         </div>
-        <div className="alm-band__moon">
+        <div className="alm-band__moon v-slide" key={p.sunriseMs}>
           <MoonPicture
             elongation={p.elongation}
             south={south}
@@ -749,7 +776,19 @@ export default function TodayScreen() {
   return (
     <Page label="Today's almanac" back="/" wide className="alm" hero={hero} sky={sky}>
       {!place ? (
-        <div className="v-skel">Reading the sky…</div>
+        <div className="v-sk" role="status" aria-busy="true">
+          <span className="v-sk__label">Reading the sky…</span>
+          <div className="v-sk--card" aria-hidden="true">
+            <i className="v-sk--line" style={{ "--w": "48%" } as React.CSSProperties} />
+            <i className="v-sk--line" />
+            <i className="v-sk--line" style={{ "--w": "72%" } as React.CSSProperties} />
+            <i className="v-sk--line" style={{ "--w": "86%" } as React.CSSProperties} />
+          </div>
+          <div className="v-sk--card" aria-hidden="true">
+            <i className="v-sk--line" style={{ "--w": "36%" } as React.CSSProperties} />
+            <i className="v-sk--line" style={{ "--w": "80%" } as React.CSSProperties} />
+          </div>
+        </div>
       ) : !p || !periods || !rows ? (
         <div className="v-note v-note--warn" role="status">
           The almanac could not be read for this place.

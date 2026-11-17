@@ -99,6 +99,13 @@ for (const tag of sizes.split("")) {
         "home");
     await page.goto(`${base}#/${r}`);
     await page.waitForTimeout(Number(process.env.WAIT ?? 1800));
+    // KEYS="/|s|a|t" presses keys or types text in order (a single character or key name is pressed, longer text is typed)
+    if (process.env.KEYS)
+      for (const k of process.env.KEYS.split("|")) {
+        if (k.length === 1 || /^[A-Z][A-Za-z+]+$/.test(k)) await page.keyboard.press(k);
+        else await page.keyboard.type(k);
+        await page.waitForTimeout(500);
+      }
     if (process.env.CLICK)
       for (const c of process.env.CLICK.split("|")) {
         await page

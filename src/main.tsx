@@ -7,7 +7,7 @@ import { MotionConfig } from "motion/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router";
-import { router } from "./app/router";
+import { router, warmScreens } from "./app/router";
 import { isNative } from "./platform/native";
 import { unlockAudioOnFirstGesture } from "./platform/sound";
 
@@ -61,4 +61,5 @@ if (root) {
       </MotionConfig>
     </StrictMode>,
   );
+  warmScreens();
 }
